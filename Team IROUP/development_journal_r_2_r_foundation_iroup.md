@@ -685,3 +685,90 @@ into a practical operational ecosystem that can:
 - evolve sustainably over time
 - support future R2R and professional development directions
 - serve as evidence of operational innovation and digital transformation
+
+---
+
+18. Dashboard Utilities Migration Stabilization (May 2026)
+Summary
+
+Continued incremental migration of the Personal IR Workspace architecture toward a shared utility-based structure using iroup-utils.js.
+
+This phase focused on stabilizing the dashboard ecosystem before deeper modularization.
+
+Completed
+Added shared utility loader:
+iroup-utils.js
+Migrated render-layer utility call sites in:
+dashboard.html
+Shared utility usage now includes:
+IU.num()
+IU.money()
+IU.toDate()
+IU.fmtDate()
+IU.esc()
+IU.sum()
+IU.group()
+Preserved local helper functions and business logic intentionally during stabilization phase
+No CSS or layout refactoring performed
+Migration remained fully incremental and reversible
+Scholarship & Events Stabilization
+
+During migration verification, a render crash was identified in:
+
+scholarship-events.html
+Root Cause
+
+The page referenced:
+
+IROUP.parseDate()
+
+However, the function was never implemented inside iroup-config.js.
+
+This caused silent render failure during event/scholarship rendering while KPI summaries continued loading normally.
+
+Resolution
+Added iroup-utils.js dependency
+Replaced all IROUP.parseDate() calls with:
+IU.toDate()
+
+The utility now correctly handles:
+
+Buddhist Era dates
+ISO date strings
+dd/mm/yyyy formats
+native JavaScript Date fallback behavior
+Verification
+
+Manual browser verification completed across:
+
+dashboard.html
+mou.html
+mobility.html
+travel.html
+scholarship-events.html
+report.html
+
+Verification included:
+
+KPI rendering
+table rendering
+chart rendering
+status badge rendering
+filter functionality
+console error inspection
+
+No critical render crashes detected after stabilization fixes.
+
+Architecture Direction
+
+Current architectural strategy continues to follow:
+
+Stabilize → Modularize → Optimize → Expand
+
+At this phase:
+
+shared formatting/date utilities are gradually centralized
+business logic remains local
+migration safety and reversibility remain higher priority than aggressive refactoring
+
+This approach reduces migration risk while allowing the system to evolve into a maintainable operational platform over time.
