@@ -719,6 +719,7 @@ function togglePill(el){
 }
 </script>
 <script src="iroup-config.js"></script>
+<script src="iroup-utils.js"></script>
 <script>
 /* ROUND 9 — Live CRUD for Scholarships & Events */
 let IROUND9_currentType = 'scholar';
@@ -728,12 +729,12 @@ function qs(root, sel){ return root.querySelector(sel); }
 function qsa(root, sel){ return Array.from(root.querySelectorAll(sel)); }
 function esc(v){ return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 function getStatusByDate(open, close){
-  const now = new Date(); const o = IROUP.parseDate(open); const c = IROUP.parseDate(close);
+  const now = new Date(); const o = IU.toDate(open); const c = IU.toDate(close);
   if (o && now < o) return ['s-upcoming','เร็วๆ นี้'];
   if (c && now > c) return ['s-closed','ปิดรับแล้ว'];
   return ['s-open','กำลังรับสมัคร'];
 }
-function daysLeft(close){ const c=IROUP.parseDate(close); if(!c) return ''; const d=Math.ceil((c-new Date())/86400000); return d>=0?`⏰ เหลือ ${d} วัน`:`ปิดแล้ว`; }
+function daysLeft(close){ const c=IU.toDate(close); if(!c) return ''; const d=Math.ceil((c-new Date())/86400000); return d>=0?`⏰ เหลือ ${d} วัน`:`ปิดแล้ว`; }
 function scholarSearchText(x){ return Object.values(x).join(' ').toLowerCase(); }
 
 function assetUrl(row, key){ return key === 'Poster_URL' ? iroupPickImage(row) : String(row?.[key] || '').trim(); }
@@ -923,7 +924,7 @@ function round9RenderEvents(list){
   return { text:`อีก ${diff} วัน`, cls:'ev-upcoming' };
 }
   wrap.innerHTML=list.map(x=>{
-    const d=IROUP.parseDate(x['วันเริ่ม'])||new Date();
+    const d=IU.toDate(x['วันเริ่ม'])||new Date();
     const poster=assetUrl(x,'Poster_URL');
     const file=assetUrl(x,'ไฟล์_URL');
     const timeLine=(x['เวลาเริ่ม']||x['เวลาสิ้นสุด']) ? `<div class="event-time-line">🕘 ${esc(x['เวลาเริ่ม']||'-')} - ${esc(x['เวลาสิ้นสุด']||'-')}</div>` : '';

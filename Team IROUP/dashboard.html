@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="iroup-config.js"></script>
+<script src="iroup-utils.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -197,7 +198,7 @@ async function reloadData(force=false){
     buildYearOptions();
     render();
   }catch(err){
-    $('#appContent').innerHTML=`<div class="panel"><div class="empty">โหลดข้อมูลไม่ได้<br><b>${esc(err.message)}</b><br><br>เช็กว่า Apps Script Deploy เวอร์ชันล่าสุดแล้ว และ URL ใน iroup-config.js ถูกต้อง</div></div>`;
+    $('#appContent').innerHTML=`<div class="panel"><div class="empty">โหลดข้อมูลไม่ได้<br><b>${IU.esc(err.message)}</b><br><br>เช็กว่า Apps Script Deploy เวอร์ชันล่าสุดแล้ว และ URL ใน iroup-config.js ถูกต้อง</div></div>`;
   }finally{
     state.loading=false;
   }
@@ -213,7 +214,7 @@ function buildYearOptions(){
     if(/^25\d{2}$/.test(y)) years.add(y);
   });
   const sorted=[...years].sort((a,b)=>b.localeCompare(a));
-  sel.innerHTML='<option value="">ทุกปีงบประมาณ</option>'+sorted.map(y=>`<option value="${esc(y)}">ปีงบ ${esc(y)}</option>`).join('');
+  sel.innerHTML='<option value="">ทุกปีงบประมาณ</option>'+sorted.map(y=>`<option value="${IU.esc(y)}">ปีงบ ${IU.esc(y)}</option>`).join('');
   sel.value=current;
 }
 
@@ -262,24 +263,24 @@ function makeSummary(data){
   return {
     countries:uniqueCount(allCountries),
     budget:{
-      scholar:sum(data.scholar,'จำนวนเงิน'),
-      event:sum(data.event,'จำนวนเงิน'),
-      travel:sum(data.travel,'จำนวนเงิน'),
-      inbound:sum(data.inbound,'จำนวนเงิน'),
-      outbound:sum(data.outbound,'จำนวนเงิน'),
-      all:sum(data.scholar,'จำนวนเงิน')+sum(data.event,'จำนวนเงิน')+sum(data.travel,'จำนวนเงิน')+sum(data.inbound,'จำนวนเงิน')+sum(data.outbound,'จำนวนเงิน')
+      scholar:IU.sum(data.scholar,'จำนวนเงิน'),
+      event:IU.sum(data.event,'จำนวนเงิน'),
+      travel:IU.sum(data.travel,'จำนวนเงิน'),
+      inbound:IU.sum(data.inbound,'จำนวนเงิน'),
+      outbound:IU.sum(data.outbound,'จำนวนเงิน'),
+      all:IU.sum(data.scholar,'จำนวนเงิน')+IU.sum(data.event,'จำนวนเงิน')+IU.sum(data.travel,'จำนวนเงิน')+IU.sum(data.inbound,'จำนวนเงิน')+IU.sum(data.outbound,'จำนวนเงิน')
     },
-    byCountry:group(allCountries),
-    byFaculty:group([
+    byCountry:IU.group(allCountries),
+    byFaculty:IU.group([
       ...data.mou.map(r=>r['หน่วยงาน_UP']),
       ...data.event.map(r=>r['หน่วยงาน']),
       ...data.inbound.map(r=>r['หน่วยงาน_UP']),
       ...data.outbound.map(r=>r['คณะ']),
       ...data.travel.map(r=>r['หน่วยงาน_UP'] || r['คณะ'])
     ]),
-    byScholarLevel:group(data.scholar.map(r=>r['ระดับ'])),
-    byEventType:group(data.event.map(r=>r['ประเภท'])),
-    byMouType:group(data.mou.map(r=>r['ประเภท']))
+    byScholarLevel:IU.group(data.scholar.map(r=>r['ระดับ'])),
+    byEventType:IU.group(data.event.map(r=>r['ประเภท'])),
+    byMouType:IU.group(data.mou.map(r=>r['ประเภท']))
   }
 }
 function group(arr){const o={}; arr.map(v=>String(v||'').trim()).filter(Boolean).forEach(v=>o[v]=(o[v]||0)+1); return o}
@@ -322,7 +323,7 @@ function topEntries(obj,n=6){return Object.entries(obj||{}).sort((a,b)=>b[1]-a[1
 function barList(obj,n=6){
   const rows=topEntries(obj,n); if(!rows.length)return '<div class="empty">ยังไม่มีข้อมูล</div>';
   const max=Math.max(...rows.map(x=>x[1]),1);
-  return rows.map(([name,val])=>`<div class="bar-row"><div class="bar-name" title="${esc(name)}">${esc(name)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(5,val/max*100)}%"></div></div><div class="bar-val">${num(val)}</div></div>`).join('');
+  return rows.map(([name,val])=>`<div class="bar-row"><div class="bar-name" title="${IU.esc(name)}">${IU.esc(name)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(5,val/max*100)}%"></div></div><div class="bar-val">${IU.num(val)}</div></div>`).join('');
 }
 
 function generateInsights(report){
@@ -333,21 +334,21 @@ function generateInsights(report){
     const diff=out-inb;
     insights.push({
       icon:'🌏',
-      title: diff===0 ? `Mobility สมดุล Inbound และ Outbound รวม ${num(mob)} รายการ` : `Mobility รวม ${num(mob)} รายการ โดย ${diff>0?'Outbound มากกว่า Inbound':'Inbound มากกว่า Outbound'} ${num(Math.abs(diff))} รายการ`,
+      title: diff===0 ? `Mobility สมดุล Inbound และ Outbound รวม ${IU.num(mob)} รายการ` : `Mobility รวม ${IU.num(mob)} รายการ โดย ${diff>0?'Outbound มากกว่า Inbound':'Inbound มากกว่า Outbound'} ${IU.num(Math.abs(diff))} รายการ`,
       sub:'คำนวณจากชีท Inbound และ Outbound'
     });
   }
   const topCountry=topEntries(summary.byCountry,1)[0];
-  if(topCountry) insights.push({icon:'🌍',title:`ประเทศที่มี activity สูงสุดคือ ${topCountry[0]} (${num(topCountry[1])} รายการ)`,sub:'รวม MOU, Mobility, Travel และทุน'});
+  if(topCountry) insights.push({icon:'🌍',title:`ประเทศที่มี activity สูงสุดคือ ${topCountry[0]} (${IU.num(topCountry[1])} รายการ)`,sub:'รวม MOU, Mobility, Travel และทุน'});
   const topFaculty=topEntries(summary.byFaculty,1)[0];
-  if(topFaculty) insights.push({icon:'🏫',title:`หน่วยงานที่ active สูงสุดคือ ${topFaculty[0]}`,sub:`พบ ${num(topFaculty[1])} รายการในข้อมูลที่เลือก`});
-  const openScholar=data.scholar.filter(r=>['active','soon','urgent'].includes(statusScholar(r)));
-  insights.push({icon:'🎓',title:openScholar.length?`ขณะนี้มีทุนที่ยังเปิดรับ/ใกล้ปิดรับ ${num(openScholar.length)} ทุน`:'ขณะนี้ยังไม่มีทุนที่เปิดรับสมัครในข้อมูลชุดนี้',sub:'ดูจากวันเปิดรับและวันปิดรับ'});
-  const upcoming=data.event.filter(r=>{const d=toDate(r['วันเริ่ม']); if(!d)return false; const diff=daysBetween(d,startDay(new Date())); return diff>=0 && diff<=30});
-  if(upcoming.length) insights.push({icon:'📅',title:`มีกิจกรรมที่กำลังจะเกิดขึ้นใน 30 วัน ${num(upcoming.length)} รายการ`,sub:'เหมาะสำหรับติดตามงานประจำเดือน'});
-  if(summary.budget.all>0) insights.push({icon:'💰',title:`งบประมาณรวมที่บันทึกในระบบ ${money(summary.budget.all)}`,sub:'รวมทุน กิจกรรม เดินทาง Inbound และ Outbound'});
-  const soonMou=data.mou.filter(r=>statusMou(r)==='soon');
-  if(soonMou.length) insights.push({icon:'⏰',title:`มี MOU ใกล้หมดอายุ ${num(soonMou.length)} รายการ`,sub:'ควรตรวจสอบเพื่อต่ออายุหรือประเมินความร่วมมือ'});
+  if(topFaculty) insights.push({icon:'🏫',title:`หน่วยงานที่ active สูงสุดคือ ${topFaculty[0]}`,sub:`พบ ${IU.num(topFaculty[1])} รายการในข้อมูลที่เลือก`});
+  const openScholar=data.scholar.filter(r=>['active','soon','urgent'].includes(IU.statusScholar(r)));
+  insights.push({icon:'🎓',title:openScholar.length?`ขณะนี้มีทุนที่ยังเปิดรับ/ใกล้ปิดรับ ${IU.num(openScholar.length)} ทุน`:'ขณะนี้ยังไม่มีทุนที่เปิดรับสมัครในข้อมูลชุดนี้',sub:'ดูจากวันเปิดรับและวันปิดรับ'});
+  const upcoming=data.event.filter(r=>{const d=IU.toDate(r['วันเริ่ม']); if(!d)return false; const diff=daysBetween(d,startDay(new Date())); return diff>=0 && diff<=30});
+  if(upcoming.length) insights.push({icon:'📅',title:`มีกิจกรรมที่กำลังจะเกิดขึ้นใน 30 วัน ${IU.num(upcoming.length)} รายการ`,sub:'เหมาะสำหรับติดตามงานประจำเดือน'});
+  if(summary.budget.all>0) insights.push({icon:'💰',title:`งบประมาณรวมที่บันทึกในระบบ ${IU.money(summary.budget.all)+' บาท'}`,sub:'รวมทุน กิจกรรม เดินทาง Inbound และ Outbound'});
+  const soonMou=data.mou.filter(r=>IU.statusMou(r)==='soon');
+  if(soonMou.length) insights.push({icon:'⏰',title:`มี MOU ใกล้หมดอายุ ${IU.num(soonMou.length)} รายการ`,sub:'ควรตรวจสอบเพื่อต่ออายุหรือประเมินความร่วมมือ'});
   return insights.slice(0,6);
 }
 
@@ -370,30 +371,30 @@ function render(){
   }
 
   const insights=generateInsights(report);
-  const openScholar=data.scholar.filter(r=>['active','soon','urgent'].includes(statusScholar(r))).length;
-  const upcomingEvent=data.event.filter(r=>statusEvent(r)==='upcoming').length;
-  const activeMou=data.mou.filter(r=>statusMou(r)==='active').length;
-  const activeTravel=data.travel.filter(r=>statusEvent({'วันเริ่ม':r['วันเริ่ม'],'วันสิ้นสุด':r['วันสิ้นสุด']})==='active').length;
+  const openScholar=data.scholar.filter(r=>['active','soon','urgent'].includes(IU.statusScholar(r))).length;
+  const upcomingEvent=data.event.filter(r=>IU.statusEvent(r)==='upcoming').length;
+  const activeMou=data.mou.filter(r=>IU.statusMou(r)==='active').length;
+  const activeTravel=data.travel.filter(r=>IU.statusEvent({'วันเริ่ม':r['วันเริ่ม'],'วันสิ้นสุด':r['วันสิ้นสุด']})==='active').length;
 
   $('#appContent').innerHTML=`
     <div class="grid-kpi">
-      ${kpi('🤝',num(total.mou),'MOU ทั้งหมด',`${num(activeMou)} active`,'blue')}
-      ${kpi('🎓',num(total.scholar),'ทุนการศึกษา',`${num(openScholar)} เปิดรับ/ใกล้ปิด`,'gold')}
-      ${kpi('📅',num(total.event),'กิจกรรม',`${num(upcomingEvent)} upcoming`,'purple')}
-      ${kpi('🌏',num(total.mobility),'Mobility',`Inbound ${num(total.inbound)} · Outbound ${num(total.outbound)}`,'teal')}
-      ${kpi('✈️',num(total.travel),'การเดินทาง',`${num(activeTravel)} กำลังเดินทาง`,'green')}
-      ${kpi('💰',summary.budget.all?money(summary.budget.all):'0 บาท','งบประมาณรวม','จากข้อมูลจำนวนเงิน','red')}
+      ${kpi('🤝',IU.num(total.mou),'MOU ทั้งหมด',`${IU.num(activeMou)} active`,'blue')}
+      ${kpi('🎓',IU.num(total.scholar),'ทุนการศึกษา',`${IU.num(openScholar)} เปิดรับ/ใกล้ปิด`,'gold')}
+      ${kpi('📅',IU.num(total.event),'กิจกรรม',`${IU.num(upcomingEvent)} upcoming`,'purple')}
+      ${kpi('🌏',IU.num(total.mobility),'Mobility',`Inbound ${IU.num(total.inbound)} · Outbound ${IU.num(total.outbound)}`,'teal')}
+      ${kpi('✈️',IU.num(total.travel),'การเดินทาง',`${IU.num(activeTravel)} กำลังเดินทาง`,'green')}
+      ${kpi('💰',summary.budget.all?IU.money(summary.budget.all)+' บาท':'0 บาท','งบประมาณรวม','จากข้อมูลจำนวนเงิน','red')}
     </div>
 
     <div class="layout-main">
       <div class="panel">
         <div class="panel-head"><div><div class="panel-title">🧠 Auto Insight</div><div class="panel-sub">ข้อความเปลี่ยนตามข้อมูลจริง ปีงบ และคำค้นที่เลือก</div></div></div>
-        <div class="panel-body"><div class="insights">${insights.map(x=>`<div class="insight"><div class="i">${x.icon}</div><div><div class="t">${esc(x.title)}</div><div class="s">${esc(x.sub)}</div></div></div>`).join('')}</div></div>
+        <div class="panel-body"><div class="insights">${insights.map(x=>`<div class="insight"><div class="i">${x.icon}</div><div><div class="t">${IU.esc(x.title)}</div><div class="s">${IU.esc(x.sub)}</div></div></div>`).join('')}</div></div>
       </div>
       <div class="panel">
         <div class="panel-head"><div><div class="panel-title">💰 Budget Snapshot</div><div class="panel-sub">สรุปงบประมาณตามหมวดข้อมูล</div></div></div>
         <div class="panel-body">
-          <div class="budget-total"><div class="n">${money(summary.budget.all)}</div><div class="l">งบประมาณรวมที่บันทึก</div></div>
+          <div class="budget-total"><div class="n">${IU.money(summary.budget.all)+' บาท'}</div><div class="l">งบประมาณรวมที่บันทึก</div></div>
           ${barList({
             'ทุนการศึกษา':summary.budget.scholar,
             'กิจกรรม':summary.budget.event,
@@ -409,10 +410,10 @@ function render(){
       <div class="panel"><div class="panel-head"><div><div class="panel-title">🌍 Top ประเทศ</div><div class="panel-sub">รวมทุกหมวดข้อมูล</div></div></div><div class="panel-body">${barList(summary.byCountry,8)}</div></div>
       <div class="panel"><div class="panel-head"><div><div class="panel-title">🏫 Top หน่วยงาน/คณะ</div><div class="panel-sub">จาก MOU, Event, Mobility, Travel</div></div></div><div class="panel-body">${barList(summary.byFaculty,8)}</div></div>
       <div class="panel"><div class="panel-head"><div><div class="panel-title">📊 Mix ข้อมูล</div><div class="panel-sub">ภาพรวมจำนวนรายการ</div></div></div><div class="panel-body"><div class="chart-mini">
-        <div class="mini"><div class="n" style="color:var(--blue)">${num(total.mou)}</div><div class="l">MOU</div></div>
-        <div class="mini"><div class="n" style="color:var(--gold)">${num(total.scholar)}</div><div class="l">ทุน</div></div>
-        <div class="mini"><div class="n" style="color:var(--purple)">${num(total.event)}</div><div class="l">กิจกรรม</div></div>
-        <div class="mini"><div class="n" style="color:var(--teal)">${num(total.mobility)}</div><div class="l">Mobility</div></div>
+        <div class="mini"><div class="n" style="color:var(--blue)">${IU.num(total.mou)}</div><div class="l">MOU</div></div>
+        <div class="mini"><div class="n" style="color:var(--gold)">${IU.num(total.scholar)}</div><div class="l">ทุน</div></div>
+        <div class="mini"><div class="n" style="color:var(--purple)">${IU.num(total.event)}</div><div class="l">กิจกรรม</div></div>
+        <div class="mini"><div class="n" style="color:var(--teal)">${IU.num(total.mobility)}</div><div class="l">Mobility</div></div>
       </div></div></div>
     </div>
 
@@ -435,20 +436,20 @@ function render(){
 }
 
 function scholarTable(rows){
-  const open=rows.filter(r=>['active','soon','urgent'].includes(statusScholar(r))).sort((a,b)=>(toDate(a['วันปิดรับ'])||new Date(9999,0,1))-(toDate(b['วันปิดรับ'])||new Date(9999,0,1))).slice(0,8);
+  const open=rows.filter(r=>['active','soon','urgent'].includes(IU.statusScholar(r))).sort((a,b)=>(IU.toDate(a['วันปิดรับ'])||new Date(9999,0,1))-(IU.toDate(b['วันปิดรับ'])||new Date(9999,0,1))).slice(0,8);
   if(!open.length)return '<div class="empty">ยังไม่มีทุนที่เปิดรับในข้อมูลชุดนี้</div>';
-  return `<table class="data-table"><thead><tr><th>ชื่อทุน</th><th>ประเทศ</th><th>ระดับ</th><th>ปิดรับ</th><th>สถานะ</th></tr></thead><tbody>${open.map(r=>`<tr><td><b>${esc(r['ชื่อทุน']||'-')}</b><br><span style="color:var(--muted);font-size:11px">${esc(r['สถาบัน']||'')}</span></td><td>${esc(r['ประเทศ']||'-')}</td><td>${esc(r['ระดับ']||'-')}</td><td>${fmtDate(r['วันปิดรับ'])}</td><td><span class="status ${statusScholar(r)}">${statusText(statusScholar(r))}</span></td></tr>`).join('')}</tbody></table>`
+  return `<table class="data-table"><thead><tr><th>ชื่อทุน</th><th>ประเทศ</th><th>ระดับ</th><th>ปิดรับ</th><th>สถานะ</th></tr></thead><tbody>${open.map(r=>`<tr><td><b>${IU.esc(r['ชื่อทุน']||'-')}</b><br><span style="color:var(--muted);font-size:11px">${IU.esc(r['สถาบัน']||'')}</span></td><td>${IU.esc(r['ประเทศ']||'-')}</td><td>${IU.esc(r['ระดับ']||'-')}</td><td>${IU.fmtDate(r['วันปิดรับ'])}</td><td><span class="status ${IU.statusScholar(r)}">${statusText(IU.statusScholar(r))}</span></td></tr>`).join('')}</tbody></table>`
 }
 function eventTable(rows){
   const today=startDay(new Date());
-  const upcoming=rows.filter(r=>{const d=toDate(r['วันเริ่ม']); return d && d>=today}).sort((a,b)=>toDate(a['วันเริ่ม'])-toDate(b['วันเริ่ม'])).slice(0,8);
+  const upcoming=rows.filter(r=>{const d=IU.toDate(r['วันเริ่ม']); return d && d>=today}).sort((a,b)=>IU.toDate(a['วันเริ่ม'])-IU.toDate(b['วันเริ่ม'])).slice(0,8);
   if(!upcoming.length)return '<div class="empty">ยังไม่มีกิจกรรมใกล้ถึงในข้อมูลชุดนี้</div>';
-  return `<table class="data-table"><thead><tr><th>กิจกรรม</th><th>ประเภท</th><th>วันที่</th><th>สถานที่</th></tr></thead><tbody>${upcoming.map(r=>`<tr><td><b>${esc(r['ชื่อกิจกรรม']||'-')}</b><br><span style="color:var(--muted);font-size:11px">${esc(r['หน่วยงาน']||'')}</span></td><td>${esc(r['ประเภท']||'-')}</td><td>${fmtDate(r['วันเริ่ม'])}</td><td>${esc(r['สถานที่']||'-')}</td></tr>`).join('')}</tbody></table>`
+  return `<table class="data-table"><thead><tr><th>กิจกรรม</th><th>ประเภท</th><th>วันที่</th><th>สถานที่</th></tr></thead><tbody>${upcoming.map(r=>`<tr><td><b>${IU.esc(r['ชื่อกิจกรรม']||'-')}</b><br><span style="color:var(--muted);font-size:11px">${IU.esc(r['หน่วยงาน']||'')}</span></td><td>${IU.esc(r['ประเภท']||'-')}</td><td>${IU.fmtDate(r['วันเริ่ม'])}</td><td>${IU.esc(r['สถานที่']||'-')}</td></tr>`).join('')}</tbody></table>`
 }
 function mouTable(rows){
-  const soon=rows.filter(r=>statusMou(r)==='soon').sort((a,b)=>toDate(a['วันสิ้นสุด'])-toDate(b['วันสิ้นสุด'])).slice(0,10);
+  const soon=rows.filter(r=>IU.statusMou(r)==='soon').sort((a,b)=>IU.toDate(a['วันสิ้นสุด'])-IU.toDate(b['วันสิ้นสุด'])).slice(0,10);
   if(!soon.length)return '<div class="empty">ยังไม่มี MOU ใกล้หมดอายุในข้อมูลชุดนี้</div>';
-  return `<table class="data-table"><thead><tr><th>หน่วยงาน ม.พะเยา</th><th>องค์กรต่างประเทศ</th><th>ประเทศ</th><th>สิ้นสุด</th><th>สถานะ</th></tr></thead><tbody>${soon.map(r=>`<tr><td>${esc(r['หน่วยงาน_UP']||'-')}</td><td><b>${esc(r['องค์กร_ตปท']||'-')}</b></td><td>${esc(r['ประเทศ']||'-')}</td><td>${fmtDate(r['วันสิ้นสุด'])}</td><td><span class="status soon">${statusText('soon')}</span></td></tr>`).join('')}</tbody></table>`
+  return `<table class="data-table"><thead><tr><th>หน่วยงาน ม.พะเยา</th><th>องค์กรต่างประเทศ</th><th>ประเทศ</th><th>สิ้นสุด</th><th>สถานะ</th></tr></thead><tbody>${soon.map(r=>`<tr><td>${IU.esc(r['หน่วยงาน_UP']||'-')}</td><td><b>${IU.esc(r['องค์กร_ตปท']||'-')}</b></td><td>${IU.esc(r['ประเทศ']||'-')}</td><td>${IU.fmtDate(r['วันสิ้นสุด'])}</td><td><span class="status soon">${statusText('soon')}</span></td></tr>`).join('')}</tbody></table>`
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
