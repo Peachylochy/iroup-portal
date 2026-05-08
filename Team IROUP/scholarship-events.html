@@ -727,6 +727,7 @@ let IROUND9_scholars = [];
 let IROUND9_events = [];
 function qs(root, sel){ return root.querySelector(sel); }
 function qsa(root, sel){ return Array.from(root.querySelectorAll(sel)); }
+// TODO: migrate to IU.* — esc, fmtDate/IROUP.formatDate call sites not yet migrated to IU.*
 function esc(v){ return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 function getStatusByDate(open, close){
   const now = new Date(); const o = IU.toDate(open); const c = IU.toDate(close);

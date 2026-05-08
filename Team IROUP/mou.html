@@ -564,6 +564,7 @@ const deptData = {
 let currentStatus = 'all';
 let liveMouList = [];
 
+// TODO: migrate to IU.* — htmlSafe → IU.esc; IROUP.getMouStatus → IU.statusMou; load iroup-utils.js first
 function htmlSafe(value){
   return String(value ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 }
