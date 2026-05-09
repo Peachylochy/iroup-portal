@@ -107,18 +107,17 @@ body{
   min-height:calc(100vh - 2*var(--s7));
   overflow:hidden;
 }
-.brand::after{
-  content:"";
+.brand-mascot{
   position:absolute;
   right:clamp(2px,2.2vw,30px);
   bottom:calc(var(--s8) + 8px);
   width:clamp(128px,14vw,178px);
-  aspect-ratio:1;
-  background:url("Globy_IROUP.png") center/contain no-repeat;
+  height:auto;
   opacity:.42;
   filter:saturate(1.14) contrast(1.08) drop-shadow(0 18px 30px rgba(15,45,90,0.20)) drop-shadow(0 0 20px rgba(255,255,255,0.34)) drop-shadow(0 0 18px rgba(75,189,232,0.12));
   transform:rotate(-2deg);
   pointer-events:none;
+  user-select:none;
   z-index:0;
 }
 
@@ -432,7 +431,7 @@ body{
     gap:var(--s7);padding:var(--s7) var(--s6);
   }
   .globe-wrap{width:280px;height:280px;right:-60px;opacity:.32}
-  .brand::after{width:128px;right:2px;bottom:var(--s8);opacity:.34}
+  .brand-mascot{width:128px;right:2px;bottom:var(--s8);opacity:.34}
 }
 
 /* ── 768px: collapse to single column ───────────────────── */
@@ -446,7 +445,7 @@ body{
     width:100%;
   }
   .brand{min-height:auto;padding:var(--s4) 0 0}
-  .brand::after{display:none}
+  .brand-mascot{display:none}
   .brand-hero{margin:var(--s5) 0 var(--s4);max-width:none;padding:0}
   .features{display:none}
   .globe-wrap{display:none}
@@ -561,6 +560,7 @@ body{
 
   <!-- ── LEFT: BRAND PANEL ─────────────────────────────── -->
   <section class="brand" aria-label="iROUP brand panel">
+    <img class="brand-mascot" src="Globy_IROUP.png" alt="" aria-hidden="true">
 
     <!-- Rotating globe — pure inline SVG, no external asset required -->
     <div class="globe-wrap" aria-hidden="true">
