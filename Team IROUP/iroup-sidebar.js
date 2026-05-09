@@ -21,6 +21,10 @@
     ]},
     { section: 'PUBLIC', items: [
       { icon: '🌐', label: 'Public View', href: 'public-landing.html', match: ['public-landing.html'] }
+    ]},
+    { section: 'ECOSYSTEM', items: [
+      { icon: 'WS', label: 'Workspace', href: '../index.html', match: [] },
+      { icon: 'PW', label: 'Workload Portfolio', href: '../peach-workload-portfolio/frontend/index.html', match: [] }
     ]}
   ];
 

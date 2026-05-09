@@ -332,3 +332,11 @@ Commits made across sessions:
 - Mirrored select readability values in `report.html` because its inline CSS overrides shared form-control styles.
 - Improved report/export table readability by strengthening header color, base cell color, and muted supporting columns.
 - Preserved the existing palette, responsive behavior, spacing, and report/export JavaScript.
+
+## 13. Ecosystem Navigation Foundation (2026-05-09)
+
+- Added lightweight cross-module navigation awareness between Team IROUP and `peach-workload-portfolio/frontend`.
+- Team IROUP private sidebar now includes an `ECOSYSTEM` section with links back to the root workspace portal and across to PEACH Workload Portfolio.
+- PEACH Workload Portfolio sidebar now includes matching ecosystem links back to the root workspace portal and across to Team IROUP.
+- Links remain relative for GitHub Pages compatibility.
+- Auth, sessionStorage, redirect logic, dashboard routing, and module internals were not refactored.

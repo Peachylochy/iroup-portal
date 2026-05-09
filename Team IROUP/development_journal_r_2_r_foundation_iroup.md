@@ -941,3 +941,27 @@ Constraints maintained:
 - No JavaScript changes
 - No auth/session/redirect logic touched
 - Existing soft premium palette preserved
+
+---
+
+24. Ecosystem Navigation Foundation (May 9, 2026)
+
+Summary
+
+The workspace entered the Ecosystem Integration Phase with a lightweight navigation foundation between the root portal, Team IROUP, and PEACH Workload Portfolio.
+
+Implementation notes:
+
+- Added an `ECOSYSTEM` section to the existing Team IROUP generated sidebar
+- Added relative links from Team IROUP private navigation back to the root workspace portal and across to PEACH Workload Portfolio
+- Added matching ecosystem links in the PEACH Workload Portfolio sidebar
+- Kept the workload styling scoped to subtle sidebar anchors and focus-visible keyboard states
+- Preserved GitHub Pages compatibility by using relative paths only
+
+Constraints maintained:
+
+- No auth/session/redirect logic touched
+- No dashboard redesign
+- No routing framework added
+- No external dependencies added
+- Workload app JavaScript left unchanged
