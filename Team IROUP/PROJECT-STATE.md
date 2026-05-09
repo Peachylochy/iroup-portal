@@ -400,3 +400,7 @@ Commits made across sessions:
 ## 25. Backend Governance Pass 2C-B Final Phase (2026-05-09)
 
 - Backend Governance Pass 2C-B Final Phase: migrated public-landing.html to public-safe endpoints for stats, scholarships, events count, and MOU map aggregation. Landing now avoids raw getStats/getMouByCountry/getAll calls while preserving existing UI behavior.
+
+## 26. Admin Stabilization Pass 1 (2026-05-10)
+
+- Admin Stabilization Pass 1: fixed urgent admin UX/data integrity issues for MOU upload payload, Mobility mock-data first render, Scholarship/Event inactive view toggles, and empty-state add actions.

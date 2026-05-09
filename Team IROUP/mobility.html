@@ -813,9 +813,13 @@ document.addEventListener('click',function(e){
 });
 
 // INIT
-renderTable('in');
-renderChart('in');
-renderTypeStats('in');
+function renderMobilityLoadingState(){
+  const head = document.getElementById('tableHead');
+  const body = document.getElementById('tableBody');
+  if(head) head.innerHTML = '<tr><th>Loading</th></tr>';
+  if(body) body.innerHTML = '<tr><td><div class="empty">Loading live mobility data...</div></td></tr>';
+}
+renderMobilityLoadingState();
 </script>
 <script src="iroup-config.js"></script>
 
@@ -836,6 +840,15 @@ async function r9LoadMobility(){
 function r9RenderMobility(list){
   const data=list || (R9_TAB==='in'?R9_IN:R9_OUT);
   const head=document.getElementById('tableHead'), body=document.getElementById('tableBody'); if(!head||!body)return;
+  if(!data.length){
+    if(R9_TAB==='in'){
+      head.innerHTML='<tr><th>#</th><th>Name</th><th>Type</th><th>Institution</th><th>Country</th><th>Period</th><th>Project</th><th>Action</th></tr>';
+    }else{
+      head.innerHTML='<tr><th>#</th><th>Name</th><th>Unit</th><th>Destination</th><th>Country</th><th>Period</th><th>Project</th><th>Action</th></tr>';
+    }
+    body.innerHTML=`<tr><td colspan="8"><div class="empty">No ${R9_TAB==='in'?'Inbound':'Outbound'} data yet.<br><button class="add-btn ${R9_TAB==='in'?'btn-inbound':'btn-outbound'}" style="display:inline-flex;margin-top:12px" onclick="openModal('${R9_TAB}')">+ Add data</button></div></td></tr>`;
+    return;
+  }
   if(R9_TAB==='in'){
     head.innerHTML='<tr><th>#</th><th>ชื่อ</th><th>ประเภท</th><th>สถาบัน</th><th>ประเทศ</th><th>ช่วงเวลา</th><th>โครงการ</th><th>จัดการ</th></tr>';
     body.innerHTML=data.map((x,i)=>`<tr><td>${i+1}</td><td><strong>${r9e([x['ชื่อ'],x['ชื่อกลาง'],x['สกุล']].filter(Boolean).join(' ')||'—')}</strong></td><td>${r9e(x['ประเภท']||'—')}</td><td>${r9e(x['สถาบัน']||'—')}</td><td>${r9e(x['ประเทศ']||'—')}</td><td>${IROUP.formatDate(x['วันมาถึง'])}–${IROUP.formatDate(x['วันกลับ'])}</td><td>${r9e(x['โครงการ']||'—')}</td><td><button onclick="r9OpenMobility('in','${r9e(x['ID'])}')">✏️</button> <button onclick="r9DeleteMobility('in','${r9e(x['ID'])}')">🗑️</button></td></tr>`).join('');

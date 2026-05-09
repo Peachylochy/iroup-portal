@@ -449,7 +449,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="section-actions">
 <div class="view-toggle">
 <div class="view-btn active" onclick="setView('scholar','card',this)">⊞ Card</div>
-<div class="view-btn" onclick="setView('scholar','list',this)">☰ List</div>
+<div class="view-btn" hidden title="List view is not wired yet">☰ List</div>
 </div>
 </div>
 </div>
@@ -489,7 +489,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="section-actions">
 <div class="view-toggle">
 <div class="view-btn active" id="evCardBtn" onclick="switchEventView('card',this)">⊞ Card</div>
-<div class="view-btn" id="evCalBtn" onclick="switchEventView('cal',this)">📅 Calendar</div>
+<div class="view-btn" id="evCalBtn" hidden title="Calendar view is not wired to live data yet">📅 Calendar</div>
 </div>
 </div>
 </div>
@@ -879,7 +879,7 @@ async function round9LoadScholarEvent(){
 }
 function round9RenderScholars(list){
   const wrap=document.getElementById('scholarCards'); if(!wrap) return;
-  if(!list.length){ wrap.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลทุนในชีต</div>'; return; }
+  if(!list.length){ wrap.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลทุนในชีต<br><button class="add-btn" style="display:inline-flex;margin-top:12px;background:linear-gradient(135deg,var(--gold),var(--gold-light))" onclick="openModal(\'scholar\')">+ Add data</button></div>'; return; }
   wrap.innerHTML=list.map(x=>{
     const st=getStatusByDate(x['วันเปิดรับ'],x['วันปิดรับ']);
     const poster=assetUrl(x,'Poster_URL');
@@ -908,7 +908,7 @@ function round9RenderScholars(list){
 }
 function round9RenderEvents(list){
   const wrap=document.getElementById('eventCards'); if(!wrap) return;
-  if(!list.length){ wrap.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลกิจกรรมในชีต</div>'; return; }
+  if(!list.length){ wrap.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลกิจกรรมในชีต<br><button class="add-btn" style="display:inline-flex;margin-top:12px" onclick="openModal(\'event\')">+ Add data</button></div>'; return; }
   function eventTimeBadge(start, end){
   const today = new Date();
   today.setHours(0,0,0,0);
