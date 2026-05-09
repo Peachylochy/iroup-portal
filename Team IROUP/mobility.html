@@ -305,32 +305,32 @@ td[style*="gray-400"]{color:var(--gray-600)!important}
       <span class="filter-label">🔍</span>
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="text" placeholder="ค้นหาชื่อ สถาบัน หรือประเทศ...">
+        <input type="text" id="mobilitySearch" placeholder="ค้นหาชื่อ สถาบัน หรือประเทศ...">
       </div>
       <select class="filter-select" id="deptFilter">
-        <option>ทุกหน่วยงาน</option>
+        <option value="">ทุกหน่วยงาน</option>
         <option>คณะวิทยาศาสตร์</option>
         <option>คณะแพทยศาสตร์</option>
         <option>คณะวิศวกรรมศาสตร์</option>
         <option>วิทยาลัยการศึกษา</option>
         <option>สำนักงานวิเทศฯ</option>
       </select>
-      <select class="filter-select">
-        <option>ทุกประเภท</option>
+      <select class="filter-select" id="typeFilter">
+        <option value="">ทุกประเภท</option>
         <option>นิสิต</option>
         <option>อาจารย์ / นักวิจัย</option>
         <option>บุคลากร</option>
         <option>ผู้บริหาร</option>
       </select>
-      <select class="filter-select">
-        <option>ทุกปีงบประมาณ</option>
+      <select class="filter-select" id="fiscalFilter">
+        <option value="">ทุกปีงบประมาณ</option>
         <option>2568</option><option>2567</option><option>2566</option>
       </select>
       <div class="status-pills">
-        <div class="pill on">ทั้งหมด</div>
-        <div class="pill" onclick="togglePill(this)">🟢 อยู่ที่นี่</div>
-        <div class="pill" onclick="togglePill(this)">🟡 กำลังจะมา</div>
-        <div class="pill" onclick="togglePill(this)">✅ กลับแล้ว</div>
+        <div class="pill on" data-status="" onclick="setMobilityStatusFilter(this)">ทั้งหมด</div>
+        <div class="pill" data-status="active" onclick="setMobilityStatusFilter(this)">อยู่/เดินทาง</div>
+        <div class="pill" data-status="upcoming" onclick="setMobilityStatusFilter(this)">กำลังจะมา/รอเดินทาง</div>
+        <div class="pill" data-status="done" onclick="setMobilityStatusFilter(this)">เสร็จสิ้น</div>
       </div>
     </div>
 
@@ -342,11 +342,11 @@ td[style*="gray-400"]{color:var(--gray-600)!important}
         <div class="table-header">
           <div>
             <div class="table-title" id="tableTitle">🌏 รายชื่อ Inbound</div>
-            <div class="table-count">แสดง 6 รายการ จาก 87</div>
+            <div class="table-count" id="tableCount">กำลังโหลดข้อมูล...</div>
           </div>
           <div class="tbl-actions">
-            <button class="tbl-btn tbl-export">📥 Export Excel</button>
-            <button class="tbl-btn tbl-print">🖨️ พิมพ์</button>
+            <button class="tbl-btn tbl-export" id="exportBtn" type="button">Export CSV</button>
+            <button class="tbl-btn tbl-print" id="printBtn" type="button">พิมพ์</button>
           </div>
         </div>
         <div class="table-wrap">
@@ -445,7 +445,7 @@ td[style*="gray-400"]{color:var(--gray-600)!important}
         </div>
         <div class="form-group">
           <label>ประเทศ</label>
-          <input type="text" placeholder="เช่น South Korea">
+          <input type="text" id="inboundCountryInput" list="countryOptions" placeholder="ค้นหาประเทศ เช่น South Korea">
         </div>
         <div class="form-group">
           <label>ระดับการศึกษา</label>
@@ -453,7 +453,7 @@ td[style*="gray-400"]{color:var(--gray-600)!important}
         </div>
         <div class="form-group">
           <label>หน่วยงาน ม.พะเยา ที่รับผิดชอบ</label>
-          <select><option>สำนักงานวิเทศฯ</option><option>คณะวิทยาศาสตร์</option><option>คณะแพทยศาสตร์</option><option>คณะวิศวกรรมศาสตร์</option><option>วิทยาลัยการศึกษา</option></select>
+          <input type="text" id="inboundUnitInput" list="unitOptions" placeholder="ค้นหาหน่วยงาน ม.พะเยา">
         </div>
         <div class="form-group">
           <label>ภาษาที่ใช้สื่อสาร</label>
@@ -514,24 +514,7 @@ td[style*="gray-400"]{color:var(--gray-600)!important}
             <span class="server-icon">🔍</span>
             <input type="text" id="serverSearch" placeholder="พิมพ์ชื่อ หรือรหัสนิสิต / บุคลากร..." oninput="searchServer(this.value)">
             <span class="server-badge">ดึงจาก Server UP</span>
-            <div class="server-dropdown" id="serverDropdown">
-              <div class="server-option" onclick="selectPerson('นายสมชาย ใจดี','63010123','คณะวิทยาศาสตร์','นิสิต ป.ตรี ปี 4','ชาย','#4BBDE8')">
-                <div class="server-avatar" style="background:#4BBDE8">สช</div>
-                <div><div class="server-name">นายสมชาย ใจดี</div><div class="server-meta">63010123 · คณะวิทยาศาสตร์ · นิสิต ป.ตรี ปี 4</div></div>
-              </div>
-              <div class="server-option" onclick="selectPerson('น.ส.สมหญิง รักเรียน','63010456','คณะแพทยศาสตร์','นิสิต ป.ตรี ปี 4','หญิง','#F5A623')">
-                <div class="server-avatar" style="background:#F5A623">สญ</div>
-                <div><div class="server-name">น.ส.สมหญิง รักเรียน</div><div class="server-meta">63010456 · คณะแพทยศาสตร์ · นิสิต ป.ตรี ปี 4</div></div>
-              </div>
-              <div class="server-option" onclick="selectPerson('ผศ.ดร.สมศักดิ์ วงศ์ดี','ST-0234','คณะวิศวกรรมศาสตร์','อาจารย์','ชาย','#7C3AED')">
-                <div class="server-avatar" style="background:#7C3AED">สศ</div>
-                <div><div class="server-name">ผศ.ดร.สมศักดิ์ วงศ์ดี</div><div class="server-meta">ST-0234 · คณะวิศวกรรมศาสตร์ · อาจารย์</div></div>
-              </div>
-              <div class="server-option" onclick="selectPerson('ดร.สมปอง แสงศรี','ST-0567','วิทยาลัยการศึกษา','นักวิจัย','ชาย','#0D9488')">
-                <div class="server-avatar" style="background:#0D9488">สป</div>
-                <div><div class="server-name">ดร.สมปอง แสงศรี</div><div class="server-meta">ST-0567 · วิทยาลัยการศึกษา · นักวิจัย</div></div>
-              </div>
-            </div>
+            <div class="server-dropdown" id="serverDropdown"></div>
           </div>
           <div class="autofill-note" id="autofillNote" style="display:none">✅ ดึงข้อมูลจากระบบ ม.พะเยา อัตโนมัติ</div>
         </div>
@@ -561,7 +544,7 @@ td[style*="gray-400"]{color:var(--gray-600)!important}
         </div>
         <div class="form-group">
           <label>ประเทศปลายทาง</label>
-          <input type="text" placeholder="เช่น Japan">
+          <input type="text" id="outboundCountryInput" list="countryOptions" placeholder="ค้นหาประเทศ เช่น Japan">
         </div>
         <div class="form-group">
           <label>วันที่ออกเดินทาง</label>
@@ -616,25 +599,13 @@ td[style*="gray-400"]{color:var(--gray-600)!important}
   </div>
 </div>
 
+<datalist id="countryOptions"></datalist>
+<datalist id="unitOptions"></datalist>
+
 <script>
 // DATA
-const inboundData = [
-  {name:'Zhang Wei',mid:'Liang',last:'Zhang',gender:'ชาย',type:'นิสิต',inst:'Shanghai Open University',country:'🇨🇳 China',dept:'สำนักงานวิเทศฯ',purpose:'แลกเปลี่ยน',from:'2569-04-20',to:'2569-07-15',project:'Immersion Hub 2026',status:'here',color:'#4BBDE8'},
-  {name:'Kim Jiyeon',mid:'',last:'Kim',gender:'หญิง',type:'อาจารย์',inst:'Keimyung University',country:'🇰🇷 Korea',dept:'คณะแพทยศาสตร์',purpose:'วิจัย',from:'2569-05-01',to:'2569-05-30',project:'Joint Research',status:'coming',color:'#7C3AED'},
-  {name:'Tanaka Hiroshi',mid:'',last:'Tanaka',gender:'ชาย',type:'นักวิจัย',inst:'Hokkaido University',country:'🇯🇵 Japan',dept:'คณะวิทยาศาสตร์',purpose:'วิจัย',from:'2569-05-10',to:'2569-06-10',project:'Research Exchange',status:'coming',color:'#F5A623'},
-  {name:'Maria Santos',mid:'Cruz',last:'Santos',gender:'หญิง',type:'นิสิต',inst:'University of Philippines',country:'🇵🇭 Philippines',dept:'วิทยาลัยการศึกษา',purpose:'แลกเปลี่ยน',from:'2568-09-01',to:'2569-01-31',project:'ASEAN Exchange',status:'done',color:'#5BAD3E'},
-  {name:'Hans Mueller',mid:'',last:'Mueller',gender:'ชาย',type:'ผู้บริหาร',inst:'Deggendorf Institute',country:'🇩🇪 Germany',dept:'สำนักงานวิเทศฯ',purpose:'วิชาการ',from:'2568-11-15',to:'2568-11-18',project:'MOU Visit',status:'done',color:'#1A6DB5'},
-  {name:'Nguyen Thi Lan',mid:'Thi',last:'Nguyen',gender:'หญิง',type:'นิสิต',inst:'Hanoi University',country:'🇻🇳 Vietnam',dept:'คณะวิศวกรรมศาสตร์',purpose:'ฝึกงาน',from:'2568-06-01',to:'2568-08-31',project:'Internship Program',status:'done',color:'#0D9488'},
-];
-
-const outboundData = [
-  {name:'นายสมชาย ใจดี',id:'63010123',dept:'คณะวิทยาศาสตร์',type:'นิสิต',gender:'ชาย',dest:'Shinshu University',country:'🇯🇵 Japan',purpose:'แลกเปลี่ยน',from:'2569-04-15',to:'2569-05-15',project:'Exchange Program',status:'abroad',color:'#4BBDE8'},
-  {name:'น.ส.วิภาดา แสงดาว',id:'63010789',dept:'คณะแพทยศาสตร์',type:'นิสิต',gender:'หญิง',dest:'Taipei Medical Univ.',country:'🇹🇼 Taiwan',purpose:'วิชาการ',from:'2569-03-01',to:'2569-06-30',project:'Medical Exchange',status:'abroad',color:'#F5A623'},
-  {name:'ผศ.ดร.ธนวัฒน์ วงศ์ใหญ่',id:'ST-0123',dept:'คณะวิทยาศาสตร์',type:'อาจารย์',gender:'ชาย',dest:'Hokkaido University',country:'🇯🇵 Japan',purpose:'วิจัย',from:'2569-04-29',to:'2569-05-03',project:'Joint Research',status:'abroad',color:'#7C3AED'},
-  {name:'น.ส.กมลชนก ดีงาม',id:'64020345',dept:'วิทยาลัยการศึกษา',type:'นิสิต',gender:'หญิง',dest:'USQ Australia',country:'🇦🇺 Australia',purpose:'แลกเปลี่ยน',from:'2569-06-01',to:'2569-11-30',project:'Student Exchange',status:'coming',color:'#5BAD3E'},
-  {name:'รศ.ดร.สุภาพร มีสุข',id:'ST-0456',dept:'คณะแพทยศาสตร์',type:'นักวิจัย',gender:'หญิง',dest:'Seoul National Univ.',country:'🇰🇷 Korea',purpose:'วิจัย',from:'2568-10-01',to:'2568-12-31',project:'Research Grant',status:'done',color:'#1A6DB5'},
-  {name:'นายปิยะ รักษ์ไทย',id:'62030678',dept:'คณะวิศวกรรมศาสตร์',type:'นิสิต',gender:'ชาย',dest:'DIT Germany',country:'🇩🇪 Germany',purpose:'ฝึกงาน',from:'2568-07-01',to:'2568-09-30',project:'Erasmus+ Internship',status:'done',color:'#0D9488'},
-];
+const inboundData = [];
+const outboundData = [];
 
 let currentTab = 'in';
 let purposeChart = null;
@@ -821,7 +792,9 @@ function renderMobilityLoadingState(){
 }
 renderMobilityLoadingState();
 </script>
+<script src="iroup-utils.js"></script>
 <script src="iroup-config.js"></script>
+<script src="iroup-selectors.js"></script>
 
 <script>
 /* ROUND 9 — Live CRUD/Search for Inbound & Outbound */
@@ -977,6 +950,238 @@ window.switchTab=function(type){
   const k=document.querySelectorAll('#kpiRow .kpi-num'); if(k[0])k[0].textContent=type==='in'?R9_IN.length:R9_OUT.length;
   r9RenderMobility();
 };
+</script>
+
+<script>
+/* Workflow usability pass: real filters, selectors, export, and edit hydration. */
+let R9_STATUS_FILTER = '';
+
+function mobilityRows(){ return R9_TAB === 'in' ? R9_IN : R9_OUT; }
+function mobilityPick(row, keys, fallback=''){
+  return IRSelectors.pick(row, keys) || fallback;
+}
+function mobilityStart(row){
+  return mobilityPick(row, R9_TAB === 'in' ? ['วันมาถึง','วันเริ่ม'] : ['วันออก','วันเริ่ม','วันเดินทาง']);
+}
+function mobilityEnd(row){
+  return mobilityPick(row, ['วันกลับ','วันสิ้นสุด']);
+}
+function mobilityStatusKey(row){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = IU.toDate(mobilityStart(row));
+  const end = IU.toDate(mobilityEnd(row));
+  if(start && today < start) return 'upcoming';
+  if(end && today > end) return 'done';
+  return 'active';
+}
+function mobilityType(row){
+  return mobilityPick(row, ['ประเภท','ประเภทผู้เดินทาง']);
+}
+function mobilityUnit(row){
+  return mobilityPick(row, ['หน่วยงาน_UP','หน่วยงาน','คณะ','up_unit','faculty']);
+}
+function mobilityFiscal(row){
+  return mobilityPick(row, ['ปีงบ','fiscal_year']);
+}
+function mobilitySearchText(row){
+  return Object.values(row || {}).join(' ').toLowerCase();
+}
+function filteredMobilityRows(){
+  const q = (document.getElementById('mobilitySearch')?.value || '').toLowerCase().trim();
+  const unit = document.getElementById('deptFilter')?.value || '';
+  const type = document.getElementById('typeFilter')?.value || '';
+  const fiscal = document.getElementById('fiscalFilter')?.value || '';
+  return mobilityRows().filter(row => {
+    if(q && !mobilitySearchText(row).includes(q)) return false;
+    if(unit && mobilityUnit(row) !== unit) return false;
+    if(type && mobilityType(row) !== type) return false;
+    if(fiscal && mobilityFiscal(row) !== fiscal) return false;
+    if(R9_STATUS_FILTER && mobilityStatusKey(row) !== R9_STATUS_FILTER) return false;
+    return true;
+  });
+}
+function refreshMobilitySelectors(){
+  const all = [...R9_IN, ...R9_OUT];
+  IRSelectors.setDatalist('countryOptions', IRSelectors.countryOptions([], all));
+  IRSelectors.setDatalist('unitOptions', IRSelectors.unitOptions(all));
+  IRSelectors.setSelect('deptFilter', IRSelectors.unitOptions(all), 'ทุกหน่วยงาน');
+  IRSelectors.setSelect('typeFilter', all.map(mobilityType), 'ทุกประเภท');
+  IRSelectors.setSelect('fiscalFilter', all.map(mobilityFiscal), 'ทุกปีงบประมาณ');
+}
+function setMobilityStatusFilter(el){
+  document.querySelectorAll('.status-pills .pill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  R9_STATUS_FILTER = el.dataset.status || '';
+  r9RenderMobility();
+}
+function updateMobilityCount(shown){
+  const el = document.getElementById('tableCount');
+  if(el) el.textContent = `แสดง ${shown} รายการ จาก ${mobilityRows().length} รายการ`;
+  const k=document.querySelectorAll('#kpiRow .kpi-num');
+  if(k[0]) k[0].textContent = mobilityRows().length;
+  if(k[1]) k[1].textContent = R9_IN.length;
+  if(k[2]) k[2].textContent = R9_OUT.length;
+  if(k[3]) k[3].textContent = R9_IN.length + R9_OUT.length;
+}
+function emptyMobilityHtml(colspan){
+  const label = R9_TAB === 'in' ? 'Inbound' : 'Outbound';
+  return `<tr><td colspan="${colspan}"><div class="empty">ยังไม่มีรายการที่ตรงกับตัวกรอง<br><button class="add-btn ${R9_TAB==='in'?'btn-inbound':'btn-outbound'}" style="display:inline-flex;margin-top:12px" onclick="openModal('${R9_TAB}')">+ เพิ่ม ${label}</button></div></td></tr>`;
+}
+window.r9RenderMobility=function(list){
+  const data = list || filteredMobilityRows();
+  const head=document.getElementById('tableHead'), body=document.getElementById('tableBody'); if(!head||!body)return;
+  updateMobilityCount(data.length);
+  if(R9_TAB==='in'){
+    head.innerHTML='<tr><th>#</th><th>ชื่อ-สกุล</th><th>ประเภท/ระดับ</th><th>สถาบัน</th><th>ประเทศ / ทวีป</th><th>หน่วยงาน UP</th><th>ช่วงเวลา</th><th>สถานะ</th><th>จัดการ</th></tr>';
+    if(!data.length){ body.innerHTML=emptyMobilityHtml(9); return; }
+    body.innerHTML=data.map((x,i)=>{
+      const name=[x['ชื่อ'],x['ชื่อกลาง'],x['สกุล']].filter(Boolean).join(' ') || irFullName(x);
+      const st=irTimeStatus(mobilityStart(x),mobilityEnd(x));
+      return `<tr><td>${i+1}</td><td><strong>${r9e(name)}</strong><br><small>${r9e(mobilityPick(x,['เพศ']))}</small></td><td>${irTypeBadge(mobilityType(x))} ${irLevelBadge(mobilityPick(x,['ระดับ']))}</td><td>${r9e(mobilityPick(x,['สถาบัน'],'—'))}</td><td>${r9e(mobilityPick(x,['ประเทศ'],'—'))}<br><small>${r9e(mobilityPick(x,['ทวีป']))}</small></td><td>${r9e(mobilityUnit(x)||'—')}</td><td>${IROUP.formatDate(mobilityStart(x))}–${IROUP.formatDate(mobilityEnd(x))}</td><td><span class="badge ${st.cls}">${st.text}</span></td><td><button onclick="r9OpenMobility('in','${r9e(x['ID'])}')">แก้ไข</button> <button onclick="r9DeleteMobility('in','${r9e(x['ID'])}')">ลบ</button></td></tr>`;
+    }).join('');
+  }else{
+    head.innerHTML='<tr><th>#</th><th>ชื่อ-สกุล</th><th>คณะ</th><th>สถาบันปลายทาง</th><th>ประเทศ / ทวีป</th><th>ประเภท/ระดับ</th><th>ช่วงเวลา</th><th>สถานะ</th><th>จัดการ</th></tr>';
+    if(!data.length){ body.innerHTML=emptyMobilityHtml(9); return; }
+    body.innerHTML=data.map((x,i)=>{
+      const start=mobilityStart(x), end=mobilityEnd(x), st=irTimeStatus(start,end);
+      return `<tr><td>${i+1}</td><td><strong>${r9e(irFullName(x))}</strong><br><small>${r9e(mobilityPick(x,['รหัส','รหัสนิสิต']))}</small></td><td>${r9e(mobilityUnit(x)||'—')}</td><td>${r9e(mobilityPick(x,['สถาบัน_ปลายทาง','มหาวิทยาลัยปลายทาง','สถาบัน','ปลายทาง'],'—'))}</td><td>${r9e(mobilityPick(x,['ประเทศ'],'—'))}<br><small>${r9e(mobilityPick(x,['ทวีป']))}</small></td><td>${irTypeBadge(mobilityType(x))} ${irLevelBadge(mobilityPick(x,['ระดับ']))}</td><td>${IROUP.formatDate(start)}–${IROUP.formatDate(end)}</td><td><span class="badge ${st.cls}">${st.text}</span></td><td><button onclick="r9OpenMobility('out','${r9e(x['ID'])}')">แก้ไข</button> <button onclick="r9DeleteMobility('out','${r9e(x['ID'])}')">ลบ</button></td></tr>`;
+    }).join('');
+  }
+};
+window.switchTab=function(type){
+  R9_TAB=type;
+  document.getElementById('tabIn').className='tab-btn'+(type==='in'?' active-in':'');
+  document.getElementById('tabOut').className='tab-btn'+(type==='out'?' active-out':'');
+  document.getElementById('tableTitle').textContent=type==='in'?'รายชื่อ Inbound':'รายชื่อ Outbound';
+  r9RenderMobility();
+};
+function setFormDate(input, value){
+  const d = IU.toDate(value);
+  input.value = d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` : '';
+}
+function clearMobilityForm(form){
+  form.querySelectorAll('input,textarea').forEach(el => { if(el.type !== 'file') el.value=''; });
+  form.querySelectorAll('select').forEach(el => { el.selectedIndex = 0; });
+  const note=document.getElementById('autofillNote'); if(note) note.style.display='none';
+}
+window.r9OpenMobility=function(type,id){
+  R9_TAB=type; openModal(type);
+  const modal=document.getElementById('modalOverlay'); modal.dataset.editId=id||'';
+  const row = id ? (type==='in'?R9_IN:R9_OUT).find(x=>String(x.ID)===String(id)) : null;
+  const form=document.getElementById(type==='in'?'inboundForm':'outboundForm');
+  clearMobilityForm(form);
+  if(!row) return;
+  const inputs=Array.from(form.querySelectorAll('input,select,textarea'));
+  if(type==='in'){
+    inputs[0].value=mobilityPick(row,['ชื่อ']); inputs[1].value=mobilityPick(row,['ชื่อกลาง']); inputs[2].value=mobilityPick(row,['สกุล']);
+    inputs[3].value=mobilityPick(row,['เพศ'])||inputs[3].value; inputs[4].value=mobilityType(row)||inputs[4].value;
+    inputs[5].value=mobilityPick(row,['สถาบัน']); inputs[6].value=mobilityPick(row,['ประเทศ']); inputs[7].value=mobilityPick(row,['ระดับ'])||inputs[7].value;
+    inputs[8].value=mobilityUnit(row); inputs[9].value=mobilityPick(row,['ภาษา'])||inputs[9].value;
+    setFormDate(inputs[10], mobilityStart(row)); setFormDate(inputs[11], mobilityEnd(row));
+    inputs[12].value=mobilityPick(row,['โครงการ']); inputs[13].value=mobilityPick(row,['วัตถุประสงค์'])||inputs[13].value; inputs[14].value=mobilityPick(row,['หมายเหตุ']);
+    inputs[15].value=mobilityFiscal(row)||inputs[15].value; inputs[17].value=mobilityPick(row,['งบประเภท'])||inputs[17].value; inputs[18].value=mobilityPick(row,['จำนวนเงิน']);
+  }else{
+    document.getElementById('ob_name').value=irFullName(row); document.getElementById('ob_id').value=mobilityPick(row,['รหัส','รหัสนิสิต']);
+    document.getElementById('ob_dept').value=mobilityUnit(row); document.getElementById('ob_type').value=mobilityType(row); document.getElementById('ob_gender').value=mobilityPick(row,['เพศ']);
+    inputs[6].value=mobilityPick(row,['สถาบัน_ปลายทาง','มหาวิทยาลัยปลายทาง','สถาบัน','ปลายทาง']); inputs[7].value=mobilityPick(row,['ประเทศ']);
+    setFormDate(inputs[8], mobilityStart(row)); setFormDate(inputs[9], mobilityEnd(row));
+    inputs[10].value=mobilityPick(row,['โครงการ']); inputs[11].value=mobilityPick(row,['วัตถุประสงค์'])||inputs[11].value; inputs[12].value=mobilityPick(row,['หมายเหตุ']);
+    inputs[13].value=mobilityFiscal(row)||inputs[13].value; inputs[15].value=mobilityPick(row,['งบประเภท'])||inputs[15].value; inputs[16].value=mobilityPick(row,['จำนวนเงิน']);
+  }
+};
+window.r9SaveMobility=async function(){
+  const modal=document.getElementById('modalOverlay'), id=modal.dataset.editId;
+  const type=document.getElementById('inboundForm').style.display==='none'?'out':'in';
+  const btn=document.getElementById('modalSaveBtn');
+  let sheet,data={};
+  if(type==='in'){
+    const inputs=Array.from(document.getElementById('inboundForm').querySelectorAll('input,select,textarea'));
+    data={'ชื่อ':inputs[0].value.trim(),'ชื่อกลาง':inputs[1].value.trim(),'สกุล':inputs[2].value.trim(),'เพศ':inputs[3].value,'ประเภท':inputs[4].value,'สถาบัน':inputs[5].value.trim(),'ประเทศ':inputs[6].value.trim(),'ระดับ':inputs[7].value,'หน่วยงาน_UP':inputs[8].value.trim(),'ภาษา':inputs[9].value,'วันมาถึง':inputs[10].value,'วันกลับ':inputs[11].value,'โครงการ':inputs[12].value.trim(),'วัตถุประสงค์':inputs[13].value,'หมายเหตุ':inputs[14].value.trim(),'ปีงบ':inputs[15].value,'งบประเภท':inputs[17]?.value||'','จำนวนเงิน':inputs[18]?.value||''};
+    sheet=IROUP.SHEETS.INBOUND;
+    if(!data['ชื่อ']||!data['สกุล']) return alert('กรุณากรอกชื่อและสกุล');
+    if(!data['ประเทศ']) return alert('กรุณาเลือกหรือกรอกประเทศ');
+    if(!data['หน่วยงาน_UP']) return alert('กรุณาเลือกหรือกรอกหน่วยงาน ม.พะเยา');
+  }else{
+    const inputs=Array.from(document.getElementById('outboundForm').querySelectorAll('input,select,textarea'));
+    data={'ชื่อ_สกุล':document.getElementById('ob_name').value.trim(),'รหัส':document.getElementById('ob_id').value.trim(),'คณะ':document.getElementById('ob_dept').value.trim(),'ประเภท':document.getElementById('ob_type').value.trim(),'เพศ':document.getElementById('ob_gender').value.trim(),'สถาบัน_ปลายทาง':inputs[6].value.trim(),'ประเทศ':inputs[7].value.trim(),'วันออก':inputs[8].value,'วันกลับ':inputs[9].value,'โครงการ':inputs[10].value.trim(),'วัตถุประสงค์':inputs[11].value,'หมายเหตุ':inputs[12].value.trim(),'ปีงบ':inputs[13].value,'งบประเภท':inputs[15]?.value||'','จำนวนเงิน':inputs[16]?.value||''};
+    sheet=IROUP.SHEETS.OUTBOUND;
+    if(!data['ชื่อ_สกุล']) return alert('กรุณาค้นหา/เลือกชื่อก่อน');
+    if(!data['ประเทศ']) return alert('กรุณาเลือกหรือกรอกประเทศปลายทาง');
+  }
+  if(btn){ btn.disabled=true; btn.textContent='กำลังบันทึก...'; }
+  try{
+    const r=id?await IROUP.edit(sheet,id,data):await IROUP.add(sheet,data);
+    if(!r.success) throw new Error(r.error||'บันทึกไม่สำเร็จ');
+    alert('บันทึกสำเร็จ');
+    closeModal();
+    await r9LoadMobilityWorkflow();
+  }catch(e){
+    alert('บันทึกไม่สำเร็จ: '+e.message);
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent=type==='in'?'บันทึก Inbound':'บันทึก Outbound'; }
+  }
+};
+async function r9LoadMobilityWorkflow(){
+  try{
+    R9_IN=await IROUP.getAll(IROUP.SHEETS.INBOUND);
+    R9_OUT=await IROUP.getAll(IROUP.SHEETS.OUTBOUND);
+    document.getElementById('tabIn').querySelector('.tab-count').textContent=R9_IN.length;
+    document.getElementById('tabOut').querySelector('.tab-count').textContent=R9_OUT.length;
+    refreshMobilitySelectors();
+    r9RenderMobility();
+  }catch(e){
+    console.warn('mobility workflow load failed', e);
+    const count=document.getElementById('tableCount'); if(count) count.textContent='โหลดข้อมูลไม่สำเร็จ';
+  }
+}
+function exportMobilityCsv(){
+  const rows=filteredMobilityRows();
+  if(!rows.length) return alert('ไม่มีข้อมูลสำหรับ Export');
+  const headers=IRSelectors.unique(rows.flatMap(row => Object.keys(row)));
+  const csv=[headers.join(','),...rows.map(row=>headers.map(h=>`"${String(row[h]??'').replace(/"/g,'""')}"`).join(','))].join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`iroup-mobility-${R9_TAB}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+let R9_STAFF_RESULTS = [];
+window.searchServer=async function(value){
+  const dd=document.getElementById('serverDropdown');
+  const q=String(value||'').trim();
+  if(!dd) return;
+  if(q.length<2){ dd.classList.remove('show'); dd.innerHTML=''; return; }
+  dd.innerHTML='<div class="server-option"><div><div class="server-name">กำลังค้นหา...</div><div class="server-meta">ค้นจากชีตบุคลากรจริง</div></div></div>';
+  dd.classList.add('show');
+  try{
+    R9_STAFF_RESULTS=await IROUP.searchStaff(q);
+    if(!R9_STAFF_RESULTS.length){
+      dd.innerHTML='<div class="server-option"><div><div class="server-name">ไม่พบรายชื่อ</div><div class="server-meta">ตรวจคำค้นหรือเพิ่มบุคลากรในชีตบุคลากรก่อนบันทึก Outbound</div></div></div>';
+      return;
+    }
+    dd.innerHTML=R9_STAFF_RESULTS.map((r,i)=>{
+      const name=r.name||'ไม่ระบุชื่อ';
+      const initial=name.trim().charAt(0)||'?';
+      return `<div class="server-option" onclick="chooseStaffResult(${i})"><div class="server-avatar" style="background:#4BBDE8">${r9e(initial)}</div><div><div class="server-name">${r9e(name)}</div><div class="server-meta">${r9e([r.id,r.faculty,r.position||r.type].filter(Boolean).join(' · '))}</div></div></div>`;
+    }).join('');
+  }catch(e){
+    dd.innerHTML='<div class="server-option"><div><div class="server-name">ค้นหาไม่สำเร็จ</div><div class="server-meta">ตรวจการเชื่อมต่อ Apps Script แล้วลองอีกครั้ง</div></div></div>';
+  }
+};
+window.chooseStaffResult=function(index){
+  const r=R9_STAFF_RESULTS[index]; if(!r) return;
+  selectPerson(r.name||'', r.id||'', r.faculty||'', r.type||r.position||'', '', '#4BBDE8');
+};
+document.addEventListener('DOMContentLoaded',()=>{
+  ['mobilitySearch','deptFilter','typeFilter','fiscalFilter'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.addEventListener('input',()=>r9RenderMobility());
+    if(el && el.tagName==='SELECT') el.addEventListener('change',()=>r9RenderMobility());
+  });
+  document.getElementById('exportBtn')?.addEventListener('click',exportMobilityCsv);
+  document.getElementById('printBtn')?.addEventListener('click',()=>window.print());
+  setTimeout(r9LoadMobilityWorkflow,700);
+});
 </script>
 
 <script src="iroup-sidebar.js"></script>
