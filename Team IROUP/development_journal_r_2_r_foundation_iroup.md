@@ -989,3 +989,26 @@ Constraints maintained:
 - No auth/session/redirect logic touched
 - No Apps Script/API logic touched
 - No routing or dependency changes
+
+---
+
+26. Final Light Theme Readability Stabilization Pass (May 9, 2026)
+
+Summary
+
+Final light-theme readability stabilization pass for MOU/report/travel/mobility minor contrast issues.
+
+Implementation notes:
+
+- Added small end-of-style CSS override blocks only
+- Strengthened remaining MOU pale text surfaces: missing gray token, placeholders, country placeholder, file-empty dash, KPI subtext, row indexes, and empty/no-result text
+- Strengthened report table columns 3-7 and select display text
+- Darkened the travel completed badge text
+- Darkened mobility generated row-number/index cells where inline color used the pale gray token
+
+Constraints maintained:
+
+- CSS-first changes only
+- No JavaScript changes
+- No auth/session/API changes
+- No layout, routing, or architecture changes

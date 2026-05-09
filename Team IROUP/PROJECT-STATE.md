@@ -349,3 +349,11 @@ Commits made across sessions:
 - Stabilized older page-local gray scales and inline theme variables where those pages bypass shared tokens.
 - Improved placeholder, helper, KPI support, empty/loading, metadata, and subdued badge text contrast while preserving layout and spacing.
 - No JavaScript, auth/session/redirect logic, Apps Script/API logic, routing, or module architecture changes were made.
+
+## 15. Final Light Theme Readability Stabilization Pass (2026-05-09)
+
+- Final light-theme readability stabilization pass for MOU/report/travel/mobility minor contrast issues.
+- Added page-local CSS override blocks only, preserving existing layout, spacing, JavaScript, auth/session/API logic, routing, and GitHub Pages compatibility.
+- Strengthened remaining pale MOU placeholders, KPI subtext, file-empty text, row indexes, and empty/no-result text.
+- Strengthened report table columns 3-7 and select display text.
+- Darkened the travel completed badge and optional mobility row-index text.
