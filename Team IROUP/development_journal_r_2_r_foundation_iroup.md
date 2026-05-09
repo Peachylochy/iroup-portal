@@ -1126,3 +1126,25 @@ Constraints maintained:
 - No public page migration yet
 - No auth enforcement
 - No UI redesign or spreadsheet structure changes
+
+---
+
+32. Backend Governance Pass 2C-B Phase 1 (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2C-B Phase 1: migrated public-scholar.html to public-safe scholarship endpoints using sanitized payload adapters while preserving existing public UI behavior.
+
+Implementation notes:
+
+- Replaced raw scholarship loading with `IROUP.getPublicScholarships()`
+- Added a page-local adapter from sanitized public payload keys to the existing scholarship card rendering shape
+- Preserved search, country/level/status filters, pinned ordering, poster rendering, public apply/detail links, public file links, and empty states
+- Restricted file rendering to `public_file_url` from the sanitized payload
+
+Constraints maintained:
+
+- No backend changes
+- No public-events or other public page migration yet
+- No auth enforcement
+- No UI redesign

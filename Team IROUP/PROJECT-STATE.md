@@ -380,3 +380,7 @@ Commits made across sessions:
 ## 20. Backend Governance Pass 2C-A (2026-05-09)
 
 - Backend Governance Pass 2C-A: removed remaining admin direct-fetch bypasses for reports/uploads by routing them through token-aware IROUP helpers. Added public-safe IROUP.getPublic* helper methods for upcoming public page migration. Backend remains in compatibility mode.
+
+## 21. Backend Governance Pass 2C-B Phase 1 (2026-05-09)
+
+- Backend Governance Pass 2C-B Phase 1: migrated public-scholar.html to public-safe scholarship endpoints using sanitized payload adapters while preserving existing public UI behavior.

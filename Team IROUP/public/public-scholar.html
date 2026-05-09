@@ -207,7 +207,7 @@ const BG = {'Japan':'#E8F4FD','China':'#FDECEA','South Korea':'#EBF7E3','Germany
 
 async function loadData() {
   try {
-    const data = await IROUP.getAll(IROUP.SHEETS.SCHOLAR);
+    const data = (await IROUP.getPublicScholarships()).map(normalizePublicScholarship);
     allScholar = data.sort((a,b) => {
       // Pin ขึ้นก่อน
       if (a['Pin'] === 'TRUE' && b['Pin'] !== 'TRUE') return -1;
@@ -243,6 +243,29 @@ async function loadData() {
   } catch(e) {
     document.getElementById('openCards').innerHTML = '<div class="loading">⚠️ ไม่สามารถโหลดข้อมูลได้</div>';
   }
+}
+
+function normalizePublicScholarship(row) {
+  return {
+    ID: row.scholarship_id || '',
+    'ชื่อทุน': row.title || '',
+    'ประเทศ': row.country || '',
+    'สถาบัน': row.institution || '',
+    'ระดับ': row.level || '',
+    'วันประชาสัมพันธ์': row.publish_date || '',
+    'วันเปิดรับ': row.open_date || row.start_date || '',
+    'วันปิดรับ': row.close_date || row.end_date || '',
+    'ครอบคลุม': row.coverage || '',
+    Link: row.apply_url || row.detail_url || row.link_url || '',
+    Poster_URL: row.poster_url || '',
+    'ไฟล์_URL': row.public_file_url || '',
+    Pin: isPublicTruthy(row.pin) ? 'TRUE' : '',
+    public_status: row.status || ''
+  };
+}
+
+function isPublicTruthy(value) {
+  return ['true', 'yes', 'y', '1', 'pin', 'pinned'].includes(String(value || '').trim().toLowerCase());
 }
 
 
