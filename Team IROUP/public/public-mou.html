@@ -303,7 +303,7 @@ let mouChart = null;
 // ============================================================
 async function loadData() {
   try {
-    const data = await IROUP.getAll(IROUP.SHEETS.MOU);
+    const data = (await IROUP.getPublicMou()).map(normalizePublicMou);
     allMou = data;
     updateKPI(data);
     renderTable(data);
@@ -313,6 +313,22 @@ async function loadData() {
     document.getElementById('mouTableBody').innerHTML =
       '<tr><td colspan="7" class="loading">⚠️ ไม่สามารถโหลดข้อมูลได้</td></tr>';
   }
+}
+
+function normalizePublicMou(row) {
+  return {
+    ID: row.mou_id || '',
+    'องค์กร_ตปท': row.partner_org || '',
+    'ประเทศ': row.country || '',
+    'ทวีป': row.continent || '',
+    'หน่วยงาน_UP': row.up_unit || '',
+    'ประเภท': row.type || 'MOU',
+    'วันเริ่ม': row.start_date || '',
+    'วันสิ้นสุด': row.end_date || '',
+    'ปีงบ': row.fiscal_year || '',
+    public_file_url: row.public_file_url || '',
+    public_status: row.status || ''
+  };
 }
 
 function updateKPI(data) {

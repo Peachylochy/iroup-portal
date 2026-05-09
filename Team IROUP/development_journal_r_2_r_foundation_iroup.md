@@ -1170,3 +1170,25 @@ Constraints maintained:
 - No other public page migration
 - No auth enforcement
 - No UI redesign
+
+---
+
+34. Backend Governance Pass 2C-B Phase 3 (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2C-B Phase 3: migrated public-mou.html to the public-safe MOU endpoint using a sanitized payload adapter while preserving the existing public map, chart, table, filters, and status behavior.
+
+Implementation notes:
+
+- Replaced raw MOU loading with `IROUP.getPublicMou()`
+- Added a page-local adapter from sanitized public payload keys to the existing MOU rendering shape
+- Preserved KPI counts, country aggregation, D3/world map coloring, map hover popup behavior, department chart, table filters, and status badges
+- Kept public file URL data constrained to `public_file_url` from the sanitized payload
+
+Constraints maintained:
+
+- No backend changes
+- No auth enforcement
+- No UI redesign
+- Incremental and reversible page-only migration
