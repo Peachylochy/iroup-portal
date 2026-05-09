@@ -50,7 +50,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-
 <main class="content">
   <section class="filter-bar">
     <div class="filter-label">🔎 ค้นหา / กรองข้อมูล</div>
-    <input class="filter-input" id="searchInput" placeholder="ค้นหาชื่อ สถาบัน ประเทศ โครงการ...">
+    <input class="filter-input" id="searchInput" placeholder="ค้นหาสถาบัน ประเทศ โครงการ...">
     <select class="filter-select" id="countryFilter"><option value="all">ทุกประเทศ</option></select>
     <div class="pill-group">
       <button class="pill active" data-type="all">ทั้งหมด</button>
@@ -106,7 +106,51 @@ function fmtDate(v){const d=toDate(v);return d?d.toLocaleDateString('th-TH',{day
 function dateValue(v){const d=toDate(v);return d?d.getTime():0;}
 function flag(c){return FLAGS[c]||'🌍'}
 function first(...vals){return vals.find(v=>v!==undefined && v!==null && String(v).trim()!=='')||''}
-function mobilityName(r,kind){return kind==='inbound' ? first([r['ชื่อ'],r['ชื่อกลาง'],r['สกุล']].filter(Boolean).join(' '),r['โครงการ']) : first(r['ชื่อ_สกุล'],r['โครงการ']);}
+function normalizePublicMobility(row){
+  const direction=row.direction==='outbound'?'outbound':'inbound';
+  return {
+    _source:'public-mobility',
+    _kind:direction,
+    'ประเทศ':row.country||'',
+    'ทวีป':row.continent||'',
+    'หน่วยงาน_UP':row.up_unit||'',
+    'คณะ':row.up_unit||'',
+    'สถาบัน':direction==='inbound'?(row.institution||''):'',
+    'สถาบัน_ปลายทาง':direction==='outbound'?(row.institution||''):'',
+    'โครงการ':row.project||'',
+    'วัตถุประสงค์':row.purpose||'',
+    'ประเภท':row.participant_type||'Mobility',
+    'จำนวน':row.participant_count||0,
+    'ปีงบ':row.fiscal_year||'',
+    'วันมาถึง':direction==='inbound'?(row.start_date||''):'',
+    'วันออก':direction==='outbound'?(row.start_date||''):'',
+    'วันเริ่ม':row.start_date||'',
+    'วันกลับ':row.end_date||'',
+    'วันสิ้นสุด':row.end_date||'',
+    status:row.status||''
+  };
+}
+function normalizePublicTravel(row){
+  return {
+    _source:'public-travel',
+    _kind:'travel',
+    'ประเทศ':row.country||'',
+    'ทวีป':row.continent||'',
+    'เมือง':row.city||'',
+    'หน่วยงาน_UP':row.up_unit||'',
+    'คณะ':row.up_unit||'',
+    'ชื่อโครงการ':row.project||'',
+    'โครงการ':row.project||'',
+    'วัตถุประสงค์':row.purpose||'',
+    'ประเภท':'การเดินทางบุคลากร',
+    'จำนวน':row.participant_count||0,
+    'ปีงบ':row.fiscal_year||'',
+    'วันเริ่ม':row.start_date||'',
+    'วันสิ้นสุด':row.end_date||'',
+    status:row.status||''
+  };
+}
+function mobilityName(r,kind){return first(r['โครงการ'],r['สถาบัน'],r['สถาบัน_ปลายทาง'],r['หน่วยงาน_UP'],kind==='inbound'?'Inbound Mobility':'Outbound Mobility');}
 function mobilityDate(r,kind){return kind==='inbound'?`${fmtDate(r['วันมาถึง'])} – ${fmtDate(r['วันกลับ'])}`:`${fmtDate(r['วันออก'])} – ${fmtDate(r['วันกลับ'])}`}
 function mobilitySortDate(r,kind){return kind==='inbound'?dateValue(r['วันมาถึง']):dateValue(r['วันออก']);}
 function cleanCountry(v){return String(v||'').replace(/^[A-Z]{2,3}\s+/,'').trim();}
@@ -114,9 +158,7 @@ function personCount(r){
   const raw=first(r['จำนวน'],r['จำนวนคน'],r['ผู้เข้าร่วม'],r['participants']);
   const n=parseInt(String(raw).replace(/[^0-9]/g,''),10);
   if(!isNaN(n)&&n>0)return n;
-  const name=first(r['ชื่อผู้เดินทาง'],r['ชื่อ_สกุล'],r['ชื่อ']);
-  if(String(name).includes(',')||String(name).includes('、'))return String(name).split(/[,、]/).filter(x=>x.trim()).length || 1;
-  return name?1:1;
+  return 1;
 }
 function sumPeople(arr){return arr.reduce((a,r)=>a+personCount(r),0);}
 function countryCounts(){const o={};[...inbound,...outbound,...travel].forEach(r=>{const c=cleanCountry(r['ประเทศ']);if(c)o[c]=(o[c]||0)+personCount(r)});return o;}
@@ -135,7 +177,7 @@ function renderCards(){
     const inst=first(r['สถาบัน'],r['สถาบัน_ปลายทาง']);
     const unit=first(r['หน่วยงาน_UP'],r['คณะ']);
     const title=kind==='inbound' ? first(inst,unit,'Inbound Mobility') : first(inst,unit,'Outbound Mobility');
-    return `<article class="mob-card" onclick="openDetail('${kind}',${i})"><div class="mob-top"><div class="mob-avatar">${flag(country)}</div><div class="mob-badge ${kind==='inbound'?'in':'out'}">${kind==='inbound'?'Inbound':'Outbound'}</div></div><div class="mob-body"><div class="mob-title">${esc(title||'-')}</div><div class="mob-meta">👥 ${personCount(r)} คน</div><div class="mob-meta">🌍 ${esc(country||'-')}</div><div class="mob-meta">📅 ${esc(mobilityDate(r,kind))}</div><div class="mob-tags"><span class="small-tag">${esc(first(r['ประเภท'],r['ระดับ'],'Mobility'))}</span><span class="small-tag">${esc(first(r['วัตถุประสงค์'],r['โครงการ'],'International'))}</span></div>${r['ไฟล์_URL']?`<a class="file-link" href="${esc(r['ไฟล์_URL'])}" target="_blank" onclick="event.stopPropagation()">📎 เอกสาร</a>`:''}</div></article>`
+    return `<article class="mob-card" onclick="openDetail('${kind}',${i})"><div class="mob-top"><div class="mob-avatar">${flag(country)}</div><div class="mob-badge ${kind==='inbound'?'in':'out'}">${kind==='inbound'?'Inbound':'Outbound'}</div></div><div class="mob-body"><div class="mob-title">${esc(title||'-')}</div><div class="mob-meta">👥 ${personCount(r)} คน</div><div class="mob-meta">🌍 ${esc(country||'-')}</div><div class="mob-meta">📅 ${esc(mobilityDate(r,kind))}</div><div class="mob-tags"><span class="small-tag">${esc(first(r['ประเภท'],r['ระดับ'],'Mobility'))}</span><span class="small-tag">${esc(first(r['วัตถุประสงค์'],r['โครงการ'],'International'))}</span></div></div></article>`
   }).join('');
 }
 function renderTimeline(){
@@ -143,7 +185,7 @@ function renderTimeline(){
   document.getElementById('travelCount').textContent=`${rows.length} รายการ / ${sumPeople(rows)} คน`;
   const el=document.getElementById('travelTimeline');
   if(!rows.length){el.innerHTML='<div class="empty">ไม่พบข้อมูลการเดินทางบุคลากรตามเงื่อนไขที่เลือก</div>';return;}
-  el.innerHTML=rows.map((r,i)=>`<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-box" onclick="openDetail('travel',${i})"><div class="timeline-title">${esc(first(r['ชื่อโครงการ'],r['วัตถุประสงค์'],'การเดินทางบุคลากร'))}</div><div class="timeline-meta"><span>🌍 ${esc(cleanCountry(r['ประเทศ'])||'-')}</span><span>📍 ${esc(r['เมือง']||'-')}</span><span>👥 ${personCount(r)} คน</span></div><div class="timeline-date">${fmtDate(r['วันเริ่ม'])} → ${fmtDate(r['วันสิ้นสุด'])}</div>${r['ไฟล์_URL']?`<div class="timeline-actions"><a href="${esc(r['ไฟล์_URL'])}" target="_blank" onclick="event.stopPropagation()">📎 ดูเอกสาร</a></div>`:''}</div></div>`).join('');
+  el.innerHTML=rows.map((r,i)=>`<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-box" onclick="openDetail('travel',${i})"><div class="timeline-title">${esc(first(r['ชื่อโครงการ'],r['วัตถุประสงค์'],'การเดินทางบุคลากร'))}</div><div class="timeline-meta"><span>🌍 ${esc(cleanCountry(r['ประเทศ'])||'-')}</span><span>📍 ${esc(r['เมือง']||'-')}</span><span>👥 ${personCount(r)} คน</span></div><div class="timeline-date">${fmtDate(r['วันเริ่ม'])} → ${fmtDate(r['วันสิ้นสุด'])}</div></div></div>`).join('');
 }
 function monthKey(v){const d=toDate(v);return d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`:'ไม่ระบุ';}
 function monthLabel(k){if(k==='ไม่ระบุ')return k;const [y,m]=k.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('th-TH',{month:'short',year:'2-digit'});}
@@ -176,13 +218,51 @@ function matchCountryActual(mapName,data){const n=String(mapName).toLowerCase();
 function matchCountryName(mapName,data){const dc=matchCountryActual(mapName,data);return dc?data[dc]:0;}
 function filterMapCountry(c){if(!c)return;const sel=document.getElementById('countryFilter');if([...sel.options].some(o=>o.value===c)){sel.value=c;renderAll();document.getElementById('mobilityCards')?.scrollIntoView({behavior:'smooth',block:'start'});}}
 async function renderMap(){const el=document.getElementById('worldMap');if(!el)return;const data=countryCounts();try{const world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');const countries=topojson.feature(world,world.objects.countries).features;el.innerHTML='<svg></svg><div class="map-tooltip" id="mapTip"></div>';const svg=d3.select(el).select('svg');const w=el.clientWidth||900,h=el.clientHeight||310;const projection=d3.geoNaturalEarth1().fitSize([w,h],{type:'Sphere'});const path=d3.geoPath(projection);const tip=el.querySelector('#mapTip');svg.attr('viewBox',`0 0 ${w} ${h}`);svg.append('path').datum({type:'Sphere'}).attr('d',path).attr('fill','#081d31');svg.selectAll('path.country').data(countries).join('path').attr('class',d=>{const v=matchCountryName(d.properties.name,data);return 'country '+(v>=8?'active-high':v>=4?'active-mid':v>=1?'active-low':'')}).attr('d',path).on('mousemove',(ev,d)=>{const v=matchCountryName(d.properties.name,data);if(!v)return;tip.style.display='block';tip.style.left=(ev.offsetX+12)+'px';tip.style.top=(ev.offsetY+12)+'px';tip.innerHTML=`<b>${esc(d.properties.name)}</b><br>${v} คน<br><span style="font-size:10px;color:#667">คลิกเพื่อกรองประเทศ</span>`;}).on('mouseleave',()=>tip.style.display='none').on('click',(ev,d)=>{filterMapCountry(matchCountryActual(d.properties.name,data));});}catch(e){console.error(e);el.innerHTML='<div class="empty" style="color:#b8c9da">โหลดแผนที่ไม่ได้ แต่ข้อมูลยังใช้งานได้</div>';}}
-function openDetail(kind,index){let rows=kind==='travel'?filteredTravel():filteredMobility().filter(r=>r._kind===kind);const r=rows[index];if(!r)return;const title=kind==='travel'?first(r['ชื่อโครงการ'],r['วัตถุประสงค์'],'การเดินทางบุคลากร'):(kind==='inbound'?first(r['สถาบัน'],r['หน่วยงาน_UP'],'Inbound Mobility'):first(r['สถาบัน_ปลายทาง'],r['คณะ'],'Outbound Mobility'));document.getElementById('modalTitle').textContent=title||'รายละเอียด';let fields=[];if(kind==='travel'){fields=[['ประเภท','การเดินทางบุคลากร'],['ประเทศ',r['ประเทศ']],['เมือง',r['เมือง']],['จำนวนผู้เดินทาง',personCount(r)+' คน'],['วันเริ่ม',fmtDate(r['วันเริ่ม'])],['วันสิ้นสุด',fmtDate(r['วันสิ้นสุด'])],['วัตถุประสงค์',r['วัตถุประสงค์']],['งบประเภท',r['งบประเภท']],['จำนวนเงิน',r['จำนวนเงิน']],['หมายเหตุ',r['หมายเหตุ']]];}else if(kind==='inbound'){fields=[['ประเภท','Inbound'],['จำนวนคน',personCount(r)+' คน'],['เพศ',r['เพศ']],['ระดับ',r['ระดับ']],['สถาบัน',r['สถาบัน']],['ประเทศ',r['ประเทศ']],['หน่วยงาน UP',r['หน่วยงาน_UP']],['วันมาถึง',fmtDate(r['วันมาถึง'])],['วันกลับ',fmtDate(r['วันกลับ'])],['โครงการ',r['โครงการ']],['วัตถุประสงค์',r['วัตถุประสงค์']],['หมายเหตุ',r['หมายเหตุ']]];}else{fields=[['ประเภท','Outbound'],['จำนวนคน',personCount(r)+' คน'],['คณะ',r['คณะ']],['สาขา',r['สาขา']],['สถาบันปลายทาง',r['สถาบัน_ปลายทาง']],['ประเทศ',r['ประเทศ']],['วันออก',fmtDate(r['วันออก'])],['วันกลับ',fmtDate(r['วันกลับ'])],['โครงการ',r['โครงการ']],['วัตถุประสงค์',r['วัตถุประสงค์']],['หมายเหตุ',r['หมายเหตุ']]];}document.getElementById('modalBody').innerHTML=`<div class="detail-grid">${fields.map(([l,v])=>`<div class="detail-item ${String(v||'').length>55?'full':''}"><div class="detail-label">${esc(l)}</div><div class="detail-val">${esc(v||'-')}</div></div>`).join('')}</div><div class="modal-actions">${r['ไฟล์_URL']?`<a class="btn green" href="${esc(r['ไฟล์_URL'])}" target="_blank">📎 เปิดเอกสารแนบ</a>`:''}<button class="btn blue" onclick="closeDetail()">ปิด</button></div>`;document.getElementById('detailModal').classList.add('show');}
+function openDetail(kind,index){
+  let rows=kind==='travel'?filteredTravel():filteredMobility().filter(r=>r._kind===kind);
+  const r=rows[index];
+  if(!r)return;
+  const title=kind==='travel'
+    ? first(r['ชื่อโครงการ'],r['วัตถุประสงค์'],'การเดินทางบุคลากร')
+    : first(r['โครงการ'],r['สถาบัน'],r['สถาบัน_ปลายทาง'],r['หน่วยงาน_UP'],kind==='inbound'?'Inbound Mobility':'Outbound Mobility');
+  document.getElementById('modalTitle').textContent=title||'รายละเอียด';
+  let fields=[];
+  if(kind==='travel'){
+    fields=[['ประเภท','การเดินทางบุคลากร'],['ประเทศ',r['ประเทศ']],['ทวีป',r['ทวีป']],['เมือง',r['เมือง']],['หน่วยงาน UP',r['หน่วยงาน_UP']],['จำนวนผู้เดินทาง',personCount(r)+' คน'],['วันเริ่ม',fmtDate(r['วันเริ่ม'])],['วันสิ้นสุด',fmtDate(r['วันสิ้นสุด'])],['โครงการ',r['โครงการ']],['วัตถุประสงค์',r['วัตถุประสงค์']],['ปีงบ',r['ปีงบ']],['สถานะ',r.status]];
+  }else if(kind==='inbound'){
+    fields=[['ประเภท','Inbound'],['จำนวนคน',personCount(r)+' คน'],['ประเภทผู้เข้าร่วม',r['ประเภท']],['สถาบัน',r['สถาบัน']],['ประเทศ',r['ประเทศ']],['ทวีป',r['ทวีป']],['หน่วยงาน UP',r['หน่วยงาน_UP']],['วันมาถึง',fmtDate(r['วันมาถึง'])],['วันกลับ',fmtDate(r['วันกลับ'])],['โครงการ',r['โครงการ']],['วัตถุประสงค์',r['วัตถุประสงค์']],['ปีงบ',r['ปีงบ']],['สถานะ',r.status]];
+  }else{
+    fields=[['ประเภท','Outbound'],['จำนวนคน',personCount(r)+' คน'],['ประเภทผู้เข้าร่วม',r['ประเภท']],['หน่วยงาน UP',r['หน่วยงาน_UP']],['สถาบันปลายทาง',r['สถาบัน_ปลายทาง']],['ประเทศ',r['ประเทศ']],['ทวีป',r['ทวีป']],['วันออก',fmtDate(r['วันออก'])],['วันกลับ',fmtDate(r['วันกลับ'])],['โครงการ',r['โครงการ']],['วัตถุประสงค์',r['วัตถุประสงค์']],['ปีงบ',r['ปีงบ']],['สถานะ',r.status]];
+  }
+  document.getElementById('modalBody').innerHTML=`<div class="detail-grid">${fields.map(([l,v])=>`<div class="detail-item ${String(v||'').length>55?'full':''}"><div class="detail-label">${esc(l)}</div><div class="detail-val">${esc(v||'-')}</div></div>`).join('')}</div><div class="modal-actions"><button class="btn blue" onclick="closeDetail()">ปิด</button></div>`;
+  document.getElementById('detailModal').classList.add('show');
+}
 function closeDetail(){document.getElementById('detailModal').classList.remove('show');}
 document.getElementById('detailModal').addEventListener('click',e=>{if(e.target.id==='detailModal')closeDetail();});
 function setupFilters(){document.getElementById('searchInput').addEventListener('input',renderAll);document.getElementById('countryFilter').addEventListener('change',renderAll);document.querySelectorAll('.pill').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentType=b.dataset.type;renderAll();}));}
 function fillCountries(){const sel=document.getElementById('countryFilter');const countries=[...new Set([...inbound,...outbound,...travel].map(r=>cleanCountry(r['ประเทศ'])).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));countries.forEach(c=>{const op=document.createElement('option');op.value=c;op.textContent=c;sel.appendChild(op);});}
 function setLang(lang){document.querySelectorAll('.nav-lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===lang));}
-async function init(){try{[inbound,outbound,travel]=await Promise.all([IROUP.getAll(IROUP.SHEETS.INBOUND),IROUP.getAll(IROUP.SHEETS.OUTBOUND),IROUP.getAll(IROUP.SHEETS.TRAVEL)]);document.getElementById('kpi-in').textContent=sumPeople(inbound);document.getElementById('kpi-out').textContent=sumPeople(outbound);document.getElementById('kpi-travel').textContent=sumPeople(travel);document.getElementById('kpi-total').textContent=sumPeople(inbound)+sumPeople(outbound)+sumPeople(travel);document.getElementById('kpi-countries').textContent=Object.keys(countryCounts()).length;fillCountries();setupFilters();renderAll();}catch(e){console.error(e);document.getElementById('mobilityCards').innerHTML='<div class="empty">⚠️ โหลดข้อมูล Mobility ไม่สำเร็จ</div>';document.getElementById('travelTimeline').innerHTML='<div class="empty">⚠️ โหลดข้อมูลการเดินทางไม่สำเร็จ</div>';}}
+async function init(){
+  try{
+    const [mobilityPayload,travelRows]=await Promise.all([IROUP.getPublicMobility(),IROUP.getPublicTravel()]);
+    const mobilityRows=(mobilityPayload.data||[]).map(normalizePublicMobility);
+    inbound=mobilityRows.filter(r=>r._kind==='inbound');
+    outbound=mobilityRows.filter(r=>r._kind==='outbound');
+    travel=(travelRows||[]).map(normalizePublicTravel);
+    document.getElementById('kpi-in').textContent=sumPeople(inbound);
+    document.getElementById('kpi-out').textContent=sumPeople(outbound);
+    document.getElementById('kpi-travel').textContent=sumPeople(travel);
+    document.getElementById('kpi-total').textContent=sumPeople(inbound)+sumPeople(outbound)+sumPeople(travel);
+    document.getElementById('kpi-countries').textContent=Object.keys(countryCounts()).length;
+    fillCountries();
+    setupFilters();
+    renderAll();
+  }catch(e){
+    console.error(e);
+    document.getElementById('mobilityCards').innerHTML='<div class="empty">⚠️ โหลดข้อมูล Mobility ไม่สำเร็จ</div>';
+    document.getElementById('travelTimeline').innerHTML='<div class="empty">⚠️ โหลดข้อมูลการเดินทางไม่สำเร็จ</div>';
+  }
+}
 init();
 </script>
 </body>

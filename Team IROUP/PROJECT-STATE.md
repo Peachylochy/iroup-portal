@@ -105,10 +105,10 @@ Legend: `[✓]` fully migrated · `[~]` partial / stabilized · `[ ]` pending
 | `mou.html` | `[ ]` pending | ❌ | ❌ | N/A — `htmlSafe()` local, TODO marked | Uses `IROUP.getMouStatus()` and local `htmlSafe()`. Migration planned. |
 | `mobility.html` | `[ ]` pending | ❌ | ❌ | N/A — `r9e()` + `formatDate()` local, TODO marked | Uses `r9e()` (esc) and local `formatDate()`. Migration planned. |
 | `index.html` | `[ ]` deferred | ❌ | ❌ | ❌ | Auth/login page — v1 layout concept approved. CSS/layout implementation next. JS/auth untouched. |
-| `public/public-scholar.html` | `[ ]` pending | ❌ | ❌ | ❌ | Small page, good next target. |
-| `public/public-events.html` | `[ ]` pending | ❌ | ❌ | ❌ | Small page, good next target. |
-| `public/public-mou.html` | `[ ]` pending | ❌ | ❌ | ❌ | Has D3 — check carefully. |
-| `public/public-mobility.html` | `[ ]` pending | ❌ | ❌ | ❌ | Has Chart.js + D3. |
+| `public/public-scholar.html` | `[~]` public-safe endpoint migrated | ❌ | ❌ | ❌ | Governance Pass 2C-B Phase 1 complete. |
+| `public/public-events.html` | `[~]` public-safe endpoint migrated | ❌ | ❌ | ❌ | Governance Pass 2C-B Phase 2 complete. |
+| `public/public-mou.html` | `[~]` public-safe endpoint migrated | ❌ | ❌ | ❌ | Governance Pass 2C-B Phase 3 complete. D3 preserved. |
+| `public/public-mobility.html` | `[~]` public-safe endpoint migrated | ❌ | ❌ | ❌ | Governance Pass 2C-B Phase 4 complete. Chart.js + D3 preserved. |
 | `public/public-landing.html` | `[ ]` deferred | ❌ | ❌ | ❌ | 305 KB — needs dedicated audit first. Theme not yet linked. |
 
 ---
@@ -388,3 +388,11 @@ Commits made across sessions:
 ## 22. Backend Governance Pass 2C-B Phase 2 (2026-05-09)
 
 - Backend Governance Pass 2C-B Phase 2: migrated public-events.html to public-safe event endpoints using sanitized payload adapters while preserving existing public UI behavior.
+
+## 23. Backend Governance Pass 2C-B Phase 3 (2026-05-09)
+
+- Backend Governance Pass 2C-B Phase 3: migrated public-mou.html to public-safe MOU endpoints using a sanitized payload adapter while preserving existing public map, chart, table, filter, and status behavior.
+
+## 24. Backend Governance Pass 2C-B Phase 4 (2026-05-09)
+
+- Backend Governance Pass 2C-B Phase 4: migrated public-mobility.html to public-safe mobility/travel endpoints using sanitized aggregate adapters while preserving existing public dashboard behavior.

@@ -1192,3 +1192,25 @@ Constraints maintained:
 - No auth enforcement
 - No UI redesign
 - Incremental and reversible page-only migration
+
+---
+
+35. Backend Governance Pass 2C-B Phase 4 (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2C-B Phase 4: migrated public-mobility.html to public-safe mobility/travel endpoints using sanitized aggregate adapters while preserving existing public dashboard behavior.
+
+Implementation notes:
+
+- Replaced raw inbound/outbound/travel loading with `IROUP.getPublicMobility()` and `IROUP.getPublicTravel()`
+- Added page-local adapters from sanitized public payload keys to the existing public mobility dashboard rendering shape
+- Preserved KPI cards, charts, country grouping, filters, top-country list, D3/world map behavior, map click filtering, mobility cards, travel timeline, modal details, and empty states
+- Removed public rendering paths for private/admin-only fields such as names, gender, branch, file links, budgets, amount, and internal notes
+
+Constraints maintained:
+
+- No backend changes
+- No auth enforcement
+- No UI redesign
+- Public landing left untouched
