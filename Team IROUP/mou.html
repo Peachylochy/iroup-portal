@@ -294,7 +294,7 @@ td[style*="gray-500"],div[style*="gray-500"]{color:var(--gray-500)!important}
     <!-- ALERT BANNER -->
     <div class="alert-banner">
       <span style="font-size:18px">⚠️</span>
-      <div class="alert-text"><strong>แจ้งเตือน:</strong> มี 3 MOU ที่จะหมดอายุภายใน 180 วัน — Keimyung University, USQ Australia, Yunnan University · <a href="#" style="color:var(--blue);font-weight:600">ดูรายการ →</a></div>
+      <div class="alert-text"><strong>แจ้งเตือน:</strong> กำลังโหลดข้อมูล MOU...</div>
     </div>
 
     <!-- KPI CARDS -->
@@ -302,23 +302,23 @@ td[style*="gray-500"],div[style*="gray-500"]{color:var(--gray-500)!important}
       <div class="kpi-card">
         <div class="kpi-icon blue">🤝</div>
         <div>
-          <div class="kpi-num blue">142</div>
+          <div class="kpi-num blue">0</div>
           <div class="kpi-label">MOU ทั้งหมด</div>
-          <div class="kpi-sub">+8 ปีงบประมาณนี้</div>
+          <div class="kpi-sub">รอโหลดข้อมูล</div>
         </div>
       </div>
       <div class="kpi-card">
         <div class="kpi-icon green">✅</div>
         <div>
-          <div class="kpi-num green">118</div>
+          <div class="kpi-num green">0</div>
           <div class="kpi-label">Active</div>
-          <div class="kpi-sub">83% ของทั้งหมด</div>
+          <div class="kpi-sub">0% ของทั้งหมด</div>
         </div>
       </div>
       <div class="kpi-card">
         <div class="kpi-icon gold">⏰</div>
         <div>
-          <div class="kpi-num gold">3</div>
+          <div class="kpi-num gold">0</div>
           <div class="kpi-label">ใกล้หมดอายุ</div>
           <div class="kpi-sub">ภายใน 180 วัน</div>
         </div>
@@ -326,9 +326,9 @@ td[style*="gray-500"],div[style*="gray-500"]{color:var(--gray-500)!important}
       <div class="kpi-card">
         <div class="kpi-icon blue" style="background:#E8F4FD">🌍</div>
         <div>
-          <div class="kpi-num blue">38</div>
+          <div class="kpi-num blue">0</div>
           <div class="kpi-label">ประเทศทั่วโลก</div>
-          <div class="kpi-sub">5 ทวีป</div>
+          <div class="kpi-sub">0 ทวีป</div>
         </div>
       </div>
     </div>
@@ -396,7 +396,7 @@ td[style*="gray-500"],div[style*="gray-500"]{color:var(--gray-500)!important}
       <div class="table-header">
         <div>
           <div class="table-title">📋 รายการ MOU ทั้งหมด</div>
-          <div class="table-count" id="tableCount">แสดง 10 รายการ จาก 142</div>
+          <div class="table-count" id="tableCount">กำลังโหลดข้อมูล...</div>
         </div>
         <div class="table-actions">
           <button class="tbl-btn tbl-btn-export" onclick="exportData()">📥 Export Excel</button>
@@ -570,6 +570,10 @@ const deptData = {
 // ============ TABLE ============
 let currentStatus = 'all';
 let liveMouList = [];
+let countryCounts = {};
+let deptChart = null;
+let mapCountryPaths = null;
+let mapCountryNames = {};
 
 // TODO: migrate to IU.* — htmlSafe → IU.esc; IROUP.getMouStatus → IU.statusMou; load iroup-utils.js first
 function htmlSafe(value){
@@ -602,14 +606,79 @@ function formatMouDate(value){
   const d = parseMouDate(value);
   return d ? d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '—';
 }
+function getMouRows(){
+  return Array.isArray(liveMouList) ? liveMouList : [];
+}
+function getMouCountry(row){
+  const country = String(normalizeRow(row).country || '').trim();
+  let countryList = [];
+  try { countryList = COUNTRIES; } catch(e) { countryList = []; }
+  if (countryList.length) {
+    const match = countryList.find(c=>c.en===country || c.th===country);
+    if (match) return match.en;
+  }
+  return country;
+}
+function getMouDept(row){
+  return String(normalizeRow(row).dept || '').trim();
+}
+function getMouEndDate(row){
+  return normalizeRow(row).to;
+}
+function getMouStartDate(row){
+  return normalizeRow(row).from;
+}
 function getRowStatus(row){
-  if (window.IROUP && IROUP.getMouStatus && row['วันสิ้นสุด']) return IROUP.getMouStatus(row['วันสิ้นสุด']);
-  const end = parseMouDate(row.to || row['วันสิ้นสุด']);
+  const end = parseMouDate(getMouEndDate(row));
   if (!end) return {status:'active', label:'Active'};
-  const diff = Math.floor((end - new Date())/(1000*60*60*24));
-  if (diff <= 0) return {status:'expired', label:'หมดอายุ'};
-  if (diff <= 180 || row.status === 'soon') return {status:'soon', label:'ใกล้หมด'};
+  const today = new Date();
+  const start = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  const diff = Math.ceil((end - start)/(1000*60*60*24));
+  if (diff < 0) return {status:'expired', label:'หมดอายุ'};
+  if (diff <= 180) return {status:'soon', label:'ใกล้หมด'};
   return {status:'active', label:'Active'};
+}
+function buildCountryCounts(rows){
+  return rows.reduce((acc,row)=>{
+    const country = getMouCountry(row);
+    if (country && country !== '—') acc[country] = (acc[country] || 0) + 1;
+    return acc;
+  },{});
+}
+function buildDeptCounts(rows){
+  return rows.filter(row=>getRowStatus(row).status==='active').reduce((acc,row)=>{
+    const dept = getMouDept(row);
+    if (dept && dept !== '—') acc[dept] = (acc[dept] || 0) + 1;
+    return acc;
+  },{});
+}
+function getExpiringRows(rows,days=180){
+  const today = new Date();
+  const start = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  return rows.filter(row=>{
+    const end = parseMouDate(getMouEndDate(row));
+    if (!end) return false;
+    const diff = Math.ceil((end - start)/(1000*60*60*24));
+    return diff >= 0 && diff <= days;
+  }).sort((a,b)=>(parseMouDate(getMouEndDate(a))||0)-(parseMouDate(getMouEndDate(b))||0));
+}
+function getVisibleMouRows(){
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const cont = document.getElementById('continentFilter')?.value || '';
+  const dateFrom = parseMouDate(document.getElementById('dateFrom')?.value || '');
+  const dateTo = parseMouDate(document.getElementById('dateTo')?.value || '');
+  return getMouRows().filter(m=>{
+    const r = normalizeRow(m);
+    const searchable = [r.dept,r.uni,r.country,r.type,r.fy,r.note,getFileUrl(m)].join(' ').toLowerCase();
+    const matchQ = !q || searchable.includes(q);
+    const matchCont = !cont || r.continent === cont;
+    const matchStatus = currentStatus === 'all' || getRowStatus(m).status === currentStatus;
+    const start = parseMouDate(r.from);
+    const end = parseMouDate(r.to) || start;
+    const matchFrom = !dateFrom || !end || end >= dateFrom;
+    const matchTo = !dateTo || !start || start <= dateTo;
+    return matchQ && matchCont && matchStatus && matchFrom && matchTo;
+  });
 }
 function badgeClassOf(status){
   return status === 'active' ? 'badge-active' : status === 'soon' ? 'badge-soon' : 'badge-expired';
@@ -665,22 +734,16 @@ function renderTable(data){
   if (c) c.textContent = `แสดง ${data.length} รายการ`;
 }
 function getCurrentMouSource(){
-  return liveMouList && liveMouList.length ? liveMouList : mouData;
+  return getMouRows();
 }
 function filterTable(){
-  const input = document.getElementById('searchInput');
-  const q = (input?.value || '').toLowerCase().trim();
-  const cont = document.getElementById('continentFilter')?.value || '';
-  const source = getCurrentMouSource();
-  const filtered = source.filter(m=>{
-    const r = normalizeRow(m);
-    const searchable = [r.dept,r.uni,r.country,r.type,r.fy,r.note,getFileUrl(m)].join(' ').toLowerCase();
-    const matchQ = !q || searchable.includes(q);
-    const matchCont = !cont || r.continent === cont;
-    const matchStatus = currentStatus === 'all' || getRowStatus(m).status === currentStatus;
-    return matchQ && matchCont && matchStatus;
-  });
-  renderTable(filtered);
+  renderTable(getVisibleMouRows());
+}
+function setStatus(status,el){
+  currentStatus = status || 'all';
+  document.querySelectorAll('.status-pills .pill').forEach(p=>p.classList.remove('all','active-p','expire-soon','expired'));
+  if (el) el.classList.add(currentStatus==='active'?'active-p':currentStatus==='soon'?'expire-soon':currentStatus==='expired'?'expired':'all');
+  filterTable();
 }
 function openMouFile(id){
   const m = getCurrentMouSource().find(x => String(x.ID || x.id || '') === String(id));
@@ -691,14 +754,14 @@ function openMouFile(id){
 
 // ============ CHART ============
 const ctx = document.getElementById('deptChart').getContext('2d');
-new Chart(ctx,{
+deptChart = new Chart(ctx,{
   type:'bar',
   data:{
-    labels:deptData.labels,
+    labels:[],
     datasets:[{
       label:'MOU Active',
-      data:deptData.values,
-      backgroundColor:deptData.values.map((_,i)=>i===0?'#1A6DB5':i<3?'#4BBDE8':'#A8D8F0'),
+      data:[],
+      backgroundColor:[],
       borderRadius:6,
       borderSkipped:false
     }]
@@ -714,6 +777,16 @@ new Chart(ctx,{
     }
   }
 });
+
+function updateDeptChart(rows){
+  const entries = Object.entries(buildDeptCounts(rows)).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const labels = entries.map(([label])=>label);
+  const values = entries.map(([,value])=>value);
+  deptChart.data.labels = labels;
+  deptChart.data.datasets[0].data = values;
+  deptChart.data.datasets[0].backgroundColor = values.map((_,i)=>i===0?'#1A6DB5':i<3?'#4BBDE8':'#A8D8F0');
+  deptChart.update();
+}
 
 // ============ WORLD MAP ============
 const w=document.getElementById('world-map').getBoundingClientRect().width||700;
@@ -735,15 +808,16 @@ fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
   .then(world=>{
     const countries=topojson.feature(world,world.objects.countries);
     const countryNames={4:"Afghanistan",8:"Albania",12:"Algeria",24:"Angola",32:"Argentina",36:"Australia",40:"Austria",50:"Bangladesh",56:"Belgium",68:"Bolivia",76:"Brazil",100:"Bulgaria",104:"Myanmar",116:"Cambodia",120:"Cameroon",124:"Canada",144:"Sri Lanka",152:"Chile",156:"China",170:"Colombia",180:"DR Congo",188:"Costa Rica",191:"Croatia",196:"Cyprus",203:"Czech Republic",208:"Denmark",214:"Dominican Republic",218:"Ecuador",818:"Egypt",222:"El Salvador",231:"Ethiopia",246:"Finland",250:"France",276:"Germany",288:"Ghana",300:"Greece",320:"Guatemala",332:"Haiti",340:"Honduras",348:"Hungary",356:"India",360:"Indonesia",364:"Iran",368:"Iraq",372:"Ireland",376:"Israel",380:"Italy",388:"Jamaica",392:"Japan",400:"Jordan",398:"Kazakhstan",404:"Kenya",410:"South Korea",414:"Kuwait",418:"Laos",422:"Lebanon",430:"Liberia",440:"Lithuania",442:"Luxembourg",454:"Malawi",458:"Malaysia",484:"Mexico",504:"Morocco",508:"Mozambique",516:"Namibia",524:"Nepal",528:"Netherlands",554:"New Zealand",558:"Nicaragua",566:"Nigeria",578:"Norway",586:"Pakistan",591:"Panama",598:"Papua New Guinea",604:"Peru",608:"Philippines",616:"Poland",620:"Portugal",630:"Puerto Rico",634:"Qatar",642:"Romania",643:"Russia",682:"Saudi Arabia",686:"Senegal",694:"Sierra Leone",703:"Slovakia",706:"Somalia",710:"South Africa",724:"Spain",736:"Sudan",752:"Sweden",756:"Switzerland",760:"Syria",764:"Thailand",788:"Tunisia",792:"Turkey",800:"Uganda",804:"Ukraine",784:"United Arab Emirates",826:"United Kingdom",840:"USA",858:"Uruguay",862:"Venezuela",704:"Vietnam",887:"Yemen",894:"Zambia",716:"Zimbabwe",158:"Taiwan",504:"Morocco",144:"Sri Lanka"};
+    mapCountryNames = countryNames;
 
-    svg.selectAll('.country')
+    mapCountryPaths = svg.selectAll('.country')
       .data(countries.features)
       .join('path')
       .attr('class','country')
       .attr('d',path)
       .attr('fill',d=>{
         const name=countryNames[+d.id]||'';
-        const cnt=countryMOU[name]||0;
+        const cnt=countryCounts[name]||0;
         if(cnt===0) return 'rgba(255,255,255,0.07)';
         if(cnt>=8) return '#F5A623';
         if(cnt>=4) return '#1A6DB5';
@@ -753,11 +827,11 @@ fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
       .attr('stroke-width',0.5)
       .style('cursor',d=>{
         const name=countryNames[+d.id]||'';
-        return countryMOU[name]>0?'pointer':'default';
+        return countryCounts[name]>0?'pointer':'default';
       })
       .on('mousemove',function(event,d){
         const name=countryNames[+d.id]||'';
-        const cnt=countryMOU[name]||0;
+        const cnt=countryCounts[name]||0;
         if(cnt===0) return;
         const rect=document.getElementById('world-map').getBoundingClientRect();
         const mapCard=document.querySelector('.map-card').getBoundingClientRect();
@@ -770,27 +844,28 @@ fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
       })
       .on('mouseleave',function(event,d){
         const name=countryNames[+d.id]||'';
-        const cnt=countryMOU[name]||0;
+        const cnt=countryCounts[name]||0;
         document.getElementById('mapTooltip').style.opacity='0';
         const fill=cnt===0?'rgba(255,255,255,0.07)':cnt>=8?'#F5A623':cnt>=4?'#1A6DB5':'#4BBDE8';
         d3.select(this).attr('fill',fill);
       })
       .on('click',function(event,d){
         const name=countryNames[+d.id]||'';
-        const cnt=countryMOU[name]||0;
+        const cnt=countryCounts[name]||0;
         if(cnt===0) return;
-        const mous=mouData.filter(m=>m.country===name);
+        const mous=getMouRows().filter(m=>getMouCountry(m)===name);
         const popup=document.getElementById('mapPopup');
         const overlay=document.getElementById('popupOverlay');
         const items=mous.length>0?mous.map(m=>`
           <div class="popup-mou-item">
-            <div class="popup-mou-name">${m.uni}</div>
-            <div class="popup-mou-meta">${m.type} · ${m.dept} · ${new Date(m.to).toLocaleDateString('th-TH',{year:'numeric',month:'short'})}</div>
+            <div class="popup-mou-name">${htmlSafe(normalizeRow(m).uni)}</div>
+            <div class="popup-mou-meta">${htmlSafe(normalizeRow(m).type)} · ${htmlSafe(normalizeRow(m).dept)} · ${formatMouDate(getMouEndDate(m))}</div>
           </div>`).join(''):`<div style="font-size:12px;color:var(--gray-600);font-family:'Inter',sans-serif">มี ${cnt} MOU</div>`;
         popup.innerHTML=`<div class="popup-header"><div class="popup-country">🌏 ${name} (${cnt} MOU)</div><button class="popup-close" onclick="closePopup()">✕</button></div>${items}`;
         popup.classList.add('show');
         overlay.classList.add('show');
       });
+      updateWorldMap(getMouRows());
   })
   .catch(()=>{
     svg.append('text').attr('x',w/2).attr('y',h/2).attr('text-anchor','middle').attr('fill','rgba(255,255,255,0.4)').attr('font-size',13).text('กำลังโหลดแผนที่...');
@@ -801,6 +876,68 @@ function closePopup(){
   document.getElementById('popupOverlay').classList.remove('show');
 }
 
+function updateWorldMap(rows){
+  countryCounts = buildCountryCounts(rows);
+  if (!mapCountryPaths) return;
+  mapCountryPaths
+    .attr('fill',d=>{
+      const name=mapCountryNames[+d.id]||'';
+      const cnt=countryCounts[name]||0;
+      if(cnt===0) return 'rgba(255,255,255,0.07)';
+      if(cnt>=8) return '#F5A623';
+      if(cnt>=4) return '#1A6DB5';
+      return '#4BBDE8';
+    })
+    .style('cursor',d=>{
+      const name=mapCountryNames[+d.id]||'';
+      return countryCounts[name]>0?'pointer':'default';
+    });
+}
+
+function updateKpis(rows){
+  const total = rows.length;
+  const active = rows.filter(row=>getRowStatus(row).status==='active').length;
+  const soon = rows.filter(row=>getRowStatus(row).status==='soon').length;
+  const expired = rows.filter(row=>getRowStatus(row).status==='expired').length;
+  const countries = Object.keys(buildCountryCounts(rows)).length;
+  const continents = new Set(rows.map(row=>normalizeRow(row).continent).filter(Boolean)).size;
+  const nums = document.querySelectorAll('.kpi-num');
+  const subs = document.querySelectorAll('.kpi-sub');
+  if (nums[0]) nums[0].textContent = total;
+  if (nums[1]) nums[1].textContent = active;
+  if (nums[2]) nums[2].textContent = soon;
+  if (nums[3]) nums[3].textContent = countries;
+  if (subs[0]) subs[0].textContent = `หมดอายุ ${expired} รายการ`;
+  if (subs[1]) subs[1].textContent = total ? `${Math.round(active/total*100)}% ของทั้งหมด` : '0% ของทั้งหมด';
+  if (subs[2]) subs[2].textContent = 'ภายใน 180 วัน';
+  if (subs[3]) subs[3].textContent = `${continents} ทวีป`;
+}
+
+function updateWarningBanner(rows){
+  const text = document.querySelector('.alert-banner .alert-text');
+  if (!text) return;
+  const expiring = getExpiringRows(rows,180);
+  if (!rows.length) {
+    text.innerHTML = '<strong>แจ้งเตือน:</strong> ไม่มีข้อมูล MOU ที่โหลดได้';
+    return;
+  }
+  if (!expiring.length) {
+    text.innerHTML = '<strong>แจ้งเตือน:</strong> ไม่มี MOU ที่จะหมดอายุภายใน 180 วัน';
+    return;
+  }
+  const names = expiring.slice(0,3).map(row=>normalizeRow(row).uni).filter(Boolean).map(htmlSafe).join(', ');
+  const more = expiring.length > 3 ? ` และอีก ${expiring.length-3} รายการ` : '';
+  text.innerHTML = `<strong>แจ้งเตือน:</strong> มี ${expiring.length} MOU ที่จะหมดอายุภายใน 180 วัน${names ? ` — ${names}${more}` : ''}`;
+}
+
+function refreshMouDashboard(rows){
+  updateKpis(rows);
+  updateWarningBanner(rows);
+  updateWorldMap(rows);
+  updateDeptChart(rows);
+  filterTable();
+}
+
 // ============ MODAL ============
 function openModal(id){
   document.getElementById('modalTitle').textContent=id?'แก้ไข MOU':'เพิ่ม MOU ใหม่';
@@ -809,7 +946,24 @@ function openModal(id){
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
 document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-function exportData(){alert('📥 กำลัง Export รายงาน...\n(Feature นี้จะเชื่อมต่อกับ Backend จริง)');}
+function exportData(){
+  const rows = getVisibleMouRows();
+  if (!rows.length) return alert('ไม่มีข้อมูล MOU สำหรับส่งออก');
+  const headers = ['หน่วยงาน_UP','องค์กร_ตปท','ประเทศ','ประเภท','วันเริ่ม','วันสิ้นสุด','ปีงบ','สถานะ','หมายเหตุ','ไฟล์_URL'];
+  const csvRows = rows.map(row=>{
+    const r = normalizeRow(row);
+    const s = getRowStatus(row);
+    const values = [r.dept,r.uni,r.country,r.type,r.from,r.to,r.fy,s.label,r.note,getFileUrl(row)];
+    return values.map(v=>`"${String(v ?? '').replace(/"/g,'""')}"`).join(',');
+  });
+  const csv = '\ufeff' + [headers.join(','),...csvRows].join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `iroup-mou-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 </script>
 <script src="iroup-config.js"></script>
 <script>
@@ -1028,24 +1182,13 @@ async function loadMouData() {
     const mouList = Array.isArray(result) ? result : (result?.data || []);
     liveMouList = mouList || [];
 
-    // อัปเดต KPI
-    const active = liveMouList.filter(m => IROUP.getMouStatus(m['วันสิ้นสุด']).status === 'active').length;
-    const soon   = liveMouList.filter(m => IROUP.getMouStatus(m['วันสิ้นสุด']).status === 'soon').length;
-    const countries = [...new Set(liveMouList.map(m => m['ประเทศ']))].filter(Boolean).length;
-
-    const kpis = document.querySelectorAll('.kpi-num');
-    if (kpis[0]) kpis[0].textContent = liveMouList.length;
-    if (kpis[1]) kpis[1].textContent = active;
-    if (kpis[2]) kpis[2].textContent = soon;
-    if (kpis[3]) kpis[3].textContent = countries;
-
-    renderTable(liveMouList);
+    refreshMouDashboard(liveMouList);
     console.log('✅ โหลดข้อมูล MOU สำเร็จ', liveMouList.length, 'รายการ');
   } catch(e) {
     console.error('loadMouData error:', e);
-    console.log('ℹ️ ใช้ข้อมูลตัวอย่าง MOU');
+    console.log('ℹ️ โหลดข้อมูล MOU ไม่สำเร็จ จึงแสดงสถานะว่าง');
     liveMouList = [];
-    renderTable(mouData);
+    refreshMouDashboard(liveMouList);
   }
 }
 

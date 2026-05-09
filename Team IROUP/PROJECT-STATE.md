@@ -357,3 +357,10 @@ Commits made across sessions:
 - Strengthened remaining pale MOU placeholders, KPI subtext, file-empty text, row indexes, and empty/no-result text.
 - Strengthened report table columns 3-7 and select display text.
 - Darkened the travel completed badge and optional mobility row-index text.
+
+## 16. MOU Real-Data Synchronization Pass (2026-05-09)
+
+- MOU real-data synchronization pass: KPI, warning banner, map counts, popup, department chart, and filters now derive from liveMouList instead of mixed static/mock sources.
+- Kept the existing MOU layout, D3 map rendering style, table structure, and Apps Script/API contract intact.
+- Added small page-local helpers for live row normalization, status, country/dept aggregation, expiring rows, date filters, and status pills.
+- API failure now renders safe empty states instead of mixing local fallback rows with live data.

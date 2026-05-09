@@ -1012,3 +1012,27 @@ Constraints maintained:
 - No JavaScript changes
 - No auth/session/API changes
 - No layout, routing, or architecture changes
+
+---
+
+27. MOU Real-Data Synchronization Pass (May 9, 2026)
+
+Summary
+
+MOU real-data synchronization pass: KPI, warning banner, map counts, popup, department chart, and filters now derive from liveMouList instead of mixed static/mock sources.
+
+Implementation notes:
+
+- Routed visible MOU dashboard sections through the Google Sheets/API result loaded by `IROUP.getAll(IROUP.SHEETS.MOU)`
+- Added small helpers for row normalization, MOU status, country counts, department active counts, expiring rows, and filtered rows
+- Updated map counts and popup details to use the same live country aggregation
+- Rebuilt the department active chart from active live rows by UP unit
+- Made status buttons and date range filters functional for the live table
+- Replaced API-failure fallback rows with safe empty dashboard/table states
+
+Constraints maintained:
+
+- No Apps Script/API changes
+- No auth/session changes
+- No layout redesign
+- No routing or architecture changes
