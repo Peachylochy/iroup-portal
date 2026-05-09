@@ -110,13 +110,13 @@ body{
 .brand::after{
   content:"";
   position:absolute;
-  right:clamp(0px,2vw,26px);
-  bottom:calc(var(--s7) + 4px);
-  width:clamp(116px,13vw,164px);
+  right:clamp(2px,2.2vw,30px);
+  bottom:calc(var(--s8) + 8px);
+  width:clamp(128px,14vw,178px);
   aspect-ratio:1;
   background:url("Globy_IROUP.png") center/contain no-repeat;
-  opacity:.28;
-  filter:drop-shadow(0 18px 28px rgba(15,45,90,0.12));
+  opacity:.36;
+  filter:drop-shadow(0 18px 30px rgba(15,45,90,0.16)) drop-shadow(0 0 24px rgba(75,189,232,0.10));
   transform:rotate(-2deg);
   pointer-events:none;
   z-index:0;
@@ -432,7 +432,7 @@ body{
     gap:var(--s7);padding:var(--s7) var(--s6);
   }
   .globe-wrap{width:280px;height:280px;right:-60px;opacity:.32}
-  .brand::after{width:118px;right:0;bottom:var(--s7);opacity:.22}
+  .brand::after{width:128px;right:2px;bottom:var(--s8);opacity:.28}
 }
 
 /* ── 768px: collapse to single column ───────────────────── */
