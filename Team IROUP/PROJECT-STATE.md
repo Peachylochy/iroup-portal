@@ -1,10 +1,45 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-09 | Session: dashboard migration + scholarship-events stabilization + migration markers**
+**Last updated: 2026-05-09 | Session: UI Polish & Readability Phase (contrast pass + login page)**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## 0. UI Polish Log
+
+### Session: 2026-05-09 — Readability & Contrast Pass + Login Page Improvement
+
+**Phase goal:** CSS/UI polish only. No API changes, no JS refactor, no layout rewrites. All changes incremental and reversible.
+
+#### `iroup-theme.css` — Contrast token fix (propagates to all pages automatically)
+
+| Token | Before | After | Reason |
+|-------|--------|-------|--------|
+| `--ir-text-muted` (dark mode `:root`) | `#4a6880` (~2:1 contrast) | `#607a9a` (~3.5:1 contrast) | WCAG AA fail on dark `#07101f` bg |
+| `--ir-text-muted` (light mode `[data-theme="light"]`) | `#94a3b8` (~2.3:1 contrast) | `#7a8fa8` | Better legibility on white bg |
+
+Downstream tokens automatically improved: `.ir-label`, `.ir-input::placeholder`, `.ir-table th`, `.ir-badge--expired`, `.ir-kpi__sub`, `.ir-sidebar__user-sub`, `.ir-nav-section`, `.ir-footer-note`, `.ir-empty`.
+
+#### `index.html` — Login page polish (9 targeted CSS changes)
+
+| Change | Before | After |
+|--------|--------|-------|
+| Body background palette | blue-green-yellow gradient | blue-purple-blue (`#E8F0FC → #EDE8FA → #E8F4FD`) |
+| Orb 2 colour | green `rgba(91,173,62,0.1)` | purple `rgba(124,58,237,0.12)` |
+| Orb 3 colour | gold `rgba(245,166,35,0.08)` | blue `rgba(26,109,181,0.10)` |
+| Card bg opacity | `rgba(255,255,255,0.85)` | `rgba(255,255,255,0.92)` |
+| Card border | white-glass | blue-tinted glass `rgba(75,189,232,0.28)` |
+| Card shadow | `0 20px 60px rgba(15,45,90,0.12)` | `0 24px 72px rgba(15,45,90,0.18)` |
+| Globy mascot | `width:100px; opacity:0.15` (invisible) | `width:120px; opacity:0.55` (visible brand element) |
+| Logo icon gradient | blue → blue (flat) | blue → purple `#5A32D0` (premium) |
+| Google button weight | `font-weight:600` | `font-weight:700` |
+
+**Visual direction:** soft blue/purple palette, glassmorphism card, mascot-assisted branding, professional university feel.
+
+**Pending:** Visual verification in browser (user's responsibility before next index.html change).
 
 ---
 
@@ -166,6 +201,7 @@ Note: `IROUP.parseDate()` does NOT exist — use `IU.toDate()` instead.
 | Two competing sidebar systems | All private pages | High — visual inconsistency | Blocked on `iroup-nav.js` |
 | Inline CSS in every page | All pages | Medium | Low — after IU migration complete |
 | `IROUP.parseDate` called but missing | Fixed in `scholarship-events.html` | ✅ Resolved | — |
+| `--ir-text-muted` contrast fail (dark + light) | All pages using theme tokens | ✅ Resolved — token raised in `iroup-theme.css` | — |
 | Duplicate Google Fonts `<link>` tags | All pages | Low — performance only | Low |
 
 ---
@@ -173,8 +209,10 @@ Note: `IROUP.parseDate()` does NOT exist — use `IU.toDate()` instead.
 ## 7. Safe Next Steps (In Order)
 
 ### Immediate
-1. **Visual verification** — open `dashboard.html` and `travel.html` in browser. Confirm rendering is correct after IU migration.
-2. **Stub removal** — once verified, remove local stubs from `travel.html` (committed separately from call-site migration per git workflow).
+1. **Visual verification** — open `index.html` (login page) in browser to confirm UI polish renders correctly.
+2. **Visual verification** — open `dashboard.html` and `travel.html` to confirm IU migration rendering is correct.
+3. **Stub removal** — once verified, remove local stubs from `travel.html` (committed separately from call-site migration per git workflow).
+4. **Consistency check** — scan `dashboard.html`, `report.html`, `travel.html`, `scholarship-events.html` for any inline CSS overriding `--ir-text-muted` that may need a matching manual fix.
 
 ### Next migration targets (in order of simplicity)
 1. `public/public-scholar.html` — small, no charting, good warm-up

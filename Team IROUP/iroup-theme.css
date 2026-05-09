@@ -110,7 +110,7 @@
   /* ── Text ─────────────────────────────────────────────────────────────── */
   --ir-text:         #d8eeff;
   --ir-text-2:       #7aa6c4;
-  --ir-text-muted:   #4a6880;
+  --ir-text-muted:   #607a9a;   /* raised from #4a6880 — better legibility on dark bg */
   --ir-text-invert:  #071828;
   --ir-text-on-brand:#ffffff;
 
@@ -146,7 +146,7 @@
 
   --ir-text:         #10233f;
   --ir-text-2:       #66758a;
-  --ir-text-muted:   #94a3b8;
+  --ir-text-muted:   #7a8fa8;   /* raised from #94a3b8 — better legibility on light bg */
   --ir-text-invert:  #ffffff;
   --ir-text-on-brand:#ffffff;
 

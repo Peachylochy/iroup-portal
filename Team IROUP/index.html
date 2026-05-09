@@ -19,7 +19,7 @@
 }
 html,body{height:100%;font-family:'Prompt',sans-serif}
 body{
-  background:linear-gradient(160deg,#EAF5FC 0%,#F0F8E8 50%,#FEF8EC 100%);
+  background:linear-gradient(160deg,#E8F0FC 0%,#EDE8FA 50%,#E8F4FD 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   min-height:100vh;position:relative;overflow:hidden
 }
@@ -27,18 +27,18 @@ body{
 /* BG ORBS */
 .orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(60px)}
 .orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(75,189,232,0.15),transparent);top:-150px;right:-100px}
-.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(91,173,62,0.1),transparent);bottom:-100px;left:-80px}
-.orb3{width:300px;height:300px;background:radial-gradient(circle,rgba(245,166,35,0.08),transparent);top:40%;left:40%}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(124,58,237,0.12),transparent);bottom:-100px;left:-80px}
+.orb3{width:300px;height:300px;background:radial-gradient(circle,rgba(26,109,181,0.10),transparent);top:40%;left:40%}
 
 /* CARD */
 .login-card{
-  background:rgba(255,255,255,0.85);
+  background:rgba(255,255,255,0.92);
   backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.8);
+  border:1px solid rgba(75,189,232,0.28);
   border-radius:24px;
   padding:40px 44px;
   width:420px;
-  box-shadow:0 20px 60px rgba(15,45,90,0.12);
+  box-shadow:0 24px 72px rgba(15,45,90,0.18);
   position:relative;z-index:2;
   animation:fadeUp .6s ease both
 }
@@ -46,7 +46,7 @@ body{
 
 /* LOGO */
 .logo-wrap{text-align:center;margin-bottom:28px}
-.logo-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--blue-light),var(--blue));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;margin:0 auto 12px;box-shadow:0 8px 24px rgba(26,109,181,0.3)}
+.logo-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--blue-light),#5A32D0);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;margin:0 auto 12px;box-shadow:0 8px 24px rgba(26,109,181,0.3)}
 .logo-title{font-size:24px;font-weight:800;color:var(--navy-dark);letter-spacing:-0.5px}
 .logo-title span{color:var(--blue-light)}
 .logo-sub{font-size:12px;color:var(--gray-600);font-family:'Sarabun',sans-serif;margin-top:4px}
@@ -61,7 +61,7 @@ body{
   width:100%;padding:13px;border-radius:12px;
   background:var(--white);border:1.5px solid var(--gray-200);
   display:flex;align-items:center;justify-content:center;gap:10px;
-  font-size:14px;font-weight:600;color:var(--navy-dark);
+  font-size:14px;font-weight:700;color:var(--navy-dark);
   cursor:pointer;transition:all .2s;font-family:'Prompt',sans-serif;
   box-shadow:0 2px 8px rgba(15,45,90,0.06)
 }
@@ -94,7 +94,7 @@ body{
 /* GLOBY */
 .globy-float{
   position:absolute;bottom:30px;right:40px;
-  width:100px;opacity:0.15;pointer-events:none;
+  width:120px;opacity:0.55;pointer-events:none;
   animation:float 4s ease-in-out infinite;z-index:1
 }
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
