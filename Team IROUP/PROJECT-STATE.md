@@ -376,3 +376,7 @@ Commits made across sessions:
 ## 19. Backend Governance Pass 2B (2026-05-09)
 
 - Backend Governance Pass 2B: added frontend admin token propagation from Google login to backend admin session. Admin token is stored in sessionStorage and attached to legacy admin API calls when available. Backend remains in compatibility mode; enforcement is deferred.
+
+## 20. Backend Governance Pass 2C-A (2026-05-09)
+
+- Backend Governance Pass 2C-A: removed remaining admin direct-fetch bypasses for reports/uploads by routing them through token-aware IROUP helpers. Added public-safe IROUP.getPublic* helper methods for upcoming public page migration. Backend remains in compatibility mode.

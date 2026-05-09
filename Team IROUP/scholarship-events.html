@@ -770,11 +770,9 @@ async function roundFinalUploadAsset(input, kind, targetName){
   input.disabled=true;
   try{
     const base64=await fileToBase64(file);
-    const res=await fetch(IROUP.SCRIPT_URL,{
-      method:'POST',
-      body:JSON.stringify({action:kind==='image'?'uploadImage':'uploadFile',base64,fileName:file.name})
-    });
-    const data=await res.json();
+    const data=kind==='image'
+      ? await IROUP.uploadImage(base64,file.name)
+      : await IROUP.uploadFile(base64,file.name);
     if(data.error) throw new Error(data.error);
     const url=data.url || data.fileUrl || data.webViewLink || '';
     if(!url) throw new Error('อัปโหลดแล้วแต่ไม่ได้รับ URL กลับมา');

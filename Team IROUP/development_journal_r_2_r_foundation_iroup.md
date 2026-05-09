@@ -1104,3 +1104,25 @@ Constraints maintained:
 - No Apps Script manifest changes
 - No deployment URL changes
 - No backend auth enforcement yet
+
+---
+
+31. Backend Governance Pass 2C-A (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2C-A: removed remaining admin direct-fetch bypasses for reports/uploads by routing them through token-aware IROUP helpers. Added public-safe IROUP.getPublic* helper methods for upcoming public page migration. Backend remains in compatibility mode.
+
+Implementation notes:
+
+- Added token-free public-safe helper methods for MOU, Mobility, Travel, Scholarships, Events, and public stats
+- Added token-aware `uploadFile` and `uploadImage` helpers using the existing admin body wrapper
+- Routed dashboard/report `getReport` calls through `IROUP.getReport`
+- Routed Travel, MOU, and Scholarship/Event uploads through `IROUP.uploadFile` or `IROUP.uploadImage`
+
+Constraints maintained:
+
+- No backend changes
+- No public page migration yet
+- No auth enforcement
+- No UI redesign or spreadsheet structure changes

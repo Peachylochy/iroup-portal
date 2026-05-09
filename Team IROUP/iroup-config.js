@@ -63,6 +63,43 @@ async createAdminSession(accessToken) {
   return this._post({ action: 'createAdminSession', accessToken });
 },
 
+async getPublicMou() {
+  const data = await this._get(`${this.SCRIPT_URL}?action=getPublicMou`);
+  return data.data || [];
+},
+
+async getPublicMobility() {
+  return this._get(`${this.SCRIPT_URL}?action=getPublicMobility`);
+},
+
+async getPublicTravel() {
+  const data = await this._get(`${this.SCRIPT_URL}?action=getPublicTravel`);
+  return data.data || [];
+},
+
+async getPublicScholarships() {
+  const data = await this._get(`${this.SCRIPT_URL}?action=getPublicScholarships`);
+  return data.data || [];
+},
+
+async getPublicEvents() {
+  const data = await this._get(`${this.SCRIPT_URL}?action=getPublicEvents`);
+  return data.data || [];
+},
+
+async getPublicStats() {
+  const data = await this._get(`${this.SCRIPT_URL}?action=getPublicStats`);
+  return data.stats || {};
+},
+
+async uploadFile(base64, fileName, folderName) {
+  return this._post(this._withAdminBody({ action: 'uploadFile', base64, fileName, folderName }));
+},
+
+async uploadImage(base64, fileName, folderName) {
+  return this._post(this._withAdminBody({ action: 'uploadImage', base64, fileName, folderName }));
+},
+
 async getAll(sheet) {
   const url = this._withAdminUrl(`${this.SCRIPT_URL}?action=getAll&sheet=${encodeURIComponent(sheet)}`);
   const data = await this._get(url);
