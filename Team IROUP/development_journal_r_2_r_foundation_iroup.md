@@ -1036,3 +1036,25 @@ Constraints maintained:
 - No auth/session changes
 - No layout redesign
 - No routing or architecture changes
+
+---
+
+28. Backend Governance Pass 1 (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 1: added public-safe endpoint layer for MOU, Mobility, Travel, Scholarships, Events, and public stats. Raw admin endpoints remain for compatibility but are marked as admin-only legacy endpoints pending auth enforcement.
+
+Implementation notes:
+
+- Added public-safe Apps Script endpoints for MOU, Mobility, Travel, Scholarships, Events, and aggregate public stats
+- Added sanitizer helpers to remove names, IDs, emails, gender, budgets, internal notes, private file links, and raw staff/student records from public responses
+- Preserved existing raw admin endpoints so the current admin frontend can keep working during the transition
+- Marked raw read, search, write, and upload routes as admin-only legacy endpoints for the next auth enforcement pass
+
+Constraints maintained:
+
+- No frontend changes
+- No spreadsheet structure changes
+- No deployment URL changes
+- No full backend rewrite

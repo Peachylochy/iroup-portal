@@ -57,14 +57,17 @@ function handleRequest_(params) {
         result = { success: true, message: 'iROUP API ready', time: new Date().toISOString() };
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'getAll':
         result = getAll(resolveSheet_(params.sheet || params.type));
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'search':
         result = search(resolveSheet_(params.sheet || params.type), params.q || params.query || '');
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'searchStaff':
         result = searchStaff(params.q || params.query || '');
         break;
@@ -73,12 +76,37 @@ function handleRequest_(params) {
         result = getStats();
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'getReport':
         result = getReport(params);
         break;
 
       case 'getMouByCountry':
         result = getMouByCountry();
+        break;
+
+      case 'getPublicMou':
+        result = getPublicMou();
+        break;
+
+      case 'getPublicMobility':
+        result = getPublicMobility();
+        break;
+
+      case 'getPublicTravel':
+        result = getPublicTravel();
+        break;
+
+      case 'getPublicScholarships':
+        result = getPublicScholarships();
+        break;
+
+      case 'getPublicEvents':
+        result = getPublicEvents();
+        break;
+
+      case 'getPublicStats':
+        result = getPublicStats();
         break;
 
       case 'checkAdmin':
@@ -114,22 +142,27 @@ function handleRequest_(params) {
         result = getAll(SHEET_NAMES.OUTBOUND);
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'add':
         result = addRow(resolveSheet_(params.sheet || params.type), params.data || params);
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'edit':
         result = editRow(resolveSheet_(params.sheet || params.type), params.id, params.data || params);
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'delete':
         result = deleteRow(resolveSheet_(params.sheet || params.type), params.id);
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'uploadImage':
         result = uploadImage(params.base64, params.fileName, params.folderName);
         break;
 
+      // ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
       case 'uploadFile':
         result = uploadFile(params.base64, params.fileName, params.folderName);
         break;
@@ -160,6 +193,7 @@ function resolveSheet_(name) {
 // Core read helpers
 // ============================================================
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function getAll(sheetName) {
   const ss = getSS();
   const sheet = ss.getSheetByName(sheetName);
@@ -225,6 +259,7 @@ function search(sheetName, query) {
 // Staff / Admin
 // ============================================================
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function searchStaff(query) {
   const q = String(query || '').toLowerCase().trim();
   if (q.length < 2) return { success: true, data: [] };
@@ -274,6 +309,7 @@ function checkAdmin(email) {
 // Report / Dashboard
 // ============================================================
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function getReport(params) {
   const year = String(params.year || '').trim();
   const cacheKey = 'iroup_report_clean_' + (year || 'all');
@@ -370,6 +406,230 @@ function getMouByCountry() {
   return { success: true, data: byCountry };
 }
 
+// ============================================================
+// Public-safe endpoints
+// ============================================================
+
+function getPublicMou() {
+  const rows = fastRead_(SHEET_NAMES.MOU).map(sanitizePublicMou_);
+  return { success: true, data: rows, total: rows.length };
+}
+
+function getPublicMobility() {
+  const inbound = fastRead_(SHEET_NAMES.INBOUND).map(r => sanitizePublicMobility_(r, 'inbound'));
+  const outbound = fastRead_(SHEET_NAMES.OUTBOUND).map(r => sanitizePublicMobility_(r, 'outbound'));
+  return {
+    success: true,
+    data: inbound.concat(outbound),
+    inbound,
+    outbound,
+    total: inbound.length + outbound.length
+  };
+}
+
+function getPublicTravel() {
+  const rows = fastRead_(SHEET_NAMES.TRAVEL).map(sanitizePublicTravel_);
+  return { success: true, data: rows, total: rows.length };
+}
+
+function getPublicScholarships() {
+  const rows = fastRead_(SHEET_NAMES.SCHOLAR).map(sanitizePublicScholarship_);
+  return { success: true, data: rows, total: rows.length };
+}
+
+function getPublicEvents() {
+  const rows = fastRead_(SHEET_NAMES.EVENT).map(sanitizePublicEvent_);
+  return { success: true, data: rows, total: rows.length };
+}
+
+function getPublicStats() {
+  const mou = getPublicMou().data;
+  const mobility = getPublicMobility();
+  const travel = getPublicTravel().data;
+  const scholarships = getPublicScholarships().data;
+  const events = getPublicEvents().data;
+  const countries = [
+    ...mou.map(r => r.country),
+    ...mobility.data.map(r => r.country),
+    ...travel.map(r => r.country),
+    ...scholarships.map(r => r.country),
+    ...events.map(r => r.country),
+  ];
+
+  return {
+    success: true,
+    stats: {
+      mou: {
+        total: mou.length,
+        active: mou.filter(r => r.status === 'active').length,
+        soon: mou.filter(r => r.status === 'soon').length,
+        countries: uniqueCount_(mou.map(r => r.country))
+      },
+      mobility: {
+        total: mobility.total,
+        inbound: mobility.inbound.length,
+        outbound: mobility.outbound.length,
+        participants: mobility.data.reduce((sum, r) => sum + safeCount_(r), 0)
+      },
+      travel: {
+        total: travel.length,
+        participants: travel.reduce((sum, r) => sum + safeCount_(r), 0)
+      },
+      scholarship: {
+        total: scholarships.length,
+        open: scholarships.filter(r => ['active', 'soon', 'urgent'].includes(r.status)).length
+      },
+      event: { total: events.length },
+      countries: uniqueCount_(countries),
+      byCountry: groupCount_(countries)
+    }
+  };
+}
+
+function sanitizePublicMou_(row) {
+  const startDate = pickFirst_(row, ['วันเริ่ม', 'start_date']);
+  const endDate = pickFirst_(row, ['วันสิ้นสุด', 'end_date']);
+  const fileUrl = pickFirst_(row, ['ไฟล์_URL', 'file_url']);
+  const canShowFile = isTruthy_(pickFirst_(row, ['public_file', 'public_file_allowed', 'public_allowed', 'is_public_file']));
+
+  return {
+    mou_id: pickFirst_(row, ['ID', 'mou_id']),
+    partner_org: pickFirst_(row, ['องค์กร_ตปท', 'องค์กรต่างประเทศ', 'partner_org']),
+    country: pickFirst_(row, ['ประเทศ', 'country']),
+    continent: pickFirst_(row, ['ทวีป', 'continent']),
+    up_unit: pickFirst_(row, ['หน่วยงาน_UP', 'หน่วยงาน', 'up_unit']),
+    type: pickFirst_(row, ['ประเภท', 'mou_type', 'type']),
+    start_date: startDate,
+    end_date: endDate,
+    fiscal_year: pickFirst_(row, ['ปีงบ', 'fiscal_year']),
+    status: statusByDate_(startDate, endDate, 180),
+    public_file_url: canShowFile ? fileUrl : ''
+  };
+}
+
+function sanitizePublicMobility_(row, direction) {
+  const inbound = direction === 'inbound';
+  const startDate = inbound
+    ? pickFirst_(row, ['วันมาถึง', 'วันเริ่ม', 'start_date'])
+    : pickFirst_(row, ['วันออก', 'วันเริ่ม', 'start_date']);
+  const endDate = pickFirst_(row, ['วันกลับ', 'วันสิ้นสุด', 'end_date']);
+
+  return {
+    direction,
+    country: pickFirst_(row, ['ประเทศ', 'country']),
+    continent: pickFirst_(row, ['ทวีป', 'continent']),
+    up_unit: pickFirst_(row, ['หน่วยงาน_UP', 'คณะ', 'หน่วยงาน', 'up_unit']),
+    institution: inbound
+      ? pickFirst_(row, ['สถาบันต้นทาง', 'สถาบัน', 'origin_institution'])
+      : pickFirst_(row, ['สถาบันปลายทาง', 'สถาบัน_ปลายทาง', 'destination_institution']),
+    project: pickFirst_(row, ['โครงการ', 'ชื่อโครงการ', 'project_name']),
+    purpose: pickFirst_(row, ['วัตถุประสงค์', 'purpose']),
+    participant_type: pickFirst_(row, ['ประเภทผู้เข้าร่วม', 'ประเภท', 'participant_type']),
+    participant_count: safeCount_(row),
+    fiscal_year: pickFirst_(row, ['ปีงบ', 'fiscal_year']),
+    start_date: startDate,
+    end_date: endDate,
+    status: statusByDate_(startDate, endDate)
+  };
+}
+
+function sanitizePublicTravel_(row) {
+  const startDate = pickFirst_(row, ['วันเริ่ม', 'start_date']);
+  const endDate = pickFirst_(row, ['วันสิ้นสุด', 'end_date']);
+
+  return {
+    direction: 'travel',
+    country: pickFirst_(row, ['ประเทศ', 'country']),
+    continent: pickFirst_(row, ['ทวีป', 'continent']),
+    city: pickFirst_(row, ['เมือง', 'city']),
+    up_unit: pickFirst_(row, ['หน่วยงาน_UP', 'คณะ', 'หน่วยงาน', 'up_unit']),
+    project: pickFirst_(row, ['ชื่อโครงการ', 'โครงการ', 'project_name']),
+    purpose: pickFirst_(row, ['วัตถุประสงค์', 'purpose']),
+    participant_count: safeCount_(row),
+    fiscal_year: pickFirst_(row, ['ปีงบ', 'fiscal_year']),
+    start_date: startDate,
+    end_date: endDate,
+    status: statusByDate_(startDate, endDate)
+  };
+}
+
+function sanitizePublicScholarship_(row) {
+  const openDate = pickFirst_(row, ['วันเปิดรับ', 'open_date']);
+  const closeDate = pickFirst_(row, ['วันปิดรับ', 'close_date']);
+  const fileUrl = pickFirst_(row, ['ไฟล์_URL', 'file_url']);
+  const canShowFile = isTruthy_(pickFirst_(row, ['public_file', 'public_file_allowed', 'public_allowed']));
+
+  return {
+    scholarship_id: pickFirst_(row, ['ID', 'scholarship_id']),
+    title: pickFirst_(row, ['ชื่อทุน', 'title', 'title_th']),
+    country: pickFirst_(row, ['ประเทศ', 'country']),
+    institution: pickFirst_(row, ['สถาบัน', 'institution']),
+    level: pickFirst_(row, ['ระดับ', 'level']),
+    publish_date: pickFirst_(row, ['วันประชาสัมพันธ์', 'publish_date']),
+    open_date: openDate,
+    close_date: closeDate,
+    coverage: pickFirst_(row, ['ครอบคลุม', 'coverage']),
+    link_url: pickFirst_(row, ['Link', 'link_url', 'detail_url', 'apply_url']),
+    poster_url: pickFirst_(row, ['Poster_URL', 'poster_url']),
+    public_file_url: canShowFile ? fileUrl : '',
+    pin: pickFirst_(row, ['Pin', 'pin']),
+    status: scholarStatus_(row)
+  };
+}
+
+function sanitizePublicEvent_(row) {
+  const startDate = pickFirst_(row, ['วันเริ่ม', 'start_date']);
+  const endDate = pickFirst_(row, ['วันสิ้นสุด', 'end_date']);
+  const fileUrl = pickFirst_(row, ['ไฟล์_URL', 'file_url']);
+  const canShowFile = isTruthy_(pickFirst_(row, ['public_file', 'public_file_allowed', 'public_allowed']));
+
+  return {
+    event_id: pickFirst_(row, ['ID', 'event_id']),
+    title: pickFirst_(row, ['ชื่อกิจกรรม', 'title', 'title_th']),
+    type: pickFirst_(row, ['ประเภท', 'event_type', 'type']),
+    country: pickFirst_(row, ['ประเทศ', 'country']),
+    continent: pickFirst_(row, ['ทวีป', 'continent']),
+    organizer: pickFirst_(row, ['หน่วยงาน', 'หน่วยงาน_UP', 'organizer_unit']),
+    location: pickFirst_(row, ['สถานที่', 'location']),
+    participant_count: safeCount_(row),
+    start_date: startDate,
+    end_date: endDate,
+    start_time: pickFirst_(row, ['เวลาเริ่ม', 'start_time']),
+    end_time: pickFirst_(row, ['เวลาสิ้นสุด', 'end_time']),
+    detail: pickFirst_(row, ['รายละเอียด', 'detail', 'detail_th']),
+    poster_url: pickFirst_(row, ['Poster_URL', 'poster_url']),
+    public_file_url: canShowFile ? fileUrl : '',
+    status: statusByDate_(startDate, endDate)
+  };
+}
+
+function safeCount_(row) {
+  const explicit = pickFirst_(row, ['participant_count', 'จำนวน', 'จำนวนคน', 'ผู้เข้าร่วม']);
+  const n = Number(String(explicit || '').replace(/[^0-9.]/g, ''));
+  if (!isNaN(n) && n > 0) return n;
+
+  const nameList = pickFirst_(row, ['ชื่อผู้เดินทาง', 'ชื่อ_สกุล', 'ชื่อ-สกุล', 'ชื่อ']);
+  if (nameList) {
+    const parts = String(nameList).split(/[,;、，\n]+/).map(v => v.trim()).filter(Boolean);
+    return Math.max(parts.length, 1);
+  }
+
+  return 1;
+}
+
+function pickFirst_(row, keys, fallback) {
+  for (const key of keys) {
+    const v = row[key];
+    if (v !== undefined && v !== null && String(v).trim() !== '') return v;
+  }
+  return fallback === undefined ? '' : fallback;
+}
+
+function isTruthy_(value) {
+  const s = String(value || '').trim().toLowerCase();
+  return ['true', 'yes', 'y', '1', 'public', 'เผยแพร่', 'ใช่', 'อนุญาต'].indexOf(s) >= 0;
+}
+
 function buildSummary_(data) {
   const countries = [
     ...data.mou.map(r => r['ประเทศ']),
@@ -413,6 +673,7 @@ function buildSummary_(data) {
 // Write helpers
 // ============================================================
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function addRow(sheetName, data) {
   const sheet = getSS().getSheetByName(sheetName);
   if (!sheet) return { success: false, error: 'ไม่พบ Sheet: ' + sheetName };
@@ -432,6 +693,7 @@ function addRow(sheetName, data) {
   return { success: true, id: payload.ID || '', message: 'เพิ่มข้อมูลสำเร็จ' };
 }
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function editRow(sheetName, id, data) {
   const sheet = getSS().getSheetByName(sheetName);
   if (!sheet) return { success: false, error: 'ไม่พบ Sheet: ' + sheetName };
@@ -453,6 +715,7 @@ function editRow(sheetName, id, data) {
   return { success: false, error: 'ไม่พบ ID: ' + id };
 }
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function deleteRow(sheetName, id) {
   const sheet = getSS().getSheetByName(sheetName);
   if (!sheet) return { success: false, error: 'ไม่พบ Sheet: ' + sheetName };
@@ -588,6 +851,7 @@ function decodeBase64File(base64, fileName) {
   return Utilities.newBlob(bytes, contentType, fileName || ('iroup-upload-' + Date.now()));
 }
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function uploadFile(base64, fileName, folderName) {
   const folder = getOrCreateUploadFolder(folderName || 'Files');
   const file = folder.createFile(decodeBase64File(base64, fileName));
@@ -603,6 +867,7 @@ function uploadFile(base64, fileName, folderName) {
   };
 }
 
+// ADMIN-ONLY LEGACY ENDPOINT — must be protected before production.
 function uploadImage(base64, fileName, folderName) {
   return uploadFile(base64, fileName, folderName || 'Images');
   

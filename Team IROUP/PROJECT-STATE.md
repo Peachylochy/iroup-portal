@@ -364,3 +364,7 @@ Commits made across sessions:
 - Kept the existing MOU layout, D3 map rendering style, table structure, and Apps Script/API contract intact.
 - Added small page-local helpers for live row normalization, status, country/dept aggregation, expiring rows, date filters, and status pills.
 - API failure now renders safe empty states instead of mixing local fallback rows with live data.
+
+## 17. Backend Governance Pass 1 (2026-05-09)
+
+- Backend Governance Pass 1: added public-safe endpoint layer for MOU, Mobility, Travel, Scholarships, Events, and public stats. Raw admin endpoints remain for compatibility but are marked as admin-only legacy endpoints pending auth enforcement.
