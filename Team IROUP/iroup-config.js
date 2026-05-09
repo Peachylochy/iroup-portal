@@ -15,6 +15,35 @@ const IROUP = {
     OUTBOUND: 'Outbound',
   },
 
+  getAdminToken() {
+    try {
+      const direct = sessionStorage.getItem('iroup_admin_token');
+      if (direct) return direct;
+
+      const rawUser = sessionStorage.getItem('iroup_user');
+      if (!rawUser) return '';
+
+      const user = JSON.parse(rawUser);
+      return user && user.adminToken ? user.adminToken : '';
+    } catch (e) {
+      return '';
+    }
+  },
+
+  _withAdminUrl(url) {
+    const token = this.getAdminToken();
+    if (!token) return url;
+
+    const separator = url.indexOf('?') >= 0 ? '&' : '?';
+    return `${url}${separator}adminToken=${encodeURIComponent(token)}`;
+  },
+
+  _withAdminBody(body) {
+    const token = this.getAdminToken();
+    if (!token) return body;
+    return Object.assign({}, body, { adminToken: token });
+  },
+
   // fetch helper กลาง — แก้ปัญหา CORS redirect ของ Apps Script
  async _get(url) {
   const res = await fetch(url, { redirect: 'follow' });
@@ -30,8 +59,12 @@ async _post(body) {
   return res.json();
 },
 
+async createAdminSession(accessToken) {
+  return this._post({ action: 'createAdminSession', accessToken });
+},
+
 async getAll(sheet) {
-  const url = `${this.SCRIPT_URL}?action=getAll&sheet=${encodeURIComponent(sheet)}`;
+  const url = this._withAdminUrl(`${this.SCRIPT_URL}?action=getAll&sheet=${encodeURIComponent(sheet)}`);
   const data = await this._get(url);
   return data.data || [];
 },
@@ -40,7 +73,7 @@ async getAll(sheet) {
   // SEARCH — ค้นหาข้อมูล
   // ============================================================
   async search(sheet, query) {
-    const url = `${this.SCRIPT_URL}?action=search&sheet=${encodeURIComponent(sheet)}&q=${encodeURIComponent(query)}`;
+    const url = this._withAdminUrl(`${this.SCRIPT_URL}?action=search&sheet=${encodeURIComponent(sheet)}&q=${encodeURIComponent(query)}`);
     const data = await this._get(url);
     return data.data || [];
   },
@@ -49,7 +82,7 @@ async getAll(sheet) {
   // SEARCH STAFF — ค้นหาบุคลากร
   // ============================================================
   async searchStaff(query) {
-    const url = `${this.SCRIPT_URL}?action=searchStaff&q=${encodeURIComponent(query)}`;
+    const url = this._withAdminUrl(`${this.SCRIPT_URL}?action=searchStaff&q=${encodeURIComponent(query)}`);
     const data = await this._get(url);
     return data.data || [];
   },
@@ -58,28 +91,28 @@ async getAll(sheet) {
   // ADD — เพิ่มข้อมูลใหม่
   // ============================================================
   async add(sheet, data) {
-    return this._post({ action: 'add', sheet, data });
+    return this._post(this._withAdminBody({ action: 'add', sheet, data }));
   },
 
   // ============================================================
   // EDIT — แก้ไขข้อมูล
   // ============================================================
   async edit(sheet, id, data) {
-    return this._post({ action: 'edit', sheet, id, data });
+    return this._post(this._withAdminBody({ action: 'edit', sheet, id, data }));
   },
 
   // ============================================================
   // DELETE — ลบข้อมูล
   // ============================================================
   async delete(sheet, id) {
-    return this._post({ action: 'delete', sheet, id });
+    return this._post(this._withAdminBody({ action: 'delete', sheet, id }));
   },
 
   // ============================================================
   // GET STATS — ดึงสถิติ Dashboard
   // ============================================================
   async getStats() {
-    const url = `${this.SCRIPT_URL}?action=getStats`;
+    const url = this._withAdminUrl(`${this.SCRIPT_URL}?action=getStats`);
     const data = await this._get(url);
     return data.stats || {};
   },
@@ -88,7 +121,7 @@ async getAll(sheet) {
   // GET REPORT — ดึงข้อมูลรายงาน
   // ============================================================
   async getReport(year = '') {
-    const url = `${this.SCRIPT_URL}?action=getReport&year=${encodeURIComponent(year)}`;
+    const url = this._withAdminUrl(`${this.SCRIPT_URL}?action=getReport&year=${encodeURIComponent(year)}`);
     return this._get(url);
   },
 
@@ -96,7 +129,7 @@ async getAll(sheet) {
   // GET MOU BY COUNTRY — สำหรับแผนที่โลก
   // ============================================================
   async getMouByCountry() {
-    const url = `${this.SCRIPT_URL}?action=getMouByCountry`;
+    const url = this._withAdminUrl(`${this.SCRIPT_URL}?action=getMouByCountry`);
     const data = await this._get(url);
     return data.data || {};
   },

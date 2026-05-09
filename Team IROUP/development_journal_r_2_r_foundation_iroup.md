@@ -1081,3 +1081,26 @@ Constraints maintained:
 - No deployment URL changes
 - No legacy endpoint removal
 - No admin route blocking while compatibility mode is active
+
+---
+
+30. Backend Governance Pass 2B (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2B: added frontend admin token propagation from Google login to backend admin session. Admin token is stored in sessionStorage and attached to legacy admin API calls when available. Backend remains in compatibility mode; enforcement is deferred.
+
+Implementation notes:
+
+- Login now attempts to create a backend admin session after Google OAuth userinfo succeeds
+- Successful backend admin sessions store `iroup_admin_token` and include `adminToken` in `iroup_user`
+- Existing `checkAdmin` login path remains as a fallback to preserve dashboard compatibility
+- `iroup-config.js` attaches `adminToken` to legacy admin GET and POST API helpers when present
+- Public-safe endpoint calls and `createAdminSession` remain token-free
+
+Constraints maintained:
+
+- No backend changes
+- No Apps Script manifest changes
+- No deployment URL changes
+- No backend auth enforcement yet

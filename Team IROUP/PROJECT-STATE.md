@@ -372,3 +372,7 @@ Commits made across sessions:
 ## 18. Backend Governance Pass 2A (2026-05-09)
 
 - Backend Governance Pass 2A: added admin auth guard foundation in compatibility mode. Public endpoints remain open. Legacy admin endpoints are classified and ready for enforcement, but not blocked yet to preserve dashboard compatibility.
+
+## 19. Backend Governance Pass 2B (2026-05-09)
+
+- Backend Governance Pass 2B: added frontend admin token propagation from Google login to backend admin session. Admin token is stored in sessionStorage and attached to legacy admin API calls when available. Backend remains in compatibility mode; enforcement is deferred.

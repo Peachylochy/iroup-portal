@@ -795,10 +795,37 @@ async function handleGoogleResponse(response) {
     const profile = await profileRes.json();
     const email   = profile.email;
     const name    = profile.name;
+    const session = await IROUP.createAdminSession(response.access_token);
+    if (session && session.success && session.allowed && session.adminToken) {
+      completeAdminLogin(email, name, session.adminToken);
+      return;
+    }
+
     await checkAdminAccess(email, name);
   } catch(e) {
-    showStatus('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่');
+    try {
+      const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${response.access_token}` }
+      });
+      const profile = await profileRes.json();
+      await checkAdminAccess(profile.email, profile.name);
+    } catch (fallbackError) {
+      showStatus('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่');
+    }
   }
+}
+
+function completeAdminLogin(email, name, adminToken) {
+  if (adminToken) sessionStorage.setItem('iroup_admin_token', adminToken);
+  else sessionStorage.removeItem('iroup_admin_token');
+  sessionStorage.setItem('iroup_user', JSON.stringify({
+    email,
+    name,
+    adminToken: adminToken || '',
+    loginAt: new Date().toISOString()
+  }));
+  showStatus('success');
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
 }
 
 async function checkAdminAccess(email, name) {
@@ -808,21 +835,14 @@ async function checkAdminAccess(email, name) {
     const data = await res.json();
 
     if (data.allowed) {
-      sessionStorage.setItem('iroup_user', JSON.stringify({
-        email, name,
-        loginAt: new Date().toISOString()
-      }));
-      showStatus('success');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+      completeAdminLogin(email, name, '');
     } else {
       showStatus('denied', email);
     }
   } catch(e) {
     const ALLOWED = ['panpancake17@gmail.com'];
     if (ALLOWED.includes(email)) {
-      sessionStorage.setItem('iroup_user', JSON.stringify({ email, name, loginAt: new Date().toISOString() }));
-      showStatus('success');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+      completeAdminLogin(email, name, '');
     } else {
       showStatus('denied', email);
     }
