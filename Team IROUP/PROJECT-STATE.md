@@ -315,3 +315,20 @@ Commits made across sessions:
 - Tablet sizing and opacity are reduced at `max-width:1080px`.
 - The mascot layer is hidden at `max-width:880px` to preserve the collapsed/mobile login layout and avoid overlap with controls.
 - Text colors, Google auth logic, sessionStorage, and redirect flow remain unchanged.
+
+## 11. Ecosystem Readability / Contrast Pass - Start (2026-05-09)
+
+- Began a non-redesign readability pass with `iroup-theme.css` and `dashboard.html`.
+- Strengthened secondary and muted slate text tokens while preserving the soft premium palette.
+- Slightly firmed light-mode borders and shadows to reduce the washed-out card/table feel.
+- Improved shared table header readability, hero/topbar supporting text, labels, and KPI/panel supporting copy.
+- Mirrored key readability values in `dashboard.html` because its inline CSS currently overrides shared theme tokens.
+- No JavaScript, auth, sessionStorage, redirect flow, spacing system, or layout structure changes were made.
+
+## 12. Readability / Contrast Pass - Selects and Report Tables (2026-05-09)
+
+- Continued the focused readability pass with `iroup-theme.css` and `report.html`.
+- Improved shared select/dropdown selected-value, option, placeholder, and label readability without changing control sizing or layout.
+- Mirrored select readability values in `report.html` because its inline CSS overrides shared form-control styles.
+- Improved report/export table readability by strengthening header color, base cell color, and muted supporting columns.
+- Preserved the existing palette, responsive behavior, spacing, and report/export JavaScript.

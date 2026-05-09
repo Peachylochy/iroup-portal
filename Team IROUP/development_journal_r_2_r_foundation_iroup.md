@@ -892,3 +892,52 @@ Constraints maintained:
 - Google Sign-In logic preserved
 - sessionStorage and redirect flow preserved
 - Text colors unchanged
+
+---
+
+22. Ecosystem Readability / Contrast Pass - Start (May 9, 2026)
+
+Summary
+
+An ecosystem-wide readability and contrast pass began with the shared theme and executive dashboard. This is intentionally not a redesign; the work focuses on text hierarchy, clarity, and subtle separation while preserving the existing soft premium aesthetic.
+
+Implementation notes:
+
+- Updated `iroup-theme.css` secondary and muted text tokens for both dark and light modes
+- Slightly strengthened light-mode borders and shadows to reduce the foggy/translucent feeling
+- Improved shared supporting text line-height for page subtitles, panel subtitles, and KPI subtext
+- Improved shared hero supporting text and topbar breadcrumb readability
+- Improved shared light-mode table header tone and expired status readability
+- Updated `dashboard.html` local CSS tokens and table/header/supporting text colors because dashboard currently defines its own inline theme values
+
+Constraints maintained:
+
+- No layout structure changes
+- No spacing scale changes
+- No component architecture changes
+- No JavaScript changes
+- Google auth, sessionStorage, and redirect flow untouched
+
+---
+
+23. Readability / Contrast Pass - Selects and Report Tables (May 9, 2026)
+
+Summary
+
+The readability pass continued with two remaining issues: pale select/dropdown text and low-contrast report/export table metadata.
+
+Implementation notes:
+
+- Updated shared `iroup-theme.css` form-control styling for select selected values, option text, placeholders, and labels
+- Kept form control layout, spacing, and component structure unchanged
+- Updated `report.html` local filter control styles because the page has inline CSS overriding shared form-control rules
+- Improved report/export table header tone, base table cell color, and muted supporting columns
+- Kept table structure and export/report JavaScript unchanged
+
+Constraints maintained:
+
+- CSS-first changes only
+- No HTML changes
+- No JavaScript changes
+- No auth/session/redirect logic touched
+- Existing soft premium palette preserved
