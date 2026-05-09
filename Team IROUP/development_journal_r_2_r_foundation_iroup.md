@@ -1214,3 +1214,11 @@ Constraints maintained:
 - No auth enforcement
 - No UI redesign
 - Public landing left untouched
+
+---
+
+36. Backend Governance Pass 2C-B Final Phase (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2C-B Final Phase: migrated public-landing.html to public-safe endpoints for stats, scholarships, events count, and MOU map aggregation. Landing now avoids raw getStats/getMouByCountry/getAll calls while preserving existing UI behavior.

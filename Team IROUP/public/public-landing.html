@@ -860,7 +860,7 @@ function renderPublicMap(countryData){
 }
 async function renderPublicScholarships(){
   try{
-    const data=await IROUP.getAll(IROUP.SHEETS.SCHOLAR);
+    const data=(await IROUP.getPublicScholarships()).map(normalizeLandingScholarship);
     const grid=document.querySelector('.scholar-grid'); if(!grid) return;
     const live=data
       .map(s=>({...s,_status:IROUP.getScholarStatus(s['วันเปิดรับ'],s['วันปิดรับ'])}))
@@ -883,11 +883,33 @@ async function renderPublicScholarships(){
   }catch(e){ console.warn('Scholarship live load failed',e); }
 }
 
+function normalizeLandingScholarship(row){
+  return {
+    'เธเธทเนเธญเธ—เธธเธ': row.title || '',
+    'เธเธฃเธฐเน€เธ—เธจ': row.country || '',
+    'เธชเธ–เธฒเธเธฑเธ': row.institution || '',
+    'เธงเธฑเธเน€เธเธดเธ”เธฃเธฑเธ': row.open_date || row.start_date || '',
+    'เธงเธฑเธเธเธดเธ”เธฃเธฑเธ': row.close_date || row.end_date || '',
+    'เธเธฃเธญเธเธเธฅเธธเธก': row.coverage || ''
+  };
+}
+
+function buildLandingMouCountryData(rows){
+  return (rows || []).reduce((acc,row)=>{
+    if(row.status === 'expired') return acc;
+    const country = String(row.country || '').trim();
+    if(!country) return acc;
+    acc[country] = (acc[country] || 0) + 1;
+    return acc;
+  },{});
+}
+
 async function initPublicLanding(){
   try{
-    const [stats,countryData,events] = await Promise.all([
-      IROUP.getStats(), IROUP.getMouByCountry(), IROUP.getAll(IROUP.SHEETS.EVENT).catch(()=>[])
+    const [stats,publicMou,events] = await Promise.all([
+      IROUP.getPublicStats(), IROUP.getPublicMou(), IROUP.getPublicEvents().catch(()=>[])
     ]);
+    const countryData = buildLandingMouCountryData(publicMou);
     const nums=document.querySelectorAll('.hero-stat .count-up');
     const values=[stats?.mou?.total||0, stats?.mou?.countries||0, stats?.scholarship?.open||0, stats?.mobility?.total||0];
     nums.forEach((el,i)=>iroupAnimateNumber(el,values[i]));

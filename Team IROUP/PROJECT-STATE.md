@@ -396,3 +396,7 @@ Commits made across sessions:
 ## 24. Backend Governance Pass 2C-B Phase 4 (2026-05-09)
 
 - Backend Governance Pass 2C-B Phase 4: migrated public-mobility.html to public-safe mobility/travel endpoints using sanitized aggregate adapters while preserving existing public dashboard behavior.
+
+## 25. Backend Governance Pass 2C-B Final Phase (2026-05-09)
+
+- Backend Governance Pass 2C-B Final Phase: migrated public-landing.html to public-safe endpoints for stats, scholarships, events count, and MOU map aggregation. Landing now avoids raw getStats/getMouByCountry/getAll calls while preserving existing UI behavior.
