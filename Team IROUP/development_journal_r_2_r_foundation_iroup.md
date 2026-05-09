@@ -1148,3 +1148,25 @@ Constraints maintained:
 - No public-events or other public page migration yet
 - No auth enforcement
 - No UI redesign
+
+---
+
+33. Backend Governance Pass 2C-B Phase 2 (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2C-B Phase 2: migrated public-events.html to public-safe event endpoints using sanitized payload adapters while preserving existing public UI behavior.
+
+Implementation notes:
+
+- Replaced raw event loading with `IROUP.getPublicEvents()`
+- Added a page-local adapter from sanitized public payload keys to the existing event card/calendar rendering shape
+- Preserved status filters, type filters, calendar highlighting, poster rendering, public file links, KPI counts, and empty states
+- Restricted file rendering to `public_file_url` from the sanitized payload
+
+Constraints maintained:
+
+- No backend changes
+- No other public page migration
+- No auth enforcement
+- No UI redesign

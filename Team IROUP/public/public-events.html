@@ -251,7 +251,7 @@ function simpleLink(url,label){
 
 async function loadData() {
   try {
-    const data = await IROUP.getAll(IROUP.SHEETS.EVENT);
+    const data = (await IROUP.getPublicEvents()).map(normalizePublicEvent);
     allEvents = data.sort((a,b) => new Date(a['วันเริ่ม']) - new Date(b['วันเริ่ม']));
     const today = new Date();
     const upcoming = data.filter(e => new Date(e['วันเริ่ม']) > today).length;
@@ -267,6 +267,33 @@ async function loadData() {
   } catch(e) {
     document.getElementById('eventList').innerHTML = '<div class="loading">⚠️ ไม่สามารถโหลดข้อมูลได้</div>';
   }
+}
+
+function normalizePublicEvent(row) {
+  return {
+    ID: row.event_id || '',
+    'ชื่อกิจกรรม': row.title || '',
+    'ประเภท': row.type || '',
+    'ประเทศ': row.country || '',
+    'ทวีป': row.continent || '',
+    'หน่วยงาน': row.organizer || row.institution || '',
+    'สถานที่': row.location || row.country || '',
+    'จำนวน': row.participant_count || '',
+    'วันเริ่ม': row.start_date || '',
+    'วันสิ้นสุด': row.end_date || row.start_date || '',
+    'เวลาเริ่ม': row.start_time || '',
+    'เวลาสิ้นสุด': row.end_time || '',
+    'รายละเอียด': row.detail || '',
+    Link: row.detail_url || row.link_url || '',
+    Poster_URL: row.poster_url || '',
+    'ไฟล์_URL': row.public_file_url || '',
+    Pin: isPublicTruthy(row.pin) ? 'TRUE' : '',
+    Status: row.status || ''
+  };
+}
+
+function isPublicTruthy(value) {
+  return ['true', 'yes', 'y', '1', 'pin', 'pinned'].includes(String(value || '').trim().toLowerCase());
 }
 
 function renderEvents() {

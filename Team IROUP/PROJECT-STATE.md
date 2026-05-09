@@ -384,3 +384,7 @@ Commits made across sessions:
 ## 21. Backend Governance Pass 2C-B Phase 1 (2026-05-09)
 
 - Backend Governance Pass 2C-B Phase 1: migrated public-scholar.html to public-safe scholarship endpoints using sanitized payload adapters while preserving existing public UI behavior.
+
+## 22. Backend Governance Pass 2C-B Phase 2 (2026-05-09)
+
+- Backend Governance Pass 2C-B Phase 2: migrated public-events.html to public-safe event endpoints using sanitized payload adapters while preserving existing public UI behavior.
