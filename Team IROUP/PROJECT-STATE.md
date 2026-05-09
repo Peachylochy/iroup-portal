@@ -1,5 +1,5 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-09 | Session: UI Polish & Readability Phase (contrast pass + login page)**
+**Last updated: 2026-05-09 | Session: Login Experience Redesign — v1 Concept (split-layout, SaaS-inspired)**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
@@ -43,6 +43,43 @@ Downstream tokens automatically improved: `.ir-label`, `.ir-input::placeholder`,
 
 ---
 
+### Session: 2026-05-09 — Login Experience Redesign (v1 Concept)
+
+**Phase goal:** Elevate `index.html` from a polished single-card login into a premium split-layout experience. CSS/layout exploration only. No JS, no API, no auth flow changes.
+
+**Why this phase started now:**
+The previous readability pass (contrast fix + palette alignment) produced a cleaner card but revealed a structural ceiling — a centered single-card layout cannot communicate the platform's identity or scale regardless of how well the CSS is tuned. The mascot (Globy) and brand assets were present but underused. The login page is the first impression for all users; the gap between its appearance and the dashboard's quality became the clear next design priority.
+
+#### Design direction — v1 Concept (tentatively approved)
+
+| Dimension | Direction |
+|-----------|-----------|
+| Layout | Split-panel: left brand panel + right login form panel |
+| Aesthetic | Premium SaaS-inspired university platform feel |
+| Colour palette | Soft blue/purple gradient — consistent with previous session's palette shift |
+| Depth technique | Subtle glassmorphism on form card; layered orb/blur effects on brand panel |
+| Visual motif | International/global: globe, connectivity, network — aligned with IR Office identity |
+| Mascot role | Globy promoted from background decoration to active brand element on left panel |
+| Typography hierarchy | Stronger size contrast between headline, subtitle, and form labels |
+| Enterprise signal | Cleaner spacing, reduced noise, intentional whitespace |
+
+#### Emerging design language (v1 tokens)
+
+```
+Brand panel:   deep blue → purple gradient (#0F2D5A → #2D1B69 or similar)
+Form side:     white/near-white, high contrast, clean
+Accent:        blue-purple range (#4B8FD4, #5A32D0)
+Glassmorphism: rgba(255,255,255,0.12–0.18) + blur(16–24px) on panel elements
+Shadow:        0 24px 72px rgba(15,45,90,0.18) — same depth scale as previous session
+```
+
+**Design exploration method:** Claude Design (AI-assisted layout exploration) used to generate and evaluate composition candidates. v1 selected as the working direction.
+
+**Status:** v1 concept approved. Implementation in `index.html` is the next step.
+**Constraint:** All changes remain CSS/layout only — auth flow, Google Sign-In SDK, session logic are untouched.
+
+---
+
 ## 1. Migration Checklist
 
 ### 1.1 Infrastructure
@@ -67,7 +104,7 @@ Legend: `[✓]` fully migrated · `[~]` partial / stabilized · `[ ]` pending
 | `scholarship-events.html` | `[~]` partial | ✅ | ⚠️ Stabilized only — `IU.toDate` at 3 sites; `esc`/`IROUP.formatDate` not yet migrated | ✅ Local `esc` kept + TODO marker | Crash fix: `IROUP.parseDate` → `IU.toDate`. Full IU migration is a future step. |
 | `mou.html` | `[ ]` pending | ❌ | ❌ | N/A — `htmlSafe()` local, TODO marked | Uses `IROUP.getMouStatus()` and local `htmlSafe()`. Migration planned. |
 | `mobility.html` | `[ ]` pending | ❌ | ❌ | N/A — `r9e()` + `formatDate()` local, TODO marked | Uses `r9e()` (esc) and local `formatDate()`. Migration planned. |
-| `index.html` | `[ ]` deferred | ❌ | ❌ | ❌ | Auth/login page — separate migration after all pages stable. |
+| `index.html` | `[ ]` deferred | ❌ | ❌ | ❌ | Auth/login page — v1 layout concept approved. CSS/layout implementation next. JS/auth untouched. |
 | `public/public-scholar.html` | `[ ]` pending | ❌ | ❌ | ❌ | Small page, good next target. |
 | `public/public-events.html` | `[ ]` pending | ❌ | ❌ | ❌ | Small page, good next target. |
 | `public/public-mou.html` | `[ ]` pending | ❌ | ❌ | ❌ | Has D3 — check carefully. |
@@ -213,6 +250,7 @@ Note: `IROUP.parseDate()` does NOT exist — use `IU.toDate()` instead.
 2. **Visual verification** — open `dashboard.html` and `travel.html` to confirm IU migration rendering is correct.
 3. **Stub removal** — once verified, remove local stubs from `travel.html` (committed separately from call-site migration per git workflow).
 4. **Consistency check** — scan `dashboard.html`, `report.html`, `travel.html`, `scholarship-events.html` for any inline CSS overriding `--ir-text-muted` that may need a matching manual fix.
+5. **Login redesign implementation** — implement v1 split-layout concept in `index.html` (CSS/layout only; auth flow untouched).
 
 ### Next migration targets (in order of simplicity)
 1. `public/public-scholar.html` — small, no charting, good warm-up

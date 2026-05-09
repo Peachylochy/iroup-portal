@@ -4,7 +4,7 @@
 
 ### Development Journal + R2R Foundation Notes
 
-Last Updated: 2026-05-08
+Last Updated: 2026-05-09
 
 > Living document. Update continuously throughout development.
 > Focus: workflow evolution, operational impact, lessons learned, and R2R direction.
@@ -772,3 +772,68 @@ business logic remains local
 migration safety and reversibility remain higher priority than aggressive refactoring
 
 This approach reduces migration risk while allowing the system to evolve into a maintainable operational platform over time.
+
+---
+
+19. Login Experience Redesign Phase (May 2026)
+
+Summary
+
+Following the readability and contrast polish pass (section 18), development entered a new phase focused on the login page experience. This phase was initiated through AI-assisted design exploration using Claude Design to generate and evaluate layout candidates.
+
+Why This Phase Started Now
+
+The contrast and palette work in the previous session improved legibility but revealed a structural ceiling. The existing single-card centered layout had limited ability to communicate the platform's identity, scale, or institutional character regardless of CSS refinement quality.
+
+Key observations that prompted the shift:
+
+- Globy mascot was present but visually suppressed (opacity 0.15 → effectively invisible)
+- Brand assets were unused in any meaningful compositional role
+- The login page did not match the quality level of the internal dashboards
+- First impressions for all users pass through this page
+
+The decision was made to shift from incremental CSS polish toward an intentional experience design phase.
+
+Design Direction: v1 Concept
+
+After AI-assisted exploration, a split-layout composition was selected as the v1 direction.
+
+Core characteristics:
+
+- Split-panel layout: left brand panel, right login form panel
+- Premium SaaS-inspired aesthetic adapted to a university platform context
+- Soft blue/purple gradient palette (consistent with previous session's palette direction)
+- Subtle glassmorphism on form card elements
+- International and global visual motif aligned with the IR Office identity
+- Globy promoted from background element to active brand presence on the left panel
+- Stronger typographic hierarchy on headline, subtitle, and form labels
+- Intentional whitespace and reduced visual noise
+
+Emerging Design Language
+
+The session began establishing a coherent design language for the login experience:
+
+- Brand panel: deep blue-to-purple gradient
+- Form side: high-contrast white/near-white
+- Accent range: blue-purple (#4B8FD4, #5A32D0)
+- Glassmorphism scale: rgba(255,255,255,0.12–0.18) at 16–24px blur
+- Shadow depth: consistent with previous session tokens
+
+Design Exploration Method
+
+Claude Design (AI-assisted layout exploration) was used to generate and compare composition candidates. This approach accelerated the exploration cycle without requiring iterative manual CSS editing for each layout option.
+
+Lesson noted: AI-assisted design exploration is most effective when the design language constraints (palette, motif, target aesthetic) are defined before exploration begins — open-ended prompts produce lower-quality candidates.
+
+Constraints Maintained
+
+- No changes to Google Sign-In SDK or auth flow
+- No JS logic touched
+- No session management modified
+- All design work remains CSS/layout only
+- Implementation remains incremental and reversible
+
+Status
+
+v1 concept tentatively approved. Implementation in index.html is the next step.
+
