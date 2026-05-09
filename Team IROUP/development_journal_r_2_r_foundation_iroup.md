@@ -1058,3 +1058,26 @@ Constraints maintained:
 - No spreadsheet structure changes
 - No deployment URL changes
 - No full backend rewrite
+
+---
+
+29. Backend Governance Pass 2A (May 9, 2026)
+
+Summary
+
+Backend Governance Pass 2A: added admin auth guard foundation in compatibility mode. Public endpoints remain open. Legacy admin endpoints are classified and ready for enforcement, but not blocked yet to preserve dashboard compatibility.
+
+Implementation notes:
+
+- Added action classification helpers for public, admin legacy, write, and upload routes
+- Added compatibility-mode auth guard flow with `getAuthMode_()` defaulting to `compat`
+- Added admin session helper structure for future Google token verification and `adminToken` enforcement
+- Added a `createAdminSession` route for the next frontend auth migration phase
+- Added dormant upload policy helper skeletons without changing current upload behavior
+
+Constraints maintained:
+
+- No frontend changes
+- No deployment URL changes
+- No legacy endpoint removal
+- No admin route blocking while compatibility mode is active

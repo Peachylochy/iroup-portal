@@ -29,6 +29,12 @@ const SHEET_ALIASES = {
   admin: SHEET_NAMES.ADMIN,
 };
 
+const AUTH_MODE_PROPERTY = 'IROUP_AUTH_MODE';
+const AUTH_MODE_COMPAT = 'compat';
+const AUTH_MODE_ENFORCE = 'enforce';
+const ADMIN_SESSION_PREFIX = 'iroup_admin_session_';
+const ADMIN_SESSION_TTL_SECONDS = 6 * 60 * 60;
+
 function getSS() {
   return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
@@ -52,6 +58,9 @@ function handleRequest_(params) {
   let result;
 
   try {
+    const guard = guardAdminLegacyAction_(action, params);
+    if (!guard.allowed) return json_(guard);
+
     switch (action) {
       case 'ping':
         result = { success: true, message: 'iROUP API ready', time: new Date().toISOString() };
@@ -107,6 +116,10 @@ function handleRequest_(params) {
 
       case 'getPublicStats':
         result = getPublicStats();
+        break;
+
+      case 'createAdminSession':
+        result = createAdminSession(params.googleToken || params.idToken || params.accessToken || '');
         break;
 
       case 'checkAdmin':
@@ -187,6 +200,255 @@ function resolveSheet_(name) {
   const key = String(name || '').trim();
   if (!key) return '';
   return SHEET_ALIASES[key.toLowerCase()] || key;
+}
+
+// ============================================================
+// Auth guard foundation
+// ============================================================
+
+function isPublicAction_(action) {
+  const publicActions = [
+    'ping',
+    'getPublicMou',
+    'getPublicMobility',
+    'getPublicTravel',
+    'getPublicScholarships',
+    'getPublicEvents',
+    'getPublicStats',
+    'createAdminSession'
+  ];
+  return publicActions.indexOf(String(action || '').trim()) >= 0;
+}
+
+function isWriteAction_(action) {
+  const writeActions = ['add', 'edit', 'delete'];
+  return writeActions.indexOf(String(action || '').trim()) >= 0;
+}
+
+function isUploadAction_(action) {
+  const uploadActions = ['uploadFile', 'uploadImage'];
+  return uploadActions.indexOf(String(action || '').trim()) >= 0;
+}
+
+function isAdminLegacyAction_(action) {
+  const key = String(action || '').trim();
+  if (!key || isPublicAction_(key)) return false;
+
+  const adminLegacyActions = [
+    'getAll',
+    'search',
+    'searchStaff',
+    'getStats',
+    'getReport',
+    'getMouByCountry',
+    'checkAdmin',
+    'getMOU',
+    'getMou',
+    'getScholarship',
+    'getScholarships',
+    'getScholar',
+    'getEvents',
+    'getEvent',
+    'getTravel',
+    'getInbound',
+    'getOutbound',
+    'add',
+    'edit',
+    'delete',
+    'uploadImage',
+    'uploadFile'
+  ];
+  return adminLegacyActions.indexOf(key) >= 0;
+}
+
+function getAuthMode_() {
+  const mode = String(PropertiesService.getScriptProperties().getProperty(AUTH_MODE_PROPERTY) || AUTH_MODE_COMPAT)
+    .toLowerCase()
+    .trim();
+  return mode === AUTH_MODE_ENFORCE ? AUTH_MODE_ENFORCE : AUTH_MODE_COMPAT;
+}
+
+function guardAdminLegacyAction_(action, params) {
+  if (!isAdminLegacyAction_(action)) return { success: true, allowed: true };
+
+  const auth = requireAdmin_(params || {});
+  if (auth.allowed) return auth;
+
+  if (getAuthMode_() === AUTH_MODE_ENFORCE) {
+    return {
+      success: false,
+      allowed: false,
+      error: 'Admin authorization required',
+      action: action
+    };
+  }
+
+  logAuthWarning_(action, auth.reason || 'Missing or invalid adminToken');
+  return { success: true, allowed: true, compat: true };
+}
+
+function requireAdmin_(params) {
+  const token = String(
+    params.adminToken ||
+    params.authToken ||
+    params.token ||
+    ''
+  ).trim();
+
+  if (!token) {
+    return { success: false, allowed: false, reason: 'Missing adminToken' };
+  }
+
+  return isAdminSessionValid_(token);
+}
+
+function createAdminSession(googleToken) {
+  const verified = verifyGoogleToken_(googleToken);
+  if (!verified.success) return verified;
+
+  const admin = getAdminRecordByEmail_(verified.email);
+  if (!admin.allowed) return admin;
+
+  const adminToken = Utilities.getUuid() + '-' + Utilities.getUuid();
+  const session = {
+    email: verified.email,
+    name: admin.name || verified.name || verified.email,
+    role: admin.role || 'admin',
+    createdAt: new Date().toISOString()
+  };
+
+  CacheService.getScriptCache().put(
+    ADMIN_SESSION_PREFIX + adminToken,
+    JSON.stringify(session),
+    ADMIN_SESSION_TTL_SECONDS
+  );
+
+  return {
+    success: true,
+    allowed: true,
+    adminToken: adminToken,
+    expiresIn: ADMIN_SESSION_TTL_SECONDS,
+    user: {
+      email: session.email,
+      name: session.name,
+      role: session.role
+    }
+  };
+}
+
+function verifyGoogleToken_(token) {
+  const raw = String(token || '').trim();
+  if (!raw) {
+    return {
+      success: false,
+      allowed: false,
+      error: 'Missing Google token',
+      todo: 'Frontend must send a verified Google access token or ID token before auth enforcement.'
+    };
+  }
+
+  const accessTokenResult = fetchGoogleUserInfo_(raw);
+  if (accessTokenResult.success) return accessTokenResult;
+
+  return fetchGoogleTokenInfo_(raw);
+}
+
+function fetchGoogleUserInfo_(token) {
+  try {
+    const response = UrlFetchApp.fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      method: 'get',
+      headers: { Authorization: 'Bearer ' + token },
+      muteHttpExceptions: true
+    });
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+      return { success: false, allowed: false, error: 'Invalid Google access token' };
+    }
+
+    const data = JSON.parse(response.getContentText() || '{}');
+    const email = String(data.email || '').toLowerCase().trim();
+    if (!email) return { success: false, allowed: false, error: 'Google token did not return an email' };
+
+    return {
+      success: true,
+      allowed: true,
+      email: email,
+      name: data.name || email
+    };
+  } catch (err) {
+    return { success: false, allowed: false, error: 'Google token verification failed: ' + err.message };
+  }
+}
+
+function fetchGoogleTokenInfo_(token) {
+  try {
+    const response = UrlFetchApp.fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(token), {
+      method: 'get',
+      muteHttpExceptions: true
+    });
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+      return { success: false, allowed: false, error: 'Invalid Google token' };
+    }
+
+    const data = JSON.parse(response.getContentText() || '{}');
+    const email = String(data.email || '').toLowerCase().trim();
+    if (!email) return { success: false, allowed: false, error: 'Google token did not return an email' };
+
+    return {
+      success: true,
+      allowed: true,
+      email: email,
+      name: data.name || email
+    };
+  } catch (err) {
+    return { success: false, allowed: false, error: 'Google token verification failed: ' + err.message };
+  }
+}
+
+function isAdminSessionValid_(token) {
+  const raw = CacheService.getScriptCache().get(ADMIN_SESSION_PREFIX + String(token || '').trim());
+  if (!raw) return { success: false, allowed: false, reason: 'Invalid or expired adminToken' };
+
+  try {
+    const session = JSON.parse(raw);
+    return {
+      success: true,
+      allowed: true,
+      user: {
+        email: session.email || '',
+        name: session.name || '',
+        role: session.role || 'admin'
+      }
+    };
+  } catch (err) {
+    return { success: false, allowed: false, reason: 'Invalid admin session payload' };
+  }
+}
+
+function getAdminRecordByEmail_(email) {
+  const sheet = getSS().getSheetByName(SHEET_NAMES.ADMIN);
+  if (!sheet) return { success: false, allowed: false, reason: 'ไม่พบ Sheet Admin' };
+
+  const target = String(email || '').toLowerCase().trim();
+  if (!target) return { success: false, allowed: false, reason: 'Missing email' };
+
+  const rows = readSheet_(sheet);
+  const found = rows.find(r => String(pick_(r, ['email', 'Email', 'อีเมล'], '')).toLowerCase().trim() === target);
+  if (!found) return { success: true, allowed: false, reason: 'Email นี้ไม่มีสิทธิ์เข้าใช้งาน' };
+
+  return {
+    success: true,
+    allowed: true,
+    name: pick_(found, ['ชื่อ-สกุล', 'ชื่อ_สกุล', 'name'], email),
+    role: pick_(found, ['role', 'Role', 'สิทธิ์'], 'admin')
+  };
+}
+
+function logAuthWarning_(action, reason) {
+  try {
+    console.warn('ADMIN-ONLY LEGACY ENDPOINT allowed in compat mode:', action, reason);
+  } catch (err) {
+    // Logging is best-effort only for Apps Script runtime compatibility.
+  }
 }
 
 // ============================================================
@@ -830,6 +1092,29 @@ function sumMoney_(rows, keys) {
 // ============================================================
 // Upload helpers
 // ============================================================
+
+function getUploadPolicy_() {
+  return {
+    // TODO: Enforce this policy after adminToken propagation is added to the frontend.
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'application/pdf'],
+    maxBytes: 10 * 1024 * 1024,
+    requireAdminToken: true
+  };
+}
+
+function validateUploadForFuture_(contentType, bytes) {
+  const policy = getUploadPolicy_();
+  const mime = String(contentType || '').toLowerCase().trim();
+  const size = bytes && bytes.length ? bytes.length : 0;
+
+  if (policy.allowedMimeTypes.indexOf(mime) < 0) {
+    return { success: false, error: 'Unsupported upload type: ' + contentType };
+  }
+  if (size > policy.maxBytes) {
+    return { success: false, error: 'Upload file is too large' };
+  }
+  return { success: true };
+}
 
 function getOrCreateUploadFolder(folderName) {
   const rootName = 'iROUP Uploads';

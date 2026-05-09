@@ -368,3 +368,7 @@ Commits made across sessions:
 ## 17. Backend Governance Pass 1 (2026-05-09)
 
 - Backend Governance Pass 1: added public-safe endpoint layer for MOU, Mobility, Travel, Scholarships, Events, and public stats. Raw admin endpoints remain for compatibility but are marked as admin-only legacy endpoints pending auth enforcement.
+
+## 18. Backend Governance Pass 2A (2026-05-09)
+
+- Backend Governance Pass 2A: added admin auth guard foundation in compatibility mode. Public endpoints remain open. Legacy admin endpoints are classified and ready for enforcement, but not blocked yet to preserve dashboard compatibility.
