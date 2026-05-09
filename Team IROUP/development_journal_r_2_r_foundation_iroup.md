@@ -837,3 +837,34 @@ Status
 
 v1 concept tentatively approved. Implementation in index.html is the next step.
 
+---
+
+20. Login Polish Pass - Accessibility and Motion (May 9, 2026)
+
+Summary
+
+After the split-layout login implementation, the login page received two small CSS-only polish passes focused on accessibility and interaction quality.
+
+Accessibility pass:
+
+- Added clearer keyboard focus states for the Google login button and public link
+- Added a scoped focus-visible rule for login-card form controls
+- Improved small support text readability without touching auth behavior
+- Expanded reduced-motion handling for existing animated elements
+
+Motion pass:
+
+- Refined Google login button hover and active transitions
+- Added subtle public link hover and active movement
+- Tuned the login card entrance from a larger rise into a quieter settle
+- Added shared easing tokens for consistent, reversible motion tuning
+- Confirmed reduced-motion users receive no hover/active transform motion
+
+Constraints maintained:
+
+- No HTML structure changes
+- No JavaScript changes
+- Google Sign-In logic preserved
+- sessionStorage and redirect flow preserved
+- Mascot positioning unchanged
+- Text colors unchanged during the motion pass

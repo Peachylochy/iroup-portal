@@ -296,3 +296,13 @@ Commits made across sessions:
 ---
 
 *This document covers the Team IROUP frontend only. `peach-workload-portfolio/` is a separate system not tracked here.*
+
+---
+
+## 9. Login Polish Pass - Motion (2026-05-09)
+
+- `index.html` received a CSS-only subtle motion polish pass.
+- Google auth logic, sessionStorage, redirect flow, and HTML structure were not modified.
+- Motion changes were limited to login card entrance, Google button hover/active response, public link hover/active response, and reduced-motion safeguards.
+- `prefers-reduced-motion: reduce` continues to disable login animations and interactive transforms.
+- Mascot positioning and text colors were intentionally left unchanged.
