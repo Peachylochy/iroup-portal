@@ -7,51 +7,36 @@
 <link rel="stylesheet" href="iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<!-- ============================================================
-  STEP 1 MERGE — CSS visual layer only
-  Protected: all <script> blocks, Google GSI SDK, signInWithGoogle(),
-             handleGoogleResponse(), checkAdminAccess(), sessionStorage logic,
-             status element IDs (statusLoading, statusError, statusSuccess,
-             deniedBox, errorMsg, deniedEmail)
-  Changed:   <style> block, background elements, card interior HTML
-  Layout:    single-column preserved (no two-column panel yet)
-============================================================ -->
 <style>
 /* ── RESET ──────────────────────────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
 
 /* ── DESIGN TOKENS ──────────────────────────────────────── */
 :root{
-  /* brand colours */
   --blue:#1A6DB5; --sky:#4BBDE8; --navy:#0F2D5A; --navy-deep:#071828;
   --purple:#7C3AED; --indigo:#4F46E5;
   --green:#5BAD3E; --green-pale:#EBF7E3;
   --red:#D63B32;   --red-pale:#FDECEA;
-  /* ink scale — WCAG AA on light glass */
   --ink:#0A1730; --ink-2:#3B4A66; --ink-3:#6E7E96; --ink-4:#A4AEC2;
-  /* borders / glass */
   --line:rgba(15,45,90,0.07);
   --line-2:rgba(15,45,90,0.05);
   --glass:rgba(255,255,255,0.72);
   --glass-strong:rgba(255,255,255,0.86);
-  /* spacing */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px;
   --s6:24px; --s7:32px; --s8:40px; --s9:56px;
 }
 
 html,body{height:100%;font-family:'Prompt','Sarabun',system-ui,sans-serif}
 
-/* ── BODY — centred single-column (layout unchanged) ─────── */
 body{
   color:var(--ink);
   background:#EEF1FB;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  min-height:100vh;position:relative;overflow:hidden
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
 }
 
-/* ── BACKDROP — replaces old .orb1/2/3 ──────────────────── */
+/* ── BACKDROP ────────────────────────────────────────────── */
 .backdrop{
   position:fixed;inset:0;z-index:0;overflow:hidden;
   background:
@@ -59,7 +44,6 @@ body{
     radial-gradient(960px 640px at 8% 92%, #ECE3FF 0%, transparent 58%),
     linear-gradient(160deg,#F6F8FE 0%,#EEF1FB 48%,#F1ECFB 100%);
 }
-/* animated aurora orbs */
 .aurora{
   position:absolute;border-radius:50%;
   filter:blur(96px);opacity:.40;
@@ -81,7 +65,6 @@ body{
   0%,100%{transform:translate(0,0) scale(1)}
   50%{transform:translate(28px,-22px) scale(1.05)}
 }
-/* faint grid texture */
 .grid-tex{
   position:absolute;inset:0;opacity:.28;pointer-events:none;
   background-image:
@@ -91,14 +74,162 @@ body{
   -webkit-mask-image:radial-gradient(ellipse at center,black 25%,transparent 78%);
   mask-image:radial-gradient(ellipse at center,black 25%,transparent 78%)
 }
-/* film grain */
 .grain{
   position:absolute;inset:0;opacity:.5;pointer-events:none;
   mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHZhbHVlcz0iMCAwIDAgMCAwLjA2IDAgMCAwIDAgMC4xMCAwIDAgMCAwIDAuMjAgMCAwIDAgMC40NSAwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI24pIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=")
 }
 
-/* ── LOGIN CARD ───────────────────────────────────────────── */
+/* ── SPLIT SHELL ─────────────────────────────────────────── */
+.shell{
+  position:relative;z-index:2;
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(420px,1fr);
+  max-width:1280px;
+  margin:0 auto;
+  padding:var(--s7) var(--s8);
+  gap:var(--s8);
+  align-items:stretch;
+}
+
+/* ── LEFT BRAND PANEL ────────────────────────────────────── */
+.brand{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:var(--s8) var(--s6);
+  min-height:calc(100vh - 2*var(--s7));
+  overflow:hidden;
+}
+
+.brand-top{
+  display:flex;align-items:center;gap:var(--s3);
+  position:relative;z-index:1;
+}
+.brand-mark{
+  width:42px;height:42px;border-radius:11px;
+  background:linear-gradient(135deg,#1A6DB5,#4BBDE8 55%,#7C3AED);
+  display:grid;place-items:center;
+  font-weight:900;font-size:17px;color:#fff;letter-spacing:.3px;
+  flex:0 0 42px;
+  box-shadow:
+    0 6px 20px -4px rgba(26,109,181,0.4),
+    0 2px 6px rgba(124,58,237,0.18),
+    inset 0 1px 0 rgba(255,255,255,.45);
+}
+.brand-mark span{pointer-events:none;user-select:none}
+.brand-wordmark{
+  font-weight:700;font-size:14.5px;color:var(--ink);
+  letter-spacing:-.15px;line-height:1.2;
+}
+.brand-wordmark small{
+  color:var(--ink-2);font-weight:500;font-size:11.5px;
+  display:block;margin-top:3px;
+  font-family:'Sarabun',sans-serif;letter-spacing:0;
+}
+
+/* globe illustration — pure inline SVG, no external asset */
+.globe-wrap{
+  position:absolute;
+  right:-52px;top:52px;
+  width:370px;height:370px;
+  opacity:.42;pointer-events:none;z-index:0;
+}
+.globe-wrap svg{
+  width:100%;height:100%;
+  animation:globe-spin 80s linear infinite;
+}
+@keyframes globe-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* hero copy */
+.brand-hero{
+  margin:auto 0;
+  padding:var(--s6) 0;
+  max-width:520px;
+  position:relative;z-index:1;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:var(--s2);
+  background:rgba(124,58,237,0.07);
+  color:#5B21B6;
+  padding:6px 12px 6px 10px;border-radius:100px;
+  font-size:11px;font-weight:600;letter-spacing:.6px;
+  border:1px solid rgba(124,58,237,0.14);
+  font-family:'Prompt',sans-serif;
+  text-transform:uppercase;
+}
+.eyebrow .dot{
+  width:6px;height:6px;border-radius:50%;background:#7C3AED;
+  box-shadow:0 0 0 4px rgba(124,58,237,0.18);
+  animation:pulse 2.4s ease-in-out infinite;
+  flex:0 0 6px;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 4px rgba(124,58,237,0.18)}
+  50%{box-shadow:0 0 0 6px rgba(124,58,237,0.08)}
+}
+.headline{
+  font-size:clamp(32px,3.8vw,46px);
+  line-height:1.06;font-weight:700;letter-spacing:-1.2px;
+  margin-top:var(--s5);color:var(--ink);text-wrap:balance;
+}
+.headline em{
+  font-style:normal;
+  background:linear-gradient(120deg,#1A6DB5 0%,#4BBDE8 45%,#7C3AED 100%);
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+}
+.subhead{
+  font-family:'Sarabun',sans-serif;font-size:15px;line-height:1.72;
+  color:var(--ink-2);margin-top:var(--s4);max-width:440px;font-weight:400;
+}
+
+/* feature pills */
+.features{
+  margin-top:var(--s7);
+  display:flex;flex-direction:column;gap:var(--s4);
+}
+.feat{display:flex;align-items:flex-start;gap:var(--s3)}
+.feat-ic{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.7));
+  border:1px solid rgba(15,45,90,0.07);
+  display:grid;place-items:center;color:#1A6DB5;
+  box-shadow:0 2px 8px -2px rgba(15,45,90,0.08),inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.feat-ic svg{width:17px;height:17px}
+.feat-tx h4{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:3px;letter-spacing:-.1px}
+.feat-tx p{font-family:'Sarabun',sans-serif;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+
+/* brand footer */
+.brand-foot{
+  display:flex;align-items:center;gap:var(--s4);
+  font-size:11px;color:var(--ink-3);
+  font-family:'Sarabun',sans-serif;letter-spacing:.2px;
+  position:relative;z-index:1;
+}
+.brand-foot .sep{
+  width:3px;height:3px;border-radius:50%;
+  background:var(--ink-3);opacity:.4;
+}
+
+/* ── RIGHT AUTH COLUMN ───────────────────────────────────── */
+.auth-col{
+  display:flex;align-items:center;justify-content:center;
+  padding:var(--s6) 0;
+  position:relative;
+}
+.auth-col::before{
+  content:"";position:absolute;
+  width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.10),transparent 65%);
+  filter:blur(40px);z-index:-1;pointer-events:none;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+
+/* ── LOGIN CARD (Step 1 — untouched) ─────────────────────── */
 .login-card{
   position:relative;z-index:2;
   width:100%;max-width:432px;
@@ -116,7 +247,6 @@ body{
     0 4px 12px -4px rgba(15,45,90,0.06);
   animation:rise .7s cubic-bezier(.2,.8,.2,1) both
 }
-/* gradient border accent */
 .login-card::before{
   content:"";position:absolute;inset:0;border-radius:22px;padding:1px;
   background:linear-gradient(135deg,
@@ -129,21 +259,6 @@ body{
   from{opacity:0;transform:translateY(16px)}
   to{opacity:1;transform:translateY(0)}
 }
-
-/* soft halo behind card */
-.login-card-wrap{
-  position:relative;z-index:2;
-  display:flex;align-items:center;justify-content:center;
-  width:100%;padding:var(--s6) var(--s8)
-}
-.login-card-wrap::before{
-  content:"";position:absolute;width:520px;height:520px;border-radius:50%;
-  background:radial-gradient(circle,rgba(124,58,237,0.10),transparent 65%);
-  filter:blur(40px);z-index:-1;pointer-events:none;
-  top:50%;left:50%;transform:translate(-50%,-50%)
-}
-
-/* ── CARD HEAD ────────────────────────────────────────────── */
 .card-head{text-align:center;margin-bottom:var(--s6)}
 .lock-icon{
   width:56px;height:56px;margin:0 auto var(--s4);border-radius:16px;
@@ -164,8 +279,6 @@ body{
   font-family:'Sarabun',sans-serif;font-size:13.5px;
   color:var(--ink-2);line-height:1.55;font-weight:400
 }
-
-/* ── ROLE CHIP ────────────────────────────────────────────── */
 .role-chip{
   display:flex;align-items:center;gap:var(--s3);
   padding:var(--s3) var(--s4);
@@ -183,8 +296,6 @@ body{
   font-family:'Sarabun',sans-serif;font-size:12.5px;
   color:var(--ink-2);line-height:1.5
 }
-
-/* ── GOOGLE BUTTON ────────────────────────────────────────── */
 .google-btn{
   width:100%;padding:14px var(--s4);
   background:#fff;color:var(--ink);
@@ -207,8 +318,6 @@ body{
   box-shadow:0 0 0 4px rgba(26,109,181,0.18),0 8px 22px -8px rgba(26,109,181,0.22)
 }
 .google-logo{width:20px;height:20px;flex:0 0 20px}
-
-/* ── DIVIDER ──────────────────────────────────────────────── */
 .div-or{
   display:flex;align-items:center;gap:var(--s3);
   margin:var(--s5) 0 var(--s3)
@@ -221,9 +330,6 @@ body{
   font-size:10px;font-family:'Sarabun',sans-serif;color:var(--ink-3);
   letter-spacing:1.8px;text-transform:uppercase;font-weight:500
 }
-
-/* ── STATUS BOXES ─────────────────────────────────────────── */
-/* Preserves original display:none default — JS uses style.display to toggle */
 .status-box{
   margin-top:var(--s3);padding:var(--s3) var(--s4);border-radius:11px;
   font-family:'Sarabun',sans-serif;font-size:12.5px;line-height:1.45;
@@ -241,16 +347,12 @@ body{
   background:var(--green-pale);color:#3F7E2A;
   border:1px solid rgba(91,173,62,0.20)
 }
-/* CSS spinner used in statusLoading */
 .spin{
   display:inline-block;width:14px;height:14px;
   border:2px solid currentColor;border-top-color:transparent;
   border-radius:50%;animation:sp 1s linear infinite
 }
 @keyframes sp{to{transform:rotate(360deg)}}
-
-/* ── DENIED BOX ───────────────────────────────────────────── */
-/* Preserves display:none — JS sets display:'block' */
 #deniedBox{
   display:none;margin-top:14px;padding:18px;border-radius:14px;
   background:linear-gradient(180deg,rgba(253,236,234,0.6),rgba(253,236,234,0.95));
@@ -263,8 +365,6 @@ body{
 }
 #deniedBox h3{font-size:14px;font-weight:700;color:#B0271F;margin-bottom:4px}
 #deniedBox p{font-family:'Sarabun',sans-serif;font-size:12px;color:#8B2A24;line-height:1.5}
-
-/* ── CARD FOOTER ──────────────────────────────────────────── */
 .card-foot{
   margin-top:var(--s6);padding-top:var(--s5);
   border-top:1px solid var(--line-2);text-align:center
@@ -282,7 +382,7 @@ body{
   margin-top:var(--s2);line-height:1.5
 }
 
-/* ── VERSION STAMP ────────────────────────────────────────── */
+/* version */
 .version{
   position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
   font-family:'Sarabun',sans-serif;font-size:10px;
@@ -291,8 +391,33 @@ body{
 }
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
+@media(max-width:1080px){
+  .shell{
+    grid-template-columns:minmax(0,1fr) minmax(420px,440px);
+    gap:var(--s7);padding:var(--s7) var(--s6);
+  }
+  .globe-wrap{width:280px;height:280px;right:-60px;opacity:.32}
+}
+@media(max-width:880px){
+  .shell{
+    grid-template-columns:1fr;
+    padding:var(--s6) var(--s5);gap:var(--s5);
+    max-width:560px;
+  }
+  .brand{min-height:auto;padding:var(--s4) 0 0}
+  .brand-hero{margin:var(--s5) 0 var(--s4);max-width:none;padding:0}
+  .features{display:none}
+  .globe-wrap{display:none}
+  .brand-foot{display:none}
+  .auth-col{padding:0 0 var(--s9)}
+  .auth-col::before{width:360px;height:360px}
+  .login-card{padding:var(--s7) var(--s6) var(--s6);max-width:none}
+}
 @media(max-width:520px){
-  .login-card-wrap{padding:var(--s5) var(--s4) var(--s7)}
+  .shell{padding:var(--s5) var(--s4) var(--s7);gap:var(--s4)}
+  .brand{padding:var(--s2) 0 0}
+  .brand-hero{margin:var(--s5) 0 var(--s3)}
+  .subhead{font-size:14px;line-height:1.65}
   .login-card{border-radius:20px;padding:var(--s6) var(--s5) var(--s5)}
   .card-head h1{font-size:21px}
   .card-head .sub{font-size:12.5px}
@@ -301,16 +426,19 @@ body{
   .role-chip{padding:10px var(--s3);gap:var(--s2)}
   .role-chip span{font-size:12px}
   .google-btn{padding:13px var(--s3);font-size:13.5px}
+  .brand-mark{width:38px;height:38px;font-size:15px}
+  .brand-wordmark{font-size:13.5px}
+  .brand-wordmark small{font-size:11px}
   .version{font-size:9.5px;bottom:8px}
 }
 @media(prefers-reduced-motion:reduce){
-  .aurora,.login-card{animation:none !important}
+  .aurora,.login-card,.globe-wrap svg,.eyebrow .dot{animation:none !important}
 }
 </style>
 </head>
 <body>
 
-<!-- BACKDROP (replaces old .orb divs) -->
+<!-- BACKDROP -->
 <div class="backdrop">
   <div class="aurora a1"></div>
   <div class="aurora a2"></div>
@@ -319,103 +447,216 @@ body{
   <div class="grain"></div>
 </div>
 
-<!-- CARD WRAPPER (centres card + provides halo) -->
-<div class="login-card-wrap">
+<!-- STEP 2: SPLIT SHELL -->
+<div class="shell">
 
-  <!-- LOGIN CARD -->
-  <div class="login-card">
+  <!-- ── LEFT: BRAND PANEL ─────────────────────────────── -->
+  <section class="brand" aria-label="iROUP brand panel">
 
-    <!-- HEAD: lock icon + title -->
-    <div class="card-head">
-      <div class="lock-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="11" width="16" height="10" rx="2"></rect>
-          <path d="M8 11V7a4 4 0 018 0v4"></path>
-          <circle cx="12" cy="16" r="1.2" fill="currentColor"></circle>
-        </svg>
-      </div>
-      <h1>ยินดีต้อนรับกลับมา</h1>
-      <p class="sub">เข้าสู่ระบบเพื่อจัดการข้อมูลงานวิเทศสัมพันธ์</p>
-    </div>
-
-    <!-- ROLE CHIP -->
-    <div class="role-chip">
-      <span class="pill">ADMIN</span>
-      <span>เฉพาะผู้ที่ได้รับสิทธิ์ · กรุณาใช้บัญชี Google ของมหาวิทยาลัย</span>
-    </div>
-
-    <!-- GOOGLE SIGN IN BUTTON — onclick preserved exactly -->
-    <button class="google-btn" onclick="signInWithGoogle()" type="button">
-      <svg class="google-logo" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    <!-- Rotating globe — pure inline SVG, no external asset required -->
+    <div class="globe-wrap" aria-hidden="true">
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"   stop-color="#4BBDE8" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#7C3AED" stop-opacity=".25"/>
+          </linearGradient>
+        </defs>
+        <circle cx="200" cy="200" r="170" stroke="url(#gg)" stroke-width="1.2" fill="none"/>
+        <!-- latitude lines -->
+        <ellipse cx="200" cy="200" rx="170" ry="58"  stroke="#4BBDE8" stroke-opacity=".25" stroke-width="1" fill="none"/>
+        <ellipse cx="200" cy="200" rx="170" ry="106" stroke="#4BBDE8" stroke-opacity=".18" stroke-width="1" fill="none"/>
+        <ellipse cx="200" cy="200" rx="170" ry="148" stroke="#4BBDE8" stroke-opacity=".12" stroke-width="1" fill="none"/>
+        <!-- longitude lines -->
+        <ellipse cx="200" cy="200" rx="58"  ry="170" stroke="#7C3AED" stroke-opacity=".22" stroke-width="1" fill="none"/>
+        <ellipse cx="200" cy="200" rx="106" ry="170" stroke="#7C3AED" stroke-opacity=".16" stroke-width="1" fill="none"/>
+        <ellipse cx="200" cy="200" rx="148" ry="170" stroke="#7C3AED" stroke-opacity=".10" stroke-width="1" fill="none"/>
+        <!-- equator & prime meridian -->
+        <line x1="30"  y1="200" x2="370" y2="200" stroke="#4BBDE8" stroke-opacity=".20" stroke-width="1"/>
+        <line x1="200" y1="30"  x2="200" y2="370" stroke="#7C3AED" stroke-opacity=".18" stroke-width="1"/>
+        <!-- partnership pin nodes -->
+        <circle cx="136" cy="118" r="4"  fill="#7C3AED"/>
+        <circle cx="136" cy="118" r="10" fill="#7C3AED" fill-opacity=".15"/>
+        <circle cx="284" cy="166" r="4"  fill="#1A6DB5"/>
+        <circle cx="284" cy="166" r="10" fill="#1A6DB5" fill-opacity=".15"/>
+        <circle cx="222" cy="278" r="4"  fill="#4BBDE8"/>
+        <circle cx="222" cy="278" r="10" fill="#4BBDE8" fill-opacity=".18"/>
+        <circle cx="168" cy="242" r="3"  fill="#7C3AED" fill-opacity=".7"/>
+        <circle cx="258" cy="124" r="3"  fill="#4BBDE8" fill-opacity=".7"/>
+        <!-- dashed arcs connecting pins -->
+        <path d="M136,118 Q200,80  284,166" stroke="#7C3AED" stroke-opacity=".22" stroke-width="1" fill="none" stroke-dasharray="4 3"/>
+        <path d="M284,166 Q260,240 222,278" stroke="#1A6DB5" stroke-opacity=".22" stroke-width="1" fill="none" stroke-dasharray="4 3"/>
+        <path d="M136,118 Q140,200 168,242" stroke="#4BBDE8" stroke-opacity=".18" stroke-width="1" fill="none" stroke-dasharray="4 3"/>
       </svg>
-      เข้าสู่ระบบด้วย Google
-    </button>
-
-    <!-- DIVIDER -->
-    <div class="div-or"><span>secure sign in</span></div>
-
-    <p class="tiny" style="text-align:center">
-      การเข้าสู่ระบบได้รับการเข้ารหัสและตรวจสอบสิทธิ์โดย Google OAuth 2.0
-    </p>
-
-    <!-- ══════════════════════════════════════════════════════
-         STATUS BOXES — IDs preserved exactly, no change to JS targets
-    ══════════════════════════════════════════════════════ -->
-    <div class="status-box" id="statusLoading">
-      <span class="spin"></span>
-      <span>กำลังตรวจสอบสิทธิ์การเข้าใช้งาน…</span>
-    </div>
-    <div class="status-box" id="statusError">
-      <span>⚠</span>
-      <span id="errorMsg">เกิดข้อผิดพลาด</span>
-    </div>
-    <div class="status-box" id="statusSuccess">
-      <span>✓</span>
-      <span>เข้าสู่ระบบสำเร็จ · กำลังนำคุณไปยังหน้า Dashboard…</span>
     </div>
 
-    <!-- DENIED BOX — id="deniedBox" and id="deniedEmail" preserved -->
-    <div id="deniedBox">
-      <div class="ic">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M4.93 4.93l14.14 14.14"></path>
-        </svg>
+    <!-- wordmark -->
+    <div class="brand-top">
+      <div class="brand-mark"><span>iR</span></div>
+      <div class="brand-wordmark">
+        iROUP Workspace
+        <small>International Relations · University of Phayao</small>
       </div>
-      <h3>ไม่มีสิทธิ์เข้าใช้งาน</h3>
-      <p id="deniedEmail"></p>
-      <p style="margin-top:4px">กรุณาติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์</p>
     </div>
 
-    <!-- CARD FOOTER -->
-    <div class="card-foot">
-      <a href="public-landing.html" class="public-link">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M2 12h20"></path>
-          <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"></path>
+    <!-- hero copy -->
+    <div class="brand-hero">
+      <div class="eyebrow">
+        <span class="dot"></span>
+        Admin Portal · ระบบบริหารจัดการ
+      </div>
+      <h1 class="headline">
+        เชื่อมโลกการศึกษา <em>ในที่เดียว</em>
+      </h1>
+      <p class="subhead">
+        ศูนย์รวมงานวิเทศสัมพันธ์ของมหาวิทยาลัยพะเยา —
+        ทุนการศึกษา ความร่วมมือระหว่างประเทศ การเดินทาง และข้อมูล Mobility
+        ในแพลตฟอร์มเดียวที่ออกแบบสำหรับทีม IR โดยเฉพาะ
+      </p>
+      <div class="features">
+        <div class="feat">
+          <div class="feat-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L3 7l9 5 9-5-9-5z"/>
+              <path d="M3 12l9 5 9-5"/>
+              <path d="M3 17l9 5 9-5"/>
+            </svg>
+          </div>
+          <div class="feat-tx">
+            <h4>MOU &amp; ความร่วมมือ</h4>
+            <p>ติดตามบันทึกข้อตกลงและพันธมิตรนานาชาติทั้งหมดในที่เดียว</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20"/>
+              <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>
+            </svg>
+          </div>
+          <div class="feat-tx">
+            <h4>Inbound &amp; Outbound Mobility</h4>
+            <p>จัดการนักศึกษาแลกเปลี่ยนและบุคลากรทั้งขาเข้า-ขาออกอย่างมีประสิทธิภาพ</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div class="feat-tx">
+            <h4>ทุนและกิจกรรม</h4>
+            <p>บริหารทุนการศึกษาและกิจกรรมนานาชาติครบวงจร</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- brand footer -->
+    <div class="brand-foot">
+      <span>มหาวิทยาลัยพะเยา</span>
+      <span class="sep"></span>
+      <span>University of Phayao</span>
+      <span class="sep"></span>
+      <span>© 2569</span>
+    </div>
+
+  </section>
+
+  <!-- ── RIGHT: AUTH COLUMN ─────────────────────────────── -->
+  <div class="auth-col">
+    <div class="login-card">
+
+      <div class="card-head">
+        <div class="lock-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+            <path d="M8 11V7a4 4 0 018 0v4"></path>
+            <circle cx="12" cy="16" r="1.2" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <h1>ยินดีต้อนรับกลับมา</h1>
+        <p class="sub">เข้าสู่ระบบเพื่อจัดการข้อมูลงานวิเทศสัมพันธ์</p>
+      </div>
+
+      <div class="role-chip">
+        <span class="pill">ADMIN</span>
+        <span>เฉพาะผู้ที่ได้รับสิทธิ์ · กรุณาใช้บัญชี Google ของมหาวิทยาลัย</span>
+      </div>
+
+      <button class="google-btn" onclick="signInWithGoogle()" type="button">
+        <svg class="google-logo" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
-        ดูข้อมูลสาธารณะ (ไม่ต้อง Login)
-      </a>
-      <p class="tiny">งานวิเทศสัมพันธ์ · มหาวิทยาลัยพะเยา</p>
-    </div>
+        เข้าสู่ระบบด้วย Google
+      </button>
 
-  </div><!-- /.login-card -->
-</div><!-- /.login-card-wrap -->
+      <div class="div-or"><span>secure sign in</span></div>
+
+      <p class="tiny" style="text-align:center">
+        การเข้าสู่ระบบได้รับการเข้ารหัสและตรวจสอบสิทธิ์โดย Google OAuth 2.0
+      </p>
+
+      <!-- STATUS BOXES — IDs preserved exactly -->
+      <div class="status-box" id="statusLoading">
+        <span class="spin"></span>
+        <span>กำลังตรวจสอบสิทธิ์การเข้าใช้งาน…</span>
+      </div>
+      <div class="status-box" id="statusError">
+        <span>⚠</span>
+        <span id="errorMsg">เกิดข้อผิดพลาด</span>
+      </div>
+      <div class="status-box" id="statusSuccess">
+        <span>✓</span>
+        <span>เข้าสู่ระบบสำเร็จ · กำลังนำคุณไปยังหน้า Dashboard…</span>
+      </div>
+
+      <!-- DENIED BOX — IDs preserved exactly -->
+      <div id="deniedBox">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M4.93 4.93l14.14 14.14"></path>
+          </svg>
+        </div>
+        <h3>ไม่มีสิทธิ์เข้าใช้งาน</h3>
+        <p id="deniedEmail"></p>
+        <p style="margin-top:4px">กรุณาติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์</p>
+      </div>
+
+      <div class="card-foot">
+        <a href="public-landing.html" class="public-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M2 12h20"></path>
+            <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"></path>
+          </svg>
+          ดูข้อมูลสาธารณะ (ไม่ต้อง Login)
+        </a>
+        <p class="tiny">งานวิเทศสัมพันธ์ · มหาวิทยาลัยพะเยา</p>
+      </div>
+
+    </div><!-- /.login-card -->
+  </div><!-- /.auth-col -->
+
+</div><!-- /.shell -->
 
 <div class="version">iROUP v1.0 · © 2569 International Relations Division · University of Phayao</div>
 
-<!-- ══════════════════════════════════════════════════════════
-     PROTECTED ZONE — ALL SCRIPT BLOCKS BELOW ARE UNTOUCHED
-     Do not edit anything from here to </html>
-══════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════
+     PROTECTED ZONE — SCRIPTS UNTOUCHED FROM STEP 1
+══════════════════════════════════════════════════ -->
 <script src="iroup-config.js"></script>
 <script>
 // ============================================================
