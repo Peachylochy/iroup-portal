@@ -6,77 +6,198 @@
   <title>Personal IR Workspace</title>
 
   <style>
+    :root{
+      --ink:#152033;
+      --muted:#5c6b80;
+      --line:#dbe4ef;
+      --panel:#ffffff;
+      --blue:#2563eb;
+      --blue-dark:#1d4ed8;
+      --mint:#0f766e;
+      --rose:#b4535d;
+      --shadow:0 20px 50px rgba(21,32,51,.10);
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
     body{
       margin:0;
       min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#f4f7fb;
-      font-family:Segoe UI,sans-serif;
-      color:#1e293b;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.10), transparent 32rem),
+        linear-gradient(135deg, #f8fbff 0%, #eef4fb 48%, #f9fbff 100%);
+      font-family:Segoe UI, Arial, sans-serif;
+      color:var(--ink);
     }
 
     .portal{
-      text-align:center;
-      padding:40px;
-      background:white;
-      border-radius:24px;
-      box-shadow:0 10px 30px rgba(0,0,0,.08);
-      width:min(90%,500px);
+      width:min(1120px, 100%);
+      margin:0 auto;
+      padding:64px 24px;
+    }
+
+    .portal-header{
+      max-width:760px;
+      margin-bottom:34px;
+    }
+
+    .eyebrow{
+      margin:0 0 12px;
+      color:var(--mint);
+      font-size:.78rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
     }
 
     h1{
-      margin-bottom:10px;
+      margin:0;
+      font-size:clamp(2.25rem, 5vw, 4.5rem);
+      line-height:1.02;
+      font-weight:750;
     }
 
-    p{
-      color:#64748b;
-      margin-bottom:30px;
+    .subtitle{
+      max-width:650px;
+      margin:18px 0 0;
+      color:var(--muted);
+      font-size:1.08rem;
+      line-height:1.7;
     }
 
-    .links{
+    .module-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:18px;
+    }
+
+    .module-card{
+      min-height:260px;
       display:flex;
       flex-direction:column;
-      gap:14px;
+      justify-content:space-between;
+      gap:28px;
+      padding:28px;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius:8px;
+      box-shadow:var(--shadow);
     }
 
-    a{
-      text-decoration:none;
-      padding:14px 18px;
-      border-radius:14px;
-      background:#2563eb;
+    .module-kicker{
+      display:inline-flex;
+      width:44px;
+      height:44px;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:22px;
+      border-radius:8px;
       color:white;
-      font-weight:600;
-      transition:.2s ease;
+      font-weight:800;
     }
 
-    a:hover{
+    .module-card:first-child .module-kicker{
+      background:linear-gradient(135deg, var(--blue), var(--mint));
+    }
+
+    .module-card:last-child .module-kicker{
+      background:linear-gradient(135deg, var(--rose), var(--blue));
+    }
+
+    h2{
+      margin:0;
+      font-size:1.45rem;
+      line-height:1.2;
+    }
+
+    .module-card p{
+      margin:12px 0 0;
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .module-link{
+      align-self:flex-start;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+      padding:0 18px;
+      border-radius:8px;
+      background:var(--blue);
+      color:white;
+      font-weight:700;
+      text-decoration:none;
+      transition:background .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+
+    .module-link:hover{
+      background:var(--blue-dark);
       transform:translateY(-2px);
-      opacity:.95;
+      box-shadow:0 12px 24px rgba(37,99,235,.22);
     }
 
     a:focus-visible{
       outline:3px solid #93c5fd;
       outline-offset:3px;
     }
+
+    @media (max-width:760px){
+      .portal{
+        padding:40px 18px;
+      }
+
+      .module-grid{
+        grid-template-columns:1fr;
+      }
+
+      .module-card{
+        min-height:auto;
+        padding:24px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="portal">
-    <h1>Personal IR Workspace</h1>
-    <p>Select a module to continue</p>
+  <main class="portal">
+    <header class="portal-header">
+      <p class="eyebrow">IROUP Workspace</p>
+      <h1>Personal IR Workspace</h1>
+      <p class="subtitle">
+        A focused entry point for international relations operations, planning, reporting, and workload visibility.
+      </p>
+    </header>
 
-    <div class="links">
-      <a href="./Team%20IROUP/index.html">
-        Open Team IROUP
-      </a>
+    <section class="module-grid" aria-label="Workspace modules">
+      <article class="module-card">
+        <div>
+          <div class="module-kicker" aria-hidden="true">IR</div>
+          <h2>Team IROUP</h2>
+          <p>
+            Access the IROUP dashboard, mobility, MOU, scholarship, travel, and reporting workspace.
+          </p>
+        </div>
+        <a class="module-link" href="./Team%20IROUP/index.html">
+          Open module
+        </a>
+      </article>
 
-      <a href="./peach-workload-portfolio/frontend/index.html">
-        Open Peach Workload Portfolio
-      </a>
-    </div>
-  </div>
+      <article class="module-card">
+        <div>
+          <div class="module-kicker" aria-hidden="true">PW</div>
+          <h2>PEACH Workload Portfolio</h2>
+          <p>
+            Review workload records, evidence, category tracking, dashboards, and annual summaries.
+          </p>
+        </div>
+        <a class="module-link" href="./peach-workload-portfolio/frontend/index.html">
+          Open module
+        </a>
+      </article>
+    </section>
+  </main>
 </body>
 </html>
