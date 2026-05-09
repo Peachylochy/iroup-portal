@@ -391,6 +391,7 @@ body{
 }
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
+/* ── 1080px: tighten split columns ──────────────────────── */
 @media(max-width:1080px){
   .shell{
     grid-template-columns:minmax(0,1fr) minmax(420px,440px);
@@ -398,11 +399,16 @@ body{
   }
   .globe-wrap{width:280px;height:280px;right:-60px;opacity:.32}
 }
+
+/* ── 768px: collapse to single column ───────────────────── */
+/* Added breakpoint between old 880 and 520 for tablet portrait */
 @media(max-width:880px){
   .shell{
     grid-template-columns:1fr;
     padding:var(--s6) var(--s5);gap:var(--s5);
     max-width:560px;
+    /* prevent shell from overflowing its own container */
+    width:100%;
   }
   .brand{min-height:auto;padding:var(--s4) 0 0}
   .brand-hero{margin:var(--s5) 0 var(--s4);max-width:none;padding:0}
@@ -411,26 +417,91 @@ body{
   .brand-foot{display:none}
   .auth-col{padding:0 0 var(--s9)}
   .auth-col::before{width:360px;height:360px}
+  /* card stretches to column width on tablet */
   .login-card{padding:var(--s7) var(--s6) var(--s6);max-width:none}
 }
+
+/* ── 768px refinement: compact brand bar ─────────────────── */
+@media(max-width:768px){
+  .shell{
+    padding:var(--s5) var(--s5);gap:var(--s4);
+    max-width:100%;
+  }
+  /* brand strip: horizontal on tablet, minimal height */
+  .brand{
+    padding:var(--s3) 0;
+    flex-direction:row;
+    align-items:center;
+    justify-content:flex-start;
+    min-height:auto;
+  }
+  .brand-hero{display:none}
+  /* card: full width with comfortable side padding */
+  .login-card{
+    padding:var(--s7) var(--s6) var(--s6);
+    max-width:none;
+    width:100%;
+  }
+  .auth-col{
+    padding:0 0 var(--s8);
+    align-items:flex-start;
+  }
+  .auth-col::before{display:none}
+  .version{bottom:10px}
+}
+
+/* ── 520px: small phones ─────────────────────────────────── */
 @media(max-width:520px){
-  .shell{padding:var(--s5) var(--s4) var(--s7);gap:var(--s4)}
-  .brand{padding:var(--s2) 0 0}
-  .brand-hero{margin:var(--s5) 0 var(--s3)}
-  .subhead{font-size:14px;line-height:1.65}
-  .login-card{border-radius:20px;padding:var(--s6) var(--s5) var(--s5)}
-  .card-head h1{font-size:21px}
-  .card-head .sub{font-size:12.5px}
-  .lock-icon{width:50px;height:50px;border-radius:14px}
-  .lock-icon svg{width:22px;height:22px}
-  .role-chip{padding:10px var(--s3);gap:var(--s2)}
-  .role-chip span{font-size:12px}
-  .google-btn{padding:13px var(--s3);font-size:13.5px}
-  .brand-mark{width:38px;height:38px;font-size:15px}
-  .brand-wordmark{font-size:13.5px}
-  .brand-wordmark small{font-size:11px}
+  /* prevent any child from bleeding past the viewport */
+  html,body{overflow-x:hidden}
+  .shell{
+    padding:var(--s4) var(--s4) var(--s7);
+    gap:var(--s3);
+    /* ensure full viewport width without causing overflow */
+    min-width:0;width:100%;
+  }
+  .brand{padding:var(--s2) 0;gap:var(--s2)}
+  .brand-mark{width:34px;height:34px;font-size:13px;flex:0 0 34px}
+  .brand-wordmark{font-size:13px}
+  .brand-wordmark small{font-size:10.5px}
+  .brand-hero{display:none}
+  .login-card{
+    border-radius:18px;
+    padding:var(--s6) var(--s5) var(--s5);
+    /* belt-and-suspenders: never exceed viewport */
+    max-width:100%;
+    width:100%;
+  }
+  .card-head{margin-bottom:var(--s5)}
+  .card-head h1{font-size:20px}
+  .card-head .sub{font-size:12px}
+  .lock-icon{width:48px;height:48px;border-radius:14px}
+  .lock-icon svg{width:21px;height:21px}
+  .role-chip{padding:9px var(--s3);gap:var(--s2)}
+  .role-chip span{font-size:11.5px}
+  .google-btn{padding:12px var(--s3);font-size:13px;gap:var(--s2)}
+  .div-or{margin:var(--s4) 0 var(--s2)}
+  .card-foot{margin-top:var(--s5);padding-top:var(--s4)}
   .version{font-size:9.5px;bottom:8px}
 }
+
+/* ── 380px: very small phones ────────────────────────────── */
+@media(max-width:380px){
+  .shell{padding:var(--s3) var(--s3) var(--s7)}
+  .login-card{
+    padding:var(--s5) var(--s4) var(--s4);
+    border-radius:16px;
+  }
+  .card-head h1{font-size:18px;letter-spacing:-.3px}
+  .card-head .sub{font-size:11.5px}
+  .lock-icon{width:44px;height:44px}
+  .lock-icon svg{width:19px;height:19px}
+  .role-chip span{font-size:11px}
+  .google-btn{font-size:12.5px;padding:11px var(--s3)}
+  .card-foot{margin-top:var(--s4);padding-top:var(--s3)}
+  .public-link{font-size:12px;padding:6px 10px}
+}
+
 @media(prefers-reduced-motion:reduce){
   .aurora,.login-card,.globe-wrap svg,.eyebrow .dot{animation:none !important}
 }
