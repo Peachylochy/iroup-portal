@@ -107,6 +107,20 @@ body{
   min-height:calc(100vh - 2*var(--s7));
   overflow:hidden;
 }
+.brand::after{
+  content:"";
+  position:absolute;
+  right:clamp(0px,2vw,26px);
+  bottom:calc(var(--s7) + 4px);
+  width:clamp(116px,13vw,164px);
+  aspect-ratio:1;
+  background:url("Globy_IROUP.png") center/contain no-repeat;
+  opacity:.28;
+  filter:drop-shadow(0 18px 28px rgba(15,45,90,0.12));
+  transform:rotate(-2deg);
+  pointer-events:none;
+  z-index:0;
+}
 
 .brand-top{
   display:flex;align-items:center;gap:var(--s3);
@@ -418,6 +432,7 @@ body{
     gap:var(--s7);padding:var(--s7) var(--s6);
   }
   .globe-wrap{width:280px;height:280px;right:-60px;opacity:.32}
+  .brand::after{width:118px;right:0;bottom:var(--s7);opacity:.22}
 }
 
 /* ── 768px: collapse to single column ───────────────────── */
@@ -431,6 +446,7 @@ body{
     width:100%;
   }
   .brand{min-height:auto;padding:var(--s4) 0 0}
+  .brand::after{display:none}
   .brand-hero{margin:var(--s5) 0 var(--s4);max-width:none;padding:0}
   .features{display:none}
   .globe-wrap{display:none}

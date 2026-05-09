@@ -868,3 +868,27 @@ Constraints maintained:
 - sessionStorage and redirect flow preserved
 - Mascot positioning unchanged
 - Text colors unchanged during the motion pass
+
+---
+
+21. Login Polish Pass - Mascot Positioning (May 9, 2026)
+
+Summary
+
+The login page received a CSS-only mascot positioning refinement to make Globy feel more intentional without competing with the login form.
+
+Implementation notes:
+
+- Added Globy as a decorative `.brand::after` background layer using the existing `Globy_IROUP.png` asset
+- Kept the mascot behind primary brand content with `z-index: 0` while text and brand elements remain above it
+- Tuned desktop size, opacity, bottom/right placement, and drop shadow for a quieter presence
+- Reduced size and opacity at the 1080px breakpoint
+- Hid the mascot layer at the 880px collapse breakpoint to protect mobile readability and avoid overlap with login controls
+
+Constraints maintained:
+
+- No HTML structure changes
+- No JavaScript changes
+- Google Sign-In logic preserved
+- sessionStorage and redirect flow preserved
+- Text colors unchanged

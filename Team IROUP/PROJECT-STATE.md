@@ -306,3 +306,12 @@ Commits made across sessions:
 - Motion changes were limited to login card entrance, Google button hover/active response, public link hover/active response, and reduced-motion safeguards.
 - `prefers-reduced-motion: reduce` continues to disable login animations and interactive transforms.
 - Mascot positioning and text colors were intentionally left unchanged.
+
+## 10. Login Polish Pass - Mascot Positioning (2026-05-09)
+
+- `index.html` received a CSS-only Globy mascot placement pass using the existing `Globy_IROUP.png` asset.
+- The mascot is rendered as a decorative `.brand::after` layer, so no HTML structure or auth logic changed.
+- Desktop placement keeps Globy low and subtle inside the brand panel, behind primary brand content.
+- Tablet sizing and opacity are reduced at `max-width:1080px`.
+- The mascot layer is hidden at `max-width:880px` to preserve the collapsed/mobile login layout and avoid overlap with controls.
+- Text colors, Google auth logic, sessionStorage, and redirect flow remain unchanged.
