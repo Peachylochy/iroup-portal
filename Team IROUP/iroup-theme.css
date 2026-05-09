@@ -145,8 +145,8 @@
   --ir-border-active:   var(--ir-blue);
 
   --ir-text:         #10233f;
-  --ir-text-2:       #58687d;
-  --ir-text-muted:   #687b92;   /* raised from #7a8fa8 — clearer supporting text on light bg */
+  --ir-text-2:       #52647a;
+  --ir-text-muted:   #5f7288;   /* raised from #7a8fa8 — clearer supporting text on light bg */
   --ir-text-invert:  #ffffff;
   --ir-text-on-brand:#ffffff;
 
@@ -1040,7 +1040,9 @@ form select option {
   box-shadow: 0 0 0 3px rgba(75,189,232,0.15);
 }
 .ir-input::placeholder,
-.input::placeholder { color: var(--ir-text-muted); opacity: 1; }
+.input::placeholder,
+form input::placeholder,
+form textarea::placeholder { color: var(--ir-text-muted); opacity: 1; }
 
 .ir-textarea,
 form textarea { min-height: 80px; resize: vertical; }
@@ -1156,6 +1158,8 @@ form textarea { min-height: 80px; resize: vertical; }
   vertical-align: top;
   color: var(--ir-text);
 }
+[data-theme="light"] .ir-table td,
+[data-theme="light"] .data-table td { color: var(--ir-text); }
 .ir-table tr:hover td,
 .data-table tr:hover td { background: rgba(75,189,232,0.04); }
 [data-theme="light"] .data-table tr:hover td { background: #FAFCFF; }
@@ -1217,7 +1221,7 @@ form textarea { min-height: 80px; resize: vertical; }
 }
 .ir-badge--expired, .ir-status--expired, .status.expired, .badge-gray {
   background: rgba(255,255,255,0.06);
-  color: var(--ir-text-muted);
+  color: var(--ir-text-2);
 }
 .ir-badge--soon,    .ir-status--soon,    .status.soon {
   background: rgba(212,137,10,0.15);
@@ -1453,6 +1457,14 @@ form textarea { min-height: 80px; resize: vertical; }
   color: var(--ir-text-muted);
   font-family: var(--ir-font-sub);
   font-size: 13px;
+}
+
+[data-theme="light"] .ir-loading,
+[data-theme="light"] .loading,
+[data-theme="light"] .ir-empty,
+[data-theme="light"] .empty,
+[data-theme="light"] .footer-note {
+  color: var(--ir-text-muted);
 }
 
 /* Inline notice / alert banners */

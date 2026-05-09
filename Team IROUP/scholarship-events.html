@@ -18,8 +18,8 @@
   --purple:#7C3AED;--purple-pale:#F0EBFF;
   --teal:#0D9488;--teal-pale:#E0F7F5;
   --orange:#E8540A;--orange-pale:#FEF0E8;
-  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#DDE2EA;--gray-400:#B8C2D0;
-  --gray-600:#6B7A8D;--gray-800:#2D3748;--gray-900:#1A202C;
+  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#D6DEE9;--gray-400:#8C9AAF;
+  --gray-600:#52647A;--gray-800:#253244;--gray-900:#142033;
   --white:#FFFFFF;
   --shadow-sm:0 1px 4px rgba(15,58,107,0.08);
   --shadow-md:0 4px 16px rgba(15,58,107,0.12);
@@ -384,6 +384,13 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
   }
 }
 
+.search-wrap input,.filter-select,.form-group input,.form-group select,.form-group textarea{color:var(--gray-900)}
+.search-wrap input::placeholder,.form-group input::placeholder,.form-group textarea::placeholder{color:var(--gray-600);opacity:1}
+.breadcrumb span,.divider-label,.filter-label,.kpi-label,.card-org,.meta-item,.event-place,.event-dept,.event-time-line,.asset-status{color:var(--gray-600)}
+.cal-day-header,.cal-num{color:#52647A}
+.cal-empty .cal-num{color:var(--gray-400)}
+.s-closed,.ev-done{color:#52647A}
+.coverage-tag,.level-badge,.event-type-tag,.status-badge,.event-status{font-weight:700}
 </style>
 </head>
 <body>

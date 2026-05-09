@@ -340,3 +340,12 @@ Commits made across sessions:
 - PEACH Workload Portfolio sidebar now includes matching ecosystem links back to the root workspace portal and across to Team IROUP.
 - Links remain relative for GitHub Pages compatibility.
 - Auth, sessionStorage, redirect logic, dashboard routing, and module internals were not refactored.
+
+## 14. Light Theme Contrast Stabilization - Continued (2026-05-09)
+
+- Continued the CSS-first light-mode readability pass across `travel.html`, `dashboard.html`, `report.html`, `mobility.html`, and `scholarship-events.html`.
+- Strengthened shared light theme secondary/muted text tokens and placeholder coverage in `iroup-theme.css`.
+- Improved global table body readability and expired/gray badge label contrast without changing table structure.
+- Stabilized older page-local gray scales and inline theme variables where those pages bypass shared tokens.
+- Improved placeholder, helper, KPI support, empty/loading, metadata, and subdued badge text contrast while preserving layout and spacing.
+- No JavaScript, auth/session/redirect logic, Apps Script/API logic, routing, or module architecture changes were made.

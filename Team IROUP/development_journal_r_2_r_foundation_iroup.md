@@ -965,3 +965,27 @@ Constraints maintained:
 - No routing framework added
 - No external dependencies added
 - Workload app JavaScript left unchanged
+
+---
+
+25. Light Theme Contrast Stabilization - Continued (May 9, 2026)
+
+Summary
+
+The light-mode readability pass continued across the remaining priority Team IROUP pages before ecosystem/auth expansion. This pass focused on contrast stabilization only: table text, secondary metadata, badges, placeholders, KPI helper labels, muted copy, and empty states.
+
+Implementation notes:
+
+- Updated shared `iroup-theme.css` light text tokens and placeholder coverage
+- Reinforced shared light-mode table body readability and gray/expired badge labels
+- Updated `travel.html`, `dashboard.html`, and `report.html` inline muted tokens and form/table readability rules
+- Updated `mobility.html` and `scholarship-events.html` page-local gray scales and placeholder/helper text contrast
+- Preserved existing layouts, spacing, cards, dashboards, and page structure
+
+Constraints maintained:
+
+- CSS-first changes only
+- No JavaScript changes
+- No auth/session/redirect logic touched
+- No Apps Script/API logic touched
+- No routing or dependency changes
