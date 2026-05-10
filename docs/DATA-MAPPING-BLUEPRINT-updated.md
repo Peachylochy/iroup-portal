@@ -1,7 +1,7 @@
 # DATA-MAPPING-BLUEPRINT.md
 # Personal IR Workspace / iROUP Database Mapping Blueprint
 
-Last updated: 2026-05-09  
+Last updated: 2026-05-10  
 Source reviewed: `iROUP Database.xlsx`  
 Purpose: ใช้เป็นคัมภีร์กลางสำหรับจัดโครง Google Sheets, Apps Script API, Admin UI, Public UI, Report/Export และ R2R evidence layer
 
@@ -1121,3 +1121,928 @@ A structured operational database layer for the Personal IR Workspace ecosystem
 ```
 
 without losing the practical flexibility needed for daily International Relations Office work.
+---
+
+# 13. IROUP Database v2 Schema Direction (May 2026)
+
+## 13.1 Why v2 Is Needed
+
+จากการทดสอบระบบหลัง Backend Governance และ Public-safe migration พบว่า pain point หลายอย่างไม่ได้เกิดจากหน้าเว็บเพียงอย่างเดียว แต่เกิดจากโครงสร้างชีทเดิมที่ยังเป็น prototype-era data model เช่น:
+
+```text
+- ประเทศถูกดึงจากข้อมูลเดิมที่เคยมี ไม่ได้ใช้ COUNTRY เป็น source of truth เดียว
+- หน่วยงาน ม.พะเยา ยังไม่ได้ใช้ FACULTY / UP_UNIT_MASTER เป็น source of truth เดียวทุก module
+- Mobility นับ “รายการ/โครงการ” กับ “จำนวนคน” ปนกัน
+- Outbound/Travel มีหลายคนในหนึ่งรายการ แต่ไม่มี detail participant table
+- Student/Staff lookup ยังไม่เป็น person model กลาง
+- ถ้าค้นหาคนไม่เจอ ยังไม่มี manual person fallback ที่เป็นระบบ
+- งบประมาณยังเป็น field กระจาย ไม่ได้เป็น reusable budget model
+- ไฟล์แนบ/โปสเตอร์ยังไม่แยก public/private ชัดเจนทุก module
+```
+
+ดังนั้นการแก้ frontend ต่อไปโดยไม่ปรับ data model จะทำให้ระบบต้องเขียน adapter เฉพาะหน้าไปเรื่อย ๆ และยังมีโอกาสข้อมูลไม่ตรงกับ operational reality อยู่ดี
+
+Core direction:
+
+```text
+ไม่ใช่ “แก้ชีท Mobility”
+แต่คือ “ออกแบบฐานข้อมูลกลางให้ทุก section ใช้ร่วมกัน”
+```
+
+---
+
+## 13.2 Database v2 Design Principle
+
+IROUP Database v2 ควรออกแบบเป็น production-lite Google Sheets database โดยยังคงใช้งานง่ายสำหรับเจ้าหน้าที่ แต่มีโครงสร้างชัดพอสำหรับ Apps Script API, dashboard, reports, public-safe endpoints และ future R2R evidence layer
+
+หลักการ:
+
+```text
+1. ใช้ MASTER DATA กลางสำหรับข้อมูลอ้างอิงทุก module
+2. แยก TRANSACTION DATA ออกจาก DETAIL / RELATION DATA
+3. ทุกตารางควรมี stable ID
+4. Frontend ไม่ควรเดา raw Thai headers เอง
+5. Apps Script ควร normalize row เป็น field กลางก่อนส่งออก
+6. Public endpoints ต้อง sanitize ตั้งแต่ backend
+7. ข้อมูลที่ใช้ทุก section เช่น ประเทศ หน่วยงาน บุคคล งบประมาณ ไฟล์ ต้องเป็น reusable system
+```
+
+---
+
+## 13.3 Proposed v2 Tab Groups
+
+### MASTER DATA
+
+```text
+ADMIN
+COUNTRY_MASTER
+UP_UNIT_MASTER
+PERSON_STAFF
+PERSON_STUDENT
+PERSON_MANUAL
+BUDGET_TYPE_MASTER
+FILE_ROLE_MASTER
+```
+
+### TRANSACTION DATA
+
+```text
+MOU
+MOBILITY_PROJECT
+TRAVEL
+SCHOLARSHIP
+EVENT
+```
+
+### RELATION / DETAIL DATA
+
+```text
+MOBILITY_PARTICIPANT
+TRAVEL_PARTICIPANT
+BUDGET
+FILES
+```
+
+Optional future tabs:
+
+```text
+ORGANIZATION_MASTER
+PROGRAM_MASTER
+AUDIT_LOG
+PUBLICATION_LOG
+R2R_EVIDENCE
+```
+
+---
+
+## 13.4 Master Tables
+
+## 13.4.1 COUNTRY_MASTER
+
+Purpose:
+
+```text
+Country source of truth for every module: MOU, Mobility, Travel, Scholarship, Event, Public Map, Reports
+```
+
+Recommended columns:
+
+```text
+country_id
+iso2
+iso3
+country_name_en
+country_name_th
+continent_en
+continent_th
+flag_emoji
+search_alias
+active
+sort_order
+```
+
+Notes:
+
+```text
+- country_id or iso2 should be the stable key
+- display language can use country_name_th / country_name_en
+- search_alias may include common Thai/English variations
+- map logic should use iso2/iso3 or country_name_en only after normalization
+```
+
+Used by:
+
+```text
+MOU.country_id
+MOBILITY_PROJECT.country_id
+TRAVEL.country_id
+SCHOLARSHIP.country_id
+EVENT.country_id
+Public map aggregation
+Country autocomplete
+Reports/exports
+```
+
+---
+
+## 13.4.2 UP_UNIT_MASTER
+
+Purpose:
+
+```text
+UP unit source of truth for faculty/college/school/office/center across all modules
+```
+
+Recommended columns:
+
+```text
+unit_id
+unit_code
+unit_name_th
+unit_name_en
+unit_type
+parent_unit_id
+active
+sort_order
+```
+
+Examples of unit_type:
+
+```text
+faculty
+college
+school
+office
+center
+institute
+other
+```
+
+Used by:
+
+```text
+MOU.up_unit_id
+MOBILITY_PROJECT.up_unit_id
+PERSON_STAFF.unit_id
+PERSON_STUDENT.unit_id
+TRAVEL_PARTICIPANT.unit_id_snapshot
+EVENT.organizer_unit_id
+BUDGET.budget_source_unit_id
+Reports/filters
+```
+
+---
+
+## 13.4.3 PERSON_STAFF
+
+Purpose:
+
+```text
+Staff lookup/master imported from university or internal source. Admin only. Not public.
+```
+
+Recommended columns:
+
+```text
+staff_id
+prefix_th
+first_name_th
+last_name_th
+full_name_th
+first_name_en
+last_name_en
+full_name_en
+gender
+unit_id
+position
+staff_type
+active
+updated_at
+```
+
+Notes:
+
+```text
+- Use for Travel and Mobility participant lookup
+- Do not expose person-level staff data to public endpoints
+- Public reporting may aggregate by unit/person_type only
+```
+
+---
+
+## 13.4.4 PERSON_STUDENT
+
+Purpose:
+
+```text
+Student lookup/master imported from student system. Admin only. Not public.
+```
+
+Recommended columns:
+
+```text
+student_id
+prefix_th
+first_name_th
+last_name_th
+full_name_th
+gender
+unit_id
+program_th
+degree_level
+student_status
+active
+updated_at
+```
+
+Notes:
+
+```text
+- Use for Mobility participant lookup, especially Outbound
+- Student ID and full name must never be returned from public endpoints
+- Public reporting may aggregate by participant_count, unit, country, level
+```
+
+---
+
+## 13.4.5 PERSON_MANUAL
+
+Purpose:
+
+```text
+Fallback person table for people not found in PERSON_STAFF or PERSON_STUDENT
+```
+
+Recommended columns:
+
+```text
+person_id
+person_type
+prefix
+first_name
+last_name
+full_name
+gender
+unit_id
+program_or_position
+source_note
+created_at
+created_by
+active
+```
+
+Rules:
+
+```text
+- Admin forms should allow manual entry when lookup returns no result
+- Manual person records can be reused later
+- Public endpoints must not expose person-level manual data
+```
+
+---
+
+## 13.4.6 BUDGET_TYPE_MASTER
+
+Purpose:
+
+```text
+Reusable budget type/source options across Mobility, Travel, Event, and future modules
+```
+
+Recommended columns:
+
+```text
+budget_type_id
+budget_type_name_th
+budget_type_name_en
+requires_source_unit
+requires_amount
+is_internal
+active
+sort_order
+```
+
+Example budget types:
+
+```text
+งบภายใน
+งบมหาวิทยาลัย
+งบคณะ
+งบโครงการ
+ทุนภายนอก
+ไม่มีงบประมาณ
+ผู้เข้าร่วมรับผิดชอบเอง
+```
+
+---
+
+## 13.4.7 FILE_ROLE_MASTER
+
+Purpose:
+
+```text
+Reusable file role classification for attachments and media
+```
+
+Recommended columns:
+
+```text
+file_role_id
+file_role_name_th
+file_role_name_en
+public_allowed_default
+active
+sort_order
+```
+
+Example roles:
+
+```text
+poster
+banner
+attachment
+pdf
+evidence
+cover
+letter
+photo
+```
+
+---
+
+## 13.5 Transaction Tables
+
+## 13.5.1 MOU
+
+Recommended columns:
+
+```text
+mou_id
+up_unit_id
+partner_org_name
+partner_org_name_en
+country_id
+mou_type
+start_date
+end_date
+fiscal_year
+status
+public_visible
+public_file_allowed
+internal_note
+created_at
+created_by
+updated_at
+updated_by
+```
+
+Public-safe fields:
+
+```text
+mou_id
+up_unit
+partner_org_name
+country
+continent
+mou_type
+start_date
+end_date
+fiscal_year
+status
+public_file_url if public_file_allowed
+```
+
+Notes:
+
+```text
+- MOU should no longer store free-text country as the primary country key
+- Apps Script may still output display text, but storage should prefer country_id
+```
+
+---
+
+## 13.5.2 MOBILITY_PROJECT
+
+Purpose:
+
+```text
+One row = one mobility project/activity/trip group, not one person
+```
+
+Recommended columns:
+
+```text
+mobility_id
+direction
+project_name
+institution_name
+country_id
+city
+up_unit_id
+purpose
+level
+participant_group
+start_date
+end_date
+fiscal_year
+status
+public_visible
+internal_note
+created_at
+created_by
+updated_at
+updated_by
+```
+
+direction values:
+
+```text
+inbound
+outbound
+```
+
+status should be derived where possible:
+
+```text
+upcoming
+active
+completed
+cancelled
+```
+
+Operational status definitions:
+
+```text
+upcoming = start_date > today
+active = start_date <= today <= end_date
+completed = end_date < today
+```
+
+---
+
+## 13.5.3 MOBILITY_PARTICIPANT
+
+Purpose:
+
+```text
+One row = one participant in a mobility project
+```
+
+Recommended columns:
+
+```text
+participant_id
+mobility_id
+person_source
+person_id
+person_type
+full_name_snapshot
+gender_snapshot
+unit_id_snapshot
+program_or_position_snapshot
+role
+created_at
+created_by
+```
+
+person_source values:
+
+```text
+student
+staff
+manual
+external
+```
+
+Why this matters:
+
+```text
+- 1 project with 10 students should be project_count = 1 and participant_count = 10
+- KPI can clearly choose whether to show records or people
+- Public endpoints can aggregate participant_count without exposing names
+```
+
+---
+
+## 13.5.4 TRAVEL
+
+Purpose:
+
+```text
+One row = one staff travel mission/project
+```
+
+Recommended columns:
+
+```text
+travel_id
+project_name
+purpose
+country_id
+city
+start_date
+end_date
+fiscal_year
+status
+public_visible
+internal_note
+created_at
+created_by
+updated_at
+updated_by
+```
+
+---
+
+## 13.5.5 TRAVEL_PARTICIPANT
+
+Purpose:
+
+```text
+One row = one traveler in a travel record
+```
+
+Recommended columns:
+
+```text
+travel_participant_id
+travel_id
+person_source
+person_id
+full_name_snapshot
+unit_id_snapshot
+position_snapshot
+created_at
+created_by
+```
+
+---
+
+## 13.5.6 SCHOLARSHIP
+
+Recommended columns:
+
+```text
+scholarship_id
+title_th
+title_en
+institution_name
+country_id
+level
+publish_date
+open_date
+close_date
+coverage_th
+coverage_en
+detail_url
+apply_url
+link_url
+pin
+status
+public_visible
+internal_note
+created_at
+created_by
+updated_at
+updated_by
+```
+
+Notes:
+
+```text
+- Poster/banner should be stored in FILES rather than only fixed poster_url if possible
+- status can be derived from open_date/close_date, but manual override may be allowed later
+```
+
+---
+
+## 13.5.7 EVENT
+
+Recommended columns:
+
+```text
+event_id
+title_th
+title_en
+event_type
+organizer_unit_id
+country_id
+location
+start_date
+end_date
+start_time
+end_time
+participant_count
+detail_th
+detail_en
+link_url
+pin
+status
+public_visible
+internal_note
+created_at
+created_by
+updated_at
+updated_by
+```
+
+Notes:
+
+```text
+- If event is domestic/internal, country_id can be blank or TH depending on reporting rule
+- Files/posters should be stored in FILES
+```
+
+---
+
+## 13.6 Relation / Detail Tables
+
+## 13.6.1 BUDGET
+
+Purpose:
+
+```text
+Reusable budget tracking across modules without exposing budget publicly
+```
+
+Recommended columns:
+
+```text
+budget_id
+module
+record_id
+budget_type_id
+budget_source_type
+budget_source_unit_id
+budget_source_name
+amount
+currency
+budget_note
+is_internal
+created_at
+created_by
+```
+
+module values:
+
+```text
+mou
+mobility
+travel
+scholarship
+event
+```
+
+Budget examples:
+
+```text
+- Mobility project funded by faculty budget
+- Travel mission funded by central university budget
+- Event funded by external partner
+- Scholarship with no UP budget
+```
+
+Public rule:
+
+```text
+BUDGET rows are admin-only. Public endpoints must not expose amount or internal budget source details.
+```
+
+---
+
+## 13.6.2 FILES
+
+Purpose:
+
+```text
+Centralized file/poster/attachment/evidence tracking
+```
+
+Recommended columns:
+
+```text
+file_id
+module
+record_id
+file_role_id
+file_name
+file_url
+drive_file_id
+mime_type
+is_public
+uploaded_at
+uploaded_by
+note
+```
+
+Public rule:
+
+```text
+Only return file_url where is_public = TRUE and file_role is appropriate for public display.
+```
+
+---
+
+## 13.7 KPI and Report Definitions
+
+## Mobility KPI Definitions
+
+```text
+Inbound ทั้งหมด = count MOBILITY_PARTICIPANT where project.direction = inbound
+Outbound ทั้งหมด = count MOBILITY_PARTICIPANT where project.direction = outbound
+
+จำนวนรายการ Inbound = count MOBILITY_PROJECT where direction = inbound
+จำนวนรายการ Outbound = count MOBILITY_PROJECT where direction = outbound
+
+อยู่ที่ ม.พะเยาตอนนี้ = count participants where direction = inbound and today between project.start_date and project.end_date
+กำลังจะมา = count participants where direction = inbound and project.start_date > today
+กลับแล้ว = count participants where direction = inbound and project.end_date < today
+
+กำลังเดินทาง = count participants where direction = outbound and today between project.start_date and project.end_date
+รอเดินทาง = count participants where direction = outbound and project.start_date > today
+กลับแล้ว = count participants where direction = outbound and project.end_date < today
+```
+
+Important distinction:
+
+```text
+project_count = จำนวนรายการ/โครงการ
+participant_count = จำนวนคน
+```
+
+Dashboard labels must state clearly which one is being shown.
+
+---
+
+## 13.8 Public-Safe v2 Rules
+
+Public endpoints should return normalized, sanitized data only.
+
+Never return:
+
+```text
+student_id
+staff_id
+person_id
+full_name
+email
+phone
+gender at row-level
+budget amount
+budget source detail
+internal_note
+non-public files
+created_by / updated_by
+```
+
+Allowed public outputs:
+
+```text
+country
+continent
+up_unit display name
+institution/partner organization
+project/event/scholarship title
+participant_count aggregate
+start/end dates
+status
+public poster/file URL where explicitly public
+```
+
+---
+
+## 13.9 Migration Strategy to v2
+
+Recommended staged approach:
+
+```text
+1. Backup current workbook.
+2. Create IROUP Database v2 workbook as a new file, not by overwriting old production sheet.
+3. Create MASTER tabs first: COUNTRY_MASTER, UP_UNIT_MASTER, PERSON_STAFF, PERSON_STUDENT, PERSON_MANUAL.
+4. Create transaction/detail tabs with headers only.
+5. Migrate COUNTRY and FACULTY data first.
+6. Migrate MOU with country_id and unit_id mapping.
+7. Migrate Mobility into MOBILITY_PROJECT + MOBILITY_PARTICIPANT.
+8. Migrate Travel into TRAVEL + TRAVEL_PARTICIPANT.
+9. Migrate Scholarships and Events.
+10. Add BUDGET and FILES gradually.
+11. Update Apps Script normalization layer to support v1/v2 compatibility temporarily.
+12. Update frontend one module at a time.
+13. Keep old workbook read-only until v2 is verified.
+```
+
+Do not:
+
+```text
+- delete old workbook immediately
+- switch all frontend modules at once
+- expose v2 public data before sanitizer is verified
+- rely on frontend to hide private fields
+```
+
+---
+
+## 13.10 Gemini Sheet Template Prompt
+
+Use this prompt to generate a Google Sheets template draft from this blueprint:
+
+```text
+คุณคือ data architect ช่วยออกแบบ Google Sheets database template สำหรับระบบ International Relations Office (IROUP) v2
+
+บริบท:
+ระบบนี้ใช้ Google Sheets + Apps Script + GitHub Pages เป็น operational workspace สำหรับงานวิเทศสัมพันธ์ มหาวิทยาลัยพะเยา
+
+ระบบมี modules:
+1. MOU
+2. Mobility Inbound/Outbound
+3. Staff Travel
+4. Scholarships
+5. Events/Projects
+6. Public View
+7. Reports/Export
+
+ปัญหาปัจจุบัน:
+- ชีทเดิมเป็น prototype และ field ไม่ตรงกับ workflow จริง
+- ประเทศและหน่วยงานไม่ได้ใช้ master data กลาง
+- Mobility นับ “รายการ/โครงการ” กับ “จำนวนคน” ปนกัน
+- Outbound บางโครงการมีหลายคนในรายการเดียว
+- student/staff lookup ยังไม่ครบ
+- ต้องมี manual person fallback ถ้าค้นไม่เจอ
+- งบประมาณต้องเก็บได้ทุก section ที่เกี่ยวข้อง
+- ไฟล์แนบ/โปสเตอร์ต้องแยก public/private
+- Public endpoints ต้องไม่เปิดเผยชื่อ รหัสนิสิต อีเมล งบประมาณ หรือหมายเหตุภายใน
+
+กรุณาออกแบบ Google Sheets template v2 โดยใช้หลัก:
+- MASTER DATA แยกจาก TRANSACTION DATA
+- ทุกตารางต้องมี stable ID
+- ใช้ COUNTRY_MASTER เป็น source of truth สำหรับประเทศทุก module
+- ใช้ UP_UNIT_MASTER เป็น source of truth สำหรับหน่วยงาน ม.พะเยาทุก module
+- Mobility ต้องแยก MOBILITY_PROJECT กับ MOBILITY_PARTICIPANT
+- Travel ต้องแยก TRAVEL กับ TRAVEL_PARTICIPANT
+- ต้องรองรับ public-safe API ในอนาคต
+- ต้องรองรับ dashboard, report, export, search, filter, map, chart
+- ต้อง practical สำหรับใช้จริงใน Google Sheets ไม่ซับซ้อนเกินไป
+
+ขอ output เป็นภาษาไทย โดยมี:
+1. รายชื่อ tabs ทั้งหมดที่ควรมี
+2. column headers ของแต่ละ tab
+3. คำอธิบายแต่ละ field
+4. data type ที่แนะนำ เช่น text, date, number, boolean, dropdown
+5. recommended data validation/dropdown ของแต่ละ field
+6. relationship ระหว่าง tables
+7. public/admin visibility ของ field สำคัญ
+8. ตัวอย่างข้อมูล 2-3 แถวต่อ tab
+9. migration plan จากชีทเดิมไป v2
+10. ข้อควรระวังสำหรับ Apps Script API และ public-safe endpoint
+
+Tabs ขั้นต่ำที่ต้องมี:
+- ADMIN
+- COUNTRY_MASTER
+- UP_UNIT_MASTER
+- PERSON_STAFF
+- PERSON_STUDENT
+- PERSON_MANUAL
+- BUDGET_TYPE_MASTER
+- FILE_ROLE_MASTER
+- MOU
+- MOBILITY_PROJECT
+- MOBILITY_PARTICIPANT
+- TRAVEL
+- TRAVEL_PARTICIPANT
+- SCHOLARSHIP
+- EVENT
+- BUDGET
+- FILES
+
+กรุณาอย่าออกแบบแบบ database ซับซ้อนเกิน Google Sheets ใช้งานจริง แต่ต้องมีโครงสร้างพอสำหรับระบบ production-lite
+```
+
+Suggested attachments for Gemini:
+
+```text
+1. DATA-MAPPING-BLUEPRINT.md
+2. screenshots of all current admin forms: MOU, Mobility Inbound, Mobility Outbound, Travel, Scholarship, Event
+3. current sheet tab names and current headers
+4. sample anonymized rows from each tab
+5. notes about current pain points and desired KPI definitions
+```
