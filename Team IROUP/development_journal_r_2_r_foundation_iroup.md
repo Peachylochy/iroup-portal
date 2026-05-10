@@ -1252,3 +1252,64 @@ Constraints maintained:
 - No auth or governance flow changes
 - No architecture redesign
 - No changes to other operational modules
+
+---
+
+39. V2 Rebuild Direction Shift (May 10, 2026)
+
+Summary
+
+The project direction shifted from V1 frontend-first stabilization toward a database-first and backend-first rebuild around `IROUP_DATABASE_V2`.
+
+New direction:
+
+```text
+Database-first
+-> Backend V2-first
+-> API DTO-first
+-> Frontend migration later
+```
+
+Why the shift happened:
+
+- The old V1 frontend pages were useful for discovering real workflow needs, but they were increasingly shaped by flat-sheet constraints.
+- Continued page-by-page patching improved usability, but did not solve the core data architecture problems: duplicated concepts, inconsistent headers, mixed public/private data, weak relational integrity, and difficult aggregation.
+- V1 data is mostly test data, so strict preservation of the old flat-sheet structure is no longer required.
+- The old UI is now treated mainly as visual, UX, and workflow reference, not as the long-term architecture source of truth.
+
+Lessons learned from the flat-sheet architecture:
+
+- Flat rows are fast to prototype but become fragile when one operational record contains many participants, budgets, files, countries, units, and public/private rules.
+- Mobility and Travel need project/mission rows separated from participant rows so KPIs can distinguish records from people.
+- Countries, UP units, file roles, budget types, and people need reusable master data instead of repeated display text.
+- Public pages should not depend on frontend filtering to hide sensitive fields; sanitization belongs in the backend/API layer.
+
+New architecture foundation:
+
+- Google Sheets is now treated as a production-lite operational database layer.
+- `IROUP_DATABASE_V2` is the new normalized source of truth.
+- Apps Script V2 backend files are isolated under `Team IROUP/backend/database-v2/`.
+- Future frontend work should consume normalized DTO APIs instead of raw sheet rows.
+- Production `Code.gs` remains intentionally isolated during V2 development unless explicitly approved.
+
+AI-assisted architecture review impact:
+
+- AI-assisted review helped identify relational risks, naming inconsistencies, public/private boundary risks, and migration hazards before data migration began.
+- The review process clarified that backend DTO contracts should stabilize before frontend refactoring.
+- The resulting direction is closer to a lightweight operational platform than a collection of independent HTML pages.
+
+Completed V2 foundation work:
+
+- Created new Google Sheet: `IROUP_DATABASE_V2`
+- Ran the `IROUP Database V2.2 Final Freeze Generator`
+- Added `IROUP_DATABASE_V2_BUILDER.gs`
+- Applied V2.2 Schema Fix Pass 1
+- Added `IROUP_V2_CONFIG.gs`
+- Added `IROUP_V2_DB.gs`
+- Added `V2-ROADMAP.md`
+
+Guiding principle going forward:
+
+```text
+Stabilize the data model and API contracts first; migrate UI only after V2 DTOs are stable.
+```

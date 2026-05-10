@@ -413,3 +413,130 @@ Commits made across sessions:
 - Save action now guards against double-submit and refreshes live Mobility data after successful add/edit.
 - Mobility live loading now uses a single idempotent workflow loader with stale-response protection and parallel inbound/outbound fetches.
 - Verification: inline script syntax check passed; local HTML serving check returned HTTP 200. Browser visual check was blocked by the in-app browser client on localhost.
+
+---
+
+## 28. IROUP Database V2.2 Final Freeze (2026-05-10)
+
+### Direction Shift
+
+The project has shifted from V1 frontend-first patching to a database-first / backend-first rebuild.
+
+Current architecture direction:
+
+```text
+Database-first
+-> Backend V2-first
+-> API DTO-first
+-> Frontend migration later
+```
+
+The old V1 frontend/UI is now primarily:
+
+- visual reference
+- UX reference
+- workflow reference
+
+It is not the long-term architecture source of truth.
+
+### New Operational Platform Foundation
+
+The new architecture is being rebuilt around:
+
+- normalized relational-style Google Sheets
+- isolated V2 Apps Script backend
+- DTO-based admin/public APIs
+- public/private data separation
+- validation and governance layers
+- future maintainability
+
+Google Sheets is now treated as a production-lite operational database layer, not just a spreadsheet.
+
+Core stack:
+
+```text
+IROUP_DATABASE_V2
+-> Apps Script V2 Backend
+-> Normalized Admin/Public DTO APIs
+-> Frontend pages
+```
+
+### Completed V2 Schema Work
+
+- Created new Google Sheet: `IROUP_DATABASE_V2`
+- Ran safe V2.2 schema generator
+- Added `Team IROUP/backend/database-v2/IROUP_DATABASE_V2_BUILDER.gs`
+- Applied V2.2 Schema Fix Pass 1
+- Added `Team IROUP/backend/database-v2/V2-ROADMAP.md`
+
+Important V2 assumptions:
+
+- V1 data is mostly test data and is not a strict preservation constraint.
+- No production API replacement has happened yet.
+- No frontend migration has happened yet.
+- Production `Code.gs` remains intentionally isolated during V2 development unless explicitly approved.
+
+---
+
+## 29. V2 Backend Foundation Phase (2026-05-10)
+
+### Files Added
+
+V2 backend files now exist under:
+
+```text
+Team IROUP/backend/database-v2/
+```
+
+Foundation files:
+
+```text
+IROUP_DATABASE_V2_BUILDER.gs
+IROUP_V2_CONFIG.gs
+IROUP_V2_DB.gs
+V2-ROADMAP.md
+```
+
+### Current Priority
+
+Future work should prioritize V2 backend/API work before frontend migration.
+
+Immediate next direction:
+
+- build isolated V2 Apps Script admin/public APIs
+- define normalized DTO contracts
+- validate relation-like IDs before writes
+- exclude soft-deleted rows from aggregates
+- sanitize public endpoints at the backend layer
+- only then migrate frontend pages module by module
+
+### Public/Private Boundary Rules
+
+Public APIs must sanitize private operational and person data.
+
+Public endpoints must never expose:
+
+- student IDs
+- staff IDs
+- person IDs
+- Mobility/Travel participant names
+- row-level participant gender
+- internal notes
+- budget amounts or internal budget source details
+- non-public files
+- creator/updater identity fields
+
+`FILES` may expose URLs only when:
+
+- parent record has `public_visible = TRUE`
+- file has `visibility_level = public`
+- file is not soft-deleted
+- file role is public-safe
+
+### Development Guardrails
+
+- Do not refactor frontend until V2 backend/DTO contracts are stable.
+- Do not modify production `Code.gs` unless explicitly approved.
+- Do not migrate data until V2 schema and backend behavior are verified.
+- V1 frontend stabilization is no longer the primary architectural direction.
+- Frontend pages should eventually consume normalized DTO APIs instead of raw sheet rows.
