@@ -874,3 +874,47 @@ Current status:
 - V1 and V2 clients can coexist safely.
 - Frontend migration is still not started.
 - Admin write migration remains blocked until V2 write routes and normalized form contracts exist.
+
+---
+
+## 35. Public Pilot Migration Pass - Scholarship Page (2026-05-11)
+
+### Purpose
+
+Started the first safe frontend migration pilot using the V2 adapter layer.
+
+Target page:
+
+```text
+Team IROUP/public/public-scholar.html
+```
+
+### Changes
+
+- Added `../iroup-v2-api.js` to the public scholarship page.
+- Migrated only the primary scholarship data-loading call from `IROUP.getPublicScholarships()` to `IROUP_V2.public.scholarshipList()`.
+- Kept existing UI, rendering structure, styling, filters, search, language controls, and card layout intact.
+- Added a page-local compatibility normalization path from V2 DTO fields into the existing render shape.
+
+### DTO Compatibility Notes
+
+The pilot exposed expected V1/V2 field differences:
+
+- V1 expected `title`, `country`, `institution`, `level`, and `public_file_url`.
+- V2 provides `title_th/title_en`, structured `country`, `institution_name`, `target_group/scholarship_type`, and `files[]`.
+
+The page now adapts those fields locally without changing the rendering layer.
+
+### Current Limitation
+
+The V2 adapter still has no hardcoded deployed V2 URL. Live browser data loading requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
+
+Still not doing:
+
+- public events migration
+- admin page migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` edits
+- deployment
+- V1 helper removal

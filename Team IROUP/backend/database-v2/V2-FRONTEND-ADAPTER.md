@@ -19,7 +19,13 @@ Current pages -> iroup-config.js -> V1 production Apps Script
 Future migrated pages -> iroup-v2-api.js -> V2 router Apps Script
 ```
 
-No current page loads `iroup-v2-api.js` yet, so this pass does not change runtime behavior.
+Current pilot page:
+
+```text
+Team IROUP/public/public-scholar.html
+```
+
+`public-scholar.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.scholarshipList()` for its primary public data flow. The adapter still has no hardcoded deployment URL, so live data requires explicit V2 endpoint configuration.
 
 ## Safety Rules
 
@@ -133,7 +139,7 @@ Current caveat:
 
 ## Migration Use
 
-Recommended first use:
+Recommended pilot pattern:
 
 1. Load `iroup-v2-api.js` on one low-risk public page.
 2. Configure a V2 deployment URL for test only.
@@ -141,5 +147,10 @@ Recommended first use:
 4. Keep the page-local adapter from V2 DTO fields to existing render fields.
 5. Verify no private fields are exposed.
 
-Do not migrate admin writes until V2 write routes and normalized form contracts exist.
+Pilot status:
 
+- `public-scholar.html` completed steps 1, 3, and 4.
+- Step 2 is blocked until a V2 deployment URL is available.
+- Step 5 requires live V2 endpoint verification.
+
+Do not migrate admin writes until V2 write routes and normalized form contracts exist.

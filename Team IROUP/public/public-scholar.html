@@ -199,6 +199,7 @@ footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(
 <footer>© 2569 International Relations Office · University of Phayao</footer>
 
 <script src="iroup-config.js"></script>
+<script src="../iroup-v2-api.js"></script>
 <script>
 let allScholar = [];
 let currentFilter = '';
@@ -207,7 +208,11 @@ const BG = {'Japan':'#E8F4FD','China':'#FDECEA','South Korea':'#EBF7E3','Germany
 
 async function loadData() {
   try {
-    const data = (await IROUP.getPublicScholarships()).map(normalizePublicScholarship);
+    // V2 pilot: primary public scholarship data now flows through the isolated V2 adapter.
+    // Rendering below still uses the existing page-local compatibility shape.
+    const response = await IROUP_V2.public.scholarshipList();
+    if (!response.success) throw new Error(response.error || 'V2 scholarship API error');
+    const data = (response.data || []).map(normalizePublicScholarship);
     allScholar = data.sort((a,b) => {
       // Pin ขึ้นก่อน
       if (a['Pin'] === 'TRUE' && b['Pin'] !== 'TRUE') return -1;
@@ -246,22 +251,44 @@ async function loadData() {
 }
 
 function normalizePublicScholarship(row) {
+  const country = normalizePublicCountryName(row.country);
+  const fileUrl = firstPublicFileUrl(row.files);
   return {
     ID: row.scholarship_id || '',
-    'ชื่อทุน': row.title || '',
-    'ประเทศ': row.country || '',
-    'สถาบัน': row.institution || '',
-    'ระดับ': row.level || '',
+    'ชื่อทุน': row.title_th || row.title_en || row.title || '',
+    'ประเทศ': country || row.country || '',
+    'สถาบัน': row.institution_name || row.institution || '',
+    'ระดับ': row.target_group || row.scholarship_type || row.level || '',
     'วันประชาสัมพันธ์': row.publish_date || '',
     'วันเปิดรับ': row.open_date || row.start_date || '',
     'วันปิดรับ': row.close_date || row.end_date || '',
-    'ครอบคลุม': row.coverage || '',
+    'ครอบคลุม': row.cover_summary || row.coverage_th || row.coverage_en || row.coverage || '',
     Link: row.apply_url || row.detail_url || row.link_url || '',
-    Poster_URL: row.poster_url || '',
-    'ไฟล์_URL': row.public_file_url || '',
+    Poster_URL: row.poster_url || firstPublicImageUrl(row.files) || '',
+    'ไฟล์_URL': row.public_file_url || fileUrl || '',
     Pin: isPublicTruthy(row.pin) ? 'TRUE' : '',
     public_status: row.status || ''
   };
+}
+
+function normalizePublicCountryName(country) {
+  if (!country || typeof country !== 'object') return '';
+  return country.country_name_en || country.country_name_th || country.country_id || '';
+}
+
+function firstPublicFileUrl(files) {
+  const list = Array.isArray(files) ? files : [];
+  const found = list.find(file => file && file.file_url);
+  return found ? found.file_url : '';
+}
+
+function firstPublicImageUrl(files) {
+  const list = Array.isArray(files) ? files : [];
+  const found = list.find(file => {
+    const mime = String(file && file.mime_type || '').toLowerCase();
+    return file && file.file_url && mime.indexOf('image/') === 0;
+  });
+  return found ? found.file_url : '';
 }
 
 function isPublicTruthy(value) {

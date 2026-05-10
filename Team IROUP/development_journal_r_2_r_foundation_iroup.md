@@ -1591,3 +1591,44 @@ Still not doing
 - deployment
 - V1 API replacement
 - admin write migration
+
+---
+
+45. Public Pilot Migration Pass - Scholarship Page (May 11, 2026)
+
+Summary
+
+Started the first frontend migration pilot by moving only the primary public scholarship data-loading flow to the V2 adapter.
+
+Target page
+
+- `Team IROUP/public/public-scholar.html`
+
+Implementation notes
+
+- Added `../iroup-v2-api.js`.
+- Replaced the primary `IROUP.getPublicScholarships()` call with `IROUP_V2.public.scholarshipList()`.
+- Preserved existing UI, card rendering, filters, search, language controls, and styling.
+- Kept the existing page-local render shape by adding compatibility normalization from V2 DTO fields.
+
+DTO mismatch discovered
+
+The old public scholarship page expected V1-style fields such as `title`, `country`, `institution`, `level`, and `public_file_url`. The V2 DTO correctly returns normalized fields such as `title_th/title_en`, structured `country`, `institution_name`, `target_group/scholarship_type`, and `files[]`.
+
+Resolution
+
+The pilot added local mapping from V2 DTO shape to the existing card-render shape without refactoring the page.
+
+Current limitation
+
+The V2 adapter still has no hardcoded deployment URL. Live data verification requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
+
+Still not doing
+
+- public events migration
+- admin migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` wiring
+- deployment
+- V1 helper removal

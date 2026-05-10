@@ -155,8 +155,31 @@ Purpose:
 
 Current rule:
 
-- Do not load `iroup-v2-api.js` into existing pages until a specific migration phase is approved.
+- `public-scholar.html` is the first approved pilot page using `iroup-v2-api.js`.
+- Do not load `iroup-v2-api.js` into additional pages until the pilot is reviewed.
 - Configure V2 endpoint explicitly during testing; the adapter intentionally has no hardcoded deployment URL.
+
+## Public Pilot Migration
+
+Pilot page:
+
+```text
+Team IROUP/public/public-scholar.html
+```
+
+Pilot scope:
+
+- Primary public scholarship data-loading flow only.
+- Existing UI/rendering/filter behavior preserved.
+- V2 DTO fields adapted locally to the old render shape.
+
+Pilot blocker:
+
+- Live data verification requires a configured/deployed V2 endpoint URL.
+
+Next rule:
+
+- Review the scholarship pilot before migrating `public-events.html` or any admin page.
 
 ## Architecture Direction
 
@@ -254,6 +277,7 @@ Reason: if admin forms collect data in the wrong structure, the system cannot pr
 - Use `FRONTEND-V2-MIGRATION-PLAN.md` as the migration map.
 - Keep V1 and V2 API clients side by side during transition.
 - Use `iroup-v2-api.js` as the V2 client boundary once a page migration is explicitly approved.
+- Start with public read-only pilots before admin pages.
 
 ### Phase 7: Retire Old V1 API Gradually
 
