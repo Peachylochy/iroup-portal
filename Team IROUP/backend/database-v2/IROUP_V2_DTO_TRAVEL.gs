@@ -24,6 +24,30 @@ function getV2AdminTravelList_(includeArchived) {
   return adminResponseV2_(true, dtos, dtos.length, '');
 }
 
+function getV2AdminTravel_(travelId) {
+  const valid = validateModuleRecordLinkV2_('travel', travelId);
+  if (!valid.success) return adminResponseV2_(false, null, 0, valid.error);
+
+  const context = buildV2TravelDtoContext_(adminResponseV2_);
+  if (!context.success) return context;
+
+  const dto = mapV2AdminTravelDetailDto_(valid.details.row, context.data);
+  return adminResponseV2_(true, dto, dto ? 1 : 0, '');
+}
+
+function listV2PublicTravel_() {
+  const context = buildV2TravelDtoContext_(publicResponseV2_);
+  if (!context.success) return context;
+
+  const ctx = context.data;
+  const rows = ctx.tables[IROUP_V2_SHEETS.TRAVEL] || [];
+  const dtos = rows
+    .filter(function (row) { return isV2PublicParentRow_(row, true); })
+    .map(function (row) { return mapV2PublicTravelDto_(row, ctx); });
+
+  return publicResponseV2_(true, dtos, dtos.length, '');
+}
+
 function getV2PublicTravelSummary_() {
   const context = buildV2TravelDtoContext_(publicResponseV2_);
   if (!context.success) return context;
@@ -67,6 +91,7 @@ function getV2PublicTravelSummary_() {
 function buildV2TravelDtoContext_(responseFactory) {
   const sheetNames = [
     IROUP_V2_SHEETS.COUNTRY_MASTER,
+    IROUP_V2_SHEETS.UP_UNIT_MASTER,
     IROUP_V2_SHEETS.BUDGET_TYPE_MASTER,
     IROUP_V2_SHEETS.FILE_ROLE_MASTER,
     IROUP_V2_SHEETS.TRAVEL,
@@ -88,6 +113,7 @@ function buildV2TravelDtoContext_(responseFactory) {
   return responseFactory(true, {
     tables: tables,
     countriesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.COUNTRY_MASTER], 'country_id'),
+    unitsById: indexV2RowsById_(tables[IROUP_V2_SHEETS.UP_UNIT_MASTER], 'unit_id'),
     budgetTypesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.BUDGET_TYPE_MASTER], 'budget_type_id'),
     fileRolesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.FILE_ROLE_MASTER], 'file_role_id')
   }, 1, '');
@@ -117,6 +143,47 @@ function mapV2AdminTravelSummaryDto_(row, ctx) {
     file_summary: summarizeV2Files_(files, ctx),
     files: groupV2FilesByVisibility_(files, ctx),
     audit: mapV2AuditDto_(row)
+  };
+}
+
+function mapV2AdminTravelDetailDto_(row, ctx) {
+  const dto = mapV2AdminTravelSummaryDto_(row, ctx);
+  dto.participants = findV2TravelParticipants_(ctx, dto.travel_id).map(mapV2AdminTravelParticipantDto_);
+  dto.budgets = findV2RelationRows_(ctx, IROUP_V2_SHEETS.BUDGET, 'travel', dto.travel_id)
+    .map(function (budget) { return mapV2BudgetDto_(budget, ctx); });
+  return dto;
+}
+
+function mapV2AdminTravelParticipantDto_(row) {
+  return {
+    travel_participant_id: row.travel_participant_id || '',
+    travel_id: row.travel_id || '',
+    person_source: row.person_source || '',
+    person_id: row.person_id || '',
+    full_name_snapshot: row.full_name_snapshot || '',
+    unit_id_snapshot: row.unit_id_snapshot || '',
+    position_snapshot: row.position_snapshot || '',
+    role: row.role || '',
+    is_deleted: isSoftDeletedV2_(row),
+    created_by: row.created_by || '',
+    created_at: row.created_at || ''
+  };
+}
+
+function mapV2PublicTravelDto_(row, ctx) {
+  return {
+    travel_id: row.travel_id || '',
+    project_name: row.project_name || '',
+    purpose: row.purpose || '',
+    country: mapV2PublicCountryRef_(ctx, row.country_id),
+    continent: mapV2PublicContinentRef_(ctx, row.country_id),
+    city: row.city || '',
+    start_date: row.start_date || '',
+    end_date: row.end_date || '',
+    fiscal_year: row.fiscal_year || '',
+    status: row.status || '',
+    participant_count: countV2TravelParticipants_(ctx, row.travel_id),
+    files: findV2PublicFiles_(ctx, 'travel', row.travel_id, row)
   };
 }
 

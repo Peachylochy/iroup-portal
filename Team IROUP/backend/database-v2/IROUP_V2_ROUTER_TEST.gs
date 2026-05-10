@@ -38,10 +38,19 @@ function testV2RouterSchema() {
 function testV2RouterReadSmoke() {
   var actions = [
     'v2.public.mou.list',
+    'v2.public.mou.map',
+    'v2.public.stats',
+    'v2.public.mobility.list',
+    'v2.public.mobility.map',
     'v2.public.mobility.summary',
+    'v2.public.travel.list',
     'v2.public.travel.summary',
     'v2.public.scholarship.list',
-    'v2.public.event.list'
+    'v2.public.event.list',
+    'v2.lookup.countries',
+    'v2.lookup.units',
+    'v2.lookup.fileRoles',
+    'v2.lookup.budgetTypes'
   ];
   var tests = [];
   var failed = 0;
@@ -71,6 +80,10 @@ function testV2RouterReadSmoke() {
     total: actions.length,
     tests: tests
   };
+}
+
+function testV2RouterPublicCoverage() {
+  return testV2RouterReadSmoke();
 }
 
 function testV2RouterAdminTravelList() {

@@ -80,6 +80,9 @@ function getV2PublicStats_() {
   const events = listV2PublicEvents_();
   if (!events.success) return events;
 
+  const travel = getV2PublicTravelSummary_();
+  if (!travel.success) return travel;
+
   const mobilityRows = mobility.data || [];
   const stats = {
     mou_count: mou.total,
@@ -87,6 +90,8 @@ function getV2PublicStats_() {
     mobility_participant_count: sumV2PublicNumbers_(mobilityRows, 'participant_count'),
     mobility_inbound_project_count: countV2PublicByField_(mobilityRows, 'direction', 'inbound'),
     mobility_outbound_project_count: countV2PublicByField_(mobilityRows, 'direction', 'outbound'),
+    travel_count: travel.data ? travel.data.travel_count : 0,
+    travel_participant_count: travel.data ? travel.data.participant_count : 0,
     scholarship_count: scholarships.total,
     pinned_scholarship_count: countV2PublicTruthy_(scholarships.data || [], 'pin'),
     event_count: events.total,
@@ -114,6 +119,60 @@ function getV2PublicMapData_() {
     return bucket;
   }).filter(function (bucket) {
     return bucket.total_count > 0;
+  });
+
+  return publicResponseV2_(true, data, data.length, '');
+}
+
+function getV2PublicMOUMapData_() {
+  const context = buildV2PublicContext_();
+  if (!context.success) return context;
+
+  const ctx = context.data;
+  const buckets = {};
+  addV2PublicCountryCounts_(buckets, ctx, IROUP_V2_SHEETS.MOU, 'mou', 'country_id');
+
+  const data = Object.keys(buckets).map(function (countryId) {
+    const bucket = buckets[countryId];
+    bucket.total_count = bucket.counts.mou;
+    return bucket;
+  }).filter(function (bucket) {
+    return bucket.total_count > 0;
+  });
+
+  return publicResponseV2_(true, data, data.length, '');
+}
+
+function getV2PublicMobilityMapData_() {
+  const mobility = listV2PublicMobility_();
+  if (!mobility.success) return mobility;
+
+  const buckets = {};
+  (mobility.data || []).forEach(function (row) {
+    const countryId = String(row.country && row.country.country_id ? row.country.country_id : '').trim();
+    if (!countryId) return;
+    if (!buckets[countryId]) {
+      buckets[countryId] = {
+        country: row.country,
+        continent: row.continent,
+        counts: {
+          mobility_project: 0,
+          inbound_project: 0,
+          outbound_project: 0
+        },
+        participant_count: 0,
+        total_count: 0
+      };
+    }
+    buckets[countryId].counts.mobility_project++;
+    if (row.direction === 'inbound') buckets[countryId].counts.inbound_project++;
+    if (row.direction === 'outbound') buckets[countryId].counts.outbound_project++;
+    buckets[countryId].participant_count += toV2PublicNumber_(row.participant_count);
+    buckets[countryId].total_count++;
+  });
+
+  const data = Object.keys(buckets).map(function (countryId) {
+    return buckets[countryId];
   });
 
   return publicResponseV2_(true, data, data.length, '');

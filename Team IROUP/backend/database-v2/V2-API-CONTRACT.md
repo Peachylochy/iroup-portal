@@ -247,6 +247,38 @@ TODO status:
 
 - Implemented through existing Admin DTO helper.
 
+### `v2.admin.mou.detail`
+
+Purpose:
+
+- Return one admin MOU detail DTO with relation summaries/details.
+
+Classification:
+
+- Admin.
+
+Required params:
+
+- `mou_id` or `id`
+- Authenticated V2 admin session through `requireV2Admin_()`.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2AdminMOU_()`.
+
+Private fields never exposed publicly:
+
+- This is admin-only and must not be reused for public pages.
+
+TODO status:
+
+- Implemented through existing Admin DTO helper.
+
 ### `v2.admin.mobility.list`
 
 Purpose:
@@ -280,6 +312,43 @@ Private fields never exposed publicly:
 - budgets
 - internal files
 - creator/updater fields
+
+TODO status:
+
+- Implemented through existing Admin DTO helper.
+
+### `v2.admin.mobility.detail`
+
+Purpose:
+
+- Return one admin Mobility project detail DTO including participants, budgets, and files.
+
+Classification:
+
+- Admin.
+
+Required params:
+
+- `mobility_id` or `id`
+- Authenticated V2 admin session through `requireV2Admin_()`.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2AdminMobilityProject_()`.
+
+Private fields never exposed publicly:
+
+- participant names
+- `person_id`
+- gender row-level data
+- unit/person snapshots
+- budgets
+- internal files
 
 TODO status:
 
@@ -342,6 +411,46 @@ TODO status:
 - Implemented through finalized Travel DTO helper: `getV2AdminTravelList_()`.
 - Router-local Travel admin helper has been removed.
 
+### `v2.admin.travel.detail`
+
+Purpose:
+
+- Return one admin Travel detail DTO including participant DTOs, budget DTOs, files, summaries, and audit.
+
+Classification:
+
+- Admin.
+
+Required params:
+
+- `travel_id` or `id`
+- Authenticated V2 admin session through `requireV2Admin_()`.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2AdminTravel_()`.
+
+Private fields never exposed publicly:
+
+- Travel participant names
+- `person_id`
+- staff/student IDs
+- gender row-level data
+- unit/person snapshots
+- budgets
+- internal notes
+- creator/updater fields
+- restricted files
+
+TODO status:
+
+- Implemented through finalized Travel DTO helper.
+
 ### `v2.admin.scholarship.list`
 
 Purpose:
@@ -372,6 +481,41 @@ Private fields never exposed publicly:
 - internal notes
 - non-public files
 - budget/internal planning fields if added later
+
+TODO status:
+
+- Implemented through existing Admin DTO helper.
+
+### `v2.admin.scholarship.detail`
+
+Purpose:
+
+- Return one admin Scholarship detail DTO with relation summaries/details.
+
+Classification:
+
+- Admin.
+
+Required params:
+
+- `scholarship_id` or `id`
+- Authenticated V2 admin session through `requireV2Admin_()`.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2AdminScholarship_()`.
+
+Private fields never exposed publicly:
+
+- creator/updater fields
+- internal notes
+- non-public files
+- budgets if present
 
 TODO status:
 
@@ -412,6 +556,146 @@ TODO status:
 
 - Implemented through existing Admin DTO helper.
 
+### `v2.admin.event.detail`
+
+Purpose:
+
+- Return one admin Event detail DTO with relation summaries/details.
+
+Classification:
+
+- Admin.
+
+Required params:
+
+- `event_id` or `id`
+- Authenticated V2 admin session through `requireV2Admin_()`.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2AdminEvent_()`.
+
+Private fields never exposed publicly:
+
+- creator/updater fields
+- internal notes
+- non-public files
+- private operational fields
+
+TODO status:
+
+- Implemented through existing Admin DTO helper.
+
+### `v2.admin.dashboard.summary`
+
+Purpose:
+
+- Return admin-safe dashboard aggregate counts for V2 modules.
+
+Classification:
+
+- Admin.
+
+Required params:
+
+- Authenticated V2 admin session through `requireV2Admin_()`.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2AdminDashboardSummary_()`.
+
+Private fields never exposed publicly:
+
+- Admin aggregate only. Do not use this route on public pages.
+
+TODO status:
+
+- Implemented as a safe aggregate DTO.
+- May need refinement once dashboard frontend requirements are finalized.
+
+### `v2.admin.report.summary`
+
+Purpose:
+
+- Return admin-safe report aggregate counts for V2 modules, optionally filtered by fiscal year.
+
+Classification:
+
+- Admin.
+
+Required params:
+
+- Authenticated V2 admin session through `requireV2Admin_()`.
+
+Optional params:
+
+- `fiscal_year`
+- `year`
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2AdminReportSummary_()`.
+
+Private fields never exposed publicly:
+
+- Admin aggregate only. Do not use this route on public pages.
+
+TODO status:
+
+- Implemented as a safe aggregate DTO.
+- Export/report table DTOs are still future work.
+
+### Lookup Routes
+
+Purpose:
+
+- Return active, sanitized master data for frontend selectors.
+
+Classification:
+
+- Public-safe lookup.
+
+Required params:
+
+- None.
+
+Optional params:
+
+- None currently stabilized.
+
+Routes:
+
+- `v2.lookup.countries`
+- `v2.lookup.units`
+- `v2.lookup.fileRoles` (normalized internally as `v2.lookup.fileroles`)
+- `v2.lookup.budgetTypes` (normalized internally as `v2.lookup.budgettypes`)
+
+Response shape:
+
+- Standard router response.
+- `data` is an array of active lookup DTOs.
+
+Private fields never exposed:
+
+- raw master rows
+- audit fields
+- soft-deleted rows
+
+TODO status:
+
+- Implemented through `IROUP_V2_DTO_LOOKUP.gs`.
+
 ### `v2.public.mou.list`
 
 Purpose:
@@ -446,6 +730,76 @@ Private fields never exposed:
 TODO status:
 
 - Implemented through existing Public DTO helper.
+
+### `v2.public.mou.map`
+
+Purpose:
+
+- Return public-safe MOU country map aggregates.
+
+Classification:
+
+- Public.
+
+Required params:
+
+- None.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2PublicMOUMapData_()`.
+
+Private fields never exposed:
+
+- raw MOU rows
+- internal notes
+- creator/updater fields
+- budgets
+- non-public files
+
+TODO status:
+
+- Implemented.
+
+### `v2.public.stats`
+
+Purpose:
+
+- Return public-safe aggregate stats across public modules.
+
+Classification:
+
+- Public.
+
+Required params:
+
+- None.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2PublicStats_()`.
+
+Private fields never exposed:
+
+- participant identities
+- budgets
+- internal notes
+- audit fields
+- raw rows
+
+TODO status:
+
+- Implemented.
 
 ### `v2.public.mobility.summary`
 
@@ -500,6 +854,80 @@ TODO status:
 - Implemented through router aggregate helper using `listV2PublicMobility_()`.
 - Future public Mobility detail/list endpoints should continue using sanitized DTOs only.
 
+### `v2.public.mobility.list`
+
+Purpose:
+
+- Return public-safe Mobility project list DTOs.
+
+Classification:
+
+- Public.
+
+Required params:
+
+- None.
+
+Optional params:
+
+- None currently stabilized.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `listV2PublicMobility_()`.
+
+Private fields never exposed:
+
+- participant names
+- `person_id`
+- student/staff IDs
+- gender row-level data
+- unit snapshots tied to people
+- budgets
+- internal notes
+- non-public files
+- creator/updater fields
+
+TODO status:
+
+- Implemented through existing Public DTO helper.
+
+### `v2.public.mobility.map`
+
+Purpose:
+
+- Return public-safe Mobility country map aggregates.
+
+Classification:
+
+- Public.
+
+Required params:
+
+- None.
+
+Optional params:
+
+- None.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `getV2PublicMobilityMapData_()`.
+
+Private fields never exposed:
+
+- participant identities
+- budgets
+- internal notes
+- audit fields
+- raw rows
+
+TODO status:
+
+- Implemented.
+
 ### `v2.public.travel.summary`
 
 Purpose:
@@ -550,6 +978,45 @@ TODO status:
 
 - Implemented through finalized Travel DTO helper: `getV2PublicTravelSummary_()`.
 - Router-local Travel public summary helper has been removed.
+
+### `v2.public.travel.list`
+
+Purpose:
+
+- Return public-safe Travel list DTOs.
+
+Classification:
+
+- Public.
+
+Required params:
+
+- None.
+
+Optional params:
+
+- None currently stabilized.
+
+Response shape:
+
+- Standard router response.
+- `data` is returned by `listV2PublicTravel_()`.
+
+Private fields never exposed:
+
+- Travel participant names
+- `person_id`
+- student/staff IDs
+- gender row-level data
+- unit/person snapshots
+- budgets
+- internal notes
+- non-public files
+- creator/updater fields
+
+TODO status:
+
+- Implemented through finalized Travel DTO helper.
 
 ### `v2.public.scholarship.list`
 
@@ -627,7 +1094,6 @@ Before frontend migration starts:
 
 - Review this contract.
 - Decide whether `v2.schema` remains public, admin-only, or debug-only.
-- Replace router-local Travel helpers with finalized Admin/Public Travel DTO helpers.
 - Confirm exact DTO field names for each public page.
 - Confirm admin list vs detail endpoints for each module.
 - Add write contracts separately for admin add/edit/delete flows.

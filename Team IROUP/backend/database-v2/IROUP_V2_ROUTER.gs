@@ -202,10 +202,22 @@ function getV2RouteDispatch_() {
         return listV2AdminMOUs_(getV2IncludeArchived_(request));
       }
     },
+    'v2.admin.mou.detail': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminMOU_(getV2RequestId_(request, 'mou_id'));
+      }
+    },
     'v2.admin.mobility.list': {
       access: 'admin',
       handler: function (request) {
         return listV2AdminMobilityProjects_(getV2IncludeArchived_(request));
+      }
+    },
+    'v2.admin.mobility.detail': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminMobilityProject_(getV2RequestId_(request, 'mobility_id'));
       }
     },
     'v2.admin.travel.list': {
@@ -214,10 +226,22 @@ function getV2RouteDispatch_() {
         return getV2AdminTravelList_(getV2IncludeArchived_(request));
       }
     },
+    'v2.admin.travel.detail': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminTravel_(getV2RequestId_(request, 'travel_id'));
+      }
+    },
     'v2.admin.scholarship.list': {
       access: 'admin',
       handler: function (request) {
         return listV2AdminScholarships_(getV2IncludeArchived_(request));
+      }
+    },
+    'v2.admin.scholarship.detail': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminScholarship_(getV2RequestId_(request, 'scholarship_id'));
       }
     },
     'v2.admin.event.list': {
@@ -226,16 +250,100 @@ function getV2RouteDispatch_() {
         return listV2AdminEvents_(getV2IncludeArchived_(request));
       }
     },
+    'v2.admin.event.detail': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminEvent_(getV2RequestId_(request, 'event_id'));
+      }
+    },
+    'v2.admin.dashboard.summary': {
+      access: 'admin',
+      handler: function () {
+        return getV2AdminDashboardSummary_();
+      }
+    },
+    'v2.admin.report.summary': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminReportSummary_(request.params.fiscal_year || request.params.year || '');
+      }
+    },
+    'v2.lookup.countries': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupCountries_();
+      }
+    },
+    'v2.lookup.units': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupUnits_();
+      }
+    },
+    'v2.lookup.fileRoles': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupFileRoles_();
+      }
+    },
+    'v2.lookup.fileroles': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupFileRoles_();
+      }
+    },
+    'v2.lookup.budgetTypes': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupBudgetTypes_();
+      }
+    },
+    'v2.lookup.budgettypes': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupBudgetTypes_();
+      }
+    },
     'v2.public.mou.list': {
       access: 'public',
       handler: function () {
         return listV2PublicMOUs_();
       }
     },
+    'v2.public.mou.map': {
+      access: 'public',
+      handler: function () {
+        return getV2PublicMOUMapData_();
+      }
+    },
+    'v2.public.stats': {
+      access: 'public',
+      handler: function () {
+        return getV2PublicStats_();
+      }
+    },
+    'v2.public.mobility.list': {
+      access: 'public',
+      handler: function () {
+        return listV2PublicMobility_();
+      }
+    },
+    'v2.public.mobility.map': {
+      access: 'public',
+      handler: function () {
+        return getV2PublicMobilityMapData_();
+      }
+    },
     'v2.public.mobility.summary': {
       access: 'public',
       handler: function () {
         return getV2RouterPublicMobilitySummary_();
+      }
+    },
+    'v2.public.travel.list': {
+      access: 'public',
+      handler: function () {
+        return listV2PublicTravel_();
       }
     },
     'v2.public.travel.summary': {
@@ -278,7 +386,7 @@ function getV2RouterPublicMobilitySummary_() {
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     var participantCount = toV2Number_(row.participant_count || row.total_participants);
-    var countryId = row.country_id || row.country || 'unknown';
+    var countryId = row.country && row.country.country_id ? row.country.country_id : 'unknown';
 
     summary.participant_count += participantCount;
 
@@ -321,6 +429,13 @@ function getV2IncludeArchived_(request) {
     request.params.includeArchived === 'true' ||
     request.params.include_archived === true ||
     request.params.include_archived === 'true';
+}
+
+function getV2RequestId_(request, preferredField) {
+  if (!request || !request.params) {
+    return '';
+  }
+  return request.params[preferredField] || request.params.id || request.params.record_id || '';
 }
 
 function getV2ResultTotal_(result) {
