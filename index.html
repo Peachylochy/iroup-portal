@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Personal IR Workspace</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="./Team%20IROUP/iroup-config.js"></script>
 
   <style>
     :root{
@@ -65,6 +67,122 @@
       color:var(--muted);
       font-size:1.08rem;
       line-height:1.7;
+    }
+
+    .auth-panel{
+      max-width:560px;
+      padding:28px;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius:8px;
+      box-shadow:var(--shadow);
+    }
+
+    .auth-panel[hidden],
+    .module-grid[hidden],
+    .session-bar[hidden]{
+      display:none !important;
+    }
+
+    .auth-panel h2{
+      margin:0;
+      font-size:1.45rem;
+      line-height:1.2;
+    }
+
+    .auth-panel p{
+      margin:12px 0 0;
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .auth-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:22px;
+    }
+
+    .google-button,
+    .secondary-button,
+    .signout-button{
+      min-height:46px;
+      padding:0 18px;
+      border-radius:8px;
+      border:0;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+      transition:background .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+
+    .google-button{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      background:var(--blue);
+      color:white;
+    }
+
+    .google-button svg{
+      width:20px;
+      height:20px;
+      flex:0 0 20px;
+    }
+
+    .google-button:hover,
+    .signout-button:hover{
+      background:var(--blue-dark);
+      transform:translateY(-2px);
+      box-shadow:0 12px 24px rgba(37,99,235,.22);
+    }
+
+    .secondary-button{
+      background:#eef4fb;
+      color:var(--ink);
+      border:1px solid var(--line);
+    }
+
+    .secondary-button:hover{
+      background:#e5edf7;
+    }
+
+    .signout-button{
+      background:var(--blue);
+      color:white;
+    }
+
+    .status-note{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:8px;
+      background:#eef4fb;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .status-note.error{
+      background:#fff1f2;
+      color:#9f1239;
+      border:1px solid #fecdd3;
+    }
+
+    .session-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin:0 0 22px;
+      padding:14px 16px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(255,255,255,.72);
+    }
+
+    .session-user{
+      margin:0;
+      color:var(--muted);
+      line-height:1.5;
     }
 
     .module-grid{
@@ -157,6 +275,11 @@
         min-height:auto;
         padding:24px;
       }
+
+      .session-bar{
+        align-items:flex-start;
+        flex-direction:column;
+      }
     }
   </style>
 </head>
@@ -171,7 +294,44 @@
       </p>
     </header>
 
-    <section class="module-grid" aria-label="Workspace modules">
+    <section class="auth-panel" id="workspaceLoading" aria-live="polite">
+      <h2>Checking workspace access</h2>
+      <p>Please wait while the portal checks whether this browser already has an authorized workspace session.</p>
+      <div class="status-note">This workspace is protected at the launcher level before module access.</div>
+    </section>
+
+    <section class="auth-panel" id="workspaceSignedOut" hidden>
+      <h2>Sign in to continue</h2>
+      <p>Use an authorized Google account to open the Personal IR Workspace launcher.</p>
+      <div class="auth-actions">
+        <button class="google-button" type="button" onclick="signInWorkspaceWithGoogle()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+      <div class="status-note" id="workspaceLoginNote">Module-specific guards remain active as a second layer.</div>
+    </section>
+
+    <section class="auth-panel" id="workspaceDenied" hidden>
+      <h2>Access denied</h2>
+      <p id="workspaceDeniedMessage">This Google account is not authorized for the Personal IR Workspace.</p>
+      <div class="auth-actions">
+        <button class="secondary-button" type="button" onclick="resetWorkspaceLogin()">Try another account</button>
+      </div>
+      <div class="status-note error">Please contact the workspace administrator if you believe this is a mistake.</div>
+    </section>
+
+    <div class="session-bar" id="workspaceSessionBar" hidden>
+      <p class="session-user" id="workspaceSessionUser"></p>
+      <button class="signout-button" type="button" onclick="signOutWorkspace()">Sign out</button>
+    </div>
+
+    <section class="module-grid" id="workspaceLauncher" aria-label="Workspace modules" hidden>
       <article class="module-card">
         <div>
           <div class="module-kicker" aria-hidden="true">IR</div>
@@ -199,5 +359,203 @@
       </article>
     </section>
   </main>
+
+  <script>
+    // Workspace Auth Gate Phase 1:
+    // This is a client-side GitHub Pages access gate. Real protection still
+    // depends on module guards and backend/API authorization.
+    const WORKSPACE_GOOGLE_CLIENT_ID = '691790352317-ijpbb36rh3dti6gbqmtnsa0581thk4t2.apps.googleusercontent.com';
+    const WORKSPACE_SESSION_KEY = 'workspace_user';
+    const WORKSPACE_TOKEN_KEY = 'workspace_admin_token';
+    const WORKSPACE_SESSION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+
+    function setWorkspaceState(state, details) {
+      const loading = document.getElementById('workspaceLoading');
+      const signedOut = document.getElementById('workspaceSignedOut');
+      const denied = document.getElementById('workspaceDenied');
+      const launcher = document.getElementById('workspaceLauncher');
+      const sessionBar = document.getElementById('workspaceSessionBar');
+      const loginNote = document.getElementById('workspaceLoginNote');
+
+      loading.hidden = state !== 'loading';
+      signedOut.hidden = state !== 'signed-out';
+      denied.hidden = state !== 'denied';
+      launcher.hidden = state !== 'authorized';
+      sessionBar.hidden = state !== 'authorized';
+
+      if (state === 'loading') {
+        loginNote.textContent = 'Checking workspace access...';
+      } else if (state === 'signed-out') {
+        loginNote.textContent = 'Module-specific guards remain active as a second layer.';
+      }
+
+      if (state === 'denied') {
+        const email = details && details.email ? details.email : '';
+        document.getElementById('workspaceDeniedMessage').textContent =
+          email
+            ? 'The account ' + email + ' is not authorized for the Personal IR Workspace.'
+            : 'This Google account is not authorized for the Personal IR Workspace.';
+      }
+
+      if (state === 'authorized') {
+        const user = details && details.user ? details.user : getWorkspaceSession();
+        const label = user && user.email
+          ? 'Signed in as ' + (user.name || user.email) + ' (' + user.email + ')'
+          : 'Signed in to Personal IR Workspace';
+        document.getElementById('workspaceSessionUser').textContent = label;
+      }
+    }
+
+    function getWorkspaceSession() {
+      try {
+        const raw = sessionStorage.getItem(WORKSPACE_SESSION_KEY);
+        if (!raw) return null;
+        const user = JSON.parse(raw);
+        if (!user || !user.email || !user.loginAt) return null;
+        if (Date.now() - new Date(user.loginAt).getTime() > WORKSPACE_SESSION_MAX_AGE_MS) {
+          clearWorkspaceSession();
+          return null;
+        }
+        return user;
+      } catch (e) {
+        clearWorkspaceSession();
+        return null;
+      }
+    }
+
+    function clearWorkspaceSession() {
+      sessionStorage.removeItem(WORKSPACE_SESSION_KEY);
+      sessionStorage.removeItem(WORKSPACE_TOKEN_KEY);
+    }
+
+    function completeWorkspaceLogin(email, name, adminToken) {
+      if (adminToken) {
+        sessionStorage.setItem(WORKSPACE_TOKEN_KEY, adminToken);
+      } else {
+        sessionStorage.removeItem(WORKSPACE_TOKEN_KEY);
+      }
+
+      const user = {
+        email: email,
+        name: name || email,
+        adminToken: adminToken || '',
+        loginAt: new Date().toISOString()
+      };
+      sessionStorage.setItem(WORKSPACE_SESSION_KEY, JSON.stringify(user));
+      setWorkspaceState('authorized', { user: user });
+    }
+
+    function signInWorkspaceWithGoogle() {
+      if (!window.google || !google.accounts || !google.accounts.oauth2) {
+        setWorkspaceState('signed-out');
+        document.getElementById('workspaceLoginNote').textContent =
+          'Google sign-in is still loading. Please try again in a moment.';
+        return;
+      }
+
+      setWorkspaceState('loading');
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: WORKSPACE_GOOGLE_CLIENT_ID,
+        scope: 'email profile',
+        callback: handleWorkspaceGoogleResponse
+      });
+      client.requestAccessToken();
+    }
+
+    async function handleWorkspaceGoogleResponse(response) {
+      if (response.error) {
+        setWorkspaceState('signed-out');
+        document.getElementById('workspaceLoginNote').textContent = 'Google sign-in was cancelled.';
+        return;
+      }
+
+      try {
+        const profile = await fetchWorkspaceGoogleProfile(response.access_token);
+        const email = profile.email || '';
+        const name = profile.name || email;
+        const session = await createWorkspaceAdminSession(response.access_token);
+
+        if (session && session.success && session.allowed) {
+          completeWorkspaceLogin(email, name, session.adminToken || '');
+          return;
+        }
+
+        const allowed = await checkWorkspaceAdminAccess(email);
+        if (allowed) {
+          completeWorkspaceLogin(email, name, '');
+        } else {
+          clearWorkspaceSession();
+          setWorkspaceState('denied', { email: email });
+        }
+      } catch (e) {
+        setWorkspaceState('signed-out');
+        document.getElementById('workspaceLoginNote').textContent =
+          'Unable to verify access. Please check your connection and try again.';
+      }
+    }
+
+    async function fetchWorkspaceGoogleProfile(accessToken) {
+      const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: 'Bearer ' + accessToken }
+      });
+      return res.json();
+    }
+
+    async function createWorkspaceAdminSession(accessToken) {
+      if (!window.IROUP || typeof IROUP.createAdminSession !== 'function') return null;
+      try {
+        return await IROUP.createAdminSession(accessToken);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function checkWorkspaceAdminAccess(email) {
+      if (!email) return false;
+
+      if (window.IROUP && typeof IROUP.checkAdmin === 'function') {
+        try {
+          const result = await IROUP.checkAdmin(email);
+          return !!(result && result.allowed);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      if (window.IROUP && IROUP.SCRIPT_URL) {
+        try {
+          const url = IROUP.SCRIPT_URL + '?action=checkAdmin&email=' + encodeURIComponent(email);
+          const res = await fetch(url);
+          const data = await res.json();
+          return !!(data && data.allowed);
+        } catch (e) {
+          const fallbackAllowed = ['panpancake17@gmail.com'];
+          return fallbackAllowed.indexOf(email) >= 0;
+        }
+      }
+
+      return false;
+    }
+
+    function resetWorkspaceLogin() {
+      clearWorkspaceSession();
+      setWorkspaceState('signed-out');
+    }
+
+    function signOutWorkspace() {
+      clearWorkspaceSession();
+      setWorkspaceState('signed-out');
+    }
+
+    (function initWorkspaceAuthGate() {
+      setWorkspaceState('loading');
+      const session = getWorkspaceSession();
+      if (session) {
+        setWorkspaceState('authorized', { user: session });
+      } else {
+        setWorkspaceState('signed-out');
+      }
+    })();
+  </script>
 </body>
 </html>
