@@ -439,6 +439,21 @@ The old V1 frontend/UI is now primarily:
 
 It is not the long-term architecture source of truth.
 
+### Data Architecture Is Source of Truth
+
+For IROUP V2, admin forms must follow the normalized backend schema. If the current dashboard add/edit forms are not suitable for the V2 backend, they should be redesigned later to match the V2 data model instead of forcing V2 APIs to preserve old flat form structures.
+
+Priority order:
+
+1. V2 schema
+2. V2 backend/API
+3. V2 admin form design
+4. V2 frontend UI polish
+
+Old V1 dashboard forms may be used as UX/reference only, not as architecture constraints.
+
+Reason: if input forms collect data in the wrong structure, the platform cannot produce accurate analytics, reporting, public DTOs, or reliable relational joins. Frontend quality depends on correct operational data design first.
+
 ### New Operational Platform Foundation
 
 The new architecture is being rebuilt around:
@@ -508,7 +523,18 @@ Immediate next direction:
 - validate relation-like IDs before writes
 - exclude soft-deleted rows from aggregates
 - sanitize public endpoints at the backend layer
+- design future admin form payloads around normalized V2 tables
 - only then migrate frontend pages module by module
+
+### Future Admin Form Migration Rules
+
+- MOU form should write to `MOU`, plus related `FILES` and `BUDGET` rows where applicable.
+- Mobility form should separate `MOBILITY_PROJECT` and `MOBILITY_PARTICIPANT`.
+- Travel form should separate `TRAVEL` and `TRAVEL_PARTICIPANT`.
+- Scholarship/Event forms should support `public_visible`, files, links, dates, status, pin, and visibility.
+- Files should have role and `visibility_level`.
+- Budgets should be relation rows, not embedded text fields.
+- Person data should use `PERSON_STUDENT`, `PERSON_STAFF`, or `PERSON_MANUAL` references, with snapshots where operational history requires them.
 
 ### Public/Private Boundary Rules
 

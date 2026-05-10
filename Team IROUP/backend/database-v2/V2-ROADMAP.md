@@ -40,6 +40,21 @@ Google Sheets: IROUP_DATABASE_V2
 
 Google Sheets is treated as a production-lite database, not just a spreadsheet.
 
+## Data Architecture Source of Truth
+
+For IROUP V2, the normalized database schema is the source of truth.
+
+Priority order:
+
+1. V2 schema
+2. V2 backend/API
+3. V2 admin form design
+4. V2 frontend UI polish
+
+Old V1 dashboard forms may be used as visual, UX, and workflow reference only. They are not architecture constraints, and the V2 backend should not preserve old flat form structures when those structures conflict with normalized data quality.
+
+Reason: if admin forms collect data in the wrong structure, the system cannot produce accurate analytics, reporting, public DTOs, or reliable relational joins. Frontend polish must follow correct operational data design.
+
 ## Roadmap Phases
 
 ### Phase 0: Stop Frontend Patching
@@ -47,6 +62,7 @@ Google Sheets is treated as a production-lite database, not just a spreadsheet.
 - Pause non-critical V1 frontend patching.
 - Do not refactor frontend until V2 backend/DTOs are stable.
 - Keep existing V1 pages usable, but avoid more architecture debt unless explicitly requested.
+- Treat V1 forms as references only, not as write-contract requirements for V2.
 
 ### Phase 1: Create and Lock IROUP_DATABASE_V2 Schema
 
@@ -68,6 +84,7 @@ Google Sheets is treated as a production-lite database, not just a spreadsheet.
 - Create a safe internal tester for V2 APIs before connecting real frontend pages.
 - Test add/edit/delete flows against normalized sheets.
 - Verify relation integrity and soft-delete filtering.
+- Test form payloads against V2 schema shape, not old flat dashboard payloads.
 
 ### Phase 4: Seed or Migrate Test Data
 
@@ -88,6 +105,7 @@ Google Sheets is treated as a production-lite database, not just a spreadsheet.
 - Migrate frontend one module at a time after DTO contracts are stable.
 - Frontend should consume normalized fields only.
 - Frontend must not depend on raw sheet headers or hide private fields client-side.
+- Redesign admin add/edit forms where needed so writes match the normalized V2 data model.
 
 ### Phase 7: Retire Old V1 API Gradually
 
@@ -106,6 +124,16 @@ Google Sheets is treated as a production-lite database, not just a spreadsheet.
 - Soft-deleted rows must be excluded from aggregates.
 - Backend should stay Apps Script compatible.
 - Public API output should be stable DTOs, not raw sheet rows.
+
+## Future Admin Form Migration Rules
+
+- MOU forms should write to `MOU`, plus related `FILES` and `BUDGET` rows where applicable.
+- Mobility forms should separate `MOBILITY_PROJECT` from `MOBILITY_PARTICIPANT`.
+- Travel forms should separate `TRAVEL` from `TRAVEL_PARTICIPANT`.
+- Scholarship and Event forms should support `public_visible`, files, links, dates, status, pin, and visibility fields.
+- Files should always include role and `visibility_level`.
+- Budgets should be relation rows in `BUDGET`, not embedded text fields.
+- Person data should use `PERSON_STUDENT`, `PERSON_STAFF`, or `PERSON_MANUAL` references, with snapshots only where operational history needs them.
 
 ## Public Data Boundary Rules
 
