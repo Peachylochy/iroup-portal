@@ -5,6 +5,7 @@
  */
 
 const IROUP_V2_SAMPLE_PREFIXES = ['TEST-', 'FAKE-', 'DUMMY-'];
+const IROUP_V2_SAMPLE_STRICT_MODE = false;
 
 const IROUP_V2_SAMPLE_ID_FIELDS = {
   SYSTEM_SETTINGS: 'setting_key',
@@ -29,33 +30,167 @@ const IROUP_V2_SAMPLE_ID_FIELDS = {
   PUBLIC_CACHE: 'cache_id'
 };
 
+const IROUP_V2_SAMPLE_REQUIRED_FIELDS = {
+  SYSTEM_SETTINGS: ['setting_key'],
+  ADMIN: ['admin_id', 'email', 'active'],
+  COUNTRY_MASTER: ['country_id'],
+  UP_UNIT_MASTER: ['unit_id'],
+  PERSON_STUDENT: ['student_id'],
+  PERSON_STAFF: ['staff_id'],
+  PERSON_MANUAL: ['person_id'],
+  BUDGET_TYPE_MASTER: ['budget_type_id'],
+  FILE_ROLE_MASTER: ['file_role_id'],
+  MOU: ['mou_id', 'status', 'public_visible', 'is_deleted'],
+  MOBILITY_PROJECT: ['mobility_id', 'direction', 'status', 'public_visible', 'is_deleted'],
+  MOBILITY_PARTICIPANT: ['participant_id', 'mobility_id', 'participant_type', 'person_source', 'person_id', 'is_deleted'],
+  TRAVEL: ['travel_id', 'status', 'public_visible', 'is_deleted'],
+  TRAVEL_PARTICIPANT: ['travel_participant_id', 'travel_id', 'person_source', 'person_id', 'is_deleted'],
+  SCHOLARSHIP: ['scholarship_id', 'status', 'public_visible', 'is_deleted'],
+  EVENT: ['event_id', 'event_mode', 'status', 'public_visible', 'is_deleted'],
+  BUDGET: ['budget_id', 'module', 'record_id', 'budget_type_id', 'budget_source_type', 'currency', 'amount_thb', 'is_deleted'],
+  FILES: ['file_id', 'module', 'record_id', 'file_role_id', 'visibility_level', 'is_deleted'],
+  AUDIT_LOG: ['log_id', 'module', 'record_id', 'action'],
+  PUBLIC_CACHE: ['cache_id', 'module', 'schema_version', 'json_data']
+};
+
 function seedV2SampleData() {
   const cleanup = cleanupV2SampleData();
-  const summary = { cleanup: cleanup, inserted: {}, errors: [] };
+  const summary = {
+    cleanup: cleanup,
+    inserted: {},
+    failed: {},
+    errors: [],
+    diagnostics: {
+      strictMode: IROUP_V2_SAMPLE_STRICT_MODE,
+      schemaAlignment: [],
+      tables: {}
+    }
+  };
 
   const batches = getV2SampleDataBatches_();
-  Object.keys(batches).forEach(function (sheetName) {
-    const rows = batches[sheetName];
-    summary.inserted[sheetName] = 0;
+  summary.diagnostics.schemaAlignment = diagnoseV2SeedSchemaAlignment_(batches, [
+    IROUP_V2_SHEETS.BUDGET,
+    IROUP_V2_SHEETS.FILES,
+    IROUP_V2_SHEETS.MOBILITY_PARTICIPANT,
+    IROUP_V2_SHEETS.TRAVEL_PARTICIPANT
+  ]);
 
-    rows.forEach(function (row) {
-      const result = appendV2Row_(sheetName, row);
-      if (result.success) {
-        summary.inserted[sheetName]++;
-      } else {
-        summary.errors.push({ sheetName: sheetName, error: result.error });
-      }
+  Object.keys(batches).forEach(function (sheetName) {
+    if (IROUP_V2_SAMPLE_STRICT_MODE && summary.errors.length) return;
+
+    const rows = batches[sheetName];
+    const result = appendV2Rows_(sheetName, rows, {
+      idField: IROUP_V2_SAMPLE_ID_FIELDS[sheetName] || '',
+      requiredFields: IROUP_V2_SAMPLE_REQUIRED_FIELDS[sheetName] || [],
+      strictMode: IROUP_V2_SAMPLE_STRICT_MODE
     });
+
+    summary.inserted[sheetName] = result.inserted || 0;
+    summary.failed[sheetName] = result.failed || 0;
+    summary.diagnostics.tables[sheetName] = result.diagnostics;
+
+    if (!result.success) {
+      summary.errors.push({
+        sheetName: sheetName,
+        error: result.error,
+        failedIds: result.diagnostics ? result.diagnostics.failedIds : [],
+        diagnostics: result.diagnostics
+      });
+    }
+
+    logV2SeedTableSummary_(sheetName, result);
   });
+
+  summary.diagnostics.schemaAlignment.forEach(function (item) {
+    if (!item.success) {
+      Logger.log('[V2 SEED][SCHEMA] ' + item.sheetName + ' alignment issue: ' + JSON.stringify(item));
+    } else {
+      Logger.log('[V2 SEED][SCHEMA] ' + item.sheetName + ' headers aligned');
+    }
+  });
+
+  Logger.log('[V2 SEED][SUMMARY] inserted=' + countV2SeedSummary_(summary.inserted) +
+    ' failed=' + countV2SeedSummary_(summary.failed) +
+    ' strictMode=' + IROUP_V2_SAMPLE_STRICT_MODE);
 
   return {
     success: summary.errors.length === 0,
+    inserted: summary.inserted,
+    failed: summary.failed,
+    diagnostics: summary.diagnostics,
     data: summary,
     error: summary.errors.length ? 'Some V2 sample rows failed to insert' : '',
-    total: Object.keys(summary.inserted).reduce(function (sum, sheetName) {
-      return sum + summary.inserted[sheetName];
-    }, 0)
+    total: countV2SeedSummary_(summary.inserted)
   };
+}
+
+function logV2SeedTableSummary_(sheetName, result) {
+  const diagnostics = result && result.diagnostics ? result.diagnostics : {};
+  Logger.log('[V2 SEED][' + sheetName + '] inserted=' + (result.inserted || 0) +
+    ' failed=' + (result.failed || 0) +
+    ' failedIds=' + JSON.stringify(diagnostics.failedIds || []));
+
+  (diagnostics.errors || []).forEach(function (err) {
+    Logger.log('[V2 SEED][' + sheetName + '][ERROR] ' + JSON.stringify({
+      id: err.id || '',
+      error: err.error || '',
+      missingHeaders: err.diagnostics ? err.diagnostics.missingHeaders : [],
+      unknownFields: err.diagnostics ? err.diagnostics.unknownFields : [],
+      emptyRequiredFields: err.diagnostics ? err.diagnostics.emptyRequiredFields : [],
+      enumErrors: err.diagnostics ? err.diagnostics.enumErrors : [],
+      checkboxErrors: err.diagnostics ? err.diagnostics.checkboxErrors : [],
+      validationWarnings: err.diagnostics ? err.diagnostics.validationWarnings : []
+    }));
+  });
+}
+
+function diagnoseV2SeedSchemaAlignment_(batches, sheetNames) {
+  return (sheetNames || []).map(function (sheetName) {
+    const sheetResult = getV2Sheet_(sheetName);
+    if (!sheetResult.success) {
+      return {
+        sheetName: sheetName,
+        success: false,
+        error: sheetResult.error,
+        missingHeaders: [],
+        unusedHeaders: [],
+        headers: [],
+        sampleFields: []
+      };
+    }
+
+    const headers = getV2Headers_(sheetResult.data);
+    const sampleFields = {};
+    (batches[sheetName] || []).forEach(function (row) {
+      Object.keys(row || {}).forEach(function (field) {
+        sampleFields[field] = true;
+      });
+    });
+
+    const sampleFieldList = Object.keys(sampleFields);
+    const missingHeaders = sampleFieldList.filter(function (field) {
+      return headers.indexOf(field) < 0;
+    });
+    const unusedHeaders = headers.filter(function (header) {
+      return sampleFieldList.indexOf(header) < 0;
+    });
+
+    return {
+      sheetName: sheetName,
+      success: missingHeaders.length === 0,
+      error: missingHeaders.length ? 'Seed row fields missing from sheet headers' : '',
+      missingHeaders: missingHeaders,
+      unusedHeaders: unusedHeaders,
+      headers: headers,
+      sampleFields: sampleFieldList
+    };
+  });
+}
+
+function countV2SeedSummary_(counts) {
+  return Object.keys(counts || {}).reduce(function (sum, sheetName) {
+    return sum + (counts[sheetName] || 0);
+  }, 0);
 }
 
 function cleanupV2SampleData() {

@@ -10,6 +10,75 @@ Sample data should verify that the normalized V2.2 schema works as a production-
 
 The sample set is for backend/API testing only and should be easy to remove. Future seed scripts should prefix all generated IDs with `TEST-`, `FAKE-`, or `DUMMY-`.
 
+## Current Seed Status
+
+Header repair has succeeded for the V2.2 drift found after Schema Fix Pass 1:
+
+- `FILE_ROLE_MASTER`
+- `PUBLIC_CACHE`
+- `TRAVEL_PARTICIPANT`
+
+`seedV2SampleData()` has been rerun and diagnostics reported `failed=0`.
+
+The later Seed Write Position Fix Pass also completed successfully.
+
+Previous issue:
+
+- Seed validation passed, but physical rows were appended after preformatted checkbox/validation rows around row 1000+.
+- Google Sheets counted formatted checkbox/validation rows as used rows.
+
+Root cause:
+
+- `appendRow()` / `getLastRow()+1` behavior is unsafe when sheets contain preformatted checkbox/validation ranges.
+
+Fix implemented:
+
+- `appendV2Row_()` no longer uses `appendRow()`.
+- `appendV2Row_()` no longer uses `getLastRow()+1`.
+- Added `findFirstEmptyRowByKey_(sheet, keyColumnIndex)`.
+- Seed writes now locate the first truly empty key row, usually column A.
+- Existing validations, checkbox formatting, formatting, and frozen headers are preserved.
+- Fallback inserts a row only if all key rows are occupied.
+
+Evidence from `debugV2SheetRows()`:
+
+- Row 2 now contains actual seed data.
+- `COUNTRY_MASTER` row 2 populated.
+- `FILE_ROLE_MASTER` row 2 populated.
+- `MOU` row 2 populated.
+- `MOBILITY_PROJECT` row 2 populated.
+- `TRAVEL` row 2 populated.
+- `TRAVEL_PARTICIPANT` row 2 populated.
+- `PUBLIC_CACHE` row 2 populated.
+
+Accurate state:
+
+- Schema repair: success.
+- Seed validation: success.
+- Physical seed persistence position: fixed.
+- Physical sheet writes: validated.
+- Backend foundation: validated.
+
+**Backend foundation validated and ready for V2 Router/API endpoint layer.**
+
+## Seed Write Position Rules
+
+Future seed changes must continue to:
+
+- Avoid `appendRow()` for V2 seed writes.
+- Avoid `getLastRow()+1` for V2 seed writes.
+- Use `findFirstEmptyRowByKey_(sheet, keyColumnIndex)` or equivalent logic.
+- Use the primary key / ID column, usually column A, to find the first truly empty row.
+- Preserve existing validation, checkbox formatting, formatting, and frozen headers.
+
+Verification sequence for future seed changes:
+
+1. `cleanupV2SampleData()`
+2. `seedV2SampleData()`
+3. `debugV2SheetRows()`
+
+Expected result: row 2 contains real seed data for `COUNTRY_MASTER`, `FILE_ROLE_MASTER`, `MOU`, `MOBILITY_PROJECT`, `TRAVEL`, `TRAVEL_PARTICIPANT`, and other seeded tables.
+
 ## Schema Corrections to Preserve
 
 For polymorphic relations in `BUDGET`, `FILES`, `AUDIT_LOG`, and `PUBLIC_CACHE`, the `module` value must use the allowed V2 module enum:

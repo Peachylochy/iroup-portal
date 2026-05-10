@@ -1,0 +1,38 @@
+function debugV2SheetRows() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheets = [
+    'SYSTEM_SETTINGS',
+    'ADMIN',
+    'COUNTRY_MASTER',
+    'UP_UNIT_MASTER',
+    'BUDGET_TYPE_MASTER',
+    'FILE_ROLE_MASTER',
+    'MOU',
+    'MOBILITY_PROJECT',
+    'TRAVEL',
+    'TRAVEL_PARTICIPANT',
+    'PUBLIC_CACHE'
+  ];
+
+  const result = sheets.map(name => {
+    const sh = ss.getSheetByName(name);
+    if (!sh) {
+      return { sheet: name, exists: false };
+    }
+
+    return {
+      sheet: name,
+      exists: true,
+      lastRow: sh.getLastRow(),
+      lastColumn: sh.getLastColumn(),
+      dataRows: Math.max(sh.getLastRow() - 1, 0),
+      row2: sh.getLastRow() >= 2
+        ? sh.getRange(2, 1, 1, sh.getLastColumn()).getValues()[0]
+        : []
+    };
+  });
+
+  Logger.log(JSON.stringify(result, null, 2));
+  return result;
+}

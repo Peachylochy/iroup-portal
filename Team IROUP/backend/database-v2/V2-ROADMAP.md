@@ -13,12 +13,62 @@ Completed:
 - Created isolated V2 backend foundation:
   - `Team IROUP/backend/database-v2/IROUP_V2_CONFIG.gs`
   - `Team IROUP/backend/database-v2/IROUP_V2_DB.gs`
+- Added V2 validation, seed sample data, admin auth guard, admin DTO APIs, public-safe DTO APIs, backend test runner, and root workspace auth gate.
+- Added `Team IROUP/backend/database-v2/IROUP_V2_REPAIR.gs`.
+- Ran `repairV22Headers()` successfully for `FILE_ROLE_MASTER`, `PUBLIC_CACHE`, and `TRAVEL_PARTICIPANT`.
+- Reran `seedV2SampleData()` and seed diagnostics reported `failed=0`.
 
 Important context:
 
 - V1 data is mostly test data and does not need strict preservation.
 - The project is no longer prioritizing V1 frontend patching.
 - V2 backend and DTO contracts should stabilize before frontend migration.
+- Backend foundation is validated and ready for V2 Router/API endpoint layer.
+
+## Current Blocker: Seed Physical Write Position
+
+Resolved. This section is retained as implementation history.
+
+Schema repair and seed validation had succeeded, but physical sheet inspection showed seed records were not consistently written into row 2 / the first true data row.
+
+Evidence from `debugV2SheetRows()`:
+
+- `ADMIN` `lastRow=1001` and row 2 contains real data.
+- `COUNTRY_MASTER` `lastRow=1005` but row 2 is blank.
+- `FILE_ROLE_MASTER` `lastRow=1015` but row 2 is blank.
+- `MOU` `lastRow=1004` but row 2 is blank.
+- `PUBLIC_CACHE` row 2 contains real data because it does not have the same large preformatted blank region problem.
+
+Current status:
+
+- Schema repair: success.
+- Seed validation: success.
+- Physical seed persistence position: fixed.
+- Physical sheet writes: validated.
+- Router/API endpoint layer: ready to begin.
+
+Root cause hypothesis:
+
+The seed writer used `appendRow()` / `getLastRow()+1` behavior. Google Sheets can count preformatted/validated checkbox rows as used rows, causing test data to land after the preformatted region around row 1000+.
+
+Fix completed:
+
+- `appendV2Row_()` no longer uses `appendRow()`.
+- `appendV2Row_()` no longer uses `getLastRow()+1`.
+- Added `findFirstEmptyRowByKey_(sheet, keyColumnIndex)`.
+- Seed writes now locate the first truly empty key row, usually column A.
+- Existing validations, checkbox formatting, formatting, and frozen headers are preserved.
+- Fallback inserts a row only if all key rows are occupied.
+
+Verification completed:
+
+1. `cleanupV2SampleData()`
+2. `seedV2SampleData()`
+3. `debugV2SheetRows()`
+
+Confirmed row 2 contains actual seed data for `COUNTRY_MASTER`, `FILE_ROLE_MASTER`, `MOU`, `MOBILITY_PROJECT`, `TRAVEL`, `TRAVEL_PARTICIPANT`, and `PUBLIC_CACHE`.
+
+**Backend foundation validated and ready for V2 Router/API endpoint layer.**
 
 ## Architecture Direction
 
@@ -85,12 +135,17 @@ Reason: if admin forms collect data in the wrong structure, the system cannot pr
 - Test add/edit/delete flows against normalized sheets.
 - Verify relation integrity and soft-delete filtering.
 - Test form payloads against V2 schema shape, not old flat dashboard payloads.
+- Router/API endpoint work may now proceed after seed physical write position was fixed and verified.
 
 ### Phase 4: Seed or Migrate Test Data
 
 - Seed clean sample data or migrate selected V1 test data.
 - V1 preservation is optional, not a strict compatibility constraint.
 - Confirm project/participant splitting for Mobility and Travel.
+- Seed/sample writes now use the primary key / ID column to find the first truly empty data row.
+- V2 seed writes do not use `appendRow()` or `getLastRow()+1`.
+- Verification completed with `cleanupV2SampleData()`, `seedV2SampleData()`, and `debugV2SheetRows()`.
+- Row 2 now contains real seed data for `COUNTRY_MASTER`, `FILE_ROLE_MASTER`, `MOU`, `MOBILITY_PROJECT`, `TRAVEL`, `TRAVEL_PARTICIPANT`, and other seeded tables.
 
 ### Phase 5: Build Normalized Public APIs
 

@@ -566,3 +566,144 @@ Public endpoints must never expose:
 - Do not migrate data until V2 schema and backend behavior are verified.
 - V1 frontend stabilization is no longer the primary architectural direction.
 - Frontend pages should eventually consume normalized DTO APIs instead of raw sheet rows.
+
+---
+
+## 30. V2.2 Header Repair And Seed Diagnostics (2026-05-11)
+
+### Completed
+
+- `IROUP_DATABASE_V2` schema exists.
+- V2.2 normalized schema direction is frozen.
+- V2 backend foundation files exist.
+- Validation layer exists.
+- Seed sample data system exists.
+- Admin auth guard exists.
+- Admin DTO APIs exist.
+- Public-safe DTO APIs exist.
+- Root workspace auth gate exists.
+- Backend test runner exists.
+- V2 backend tests previously passed.
+- Created `Team IROUP/backend/database-v2/IROUP_V2_REPAIR.gs`.
+- Ran `repairV22Headers()`.
+- Header repair succeeded for:
+  - `FILE_ROLE_MASTER`
+  - `PUBLIC_CACHE`
+  - `TRAVEL_PARTICIPANT`
+- Reran `seedV2SampleData()`.
+- Seed diagnostics reported `failed=0`.
+
+### Important Correction
+
+Although seed diagnostics report `failed=0`, physical inspection showed many seed records are being appended after preformatted checkbox/validation rows around row 1000+, instead of starting at row 2.
+
+Evidence from `debugV2SheetRows()`:
+
+- `ADMIN` `lastRow=1001` and row 2 contains real data.
+- `COUNTRY_MASTER` `lastRow=1005` but row 2 is blank.
+- `FILE_ROLE_MASTER` `lastRow=1015` but row 2 is blank.
+- `MOU` `lastRow=1004` but row 2 is blank.
+- `PUBLIC_CACHE` row 2 contains real data because it does not have the same large preformatted blank region problem.
+
+Current accurate status:
+
+- Schema repair: success.
+- Seed validation: success.
+- Physical seed persistence position: inconsistent.
+- V2 Router/API endpoint layer: blocked until Seed Write Position Fix Pass is completed and verified.
+
+Root cause hypothesis:
+
+The seed writer likely uses `appendRow()` or `getLastRow()+1`. Google Sheets counts preformatted/validated checkbox rows as used rows, so sample data is appended after those rows.
+
+### Next Required Phase: Seed Write Position Fix Pass
+
+Requirements:
+
+- Do not recreate sheets.
+- Do not clear production data.
+- Do not touch frontend.
+- Do not deploy.
+- Do not touch production `Code.gs`.
+- Fix only V2 seed/sample write behavior.
+- Do not use `appendRow()` for V2 seed writes.
+- Do not use `getLastRow()+1` for V2 seed writes.
+- Add helper such as `findFirstEmptyRowByKey_(sheet, keyColumnIndex)`.
+- Use primary key / ID column, usually column A, to find first truly empty row.
+- Preserve existing validation, checkbox formatting, formatting, and frozen headers.
+
+After fix, run:
+
+1. `cleanupV2SampleData()`
+2. `seedV2SampleData()`
+3. `debugV2SheetRows()`
+
+Expected result:
+
+Row 2 should contain real seed data for `COUNTRY_MASTER`, `FILE_ROLE_MASTER`, `MOU`, `MOBILITY_PROJECT`, `TRAVEL`, `TRAVEL_PARTICIPANT`, and other seeded tables.
+
+---
+
+## 31. V2.2 Seed Write Position Fix Pass Complete (2026-05-11)
+
+### Confirmed Status
+
+V2.2 Seed Write Position Fix Pass completed successfully.
+
+Previous issue:
+
+- Seed validation passed, but physical rows were appended after preformatted checkbox/validation rows around row 1000+.
+- Google Sheets counted formatted checkbox/validation rows as used rows.
+
+Root cause:
+
+- V2 seed writing used `appendRow()` / `getLastRow()+1` behavior, which is unsafe when sheets contain preformatted validation/checkbox ranges.
+
+Fix implemented in `Team IROUP/backend/database-v2/IROUP_V2_DB.gs`:
+
+- `appendV2Row_()` no longer uses `appendRow()`.
+- `appendV2Row_()` no longer uses `getLastRow()+1`.
+- Added `findFirstEmptyRowByKey_(sheet, keyColumnIndex)`.
+- Seed writes now locate the first truly empty key row, usually column A.
+- Existing validations, checkbox formatting, formatting, and frozen headers are preserved.
+- Fallback inserts a row only if all key rows are occupied.
+
+Verification completed:
+
+1. `cleanupV2SampleData()`
+2. `seedV2SampleData()`
+3. `debugV2SheetRows()`
+
+Confirmed row 2 contains actual seed data for:
+
+- `COUNTRY_MASTER`
+- `FILE_ROLE_MASTER`
+- `MOU`
+- `MOBILITY_PROJECT`
+- `TRAVEL`
+- `TRAVEL_PARTICIPANT`
+- `PUBLIC_CACHE`
+
+Current accurate status:
+
+- V2 schema freeze: complete.
+- Header repair: complete.
+- Validation layer: working.
+- Seed diagnostics: passed.
+- Seed persistence positioning: fixed.
+- Physical sheet writes: validated.
+- Backend foundation: validated.
+
+**Backend foundation validated and ready for V2 Router/API endpoint layer.**
+
+### Next Phase
+
+Proceed to V2 Router/API endpoint layer.
+
+Still not doing:
+
+- deployment
+- frontend refactor
+- production migration
+- production enforcement
+- public launch
