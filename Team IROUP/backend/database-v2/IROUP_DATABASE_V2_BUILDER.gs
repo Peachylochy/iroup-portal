@@ -29,13 +29,13 @@ function generateIROUPDatabaseV2() {
     "PERSON_STAFF": ["staff_id", "prefix_th", "first_name_th", "last_name_th", "full_name_th", "first_name_en", "last_name_en", "full_name_en", "gender", "unit_id", "position", "staff_type", "active", "source_system", "updated_at"],
     "PERSON_MANUAL": ["person_id", "person_type", "prefix", "first_name", "last_name", "full_name", "gender", "unit_id", "program_or_position", "source_note", "created_at", "created_by", "active"],
     "BUDGET_TYPE_MASTER": ["budget_type_id", "budget_type_name", "active"],
-    "FILE_ROLE_MASTER": ["role_id", "role_name", "active"],
+    "FILE_ROLE_MASTER": ["file_role_id", "file_role_name", "public_safe", "active", "sort_order"],
 
     "MOU": ["mou_id", "up_unit_id", "partner_org_name", "partner_org_name_en", "country_id", "mou_type", "start_date", "end_date", "fiscal_year", "status", "public_visible", "public_file_allowed", "is_deleted", "created_by", "updated_by", "created_at", "updated_at"],
     "MOBILITY_PROJECT": ["mobility_id", "direction", "project_name", "institution_name", "country_id", "city", "up_unit_id", "purpose", "level", "participant_group", "start_date", "end_date", "fiscal_year", "participant_count_cached", "student_count", "staff_count", "status", "public_visible", "is_deleted", "created_by", "updated_by", "created_at", "updated_at"],
     "MOBILITY_PARTICIPANT": ["participant_id", "mobility_id", "participant_type", "person_source", "person_id", "unit_id_snapshot", "full_name_snapshot", "gender_snapshot", "program_or_position_snapshot", "role", "is_deleted", "created_by", "created_at"],
     "TRAVEL": ["travel_id", "project_name", "purpose", "country_id", "city", "start_date", "end_date", "fiscal_year", "status", "participant_count", "public_visible", "is_deleted", "created_by", "updated_by", "created_at", "updated_at"],
-    "TRAVEL_PARTICIPANT": ["travel_participant_id", "travel_id", "person_source", "person_id", "full_name_snapshot", "unit_id_snapshot", "position_snapshot", "role", "is_deleted", "created_at"],
+    "TRAVEL_PARTICIPANT": ["travel_participant_id", "travel_id", "person_source", "person_id", "full_name_snapshot", "unit_id_snapshot", "position_snapshot", "role", "is_deleted", "created_by", "created_at"],
     "SCHOLARSHIP": ["scholarship_id", "title_th", "title_en", "institution_name", "country_id", "scholarship_type", "funding_type", "target_group", "cover_summary", "coverage_th", "coverage_en", "publish_date", "open_date", "close_date", "detail_url", "apply_url", "link_url", "pin", "status", "public_visible", "is_deleted", "created_by", "updated_by", "created_at", "updated_at"],
     "EVENT": ["event_id", "title_th", "title_en", "event_type", "event_mode", "organizer_unit_id", "country_id", "location", "meeting_url", "start_date", "end_date", "start_time", "end_time", "participant_count", "detail_th", "detail_en", "link_url", "pin", "status", "public_visible", "is_deleted", "created_by", "updated_by", "created_at", "updated_at"],
 
@@ -43,7 +43,7 @@ function generateIROUPDatabaseV2() {
     "FILES": ["file_id", "module", "record_id", "file_role_id", "file_name", "mime_type", "drive_file_id", "file_url", "thumbnail_url", "visibility_level", "is_deleted", "uploaded_by", "uploaded_at", "note"],
 
     "AUDIT_LOG": ["log_id", "module", "record_id", "action", "before_json", "after_json", "performed_by", "performed_at"],
-    "PUBLIC_CACHE": ["cache_id", "module", "json_data", "updated_at"]
+    "PUBLIC_CACHE": ["cache_id", "module", "schema_version", "json_data", "updated_at", "expires_at"]
   };
 
   const dv = SpreadsheetApp.newDataValidation;
@@ -52,11 +52,14 @@ function generateIROUPDatabaseV2() {
     "is_deleted": dv().requireCheckbox().build(),
     "public_visible": dv().requireCheckbox().build(),
     "public_file_allowed": dv().requireCheckbox().build(),
+    "public_safe": dv().requireCheckbox().build(),
     "is_internal": dv().requireCheckbox().build(),
     "pin": dv().requireCheckbox().build(),
 
     "status": dv().requireValueInList(["draft", "active", "upcoming", "ongoing", "completed", "expired", "cancelled", "archived"], true).build(),
+    "module": dv().requireValueInList(["mou", "mobility", "travel", "scholarship", "event"], true).build(),
     "visibility_level": dv().requireValueInList(["public", "internal", "restricted", "confidential"], true).build(),
+    "budget_source_type": dv().requireValueInList(["internal_unit", "university", "external_partner", "self_funded", "none", "other"], true).build(),
     "direction": dv().requireValueInList(["inbound", "outbound"], true).build(),
     "event_mode": dv().requireValueInList(["online", "offline", "hybrid"], true).build(),
     "participant_type": dv().requireValueInList(["student", "staff", "external", "guest"], true).build(),
