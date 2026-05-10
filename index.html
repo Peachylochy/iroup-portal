@@ -368,6 +368,10 @@
     const WORKSPACE_SESSION_KEY = 'workspace_user';
     const WORKSPACE_TOKEN_KEY = 'workspace_admin_token';
     const WORKSPACE_SESSION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+    // Temporary root allowlist until V2 auth endpoint reads IROUP_DATABASE_V2.ADMIN.
+    const WORKSPACE_ALLOWED_EMAILS = [
+      'panpancake17@gmail.com'
+    ];
 
     function setWorkspaceState(state, details) {
       const loading = document.getElementById('workspaceLoading');
@@ -473,15 +477,7 @@
         const profile = await fetchWorkspaceGoogleProfile(response.access_token);
         const email = profile.email || '';
         const name = profile.name || email;
-        const session = await createWorkspaceAdminSession(response.access_token);
-
-        if (session && session.success && session.allowed) {
-          completeWorkspaceLogin(email, name, session.adminToken || '');
-          return;
-        }
-
-        const allowed = await checkWorkspaceAdminAccess(email);
-        if (allowed) {
+        if (isWorkspaceEmailAllowed(email)) {
           completeWorkspaceLogin(email, name, '');
         } else {
           clearWorkspaceSession();
@@ -499,6 +495,17 @@
         headers: { Authorization: 'Bearer ' + accessToken }
       });
       return res.json();
+    }
+
+    function normalizeWorkspaceEmail(email) {
+      return String(email || '').trim().toLowerCase();
+    }
+
+    function isWorkspaceEmailAllowed(email) {
+      const target = normalizeWorkspaceEmail(email);
+      return WORKSPACE_ALLOWED_EMAILS
+        .map(normalizeWorkspaceEmail)
+        .indexOf(target) >= 0;
     }
 
     async function createWorkspaceAdminSession(accessToken) {
@@ -529,8 +536,7 @@
           const data = await res.json();
           return !!(data && data.allowed);
         } catch (e) {
-          const fallbackAllowed = ['panpancake17@gmail.com'];
-          return fallbackAllowed.indexOf(email) >= 0;
+          return isWorkspaceEmailAllowed(email);
         }
       }
 
