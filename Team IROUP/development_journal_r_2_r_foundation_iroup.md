@@ -1555,3 +1555,39 @@ Still not doing
 - deployment
 - V1 API replacement
 - production migration
+
+---
+
+44. V2 Frontend API Adapter Pass (May 11, 2026)
+
+Summary
+
+Created a safe frontend-side V2 API adapter for gradual migration without changing any current page behavior.
+
+Files added
+
+- `Team IROUP/iroup-v2-api.js`
+- `Team IROUP/backend/database-v2/V2-FRONTEND-ADAPTER.md`
+
+Implementation notes
+
+- Added `IROUP_V2` as a separate global namespace.
+- Kept the existing V1 `IROUP` namespace untouched.
+- Added grouped helpers for `public`, `admin`, and `lookup` routes.
+- Added top-level diagnostics for `health` and `schema`.
+- Added a standardized request wrapper, response normalization, timeout handling, and graceful error responses.
+- Centralized admin token lookup from workspace and Team IROUP session storage keys.
+- Left the V2 Apps Script URL blank/configurable so no accidental production switch can happen.
+
+Architecture lesson
+
+This pass creates a bridge rather than a cutover. The frontend can now migrate one page at a time through a stable V2 client boundary while V1 pages continue using the existing production helper.
+
+Still not doing
+
+- page migration
+- frontend behavior changes
+- production `Code.gs` wiring
+- deployment
+- V1 API replacement
+- admin write migration

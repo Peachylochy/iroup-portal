@@ -137,6 +137,27 @@ Key route gaps before frontend migration:
 - V2 file upload/relation routes
 - V2 budget relation routes
 
+## V2 Frontend API Adapter
+
+Created:
+
+```text
+Team IROUP/iroup-v2-api.js
+Team IROUP/backend/database-v2/V2-FRONTEND-ADAPTER.md
+```
+
+Purpose:
+
+- Keep V1 `iroup-config.js` and V2 `iroup-v2-api.js` side by side.
+- Avoid global replacement of `IROUP.SCRIPT_URL`.
+- Standardize V2 router response handling before page migration.
+- Centralize admin token lookup for future V2 admin routes.
+
+Current rule:
+
+- Do not load `iroup-v2-api.js` into existing pages until a specific migration phase is approved.
+- Configure V2 endpoint explicitly during testing; the adapter intentionally has no hardcoded deployment URL.
+
 ## Architecture Direction
 
 ```text
@@ -232,6 +253,7 @@ Reason: if admin forms collect data in the wrong structure, the system cannot pr
 - Do not begin frontend migration until `V2-API-CONTRACT.md` is reviewed and Travel DTO TODOs are resolved or explicitly accepted.
 - Use `FRONTEND-V2-MIGRATION-PLAN.md` as the migration map.
 - Keep V1 and V2 API clients side by side during transition.
+- Use `iroup-v2-api.js` as the V2 client boundary once a page migration is explicitly approved.
 
 ### Phase 7: Retire Old V1 API Gradually
 

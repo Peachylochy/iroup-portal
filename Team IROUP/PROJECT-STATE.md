@@ -829,3 +829,48 @@ Still not doing:
 - deployment
 - V1 API replacement
 - production migration
+
+---
+
+## 34. V2 Frontend API Adapter Pass (2026-05-11)
+
+### Purpose
+
+Created a safe frontend-side V2 API adapter layer for gradual migration without changing existing frontend behavior.
+
+Created:
+
+```text
+Team IROUP/iroup-v2-api.js
+Team IROUP/backend/database-v2/V2-FRONTEND-ADAPTER.md
+```
+
+### Adapter Strategy
+
+The V2 adapter exposes:
+
+- `IROUP_V2.public.*`
+- `IROUP_V2.admin.*`
+- `IROUP_V2.lookup.*`
+- top-level diagnostics: `IROUP_V2.health()` and `IROUP_V2.schema()`
+
+It standardizes:
+
+- V2 route calls
+- response normalization
+- graceful client-side error normalization
+- admin token lookup from `workspace_admin_token`, `iroup_admin_token`, `workspace_user`, and `iroup_user`
+
+### Safety Notes
+
+- Existing pages were not modified.
+- `iroup-config.js` was not replaced.
+- `IROUP.SCRIPT_URL` was not changed.
+- No page currently loads `iroup-v2-api.js`.
+- The adapter has no hardcoded deployed V2 URL; it must be configured later with `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
+
+Current status:
+
+- V1 and V2 clients can coexist safely.
+- Frontend migration is still not started.
+- Admin write migration remains blocked until V2 write routes and normalized form contracts exist.
