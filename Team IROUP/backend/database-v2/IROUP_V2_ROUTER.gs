@@ -211,7 +211,7 @@ function getV2RouteDispatch_() {
     'v2.admin.travel.list': {
       access: 'admin',
       handler: function (request) {
-        return listV2RouterAdminTravel_(request);
+        return getV2AdminTravelList_(getV2IncludeArchived_(request));
       }
     },
     'v2.admin.scholarship.list': {
@@ -241,7 +241,7 @@ function getV2RouteDispatch_() {
     'v2.public.travel.summary': {
       access: 'public',
       handler: function () {
-        return getV2RouterPublicTravelSummary_();
+        return getV2PublicTravelSummary_();
       }
     },
     'v2.public.scholarship.list': {
@@ -256,50 +256,6 @@ function getV2RouteDispatch_() {
         return listV2PublicEvents_();
       }
     }
-  };
-}
-
-function listV2RouterAdminTravel_(request) {
-  // TODO: Replace this router-local summary with a full admin Travel DTO helper.
-  var read = readV2Sheet_(IROUP_V2_SHEETS.TRAVEL);
-  if (!read.success) {
-    return read;
-  }
-
-  var includeArchived = getV2IncludeArchived_(request);
-  var rows = read.data || [];
-  var data = [];
-
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    if (isSoftDeletedV2_(row)) {
-      continue;
-    }
-    if (!includeArchived && isArchivedStatusV2_(row.status)) {
-      continue;
-    }
-
-    data.push({
-      travel_id: row.travel_id || '',
-      title: row.title || row.project_name || row.purpose || '',
-      purpose: row.purpose || '',
-      country_id: row.country_id || '',
-      city: row.city || '',
-      start_date: row.start_date || '',
-      end_date: row.end_date || '',
-      fiscal_year: row.fiscal_year || '',
-      status: row.status || '',
-      public_visible: row.public_visible === true,
-      participant_count: toV2Number_(row.participant_count),
-      is_deleted: row.is_deleted === true
-    });
-  }
-
-  return {
-    success: true,
-    data: data,
-    total: data.length,
-    error: ''
   };
 }
 
@@ -350,53 +306,6 @@ function getV2RouterPublicMobilitySummary_() {
     success: true,
     data: summary,
     total: rows.length,
-    error: ''
-  };
-}
-
-function getV2RouterPublicTravelSummary_() {
-  // TODO: Replace this router-local aggregate with the finalized public Travel DTO layer.
-  var read = readV2Sheet_(IROUP_V2_SHEETS.TRAVEL);
-  if (!read.success) {
-    return read;
-  }
-
-  var rows = read.data || [];
-  var summary = {
-    travel_count: 0,
-    participant_count: 0,
-    by_country: []
-  };
-  var countryMap = {};
-
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    if (isSoftDeletedV2_(row) || row.public_visible !== true || isArchivedStatusV2_(row.status)) {
-      continue;
-    }
-
-    var participantCount = toV2Number_(row.participant_count);
-    var countryId = row.country_id || 'unknown';
-    summary.travel_count++;
-    summary.participant_count += participantCount;
-
-    if (!countryMap[countryId]) {
-      countryMap[countryId] = {
-        country_id: countryId,
-        travel_count: 0,
-        participant_count: 0
-      };
-    }
-    countryMap[countryId].travel_count++;
-    countryMap[countryId].participant_count += participantCount;
-  }
-
-  summary.by_country = mapV2ObjectValues_(countryMap);
-
-  return {
-    success: true,
-    data: summary,
-    total: summary.travel_count,
     error: ''
   };
 }

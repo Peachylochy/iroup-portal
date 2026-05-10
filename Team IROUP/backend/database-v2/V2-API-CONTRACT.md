@@ -339,8 +339,8 @@ Private fields never exposed publicly:
 
 TODO status:
 
-- Uses a router-local helper: `listV2RouterAdminTravel_()`.
-- TODO: replace with a finalized Admin Travel DTO helper that joins `TRAVEL_PARTICIPANT`, `BUDGET`, and `FILES` safely for admin workflows.
+- Implemented through finalized Travel DTO helper: `getV2AdminTravelList_()`.
+- Router-local Travel admin helper has been removed.
 
 ### `v2.admin.scholarship.list`
 
@@ -548,8 +548,8 @@ Private fields never exposed:
 
 TODO status:
 
-- Uses a router-local helper: `getV2RouterPublicTravelSummary_()`.
-- TODO: replace with finalized Public Travel DTO helper after Travel public contract is fully designed.
+- Implemented through finalized Travel DTO helper: `getV2PublicTravelSummary_()`.
+- Router-local Travel public summary helper has been removed.
 
 ### `v2.public.scholarship.list`
 
@@ -632,4 +632,3 @@ Before frontend migration starts:
 - Confirm admin list vs detail endpoints for each module.
 - Add write contracts separately for admin add/edit/delete flows.
 - Keep production `Code.gs` untouched until deployment wiring is explicitly approved.
-
