@@ -404,3 +404,12 @@ Commits made across sessions:
 ## 26. Admin Stabilization Pass 1 (2026-05-10)
 
 - Admin Stabilization Pass 1: fixed urgent admin UX/data integrity issues for MOU upload payload, Mobility mock-data first render, Scholarship/Event inactive view toggles, and empty-state add actions.
+
+## 27. Mobility Workflow Usability Stabilization (2026-05-10)
+
+- Stabilized `mobility.html` add/edit modal state without changing backend governance, auth flow, or page architecture.
+- Add actions now clear stale form values and reset any previous edit id before opening the modal.
+- Edit actions continue to hydrate from the loaded live row, with explicit modal mode tracking.
+- Save action now guards against double-submit and refreshes live Mobility data after successful add/edit.
+- Mobility live loading now uses a single idempotent workflow loader with stale-response protection and parallel inbound/outbound fetches.
+- Verification: inline script syntax check passed; local HTML serving check returned HTTP 200. Browser visual check was blocked by the in-app browser client on localhost.

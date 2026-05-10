@@ -1230,3 +1230,25 @@ Backend Governance Pass 2C-B Final Phase: migrated public-landing.html to public
 Summary
 
 Admin Stabilization Pass 1: fixed urgent admin UX/data integrity issues for MOU upload payload, Mobility mock-data first render, Scholarship/Event inactive view toggles, and empty-state add actions.
+
+---
+
+38. Mobility Workflow Usability Stabilization (May 10, 2026)
+
+Summary
+
+Stabilized the Mobility add/edit workflow before moving to other modules.
+
+Implementation notes:
+
+- Add modal opening now resets stale edit state and clears form values.
+- Edit modal opening now explicitly tracks edit mode and hydrates fields from the current live row.
+- Save now prevents double-submit, keeps the existing Apps Script add/edit contract, and forces a fresh Mobility reload after success.
+- Live Mobility loading now uses one idempotent workflow loader with stale-response protection and parallel inbound/outbound fetches.
+
+Constraints maintained:
+
+- No backend changes
+- No auth or governance flow changes
+- No architecture redesign
+- No changes to other operational modules

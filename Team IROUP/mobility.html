@@ -955,6 +955,8 @@ window.switchTab=function(type){
 <script>
 /* Workflow usability pass: real filters, selectors, export, and edit hydration. */
 let R9_STATUS_FILTER = '';
+let R9_LOAD_PROMISE = null;
+let R9_LOAD_SEQ = 0;
 
 function mobilityRows(){ return R9_TAB === 'in' ? R9_IN : R9_OUT; }
 function mobilityPick(row, keys, fallback=''){
@@ -1064,9 +1066,30 @@ function clearMobilityForm(form){
   form.querySelectorAll('select').forEach(el => { el.selectedIndex = 0; });
   const note=document.getElementById('autofillNote'); if(note) note.style.display='none';
 }
+function setMobilitySaveState(type, saving){
+  const btn=document.getElementById('modalSaveBtn');
+  if(!btn) return;
+  btn.disabled=!!saving;
+  btn.textContent=saving ? 'Saving...' : `บันทึก ${type==='in'?'Inbound':'Outbound'}`;
+}
+window.openModal=function(type){
+  const nextType=type || R9_TAB || 'in';
+  R9_TAB=nextType;
+  switchModalTab(nextType);
+  const modal=document.getElementById('modalOverlay');
+  const form=document.getElementById(nextType==='in'?'inboundForm':'outboundForm');
+  if(form) clearMobilityForm(form);
+  if(modal){
+    modal.dataset.editId='';
+    modal.dataset.mode='add';
+    modal.classList.add('show');
+  }
+  setMobilitySaveState(nextType,false);
+};
 window.r9OpenMobility=function(type,id){
   R9_TAB=type; openModal(type);
   const modal=document.getElementById('modalOverlay'); modal.dataset.editId=id||'';
+  modal.dataset.mode=id?'edit':'add';
   const row = id ? (type==='in'?R9_IN:R9_OUT).find(x=>String(x.ID)===String(id)) : null;
   const form=document.getElementById(type==='in'?'inboundForm':'outboundForm');
   clearMobilityForm(form);
@@ -1093,6 +1116,7 @@ window.r9SaveMobility=async function(){
   const modal=document.getElementById('modalOverlay'), id=modal.dataset.editId;
   const type=document.getElementById('inboundForm').style.display==='none'?'out':'in';
   const btn=document.getElementById('modalSaveBtn');
+  if(btn?.disabled) return;
   let sheet,data={};
   if(type==='in'){
     const inputs=Array.from(document.getElementById('inboundForm').querySelectorAll('input,select,textarea'));
@@ -1108,23 +1132,34 @@ window.r9SaveMobility=async function(){
     if(!data['ชื่อ_สกุล']) return alert('กรุณาค้นหา/เลือกชื่อก่อน');
     if(!data['ประเทศ']) return alert('กรุณาเลือกหรือกรอกประเทศปลายทาง');
   }
-  if(btn){ btn.disabled=true; btn.textContent='กำลังบันทึก...'; }
+  setMobilitySaveState(type,true);
   try{
     const r=id?await IROUP.edit(sheet,id,data):await IROUP.add(sheet,data);
     if(!r.success) throw new Error(r.error||'บันทึกไม่สำเร็จ');
     alert('บันทึกสำเร็จ');
     closeModal();
-    await r9LoadMobilityWorkflow();
+    await r9LoadMobilityWorkflow({force:true});
   }catch(e){
     alert('บันทึกไม่สำเร็จ: '+e.message);
   }finally{
-    if(btn){ btn.disabled=false; btn.textContent=type==='in'?'บันทึก Inbound':'บันทึก Outbound'; }
+    setMobilitySaveState(type,false);
   }
 };
-async function r9LoadMobilityWorkflow(){
+async function r9LoadMobilityWorkflow(options){
+  const force=options===true || !!(options && options.force);
+  if(R9_LOAD_PROMISE && !force) return R9_LOAD_PROMISE;
+  const seq=++R9_LOAD_SEQ;
+  const count=document.getElementById('tableCount');
+  if(count) count.textContent='Loading mobility data...';
+  R9_LOAD_PROMISE=(async function(){
   try{
-    R9_IN=await IROUP.getAll(IROUP.SHEETS.INBOUND);
-    R9_OUT=await IROUP.getAll(IROUP.SHEETS.OUTBOUND);
+    const results=await Promise.all([
+      IROUP.getAll(IROUP.SHEETS.INBOUND),
+      IROUP.getAll(IROUP.SHEETS.OUTBOUND)
+    ]);
+    if(seq!==R9_LOAD_SEQ) return;
+    R9_IN=Array.isArray(results[0])?results[0]:[];
+    R9_OUT=Array.isArray(results[1])?results[1]:[];
     document.getElementById('tabIn').querySelector('.tab-count').textContent=R9_IN.length;
     document.getElementById('tabOut').querySelector('.tab-count').textContent=R9_OUT.length;
     refreshMobilitySelectors();
@@ -1132,8 +1167,13 @@ async function r9LoadMobilityWorkflow(){
   }catch(e){
     console.warn('mobility workflow load failed', e);
     const count=document.getElementById('tableCount'); if(count) count.textContent='โหลดข้อมูลไม่สำเร็จ';
+  }finally{
+    if(seq===R9_LOAD_SEQ) R9_LOAD_PROMISE=null;
   }
+  })();
+  return R9_LOAD_PROMISE;
 }
+window.r9LoadMobility=r9LoadMobilityWorkflow;
 function exportMobilityCsv(){
   const rows=filteredMobilityRows();
   if(!rows.length) return alert('ไม่มีข้อมูลสำหรับ Export');
