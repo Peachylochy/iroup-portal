@@ -764,3 +764,68 @@ Still not doing:
 - deployment
 - V1 API replacement
 - production migration
+
+---
+
+## 33. V2 Frontend API Audit Pass (2026-05-11)
+
+### Purpose
+
+Prepared frontend migration to the V2 router layer without refactoring frontend behavior.
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/FRONTEND-V2-MIGRATION-PLAN.md
+```
+
+### Audit Findings
+
+Most frontend pages use `Team IROUP/iroup-config.js` as the V1 API client. The main legacy patterns are:
+
+- `IROUP.getAll(sheet)` raw sheet reads
+- `IROUP.getReport(year)` dashboard/report aggregate
+- `IROUP.getStats()` and `IROUP.getMouByCountry()`
+- `IROUP.add/edit/delete()` flat-sheet writes
+- `IROUP.uploadFile/uploadImage()` V1 Drive upload behavior
+- `IROUP.getPublic*()` V1 public-safe helper methods
+- root login fallback calls to old `createAdminSession` / `checkAdmin`
+
+Direct `fetch()` calls found:
+
+- central `fetch()` in `iroup-config.js`
+- Google userinfo and old `checkAdmin` in `index.html`
+- CDN world-atlas requests in map pages
+- design artifact fetches in `index-design-v1.html`
+
+### Migration Readiness
+
+Current recommendation:
+
+- No frontend migration yet.
+- Do not replace `IROUP.SCRIPT_URL` globally.
+- Create a separate V2 API client adapter later.
+- Migrate public low-risk pages first only after V2 router deployment/client wiring is approved.
+
+Important blockers:
+
+- V2 router currently lacks public stats/map actions needed by `public-landing.html`.
+- Public Mobility/Travel pages need list/detail DTOs, not only summary routes.
+- Admin pages need detail/create/update/delete routes before forms can migrate.
+- Dashboard/report need V2 aggregate/report contracts.
+- Admin frontend migration depends on V2 auth/session deployment strategy.
+
+### Page-Level Direction
+
+- Early public candidates: `public-scholar.html`, `public-events.html`, `public-mou.html`
+- Later public candidates: `public-landing.html`, `public-mobility.html`
+- Admin read-only migration should precede admin writes.
+- Mobility admin write migration remains the operational priority, but only after V2 normalized write contracts exist.
+
+Still not doing:
+
+- frontend refactor
+- production `Code.gs` edits
+- deployment
+- V1 API replacement
+- production migration

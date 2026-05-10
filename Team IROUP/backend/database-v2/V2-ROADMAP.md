@@ -108,6 +108,35 @@ Next gate:
 
 - Stabilize the V2 API contract before frontend migration, production `Code.gs` wiring, or deployment.
 
+## Frontend V2 API Audit
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/FRONTEND-V2-MIGRATION-PLAN.md
+```
+
+Audit conclusion:
+
+- Current frontend still depends on V1 `iroup-config.js` and old production Apps Script actions.
+- Do not replace `IROUP.SCRIPT_URL` globally.
+- Add a separate V2 API client adapter before page migration.
+- Frontend migration should start with low-risk public pages only after V2 deployment/client wiring is approved.
+- Admin migration requires read/detail/write route contracts, not only list endpoints.
+
+Key route gaps before frontend migration:
+
+- `v2.public.stats`
+- `v2.public.map`
+- `v2.public.mobility.list`
+- `v2.public.travel.list`
+- `v2.admin.dashboard.summary`
+- `v2.admin.report.summary`
+- admin detail/create/update/delete routes per module
+- person/country/unit lookup routes
+- V2 file upload/relation routes
+- V2 budget relation routes
+
 ## Architecture Direction
 
 ```text
@@ -201,6 +230,8 @@ Reason: if admin forms collect data in the wrong structure, the system cannot pr
 - Frontend must not depend on raw sheet headers or hide private fields client-side.
 - Redesign admin add/edit forms where needed so writes match the normalized V2 data model.
 - Do not begin frontend migration until `V2-API-CONTRACT.md` is reviewed and Travel DTO TODOs are resolved or explicitly accepted.
+- Use `FRONTEND-V2-MIGRATION-PLAN.md` as the migration map.
+- Keep V1 and V2 API clients side by side during transition.
 
 ### Phase 7: Retire Old V1 API Gradually
 

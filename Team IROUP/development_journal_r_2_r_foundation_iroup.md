@@ -1507,3 +1507,51 @@ Still not doing
 - deployment
 - V1 API replacement
 - production migration
+
+---
+
+43. V2 Frontend API Audit Pass (May 11, 2026)
+
+Summary
+
+Completed a planning-only audit of Team IROUP frontend/public pages to prepare for eventual migration to the V2 router layer.
+
+Documentation added
+
+- Created `Team IROUP/backend/database-v2/FRONTEND-V2-MIGRATION-PLAN.md`.
+
+What the audit found
+
+- Most pages do not call Apps Script directly; they depend on `iroup-config.js` as the V1 API helper.
+- Core legacy patterns are `getAll`, `getReport`, `getStats`, `getMouByCountry`, `add/edit/delete`, upload helpers, and V1 public-safe helper methods.
+- Root login still contains V1 `createAdminSession` / `checkAdmin` behavior.
+- Direct page-level `fetch()` usage is mostly Google userinfo, CDN map data, or design-artifact loading rather than operational API calls.
+
+Migration insight
+
+The frontend should not be migrated by globally replacing `IROUP.SCRIPT_URL`. V1 and V2 clients should run side by side, with a dedicated V2 adapter that speaks the router contract and unwraps `{ success, data, error, meta }` consistently.
+
+Current blockers before frontend migration
+
+- Missing V2 public stats/map router actions.
+- Missing public Mobility/Travel list/detail DTOs for the current public mobility page.
+- Missing admin detail/create/update/delete routes.
+- Missing V2 person/country/unit lookup routes.
+- Missing V2 file upload/relation and budget relation routes.
+- Dashboard/report need their own V2 aggregate contracts.
+
+Recommended migration order
+
+1. Add V2 client adapter later.
+2. Migrate low-risk public pages first: scholarship, events, MOU.
+3. Add missing public aggregate/list routes before public landing and public mobility migration.
+4. Move admin pages read-only before write migration.
+5. Redesign admin write forms around normalized V2 contracts, starting with Mobility after write routes exist.
+
+Still not doing
+
+- frontend refactor
+- production `Code.gs` wiring
+- deployment
+- V1 API replacement
+- production migration
