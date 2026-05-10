@@ -1451,3 +1451,59 @@ Still not doing:
 - production migration
 - production enforcement
 - public launch
+
+---
+
+42. V2 Router/API Contract Documentation Pass (May 11, 2026)
+
+Summary
+
+The V2 Router/API endpoint layer now has an explicit contract document before frontend migration begins.
+
+Current confirmed state
+
+- V2 backend foundation validated.
+- Seed persistence fixed.
+- V2 Router/API endpoint layer created.
+- Router smoke tests passed.
+- GitHub checkpoint pushed.
+
+Documentation added
+
+- Created `Team IROUP/backend/database-v2/V2-API-CONTRACT.md`.
+- Documented the router entrypoint, request action handling, standard response shape, admin/public route classification, route parameters, public/private data boundary rules, and endpoint TODO status.
+
+Actions documented
+
+- `v2.health`
+- `v2.schema`
+- `v2.admin.mou.list`
+- `v2.admin.mobility.list`
+- `v2.admin.travel.list`
+- `v2.admin.scholarship.list`
+- `v2.admin.event.list`
+- `v2.public.mou.list`
+- `v2.public.mobility.summary`
+- `v2.public.travel.summary`
+- `v2.public.scholarship.list`
+- `v2.public.event.list`
+
+Important contract notes
+
+- Admin routes require `requireV2Admin_()`.
+- Public endpoints must return sanitized DTOs or aggregate summaries only.
+- Public APIs must never expose Mobility/Travel participant personal data, person IDs, row-level gender data, budgets, internal notes, audit fields, or restricted files.
+- `v2.admin.travel.list` and `v2.public.travel.summary` currently use router-local helpers and should be replaced with finalized Travel DTO helpers before frontend migration depends on them.
+- `v2.schema` is currently useful as a diagnostic route, but should be reviewed before any public deployment.
+
+R2R / architecture lesson
+
+This pass marks a shift from "the API works" to "the API contract is stable enough to become a system boundary." For a lightweight operational platform, documenting public/private behavior before UI migration helps prevent the frontend from becoming another accidental data-governance layer.
+
+Still not doing
+
+- frontend migration
+- production `Code.gs` wiring
+- deployment
+- V1 API replacement
+- production migration

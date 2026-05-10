@@ -23,7 +23,9 @@ Important context:
 - V1 data is mostly test data and does not need strict preservation.
 - The project is no longer prioritizing V1 frontend patching.
 - V2 backend and DTO contracts should stabilize before frontend migration.
-- Backend foundation is validated and ready for V2 Router/API endpoint layer.
+- Backend foundation is validated.
+- V2 Router/API endpoint layer has been created and smoke-tested.
+- V2 API contract documentation has started in `V2-API-CONTRACT.md`.
 
 ## Current Blocker: Seed Physical Write Position
 
@@ -68,7 +70,43 @@ Verification completed:
 
 Confirmed row 2 contains actual seed data for `COUNTRY_MASTER`, `FILE_ROLE_MASTER`, `MOU`, `MOBILITY_PROJECT`, `TRAVEL`, `TRAVEL_PARTICIPANT`, and `PUBLIC_CACHE`.
 
-**Backend foundation validated and ready for V2 Router/API endpoint layer.**
+**Backend foundation validated. V2 Router/API endpoint layer created and ready for contract review.**
+
+## Current Phase: V2 Router/API Contract Review
+
+The V2 router foundation now exists, but frontend migration should not begin until the API contract is reviewed and stabilized.
+
+Current router contract document:
+
+```text
+Team IROUP/backend/database-v2/V2-API-CONTRACT.md
+```
+
+Documented actions:
+
+- `v2.health`
+- `v2.schema`
+- `v2.admin.mou.list`
+- `v2.admin.mobility.list`
+- `v2.admin.travel.list`
+- `v2.admin.scholarship.list`
+- `v2.admin.event.list`
+- `v2.public.mou.list`
+- `v2.public.mobility.summary`
+- `v2.public.travel.summary`
+- `v2.public.scholarship.list`
+- `v2.public.event.list`
+
+Contract review notes:
+
+- Admin routes are protected by `requireV2Admin_()`.
+- Public routes must return DTOs or aggregate summaries only.
+- `v2.admin.travel.list` and `v2.public.travel.summary` currently use router-local helpers and should be replaced with finalized Travel DTO helpers before frontend migration depends on them.
+- `v2.schema` is useful during testing but should be reviewed before public deployment.
+
+Next gate:
+
+- Stabilize the V2 API contract before frontend migration, production `Code.gs` wiring, or deployment.
 
 ## Architecture Direction
 
@@ -135,7 +173,8 @@ Reason: if admin forms collect data in the wrong structure, the system cannot pr
 - Test add/edit/delete flows against normalized sheets.
 - Verify relation integrity and soft-delete filtering.
 - Test form payloads against V2 schema shape, not old flat dashboard payloads.
-- Router/API endpoint work may now proceed after seed physical write position was fixed and verified.
+- Router/API endpoint foundation has been created.
+- Router/API contract review is now the active gate before frontend migration.
 
 ### Phase 4: Seed or Migrate Test Data
 
@@ -161,6 +200,7 @@ Reason: if admin forms collect data in the wrong structure, the system cannot pr
 - Frontend should consume normalized fields only.
 - Frontend must not depend on raw sheet headers or hide private fields client-side.
 - Redesign admin add/edit forms where needed so writes match the normalized V2 data model.
+- Do not begin frontend migration until `V2-API-CONTRACT.md` is reviewed and Travel DTO TODOs are resolved or explicitly accepted.
 
 ### Phase 7: Retire Old V1 API Gradually
 

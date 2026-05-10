@@ -707,3 +707,60 @@ Still not doing:
 - production migration
 - production enforcement
 - public launch
+
+---
+
+## 32. V2 Router/API Contract Documentation Pass (2026-05-11)
+
+### Current Confirmed State
+
+- V2 backend foundation validated.
+- Seed persistence fixed.
+- V2 Router/API endpoint layer created.
+- Router smoke tests passed.
+- GitHub checkpoint pushed.
+
+### Contract Documentation Added
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/V2-API-CONTRACT.md
+```
+
+The contract documents the current router entrypoint, request normalization rules, standard response shape, admin/public route classification, route parameters, public/private data boundary rules, and endpoint TODO status before frontend migration begins.
+
+Documented router actions:
+
+- `v2.health`
+- `v2.schema`
+- `v2.admin.mou.list`
+- `v2.admin.mobility.list`
+- `v2.admin.travel.list`
+- `v2.admin.scholarship.list`
+- `v2.admin.event.list`
+- `v2.public.mou.list`
+- `v2.public.mobility.summary`
+- `v2.public.travel.summary`
+- `v2.public.scholarship.list`
+- `v2.public.event.list`
+
+### Contract Notes
+
+- Admin routes require `requireV2Admin_()`.
+- Public routes must return sanitized DTOs or aggregates only.
+- Public APIs must never expose Mobility/Travel participant personal data, person IDs, row-level gender data, budgets, internal notes, audit fields, or restricted files.
+- `v2.admin.travel.list` and `v2.public.travel.summary` currently use router-local helpers and should be replaced with finalized Travel DTO helpers before frontend migration relies on them.
+- `v2.schema` is currently a public diagnostic route; before deployment, decide whether it should become admin-only or debug-only.
+
+### Next Phase
+
+Review and stabilize the V2 API contract before any frontend migration or deployment wiring.
+
+Still not doing:
+
+- frontend refactor
+- production `Code.gs` edits
+- deployment
+- V1 API replacement
+- production migration
