@@ -2187,3 +2187,48 @@ Recommended next phase
 - Start with `public/public-scholar.html`.
 - Keep `v2.schema` controlled diagnostic only until exposure is reviewed.
 - Keep dashboard/admin frontend activation blocked until a separate admin readiness pass.
+
+---
+
+59. V2 Frontend Endpoint Activation Pilot - Public Scholar Only (May 11, 2026)
+
+Summary
+
+Started the single-page live V2 frontend endpoint activation pilot for `public/public-scholar.html` only. No other public pages were activated, no dashboard/admin activation happened, no backend deployment changes were made, and `IROUP.SCRIPT_URL` remains unchanged.
+
+Implementation
+
+- Added `Team IROUP/iroup-v2-endpoint.js`.
+- Updated only `Team IROUP/public/public-scholar.html`.
+- Inserted endpoint config between `iroup-config.js` and `../iroup-v2-api.js`.
+
+Load order
+
+```html
+<script src="iroup-config.js"></script>
+<script src="../iroup-v2-endpoint.js"></script>
+<script src="../iroup-v2-api.js"></script>
+```
+
+Runtime note
+
+- `iroup-v2-endpoint.js` currently contains the reviewed placeholder `LIVE_V2_EXEC_URL`.
+- Browser verification requires replacing that placeholder with the actual live V2 `/exec` URL.
+
+Verification targets
+
+- `public-scholar.html` renders V2 scholarship DTOs.
+- Poster/file mapping works.
+- Status badges still work.
+- Search/filter still work.
+- Primary scholarship load does not call `IROUP.getPublicScholarships()`.
+
+Still not doing
+
+- activating `public-events.html`
+- activating `public-mou.html`
+- activating `public-mobility.html`
+- activating dashboard/admin
+- replacing `IROUP.SCRIPT_URL`
+- changing V1 runtime
+- changing backend deployment

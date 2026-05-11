@@ -8,6 +8,48 @@
 
 ---
 
+## Latest V2 Frontend Endpoint Activation Pilot
+
+### Session: 2026-05-11 - Public Scholar Live V2 Endpoint Pilot
+
+**Phase goal:** Activate the live V2 backend endpoint path for `public/public-scholar.html` only. No other public pages, dashboard/admin pages, V1 runtime, backend deployment, or `IROUP.SCRIPT_URL` replacement.
+
+Implementation:
+
+- Added `Team IROUP/iroup-v2-endpoint.js`.
+- `iroup-v2-endpoint.js` sets `window.IROUP_V2_SCRIPT_URL`.
+- Updated only `Team IROUP/public/public-scholar.html`.
+- Load order is now:
+
+```html
+<script src="iroup-config.js"></script>
+<script src="../iroup-v2-endpoint.js"></script>
+<script src="../iroup-v2-api.js"></script>
+```
+
+Scope boundary:
+
+- `public/public-events.html` remains unchanged.
+- `public/public-mou.html` remains unchanged.
+- `public/public-mobility.html` remains unchanged.
+- `dashboard.html` remains unchanged.
+- `IROUP.SCRIPT_URL` remains the V1 production lane.
+
+Runtime note:
+
+- The endpoint file currently contains the reviewed placeholder `LIVE_V2_EXEC_URL`.
+- Replace that placeholder with the actual live V2 `/exec` URL before browser runtime verification.
+
+Expected runtime checks:
+
+- `public-scholar.html` renders V2 scholarship DTOs.
+- Poster/file mapping works.
+- Status badges still work.
+- Search/filter still work.
+- No primary scholarship load uses `IROUP.getPublicScholarships()`.
+
+---
+
 ## Latest V2 Live Backend Smoke Test
 
 ### Session: 2026-05-11 - First Isolated V2 Backend Smoke Test Results

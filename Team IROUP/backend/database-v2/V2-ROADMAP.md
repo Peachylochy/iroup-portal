@@ -385,6 +385,48 @@ Next gate:
 - Do not activate dashboard/admin frontend yet.
 - Keep `v2.schema` as controlled diagnostic until public exposure is reviewed.
 
+## Public Scholar V2 Endpoint Activation Pilot
+
+Status:
+
+- `public/public-scholar.html` is the first and only page wired to the V2 endpoint config.
+- Other public pages remain V2-adapter migrated but not endpoint-activated.
+- Dashboard/admin remain non-activated for V2 frontend use.
+- V1 `IROUP.SCRIPT_URL` remains unchanged.
+
+Created:
+
+```text
+Team IROUP/iroup-v2-endpoint.js
+```
+
+Activated only in:
+
+```text
+Team IROUP/public/public-scholar.html
+```
+
+Script load order:
+
+```html
+<script src="iroup-config.js"></script>
+<script src="../iroup-v2-endpoint.js"></script>
+<script src="../iroup-v2-api.js"></script>
+```
+
+Runtime note:
+
+- `iroup-v2-endpoint.js` currently contains `LIVE_V2_EXEC_URL`.
+- Replace that placeholder with the actual live V2 `/exec` URL before browser verification.
+
+Verification focus:
+
+- V2 scholarship DTO render.
+- Poster/file mapping.
+- Status badges.
+- Search/filter behavior.
+- No primary scholarship load through `IROUP.getPublicScholarships()`.
+
 ## Public Pilot Migration
 
 Pilot pages:
