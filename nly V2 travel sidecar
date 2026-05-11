@@ -1,0 +1,86 @@
+warning: in the working copy of 'Team IROUP/travel.html', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/Team IROUP/travel.html b/Team IROUP/travel.html[m
+[1mindex a7d0ec4..077fecd 100644[m
+[1m--- a/Team IROUP/travel.html[m	
+[1m+++ b/Team IROUP/travel.html[m	
+[36m@@ -7,6 +7,8 @@[m
+ <link rel="stylesheet" href="iroup-theme.css">[m
+ <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">[m
+ <script src="iroup-config.js"></script>[m
+[32m+[m[32m<script src="iroup-v2-endpoint.js"></script>[m
+[32m+[m[32m<script src="iroup-v2-api.js"></script>[m
+ <script src="iroup-utils.js"></script>[m
+ <style>[m
+ *{box-sizing:border-box;margin:0;padding:0}[m
+[36m@@ -26,7 +28,7 @@[m [mbody{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-[m
+ <div class="page">[m
+   <div class="head">[m
+     <div><div class="title">✈️ การเดินทางบุคลากร</div><div class="sub">จัดการข้อมูลบุคลากรเดินทางไปปฏิบัติงานต่างประเทศ เชื่อมข้อมูลบุคลากร ประเทศ และไฟล์แนบ</div></div>[m
+[31m-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn gray" onclick="loadAll()">↻ โหลดใหม่</button><button class="btn primary" onclick="openForm()">＋ เพิ่มการเดินทาง</button></div>[m
+[32m+[m[32m    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="status done" id="v2TravelReadiness">V2 travel: checking</span><button class="btn gray" onclick="loadAll()">↻ โหลดใหม่</button><button class="btn primary" onclick="openForm()">＋ เพิ่มการเดินทาง</button></div>[m
+   </div>[m
+   <div class="grid-kpi">[m
+     <div class="kpi"><div class="kpi-ico">📄</div><div><div class="num" id="kTotal">0</div><div class="label">รายการทั้งหมด</div><div class="hint">จากชีตการเดินทาง</div></div></div>[m
+[36m@@ -59,6 +61,7 @@[m [mbody{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-[m
+ </div><div class="modal-foot"><button type="button" class="btn gray" onclick="closeModal()">ยกเลิก</button><button type="submit" class="btn primary" id="saveBtn">บันทึก</button></div></form></div></div>[m
+ <script>[m
+ let travelRows=[], staffRows=[], countryRows=[], selectedStaff=[], editingId=null;[m
+[32m+[m[32mlet v2TravelList=[];[m
+ const $=s=>document.querySelector(s);[m
+ function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}[m
+ function uniq(a){return [...new Set(a.map(x=>String(x||'').trim()).filter(Boolean))];}[m
+[36m@@ -70,12 +73,54 @@[m [mfunction countPeople(r){const n=Number(r['จำนวน']); if(n>0)return n; c[m
+ function staffName(s){return `${s['คำนำหน้า']||''}${s['ชื่อ']||''} ${s['สกุล']||''}`.trim() || `${s['ชื่ออังกฤษ']||''} ${s['สกุลอังกฤษ']||''}`.trim() || s['รหัส'] || '-';}[m
+ function staffAff(s){return s['ต้นสังกัด'] || s['คณะ'] || s['หน่วยงาน'] || '';}[m
+ function normalizeStaff(s){return {code:String(s['รหัส']||'').trim(), name:staffName(s), first:s['ชื่อ']||'', last:s['สกุล']||'', en:`${s['ชื่ออังกฤษ']||''} ${s['สกุลอังกฤษ']||''}`.trim(), aff:staffAff(s), pos:s['ตำแหน่ง']||'', type:s['ประเภท']||'', raw:s};}[m
+[32m+[m[32mfunction getV2TravelBridgeSession(){[m
+[32m+[m[32m  const result={email:'',name:'',hasAdminToken:false};[m
+[32m+[m[32m  try{[m
+[32m+[m[32m    const direct=sessionStorage.getItem('iroup_admin_token');[m
+[32m+[m[32m    result.hasAdminToken=!!direct;[m
+[32m+[m[32m    const rawUser=sessionStorage.getItem('iroup_user');[m
+[32m+[m[32m    if(rawUser){[m
+[32m+[m[32m      const user=JSON.parse(rawUser);[m
+[32m+[m[32m      result.email=String(user.email||'').trim();[m
+[32m+[m[32m      result.name=String(user.name||'').trim();[m
+[32m+[m[32m      result.hasAdminToken=result.hasAdminToken || !!user.adminToken;[m
+[32m+[m[32m    }[m
+[32m+[m[32m  }catch(err){[m
+[32m+[m[32m    console.warn('IROUP V2 travel bridge could not read V1 session metadata.', err);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  return result;[m
+[32m+[m[32m}[m
+[32m+[m[32masync function fetchV2TravelListSidecar(){[m
+[32m+[m[32m  const badge=$('#v2TravelReadiness');[m
+[32m+[m[32m  try{[m
+[32m+[m[32m    if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.travelList){[m
+[32m+[m[32m      throw new Error('IROUP_V2 travel adapter is not available');[m
+[32m+[m[32m    }[m
+[32m+[m[32m    const bridgeSession=getV2TravelBridgeSession();[m
+[32m+[m[32m    const adapterToken=typeof IROUP_V2.getAdminToken==='function' ? IROUP_V2.getAdminToken() : '';[m
+[32m+[m[32m    if(!bridgeSession.email && !bridgeSession.hasAdminToken && !adapterToken){[m
+[32m+[m[32m      throw new Error('No V1 admin session metadata available for V2 travel handoff');[m
+[32m+[m[32m    }[m
+[32m+[m[32m    const response=await IROUP_V2.admin.travelList();[m
+[32m+[m[32m    if(!response.success) throw new Error(response.error || 'V2 travel list API error');[m
+[32m+[m[32m    v2TravelList=Array.isArray(response.data) ? response.data : [];[m
+[32m+[m[32m    if(badge) badge.textContent='V2 travel: ready';[m
+[32m+[m[32m    console.info('IROUP V2 travel list readiness OK', {total:v2TravelList.length, action:response.meta&&response.meta.action?response.meta.action:''});[m
+[32m+[m[32m    return v2TravelList;[m
+[32m+[m[32m  }catch(err){[m
+[32m+[m[32m    v2TravelList=[];[m
+[32m+[m[32m    if(badge) badge.textContent='V2 travel: unavailable';[m
+[32m+[m[32m    console.warn('IROUP V2 travel list readiness failed; V1 travel render continues.', err);[m
+[32m+[m[32m    return [];[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+ async function loadAll(){[m
+   $('#travelBody').innerHTML='<tr><td colspan="9"><div class="loading">กำลังโหลดข้อมูล...</div></td></tr>';[m
+   try{[m
+     const [t,s,c]=await Promise.all([IROUP.getAll(IROUP.SHEETS.TRAVEL), IROUP.getAll(IROUP.SHEETS.STAFF), IROUP.getAll('COUNTRY')]);[m
+     travelRows=t||[]; staffRows=(s||[]).map(normalizeStaff); countryRows=c||[];[m
+     fillCountryOptions(); updateKpis(); renderTable();[m
+[32m+[m[32m    setTimeout(()=>fetchV2TravelListSidecar(),0);[m
+   }catch(e){console.error(e); $('#travelBody').innerHTML='<tr><td colspan="9"><div class="empty">โหลดข้อมูลไม่สำเร็จ</div></td></tr>';}[m
+ }[m
+ function fillCountryOptions(){const countries=uniq([...countryRows.flatMap(c=>[c.en_name,c.th_name,c.code]),...travelRows.map(r=>r['ประเทศ'])]); $('#countryList').innerHTML=countries.map(c=>`<option value="${IU.esc(c)}"></option>`).join(''); $('#countryFilter').innerHTML='<option value="">ทุกประเทศ</option>'+uniq(travelRows.map(r=>r['ประเทศ'])).map(c=>`<option value="${IU.esc(c)}">${IU.esc(c)}</option>`).join('');}[m

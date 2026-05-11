@@ -2559,3 +2559,40 @@ Still not doing
 - CRUD/write/upload migration
 - admin form or login/session changes
 - push
+
+---
+
+68. Travel Page V2 Read-Only List Sidecar (May 11, 2026)
+
+Summary
+
+Added a controlled V2 admin read-only sidecar to `travel.html` only. The page still renders from the existing V1 travel pipeline, and V2 is used only as a non-blocking travel list readiness check.
+
+Implementation
+
+- Updated `Team IROUP/travel.html`.
+- Loaded `iroup-v2-endpoint.js` and `iroup-v2-api.js` between `iroup-config.js` and `iroup-utils.js`.
+- Added `#v2TravelReadiness` with default text `V2 travel: checking`.
+- Added page-local `v2TravelList`.
+- Added travel-scoped `getV2TravelBridgeSession()` using existing V1 session metadata without exposing token values.
+- Added `fetchV2TravelListSidecar()` using `IROUP_V2.admin.travelList()`.
+- Called the V2 sidecar only after successful V1 load/render.
+
+Preserved V1 travel flow
+
+- Travel, staff, and country reads remain V1-backed.
+- KPIs, filters, table rows, modal hydration, exports, staff selector, and upload flow remain V1-backed.
+- `submitTravel()` remains unchanged.
+- `deleteTravel()` remains unchanged.
+- `quickAddStaff()` remains unchanged.
+- `uploadFileFromInput()` remains unchanged.
+
+Still not doing
+
+- V1 `SCRIPT_URL` replacement
+- travel render-source replacement
+- V2 data feeding into KPIs/table/filters/export
+- CRUD/write/upload migration
+- staff/country lookup migration
+- admin form or login/session changes
+- push

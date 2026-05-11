@@ -276,3 +276,36 @@ Still not migrated:
 - `exportRaw()`
 - `exportFilteredCsv()`
 - admin CRUD/write/upload
+
+## Travel Read-Only List Sidecar
+
+Date: 2026-05-11
+
+`travel.html` now has a controlled V2 read-only list sidecar.
+
+Implementation pattern:
+
+```html
+<script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
+<script src="iroup-utils.js"></script>
+```
+
+Behavior:
+
+- `travel.html` calls `IROUP_V2.admin.travelList()` only after the V1 travel load/render path succeeds.
+- The result is stored in page-local `v2TravelList`.
+- The badge `#v2TravelReadiness` reports `V2 travel: checking`, `V2 travel: ready`, or `V2 travel: unavailable`.
+- V2 failure is caught locally and never throws into `loadAll()`.
+- Existing travel KPIs, filters, table, modal hydration, exports, staff selector, and upload flow remain V1-backed.
+
+Still not migrated:
+
+- V1 travel render source
+- `submitTravel()`
+- `deleteTravel()`
+- `quickAddStaff()`
+- `uploadFileFromInput()`
+- admin CRUD/write/upload
+- staff/country lookup behavior

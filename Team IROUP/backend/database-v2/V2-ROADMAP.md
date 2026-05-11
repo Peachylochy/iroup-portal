@@ -741,3 +741,32 @@ Next validation:
 - Confirm V1 data and exports still work.
 - Confirm `V2 report: ready` when the token bridge is valid.
 - Keep CRUD/write/upload deferred.
+
+## Controlled Read-Only Expansion - Travel List Sidecar
+
+Date: 2026-05-11
+
+Status: implemented for `travel.html` as a sidecar only.
+
+Confirmed design:
+
+- `travel.html` keeps the V1 travel render pipeline active.
+- V1 reads still load travel, staff, and country rows through `IROUP.getAll(...)`.
+- V2 calls only `IROUP_V2.admin.travelList()`.
+- V2 list data is stored separately in `v2TravelList`.
+- V2 list data does not drive current KPIs, filters, table rows, modal hydration, exports, staff selectors, or upload behavior.
+- V2 failure is graceful and does not break V1 travel rendering.
+
+Preserved V1 functions:
+
+- `submitTravel()`
+- `deleteTravel()`
+- `quickAddStaff()`
+- `uploadFileFromInput()`
+
+Next validation:
+
+- Browser-smoke `travel.html`.
+- Confirm V1 table, KPIs, filters, add/edit/delete, and upload controls still work.
+- Confirm `V2 travel: ready` when the token bridge is valid.
+- Keep CRUD/write/upload deferred.
