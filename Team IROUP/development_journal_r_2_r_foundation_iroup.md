@@ -2315,3 +2315,43 @@ Still not doing
 - changing V1 runtime
 - changing backend deployment
 - push
+
+---
+
+62. V2 Frontend Endpoint Activation Pilot - Public Mobility Only (May 11, 2026)
+
+Summary
+
+Completed the controlled public-page live V2 frontend rollout by activating `public/public-mobility.html` only. This follows the successful scholar, events, and MOU endpoint pilots and keeps the V1 production/admin lane untouched.
+
+Implementation
+
+- Updated only `Team IROUP/public/public-mobility.html`.
+- Inserted `../iroup-v2-endpoint.js` between `../iroup-config.js` and `../iroup-v2-api.js`.
+- Reused the existing `IROUP_V2.public.mobilityList()` and `IROUP_V2.public.travelList()` primary public data-loading flows.
+- Kept KPI rendering, cards, timeline, charts, D3 map, country filters, TH/EN controls, and layout unchanged.
+- Did not use public summary or map aggregate helpers yet.
+
+Load order
+
+```html
+<script src="../iroup-config.js"></script>
+<script src="../iroup-v2-endpoint.js"></script>
+<script src="../iroup-v2-api.js"></script>
+```
+
+Verification targets
+
+- `public-mobility.html` parses.
+- Mobility and travel rows render from V2 public DTOs.
+- KPI, cards, timeline, charts, map, country filters, TH/EN controls, and layout remain unchanged.
+- Rendered DOM remains public/sanitized only.
+- Primary mobility/travel loads do not call `IROUP.getPublicMobility()` or `IROUP.getPublicTravel()`.
+
+Still not doing
+
+- activating dashboard/admin
+- replacing `IROUP.SCRIPT_URL`
+- changing V1 runtime
+- changing backend deployment
+- push

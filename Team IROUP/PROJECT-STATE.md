@@ -10,17 +10,17 @@
 
 ## Latest V2 Frontend Endpoint Activation Pilot
 
-### Session: 2026-05-11 - Public MOU Live V2 Endpoint Pilot
+### Session: 2026-05-11 - Public Mobility Live V2 Endpoint Pilot
 
-**Phase goal:** Continue the controlled live V2 frontend rollout by activating `public/public-mou.html` only after the successful scholar and events pilots. No mobility, dashboard/admin, V1 runtime, backend deployment, or `IROUP.SCRIPT_URL` replacement.
+**Phase goal:** Complete the controlled public-page live V2 frontend rollout by activating `public/public-mobility.html` only after the successful scholar, events, and MOU pilots. No dashboard/admin, V1 runtime, backend deployment, or `IROUP.SCRIPT_URL` replacement.
 
 Implementation:
 
 - Reused `Team IROUP/iroup-v2-endpoint.js`.
-- Updated only `Team IROUP/public/public-mou.html` for this pass.
-- `public-mou.html` already used `IROUP_V2.public.mouList()` for its primary public MOU list load.
+- Updated only `Team IROUP/public/public-mobility.html` for this pass.
+- `public-mobility.html` already used `IROUP_V2.public.mobilityList()` and `IROUP_V2.public.travelList()` for its primary public list loads.
 - Inserted the endpoint config between `../iroup-config.js` and `../iroup-v2-api.js`.
-- Load order for `public-mou.html` is now:
+- Load order for `public-mobility.html` is now:
 
 ```html
 <script src="../iroup-config.js"></script>
@@ -32,21 +32,21 @@ Scope boundary:
 
 - `public/public-scholar.html` remains the first live V2 frontend endpoint pilot.
 - `public/public-events.html` remains the second live V2 frontend endpoint pilot.
-- `public/public-mobility.html` remains unchanged.
+- `public/public-mou.html` remains the third live V2 frontend endpoint pilot.
 - `dashboard.html` remains unchanged.
 - `IROUP.SCRIPT_URL` remains the V1 production lane.
 
 Runtime note:
 
 - The endpoint file contains the live isolated V2 `/exec` URL.
-- Only `public-scholar.html`, `public-events.html`, and `public-mou.html` should load `iroup-v2-endpoint.js` at this stage.
+- Only `public-scholar.html`, `public-events.html`, `public-mou.html`, and `public-mobility.html` should load `iroup-v2-endpoint.js` at this stage.
 
 Expected runtime checks:
 
-- `public-mou.html` renders V2 MOU DTOs.
-- KPI, table, chart, D3 map, local country aggregation, filters/search, and language behavior remain unchanged.
-- File URL mapping remains compatible.
-- No primary MOU load uses `IROUP.getPublicMou()`.
+- `public-mobility.html` renders V2 public mobility and travel DTOs.
+- KPI, cards, timeline, charts, D3 map, country filters, TH/EN controls, and layout remain unchanged.
+- Public mobility remains aggregate/sanitized only: no names, student IDs, staff names, internal notes, budget, phone, email, passport, or private admin fields should appear in the DOM.
+- No primary mobility/travel load uses `IROUP.getPublicMobility()` or `IROUP.getPublicTravel()`.
 
 ---
 

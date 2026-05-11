@@ -392,7 +392,7 @@ Status:
 - `public/public-scholar.html` is the first page wired to the V2 endpoint config.
 - `public/public-events.html` is the second page wired to the V2 endpoint config.
 - `public/public-mou.html` is the third page wired to the V2 endpoint config.
-- Other public pages remain V2-adapter migrated but not endpoint-activated.
+- `public/public-mobility.html` is the fourth page wired to the V2 endpoint config.
 - Dashboard/admin remain non-activated for V2 frontend use.
 - V1 `IROUP.SCRIPT_URL` remains unchanged.
 
@@ -408,9 +408,10 @@ Activated only in:
 Team IROUP/public/public-scholar.html
 Team IROUP/public/public-events.html
 Team IROUP/public/public-mou.html
+Team IROUP/public/public-mobility.html
 ```
 
-Script load order for `public-mou.html`:
+Script load order for `public-mobility.html`:
 
 ```html
 <script src="../iroup-config.js"></script>
@@ -421,7 +422,7 @@ Script load order for `public-mou.html`:
 Runtime note:
 
 - `iroup-v2-endpoint.js` contains the live isolated V2 `/exec` URL.
-- Do not load it from `public-mobility.html`, dashboard, or admin pages until each page receives its own reviewed activation pass.
+- Do not load it from dashboard or admin pages until each area receives its own reviewed activation pass.
 
 Verification focus:
 
@@ -438,6 +439,10 @@ Verification focus:
 - V2 MOU DTO render.
 - MOU KPI, table, chart, D3 map, local country aggregation, filters/search, and language behavior.
 - No primary MOU load through `IROUP.getPublicMou()`.
+- V2 public mobility/travel DTO render.
+- Mobility KPI, cards, timeline, charts, D3 map, country filters, TH/EN controls, and layout.
+- No private participant identity, contact, budget, internal notes, passport, or admin fields in rendered DOM.
+- No primary mobility/travel load through `IROUP.getPublicMobility()` or `IROUP.getPublicTravel()`.
 
 ## Public Pilot Migration
 
