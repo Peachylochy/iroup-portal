@@ -19,6 +19,7 @@ Implementation:
 - Updated only `Team IROUP/dashboard.html`.
 - Added `Team IROUP/iroup-v2-endpoint.js` before `iroup-v2-api.js`.
 - Kept the existing `fetchV2DashboardSummary()` sidecar as a read-only readiness bridge.
+- Added a frontend-only V1 session preflight for the V2 bridge using `sessionStorage.iroup_user` and `sessionStorage.iroup_admin_token`.
 - Added isolation comments around the V2 bridge loader and summary function.
 - Kept `reloadData()`, `fetchReport(year)`, `filteredReport()`, `makeSummary()`, cards, charts, tables, and dashboard UI V1-backed.
 - `state.v2Summary` remains separate from `state.raw`.
@@ -44,6 +45,8 @@ Runtime note:
 - The endpoint file contains the live isolated V2 `/exec` URL.
 - V2 summary failure is graceful: badge changes to unavailable, `state.v2Summary` is cleared, and V1 dashboard rendering continues.
 - Local browser smoke returned `No active Apps Script user email available` for the V2 admin route, confirming the current admin-auth deployment caveat while preserving V1 dashboard rendering.
+- The frontend handoff does not create new auth. It only reuses the existing V1 session metadata so V2 read-only calls are attempted only from an admin session context.
+- Verification covered both no-session and session-metadata cases; V1 dashboard rendering continued in both.
 
 Expected runtime checks:
 

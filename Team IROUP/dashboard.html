@@ -178,6 +178,26 @@ async function fetchReport(year=''){
   return json;
 }
 
+function getV2AdminBridgeSession(){
+  // V2 read-only auth bridge: reuse V1 session metadata only for readiness diagnostics.
+  // The live V2 backend still authorizes with Apps Script active-user email, so this does not replace backend auth.
+  const result={email:'',name:'',hasAdminToken:false};
+  try{
+    const direct=sessionStorage.getItem('iroup_admin_token');
+    result.hasAdminToken=!!direct;
+    const raw=sessionStorage.getItem('iroup_user');
+    if(raw){
+      const user=JSON.parse(raw);
+      result.email=String(user.email||'').trim();
+      result.name=String(user.name||'').trim();
+      result.hasAdminToken=result.hasAdminToken || !!user.adminToken;
+    }
+  }catch(err){
+    console.warn('IROUP V2 dashboard auth bridge could not read V1 session metadata.', err);
+  }
+  return result;
+}
+
 async function fetchV2DashboardSummary(){
   // V2 read-only bridge: validates isolated admin aggregate access without replacing V1 dashboard rendering.
   const badge=$('#v2Readiness');
@@ -185,6 +205,14 @@ async function fetchV2DashboardSummary(){
     if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.dashboardSummary){
       throw new Error('IROUP_V2 admin adapter is not available');
     }
+    const bridgeSession=getV2AdminBridgeSession();
+    if(!bridgeSession.email && !bridgeSession.hasAdminToken){
+      throw new Error('No V1 admin session metadata available for V2 read-only handoff');
+    }
+    console.info('IROUP V2 dashboard auth bridge session ready', {
+      email: bridgeSession.email || '(token-only)',
+      hasAdminToken: bridgeSession.hasAdminToken
+    });
     const response=await IROUP_V2.admin.dashboardSummary();
     if(!response.success) throw new Error(response.error || 'V2 dashboard summary API error');
     state.v2Summary=response.data || null;

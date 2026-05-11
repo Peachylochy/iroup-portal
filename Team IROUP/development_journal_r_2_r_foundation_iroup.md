@@ -2369,6 +2369,7 @@ Implementation
 - Updated only `Team IROUP/dashboard.html`.
 - Added `iroup-v2-endpoint.js` between `iroup-config.js` and `iroup-v2-api.js`.
 - Kept the existing `fetchV2DashboardSummary()` call to `IROUP_V2.admin.dashboardSummary()`.
+- Added a frontend-only V1 session preflight for the V2 read-only handoff.
 - Added clear isolation comments around the V2 bridge loader and summary function.
 - Kept `state.v2Summary` separate from `state.raw`.
 - Kept `reloadData()`, `fetchReport(year)`, `filteredReport()`, `makeSummary()`, KPI rendering, budget snapshot, rankings, insight tables, sidebar/navigation, and layout unchanged.
@@ -2396,4 +2397,42 @@ Still not doing
 - changing auth/session logic
 - replacing `IROUP.SCRIPT_URL`
 - changing backend deployment
+- push
+
+---
+
+64. Dashboard V2 Admin Auth Bridge Investigation and Frontend Handoff (May 11, 2026)
+
+Summary
+
+Investigated the current V1/V2 admin auth boundary and added the minimum safe frontend handoff for the dashboard read-only V2 summary bridge. V1 dashboard rendering remains the operational path.
+
+Findings
+
+- V1 login stores `sessionStorage.iroup_user` with `email`, `name`, `adminToken`, and `loginAt`.
+- V1 login may also store `sessionStorage.iroup_admin_token`.
+- `iroup-config.js` attaches that token to V1 admin requests.
+- `iroup-v2-api.js` already reads `iroup_admin_token` and `iroup_user.adminToken` and attaches `adminToken` to `v2.admin.*` requests.
+- Current V2 backend admin auth still uses `Session.getActiveUser().getEmail()` through `requireV2Admin_()`, so frontend token propagation alone cannot fix `No active Apps Script user email available`.
+
+Implementation
+
+- Updated only `Team IROUP/dashboard.html`.
+- Added `getV2AdminBridgeSession()` to read existing V1 session metadata before attempting the V2 read-only summary bridge.
+- The bridge logs only `email` and `hasAdminToken`; it never logs token values.
+- If no V1 session metadata exists, the V2 summary call is skipped and V1 dashboard rendering continues.
+- If V1 session metadata exists, the V2 summary call is attempted and still depends on backend `requireV2Admin_()`.
+
+Verification
+
+- No-session browser smoke: V2 summary call was skipped, `v2Readiness` showed unavailable, and V1 dashboard rendered 6 KPI cards.
+- Session-metadata browser smoke: V2 summary call was attempted with existing adapter token propagation, backend returned `No active Apps Script user email available`, and V1 dashboard rendered 6 KPI cards.
+
+Still not doing
+
+- backend auth changes
+- V2 session creation
+- CRUD/write/upload migration
+- auth/session replacement
+- `IROUP.SCRIPT_URL` replacement
 - push

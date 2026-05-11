@@ -436,6 +436,7 @@ Runtime note:
 - Dashboard uses it only for read-only aggregate summary readiness.
 - Do not use it for admin CRUD, upload, edit/delete, write actions, or admin forms until each area receives its own reviewed activation pass.
 - Local browser smoke currently reports the expected admin-auth caveat for V2 admin routes: `No active Apps Script user email available`. V1 dashboard rendering continues.
+- Dashboard now performs a frontend-only V1 session preflight before the V2 summary sidecar. It reads `sessionStorage.iroup_user` / `sessionStorage.iroup_admin_token`, logs no token values, and keeps backend authorization with `requireV2Admin_()`.
 
 Verification focus:
 

@@ -41,6 +41,8 @@ Team IROUP/dashboard.html
 
 Current dashboard bridge caveat: local browser smoke can reach the live V2 admin route, but Apps Script may return `No active Apps Script user email available` outside the expected signed-in execution context. This failure is handled as a readiness failure and does not block V1 dashboard rendering.
 
+Dashboard frontend handoff: `dashboard.html` now checks the existing V1 session metadata before attempting the read-only V2 summary sidecar. It uses `sessionStorage.iroup_user` and `sessionStorage.iroup_admin_token` only to decide whether the bridge should run and to emit non-secret diagnostics. It does not create a V2 session, does not expose token values, and does not bypass backend `requireV2Admin_()`.
+
 ## Safety Rules
 
 - Do not replace `IROUP.SCRIPT_URL` globally.
@@ -130,7 +132,7 @@ For admin routes, the adapter attaches `adminToken` as a request parameter when 
 Current caveat:
 
 - V2 Apps Script admin auth currently uses `Session.getActiveUser()` through `requireV2Admin_()`.
-- Token-based V2 auth/session behavior still needs a deployment/auth design pass.
+- Token-based V2 auth/session behavior still needs a deployment/auth design pass. Frontend token propagation alone is not sufficient for current V2 admin authorization.
 
 ## Helper Groups
 
