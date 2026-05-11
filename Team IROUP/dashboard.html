@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="iroup-config.js"></script>
+<!-- V2 read-only bridge: endpoint config for aggregate summary sidecar only. Do not use for CRUD/write flows. -->
+<script src="iroup-v2-endpoint.js"></script>
 <script src="iroup-v2-api.js"></script>
 <script src="iroup-utils.js"></script>
 <style>
@@ -177,6 +179,7 @@ async function fetchReport(year=''){
 }
 
 async function fetchV2DashboardSummary(){
+  // V2 read-only bridge: validates isolated admin aggregate access without replacing V1 dashboard rendering.
   const badge=$('#v2Readiness');
   try{
     if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.dashboardSummary){

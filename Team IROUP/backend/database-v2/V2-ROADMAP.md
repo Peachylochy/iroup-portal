@@ -393,7 +393,9 @@ Status:
 - `public/public-events.html` is the second page wired to the V2 endpoint config.
 - `public/public-mou.html` is the third page wired to the V2 endpoint config.
 - `public/public-mobility.html` is the fourth page wired to the V2 endpoint config.
-- Dashboard/admin remain non-activated for V2 frontend use.
+- `dashboard.html` has a V2 admin-safe read-only aggregate bridge for `IROUP_V2.admin.dashboardSummary()`.
+- Dashboard rendering remains V1-backed through `IROUP.getReport(year)`.
+- Admin CRUD/write/upload flows remain non-activated for V2 frontend use.
 - V1 `IROUP.SCRIPT_URL` remains unchanged.
 
 Created:
@@ -409,9 +411,10 @@ Team IROUP/public/public-scholar.html
 Team IROUP/public/public-events.html
 Team IROUP/public/public-mou.html
 Team IROUP/public/public-mobility.html
+Team IROUP/dashboard.html
 ```
 
-Script load order for `public-mobility.html`:
+Public page script load order:
 
 ```html
 <script src="../iroup-config.js"></script>
@@ -419,10 +422,20 @@ Script load order for `public-mobility.html`:
 <script src="../iroup-v2-api.js"></script>
 ```
 
+Dashboard read-only bridge load order:
+
+```html
+<script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
+```
+
 Runtime note:
 
 - `iroup-v2-endpoint.js` contains the live isolated V2 `/exec` URL.
-- Do not load it from dashboard or admin pages until each area receives its own reviewed activation pass.
+- Dashboard uses it only for read-only aggregate summary readiness.
+- Do not use it for admin CRUD, upload, edit/delete, write actions, or admin forms until each area receives its own reviewed activation pass.
+- Local browser smoke currently reports the expected admin-auth caveat for V2 admin routes: `No active Apps Script user email available`. V1 dashboard rendering continues.
 
 Verification focus:
 
@@ -443,6 +456,9 @@ Verification focus:
 - Mobility KPI, cards, timeline, charts, D3 map, country filters, TH/EN controls, and layout.
 - No private participant identity, contact, budget, internal notes, passport, or admin fields in rendered DOM.
 - No primary mobility/travel load through `IROUP.getPublicMobility()` or `IROUP.getPublicTravel()`.
+- Dashboard V2 aggregate bridge reaches `IROUP_V2.admin.dashboardSummary()` without replacing `IROUP.getReport(year)`.
+- V2 summary failures remain graceful and V1 dashboard rendering continues.
+- No dashboard CRUD/write/upload routes are modified or activated.
 
 ## Public Pilot Migration
 

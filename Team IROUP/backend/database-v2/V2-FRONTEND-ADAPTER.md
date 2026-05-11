@@ -37,7 +37,9 @@ Team IROUP/dashboard.html
 
 `public-mobility.html` now loads `iroup-v2-endpoint.js` before `iroup-v2-api.js` and uses `IROUP_V2.public.mobilityList()` plus `IROUP_V2.public.travelList()` for its primary public list data flow. It is the fourth single-page V2 endpoint activation pilot and keeps existing KPI, charts, D3 map rendering, top countries, filters/search, detail modal, timeline behavior, TH/EN controls, and layout by mapping V2 DTO fields into the page-local render shape. It does not use public summary or map aggregate helpers yet.
 
-`dashboard.html` now loads `iroup-v2-api.js` for an admin-read readiness pilot only. It calls `IROUP_V2.admin.dashboardSummary()` as a sidecar check, stores the result in `state.v2Summary`, and leaves the existing V1 `IROUP.getReport(year)` dashboard rendering path unchanged.
+`dashboard.html` now loads `iroup-v2-endpoint.js` before `iroup-v2-api.js` for an admin-safe read-only aggregate bridge only. It calls `IROUP_V2.admin.dashboardSummary()` as a sidecar check, stores the result in `state.v2Summary`, and leaves the existing V1 `IROUP.getReport(year)` dashboard rendering path unchanged. CRUD, upload, edit/delete, admin forms, and auth/session logic remain V1-backed and untouched.
+
+Current dashboard bridge caveat: local browser smoke can reach the live V2 admin route, but Apps Script may return `No active Apps Script user email available` outside the expected signed-in execution context. This failure is handled as a readiness failure and does not block V1 dashboard rendering.
 
 ## Safety Rules
 
@@ -70,6 +72,14 @@ Current endpoint activation load order for `public/public-scholar.html`, `public
 ```
 
 `iroup-v2-endpoint.js` contains the live isolated V2 `/exec` URL. Keep it loaded only by reviewed pilot pages until the rollout advances.
+
+Dashboard uses the root-relative load order because it is not under `/public/`:
+
+```html
+<script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
+```
 
 If no V2 URL is configured, calls return a normalized client error:
 
@@ -181,8 +191,8 @@ Pilot status:
 - `public-events.html` completed steps 1, 2, 3, and 4 for the second single-page endpoint activation pilot.
 - `public-mou.html` completed steps 1, 2, 3, and 4 for the third single-page endpoint activation pilot.
 - `public-mobility.html` completed steps 1, 2, 3, and 4 for the fourth single-page endpoint activation pilot.
-- `dashboard.html` completed an admin-read readiness pilot using `IROUP_V2.admin.dashboardSummary()` without migrating dashboard rendering.
-- Step 2 remains inactive for dashboard/admin pages.
+- `dashboard.html` completed step 2 for the admin-safe read-only aggregate bridge using `IROUP_V2.admin.dashboardSummary()` without migrating dashboard rendering.
+- Step 2 remains inactive for admin CRUD/write/upload pages and flows.
 - Step 5 browser verification remains required page by page after each endpoint activation.
 
 Do not migrate admin writes until V2 write routes and normalized form contracts exist.

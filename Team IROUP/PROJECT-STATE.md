@@ -8,45 +8,49 @@
 
 ---
 
-## Latest V2 Frontend Endpoint Activation Pilot
+## Latest V2 Admin-Safe Read-Only Bridge Pilot
 
-### Session: 2026-05-11 - Public Mobility Live V2 Endpoint Pilot
+### Session: 2026-05-11 - Dashboard V2 Aggregate Read Bridge
 
-**Phase goal:** Complete the controlled public-page live V2 frontend rollout by activating `public/public-mobility.html` only after the successful scholar, events, and MOU pilots. No dashboard/admin, V1 runtime, backend deployment, or `IROUP.SCRIPT_URL` replacement.
+**Phase goal:** Activate the isolated V2 admin aggregate summary sidecar in `dashboard.html` only. Dashboard rendering remains V1-backed through `IROUP.getReport(year)`. No CRUD, upload, edit/delete, admin forms, auth/session logic, backend deployment, or `IROUP.SCRIPT_URL` replacement.
 
 Implementation:
 
-- Reused `Team IROUP/iroup-v2-endpoint.js`.
-- Updated only `Team IROUP/public/public-mobility.html` for this pass.
-- `public-mobility.html` already used `IROUP_V2.public.mobilityList()` and `IROUP_V2.public.travelList()` for its primary public list loads.
-- Inserted the endpoint config between `../iroup-config.js` and `../iroup-v2-api.js`.
-- Load order for `public-mobility.html` is now:
+- Updated only `Team IROUP/dashboard.html`.
+- Added `Team IROUP/iroup-v2-endpoint.js` before `iroup-v2-api.js`.
+- Kept the existing `fetchV2DashboardSummary()` sidecar as a read-only readiness bridge.
+- Added isolation comments around the V2 bridge loader and summary function.
+- Kept `reloadData()`, `fetchReport(year)`, `filteredReport()`, `makeSummary()`, cards, charts, tables, and dashboard UI V1-backed.
+- `state.v2Summary` remains separate from `state.raw`.
+
+Load order:
 
 ```html
-<script src="../iroup-config.js"></script>
-<script src="../iroup-v2-endpoint.js"></script>
-<script src="../iroup-v2-api.js"></script>
+<script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
 ```
 
 Scope boundary:
 
-- `public/public-scholar.html` remains the first live V2 frontend endpoint pilot.
-- `public/public-events.html` remains the second live V2 frontend endpoint pilot.
-- `public/public-mou.html` remains the third live V2 frontend endpoint pilot.
-- `dashboard.html` remains unchanged.
-- `IROUP.SCRIPT_URL` remains the V1 production lane.
+- `dashboard.html` calls only `IROUP_V2.admin.dashboardSummary()` on the V2 bridge.
+- No dashboard CRUD/write/upload routes are activated.
+- Sidebar/navigation and dashboard layout remain unchanged.
+- Public page V2 activation remains unchanged.
+- `IROUP.SCRIPT_URL` remains the V1 admin production lane.
 
 Runtime note:
 
 - The endpoint file contains the live isolated V2 `/exec` URL.
-- Only `public-scholar.html`, `public-events.html`, `public-mou.html`, and `public-mobility.html` should load `iroup-v2-endpoint.js` at this stage.
+- V2 summary failure is graceful: badge changes to unavailable, `state.v2Summary` is cleared, and V1 dashboard rendering continues.
+- Local browser smoke returned `No active Apps Script user email available` for the V2 admin route, confirming the current admin-auth deployment caveat while preserving V1 dashboard rendering.
 
 Expected runtime checks:
 
-- `public-mobility.html` renders V2 public mobility and travel DTOs.
-- KPI, cards, timeline, charts, D3 map, country filters, TH/EN controls, and layout remain unchanged.
-- Public mobility remains aggregate/sanitized only: no names, student IDs, staff names, internal notes, budget, phone, email, passport, or private admin fields should appear in the DOM.
-- No primary mobility/travel load uses `IROUP.getPublicMobility()` or `IROUP.getPublicTravel()`.
+- Dashboard V1 cards/charts/tables still render from `IROUP.getReport(year)`.
+- `v2Readiness` reports V2 summary bridge status.
+- No CRUD/write/upload flow changes.
+- No `IROUP.SCRIPT_URL` replacement.
 
 ---
 

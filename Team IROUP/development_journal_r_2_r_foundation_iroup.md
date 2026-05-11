@@ -2355,3 +2355,45 @@ Still not doing
 - changing V1 runtime
 - changing backend deployment
 - push
+
+---
+
+63. Dashboard V2 Admin-Safe Read-Only Aggregate Bridge (May 11, 2026)
+
+Summary
+
+Started the controlled V2 admin-safe read-only bridge rollout in `dashboard.html` only. The dashboard still renders from the V1 `IROUP.getReport(year)` path. V2 is used only as an isolated aggregate summary sidecar.
+
+Implementation
+
+- Updated only `Team IROUP/dashboard.html`.
+- Added `iroup-v2-endpoint.js` between `iroup-config.js` and `iroup-v2-api.js`.
+- Kept the existing `fetchV2DashboardSummary()` call to `IROUP_V2.admin.dashboardSummary()`.
+- Added clear isolation comments around the V2 bridge loader and summary function.
+- Kept `state.v2Summary` separate from `state.raw`.
+- Kept `reloadData()`, `fetchReport(year)`, `filteredReport()`, `makeSummary()`, KPI rendering, budget snapshot, rankings, insight tables, sidebar/navigation, and layout unchanged.
+
+Load order
+
+```html
+<script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
+```
+
+Verification targets
+
+- `dashboard.html` parses.
+- V2 bridge reaches only `IROUP_V2.admin.dashboardSummary()`.
+- V2 summary failure remains graceful and V1 dashboard rendering continues.
+- Local browser smoke currently returns `No active Apps Script user email available` for the V2 admin summary route, which confirms the admin-auth caveat without breaking V1 dashboard rendering.
+- No CRUD, upload, edit/delete, write actions, admin forms, auth/session logic, backend deployment, or `IROUP.SCRIPT_URL` changes.
+
+Still not doing
+
+- migrating dashboard rendering to V2
+- activating admin CRUD/write/upload flows
+- changing auth/session logic
+- replacing `IROUP.SCRIPT_URL`
+- changing backend deployment
+- push
