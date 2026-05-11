@@ -24,13 +24,21 @@ function testV2RouterSchema() {
       action: 'v2.schema'
     }
   });
+  var sheets = response.data && response.data.sheets ? response.data.sheets : [];
+  var validShape = sheets.length > 0 && sheets.every(function (sheet) {
+    return typeof sheet.sheet_name === 'string' &&
+      typeof sheet.exists === 'boolean' &&
+      Object.prototype.toString.call(sheet.headers) === '[object Array]' &&
+      typeof sheet.header_count === 'number' &&
+      typeof sheet.last_row === 'number' &&
+      typeof sheet.last_column === 'number';
+  });
 
   return {
     name: 'testV2RouterSchema',
     success: response.success === true &&
       response.data &&
-      response.data.sheets &&
-      response.data.sheets.length > 0,
+      validShape,
     details: response
   };
 }
@@ -84,6 +92,35 @@ function testV2RouterReadSmoke() {
 
 function testV2RouterPublicCoverage() {
   return testV2RouterReadSmoke();
+}
+
+function testV2AggregateFilteringIgnoresBlankRows() {
+  var rows = [
+    { mobility_id: 'MOB-1', status: 'active', public_visible: true, is_deleted: false, aggregate_counts: { participant_count_actual: 3 } },
+    { mobility_id: '', status: '', public_visible: true, is_deleted: false, aggregate_counts: { participant_count_actual: 999 } },
+    { mobility_id: 'MOB-2', status: 'active', public_visible: true, is_deleted: true, aggregate_counts: { participant_count_actual: 7 } },
+    { mobility_id: 'MOB-3', status: 'upcoming', public_visible: false, is_deleted: false, aggregate_counts: { participant_count_actual: 2 } }
+  ];
+  var filtered = filterV2AggregateValidRows_(rows, 'mobility_id');
+  var status = countV2AggregateByField_(filtered, 'status');
+  var publicVisible = countV2AggregateTruthy_(filtered, 'public_visible');
+  var participantTotal = sumV2AggregateNestedNumber_(filtered, ['aggregate_counts', 'participant_count_actual']);
+
+  return {
+    name: 'testV2AggregateFilteringIgnoresBlankRows',
+    success: filtered.length === 2 &&
+      status.active === 1 &&
+      status.upcoming === 1 &&
+      !status.unknown &&
+      publicVisible === 1 &&
+      participantTotal === 5,
+    details: {
+      filtered: filtered,
+      status: status,
+      public_visible: publicVisible,
+      participant_total: participantTotal
+    }
+  };
 }
 
 function testV2RouterAdminTravelList() {

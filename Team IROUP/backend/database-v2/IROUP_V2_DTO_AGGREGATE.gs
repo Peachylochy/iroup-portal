@@ -17,32 +17,40 @@ function getV2AdminDashboardSummary_() {
   const events = listV2AdminEvents_(false);
   if (!events.success) return events;
 
+  const rows = {
+    mou: filterV2AggregateValidRows_(mou.data, 'mou_id'),
+    mobility_project: filterV2AggregateValidRows_(mobility.data, 'mobility_id'),
+    travel: filterV2AggregateValidRows_(travel.data, 'travel_id'),
+    scholarship: filterV2AggregateValidRows_(scholarships.data, 'scholarship_id'),
+    event: filterV2AggregateValidRows_(events.data, 'event_id')
+  };
+
   const data = {
     counts: {
-      mou: mou.total,
-      mobility_project: mobility.total,
-      travel: travel.total,
-      scholarship: scholarships.total,
-      event: events.total
+      mou: rows.mou.length,
+      mobility_project: rows.mobility_project.length,
+      travel: rows.travel.length,
+      scholarship: rows.scholarship.length,
+      event: rows.event.length
     },
     participants: {
-      mobility: sumV2AggregateNestedNumber_(mobility.data || [], ['aggregate_counts', 'participant_count_actual']),
-      travel: sumV2AggregateNestedNumber_(travel.data || [], ['participant_summary', 'total']),
+      mobility: sumV2AggregateNestedNumber_(rows.mobility_project, ['aggregate_counts', 'participant_count_actual']),
+      travel: sumV2AggregateNestedNumber_(rows.travel, ['participant_summary', 'total']),
       total: 0
     },
     public_visible: {
-      mou: countV2AggregateTruthy_(mou.data || [], 'public_visible'),
-      mobility_project: countV2AggregateTruthy_(mobility.data || [], 'public_visible'),
-      travel: countV2AggregateTruthy_(travel.data || [], 'public_visible'),
-      scholarship: countV2AggregateTruthy_(scholarships.data || [], 'public_visible'),
-      event: countV2AggregateTruthy_(events.data || [], 'public_visible')
+      mou: countV2AggregateTruthy_(rows.mou, 'public_visible'),
+      mobility_project: countV2AggregateTruthy_(rows.mobility_project, 'public_visible'),
+      travel: countV2AggregateTruthy_(rows.travel, 'public_visible'),
+      scholarship: countV2AggregateTruthy_(rows.scholarship, 'public_visible'),
+      event: countV2AggregateTruthy_(rows.event, 'public_visible')
     },
     by_status: {
-      mou: countV2AggregateByField_(mou.data || [], 'status'),
-      mobility_project: countV2AggregateByField_(mobility.data || [], 'status'),
-      travel: countV2AggregateByField_(travel.data || [], 'status'),
-      scholarship: countV2AggregateByField_(scholarships.data || [], 'status'),
-      event: countV2AggregateByField_(events.data || [], 'status')
+      mou: countV2AggregateByField_(rows.mou, 'status'),
+      mobility_project: countV2AggregateByField_(rows.mobility_project, 'status'),
+      travel: countV2AggregateByField_(rows.travel, 'status'),
+      scholarship: countV2AggregateByField_(rows.scholarship, 'status'),
+      event: countV2AggregateByField_(rows.event, 'status')
     }
   };
   data.participants.total = data.participants.mobility + data.participants.travel;
@@ -66,11 +74,11 @@ function getV2AdminReportSummary_(year) {
   if (!events.success) return events;
 
   const filtered = {
-    mou: filterV2AggregateByFiscalYear_(mou.data || [], year),
-    mobility_project: filterV2AggregateByFiscalYear_(mobility.data || [], year),
-    travel: filterV2AggregateByFiscalYear_(travel.data || [], year),
-    scholarship: filterV2AggregateByFiscalYear_(scholarships.data || [], year),
-    event: filterV2AggregateByFiscalYear_(events.data || [], year)
+    mou: filterV2AggregateByFiscalYear_(filterV2AggregateValidRows_(mou.data, 'mou_id'), year),
+    mobility_project: filterV2AggregateByFiscalYear_(filterV2AggregateValidRows_(mobility.data, 'mobility_id'), year),
+    travel: filterV2AggregateByFiscalYear_(filterV2AggregateValidRows_(travel.data, 'travel_id'), year),
+    scholarship: filterV2AggregateByFiscalYear_(filterV2AggregateValidRows_(scholarships.data, 'scholarship_id'), year),
+    event: filterV2AggregateByFiscalYear_(filterV2AggregateValidRows_(events.data, 'event_id'), year)
   };
 
   const data = {
@@ -98,6 +106,18 @@ function getV2AdminReportSummary_(year) {
   data.participant_counts.total = data.participant_counts.mobility + data.participant_counts.travel;
 
   return adminResponseV2_(true, data, 1, '');
+}
+
+function filterV2AggregateValidRows_(rows, idField) {
+  const keyField = String(idField || '').trim();
+  if (!keyField) return [];
+
+  return (rows || []).filter(function (row) {
+    if (!row) return false;
+    if (!String(row[keyField] || '').trim()) return false;
+    if (isTruthyV2_(row.is_deleted)) return false;
+    return true;
+  });
 }
 
 function filterV2AggregateByFiscalYear_(rows, year) {

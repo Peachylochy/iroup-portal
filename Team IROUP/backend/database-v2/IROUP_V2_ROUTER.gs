@@ -138,9 +138,10 @@ function getV2SchemaSummary_() {
 
     for (var i = 0; i < sheetNames.length; i++) {
       var sheetName = sheetNames[i];
-      var sheet = getV2Sheet_(sheetName);
+      var sheetResult = getV2Sheet_(sheetName);
+      var sheet = sheetResult && sheetResult.data ? sheetResult.data : null;
 
-      if (!sheet) {
+      if (!sheetResult || !sheetResult.success || !isV2SheetObject_(sheet)) {
         sheets.push({
           sheet_name: sheetName,
           exists: false,
@@ -180,6 +181,13 @@ function getV2SchemaSummary_() {
       error: error && error.message ? error.message : String(error)
     };
   }
+}
+
+function isV2SheetObject_(sheet) {
+  return !!sheet &&
+    typeof sheet.getLastColumn === 'function' &&
+    typeof sheet.getLastRow === 'function' &&
+    typeof sheet.getRange === 'function';
 }
 
 function getV2RouteDispatch_() {
