@@ -45,6 +45,47 @@ Known cleanup before admin/dashboard migration:
 
 ---
 
+## Latest Admin/Dashboard Migration Audit
+
+### Session: 2026-05-11 - Admin/Dashboard Migration Audit Pass
+
+**Phase goal:** Audit/planning/stabilization only. No operational page behavior, frontend refactor, backend route change, deployment, or push.
+
+Audited target pages:
+
+- `dashboard.html`
+- `report.html`
+- `mobility.html`
+- `mou.html`
+- `scholarship-events.html`
+- `travel.html`
+
+Audit result:
+
+- `dashboard.html` is the safest first admin-side candidate because it is read-only and uses one aggregate V1 call: `IROUP.getReport(year)`.
+- `report.html` should migrate separately from dashboard because it depends on row-level report/export behavior and has V1 `getAll(...)` fallback reads.
+- `mou.html`, `scholarship-events.html`, `travel.html`, and `mobility.html` are mixed read/write operational pages and should not start with V2 CRUD.
+- Upload flows are still V1-only through `IROUP.uploadFile()` / `IROUP.uploadImage()`.
+- V2 admin list/detail routes exist, but V2 create/update/delete/upload/person/staff routes are not ready for frontend migration.
+- Admin token propagation is centralized in both clients, but mixed V1/V2 pages need a page-local readiness check before enabling V2 admin reads.
+
+Audit record:
+
+```text
+Team IROUP/backend/database-v2/ADMIN-MIGRATION-AUDIT.md
+```
+
+Recommended migration order:
+
+1. `dashboard.html` read-only V2 summary proof.
+2. `report.html` read-only summary/report proof, separate from dashboard.
+3. Module read-list pilots only: MOU, scholarship/events, travel, mobility.
+4. V2 detail reads where needed.
+5. V2 create/update/delete only after write contracts are locked.
+6. V2 upload/file relation workflow only after CRUD contracts stabilize.
+
+---
+
 ## 0. UI Polish Log
 
 ### Session: 2026-05-09 — Readability & Contrast Pass + Login Page Improvement

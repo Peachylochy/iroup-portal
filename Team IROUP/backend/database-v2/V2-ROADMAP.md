@@ -198,6 +198,15 @@ Verification pass:
 - Remaining V1 dependencies are utility-only status/date helpers from `iroup-config.js`.
 - Before admin/dashboard migration, resolve or consciously accept the documented public cleanup items: continent helper parity, utility-helper ownership, public normalization helper duplication, local hosting script-path behavior, and live V2 endpoint visual smoke testing.
 
+Admin/dashboard audit:
+
+- Admin/Dashboard Migration Audit was completed on 2026-05-11.
+- Audit record: `Team IROUP/backend/database-v2/ADMIN-MIGRATION-AUDIT.md`.
+- Recommended first admin-side migration is `dashboard.html` as a read-only summary proof, followed by `report.html` as a separate read/report proof.
+- CRUD migration should wait until V2 create/update/delete contracts are designed and tested per module.
+- Upload migration should wait until V2 file upload plus normalized `FILES` relation workflow is locked.
+- `mou.html`, `scholarship-events.html`, `travel.html`, and `mobility.html` should begin with read-list/detail-only coexistence; keep V1 writes/uploads during the transition.
+
 ## Architecture Direction
 
 ```text

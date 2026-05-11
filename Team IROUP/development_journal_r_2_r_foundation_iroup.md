@@ -1802,3 +1802,52 @@ Still not doing
 - production `Code.gs` wiring
 - deployment
 - push
+
+---
+
+50. Admin/Dashboard Migration Audit Pass (May 11, 2026)
+
+Summary
+
+Completed the pre-migration audit for admin/dashboard pages after Public Migration Wave 1 was verified.
+
+Scope
+
+- `Team IROUP/dashboard.html`
+- `Team IROUP/report.html`
+- `Team IROUP/mobility.html`
+- `Team IROUP/mou.html`
+- `Team IROUP/scholarship-events.html`
+- `Team IROUP/travel.html`
+
+Audit notes
+
+- `dashboard.html` is the safest first candidate because it is read-only and currently depends on one V1 aggregate call: `IROUP.getReport(year)`.
+- `report.html` should migrate separately because it combines aggregate loading, V1 multi-sheet fallback reads, client-side row normalization, Chart.js, cache, and CSV export.
+- `mou.html`, `scholarship-events.html`, `travel.html`, and `mobility.html` are mixed read/write operational pages.
+- Upload workflows remain V1-only through `IROUP.uploadFile()` and `IROUP.uploadImage()`.
+- V2 admin list/detail routes exist, but create/update/delete, upload/file relation, person/staff lookup, quick-add staff, and budget relation routes are not ready.
+- Admin token propagation exists in both V1 and V2 clients, but mixed pages need a readiness check before enabling V2 admin reads.
+
+Audit record
+
+- `Team IROUP/backend/database-v2/ADMIN-MIGRATION-AUDIT.md`
+
+Recommended order
+
+1. `dashboard.html` read-only V2 summary proof.
+2. `report.html` read-only report/summary proof.
+3. MOU read-list-only pilot.
+4. Scholarship/events read-list-only pilot, split internally by module.
+5. Travel read-list-only pilot.
+6. Mobility read/detail-only pilot last.
+7. V2 CRUD only after write contracts are locked.
+8. V2 upload/file relation workflow only after CRUD contracts stabilize.
+
+Still not doing
+
+- operational page migration
+- frontend refactor
+- backend route changes
+- deployment
+- push
