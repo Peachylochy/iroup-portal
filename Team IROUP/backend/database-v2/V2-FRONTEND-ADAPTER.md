@@ -242,3 +242,37 @@ Still not migrated:
 - admin forms
 - V1 runtime
 - production cutover
+
+## Report Read-Only Summary Sidecar
+
+Date: 2026-05-11
+
+`report.html` now has a controlled V2 read-only report summary sidecar.
+
+Implementation pattern:
+
+```html
+<script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
+<script src="iroup-utils.js"></script>
+```
+
+Behavior:
+
+- `report.html` calls `IROUP_V2.admin.reportSummary(fiscalYear)` only after the V1 report load/render path succeeds.
+- The result is stored in page-local `v2ReportSummary`.
+- The badge `#v2ReportReadiness` reports `V2 report: checking`, `V2 report: ready`, or `V2 report: unavailable`.
+- V2 failure is caught locally and never throws into `loadAll()`.
+- Existing report KPIs, tables, charts, filters, and exports remain V1-backed.
+
+Still not migrated:
+
+- `getReportFast()`
+- `getAllFallback()`
+- `loadAll()`
+- `makeRows()`
+- `applyReport()`
+- `exportRaw()`
+- `exportFilteredCsv()`
+- admin CRUD/write/upload

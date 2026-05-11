@@ -2522,3 +2522,40 @@ Still not doing
 - dashboard render-source replacement
 - production `Code.gs` changes
 - push
+
+---
+
+67. Report Page V2 Read-Only Summary Sidecar (May 11, 2026)
+
+Summary
+
+Added the next controlled V2 read-only admin bridge to `report.html` only. The page still renders from the existing V1 report pipeline, and V2 is used only as a non-blocking report summary readiness sidecar.
+
+Implementation
+
+- Updated `Team IROUP/report.html`.
+- Loaded `iroup-v2-endpoint.js` and `iroup-v2-api.js` between `iroup-config.js` and `iroup-utils.js`.
+- Added `#v2ReportReadiness` with default text `V2 report: checking`.
+- Added page-local `v2ReportSummary`.
+- Added report-scoped `getV2ReportBridgeSession()` using existing V1 session metadata without exposing token values.
+- Added `fetchV2ReportSummary(fiscalYear)` using `IROUP_V2.admin.reportSummary(fiscalYear)`.
+- Called the V2 sidecar only after successful V1 load/render.
+
+Preserved V1 report flow
+
+- `getReportFast()`
+- `getAllFallback()`
+- `loadAll()`
+- `makeRows()`
+- `applyReport()`
+- `exportRaw()`
+- `exportFilteredCsv()`
+
+Still not doing
+
+- V1 `SCRIPT_URL` replacement
+- report render-source replacement
+- V2 data feeding into KPIs/table/charts
+- CRUD/write/upload migration
+- admin form or login/session changes
+- push

@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
 <script src="iroup-utils.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -30,6 +32,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="sub">สรุปข้อมูล MOU / ทุน / กิจกรรม / Inbound / Outbound / การเดินทาง พร้อมกรองและส่งออกข้อมูล</div>
     </div>
     <div class="quick-grid">
+      <span class="badge gray" id="v2ReportReadiness">V2 report: checking</span>
       <button class="btn" onclick="loadAll(true)">↻ โหลดใหม่</button>
       <button class="btn primary" onclick="exportFilteredCsv()">⬇ Export ตาม Filter</button>
     </div>
@@ -103,6 +106,7 @@ const SHEETS={
 let raw={inbound:[],outbound:[],travel:[],mou:[],scholar:[],event:[]};
 let allRows=[], filteredRows=[]; let trendChart=null;
 let isLoading=false;
+let v2ReportSummary=null;
 const REPORT_CACHE_KEY='iroup_report_cache_v4_full';
 const TABLE_LIMIT=500;
 const $=s=>document.querySelector(s);
@@ -137,6 +141,54 @@ function readCache(){try{const c=JSON.parse(localStorage.getItem(REPORT_CACHE_KE
 function writeCache(){try{localStorage.setItem(REPORT_CACHE_KEY,JSON.stringify({ts:Date.now(),raw}));}catch(e){console.warn('cache write failed',e)}}
 function useCache(){const c=readCache(); if(!c)return false; raw=c.raw; makeRows(); initFilters(); applyReport(); const ageMin=Math.round((Date.now()-c.ts)/60000); $('#notice').textContent=`แสดงข้อมูลจาก cache เมื่อ ${ageMin} นาทีที่แล้ว · กำลังอัปเดตจาก Google Sheet...`; return true;}
 
+function getV2ReportBridgeSession(){
+  // V2 read-only report bridge: inspect V1 session metadata only, never token values.
+  const result={email:'',name:'',hasAdminToken:false};
+  try{
+    const direct=sessionStorage.getItem('iroup_admin_token');
+    result.hasAdminToken=!!direct;
+    const rawUser=sessionStorage.getItem('iroup_user');
+    if(rawUser){
+      const user=JSON.parse(rawUser);
+      result.email=String(user.email||'').trim();
+      result.name=String(user.name||'').trim();
+      result.hasAdminToken=result.hasAdminToken || !!user.adminToken;
+    }
+  }catch(err){
+    console.warn('IROUP V2 report bridge could not read V1 session metadata.', err);
+  }
+  return result;
+}
+
+async function fetchV2ReportSummary(fiscalYear=''){
+  // V2 read-only sidecar: do not feed V2 data into the current V1 report render.
+  const badge=$('#v2ReportReadiness');
+  try{
+    if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.reportSummary){
+      throw new Error('IROUP_V2 report adapter is not available');
+    }
+    const bridgeSession=getV2ReportBridgeSession();
+    const adapterToken=typeof IROUP_V2.getAdminToken==='function' ? IROUP_V2.getAdminToken() : '';
+    if(!bridgeSession.email && !bridgeSession.hasAdminToken && !adapterToken){
+      throw new Error('No V1 admin session metadata available for V2 report handoff');
+    }
+    const response=await IROUP_V2.admin.reportSummary(fiscalYear || '');
+    if(!response.success) throw new Error(response.error || 'V2 report summary API error');
+    v2ReportSummary=response.data || null;
+    if(badge) badge.textContent='V2 report: ready';
+    console.info('IROUP V2 report summary readiness OK', {
+      fiscalYear: fiscalYear || 'all',
+      action: response.meta && response.meta.action ? response.meta.action : ''
+    });
+    return v2ReportSummary;
+  }catch(err){
+    v2ReportSummary=null;
+    if(badge) badge.textContent='V2 report: unavailable';
+    console.warn('IROUP V2 report summary readiness failed; V1 report render continues.', err);
+    return null;
+  }
+}
+
 function makeRows(){
   const inbound=raw.inbound.map(r=>({type:'Inbound', typeKey:'inbound', name:[pick(r,['ชื่อ']),pick(r,['ชื่อกลาง']),pick(r,['สกุล'])].filter(Boolean).join(' ')||pick(r,['ชื่อ_สกุล','ชื่อ-สกุล'],'-'), project:pick(r,['โครงการ','วัตถุประสงค์'],'-'), country:pick(r,['ประเทศ']), continent:pick(r,['ทวีป']), faculty:pick(r,['หน่วยงาน_UP','คณะ','หน่วยงาน']), start:pick(r,['วันมาถึง','วันเริ่ม']), end:pick(r,['วันกลับ','วันสิ้นสุด']), fy:pick(r,['ปีงบ']), people:1, budget:pick(r,['จำนวนเงิน']), file:pick(r,['ไฟล์_URL','Link']), level:pick(r,['ระดับ']), raw:r}));
   const outbound=raw.outbound.map(r=>({type:'Outbound', typeKey:'outbound', name:pick(r,['ชื่อ_สกุล','ชื่อ-สกุล','ชื่อผู้เดินทาง','ชื่อ','Full Name'],'-'), project:pick(r,['โครงการ','วัตถุประสงค์'],'-'), country:pick(r,['ประเทศ']), continent:pick(r,['ทวีป']), faculty:pick(r,['คณะ','หน่วยงาน_UP','หน่วยงาน']), institution:pick(r,['สถาบัน_ปลายทาง','มหาวิทยาลัยปลายทาง','สถาบัน','ปลายทาง']), start:pick(r,['วันออก','วันเริ่ม','วันเดินทาง']), end:pick(r,['วันกลับ','วันสิ้นสุด']), fy:pick(r,['ปีงบ']), people:countPeople(r), budget:pick(r,['จำนวนเงิน']), file:pick(r,['ไฟล์_URL','Link']), level:pick(r,['ระดับ','ประเภท']), raw:r}));
@@ -155,6 +207,7 @@ async function loadAll(force=false){
     try{ raw={inbound:[],outbound:[],travel:[],mou:[],scholar:[],event:[],...(await getReportFast())}; }
     catch(e){ console.warn('getReport failed, fallback to getAll',e); raw=await getAllFallback(); }
     writeCache(); makeRows(); initFilters(); applyReport();
+    setTimeout(()=>fetchV2ReportSummary($('#fyFilter').value || ''), 250);
     $('#notice').textContent=`โหลดข้อมูลล่าสุดแล้ว: MOU ${raw.mou.length} · ทุน ${raw.scholar.length} · กิจกรรม ${raw.event.length} · Inbound ${raw.inbound.length} · Outbound ${raw.outbound.length} · Travel ${raw.travel.length}`;
   }catch(e){ console.error('Report load failed',e); const hasData=allRows.length>0; $('#notice').textContent=hasData ? `⚠️ Google Sheet ตอบช้า/โหลดไม่สำเร็จ จึงแสดงข้อมูลจาก cache ก่อน (${e.message})` : `⚠️ โหลดข้อมูลไม่สำเร็จ: ${e.message}`; }
   finally{isLoading=false;}

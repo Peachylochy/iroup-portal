@@ -1542,3 +1542,43 @@ Still not doing:
 - admin CRUD/write/upload migration
 - global dashboard/admin architecture rewrite
 - production `Code.gs` changes
+
+---
+
+## 40. Report Page V2 Read-Only Summary Sidecar (2026-05-11)
+
+### Purpose
+
+Started the next controlled V2 admin-safe read-only expansion by adding a V2 report summary sidecar to `report.html`.
+
+### Runtime Architecture
+
+- `report.html` still renders from the existing V1 report flow.
+- V1 functions remain the operational source:
+  - `getReportFast()`
+  - `getAllFallback()`
+  - `loadAll()`
+  - `makeRows()`
+  - `applyReport()`
+  - `exportRaw()`
+  - `exportFilteredCsv()`
+- V2 is used only as a non-blocking readiness sidecar through `IROUP_V2.admin.reportSummary(fiscalYear)`.
+- V2 summary data is stored only in page-local `v2ReportSummary`.
+- V2 data is not used for KPIs, tables, charts, filters, or exports.
+
+### Changes
+
+- Added `iroup-v2-endpoint.js` and `iroup-v2-api.js` between `iroup-config.js` and `iroup-utils.js`.
+- Added `#v2ReportReadiness` badge with default text `V2 report: checking`.
+- Added report-scoped V1 session metadata preflight without logging token values.
+- Added `fetchV2ReportSummary(fiscalYear)` with graceful failure handling.
+- Called the sidecar only after successful V1 load/render.
+
+Still not doing:
+
+- replacing `IROUP.SCRIPT_URL`
+- replacing V1 report data source
+- feeding V2 data into report rendering
+- CRUD/write/upload migration
+- admin form/session/login changes
+- production cutover

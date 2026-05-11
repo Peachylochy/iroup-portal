@@ -710,3 +710,34 @@ Next recommended phase:
 2. Validate report/analytics aggregate DTOs.
 3. Pilot normalized DTO rendering for read-only admin views.
 4. Defer CRUD/write/upload migration until read-only admin stability is proven.
+
+## Controlled Read-Only Expansion - Report Summary Sidecar
+
+Date: 2026-05-11
+
+Status: implemented for `report.html` as a sidecar only.
+
+Confirmed design:
+
+- `report.html` keeps the V1 report pipeline active.
+- V2 calls only `IROUP_V2.admin.reportSummary(fiscalYear)`.
+- V2 summary data is stored separately in `v2ReportSummary`.
+- V2 summary data does not drive current KPIs, charts, tables, filters, or exports.
+- V2 failure is graceful and does not break V1 report rendering.
+
+Preserved V1 functions:
+
+- `getReportFast()`
+- `getAllFallback()`
+- `loadAll()`
+- `makeRows()`
+- `applyReport()`
+- `exportRaw()`
+- `exportFilteredCsv()`
+
+Next validation:
+
+- Browser-smoke `report.html`.
+- Confirm V1 data and exports still work.
+- Confirm `V2 report: ready` when the token bridge is valid.
+- Keep CRUD/write/upload deferred.
