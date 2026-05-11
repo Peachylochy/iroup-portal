@@ -770,3 +770,45 @@ Next validation:
 - Confirm V1 table, KPIs, filters, add/edit/delete, and upload controls still work.
 - Confirm `V2 travel: ready` when the token bridge is valid.
 - Keep CRUD/write/upload deferred.
+
+## V2 Write Isolation Architecture Plan
+
+Date: 2026-05-11
+
+Status: documented only.
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/V2-WRITE-ISOLATION-PLAN.md
+```
+
+Planning conclusions:
+
+- V2 writes must be module-specific, not generic sheet writes.
+- V1 `IROUP.add/edit/delete/uploadFile/uploadImage` must remain available during pilots.
+- Upload migration should be deferred until metadata-only writes are proven.
+- V2 write routes should require admin role authorization and audit fields.
+- Page-level rollback must be available before every pilot.
+
+Recommended first future write pilot:
+
+```text
+scholarship-events.html
+event metadata-only create/update
+```
+
+Pilot boundaries:
+
+- no delete in the first pass
+- no upload migration
+- no scholarship write migration in the same pass
+- no multi-page activation
+- no `IROUP.SCRIPT_URL` replacement
+
+Next gate before implementation:
+
+- review V2 event create/update backend contract
+- add isolated backend test routes only after approval
+- add explicit adapter wrappers only after backend contract review
+- keep all frontend write handlers V1-backed until the pilot is explicitly approved

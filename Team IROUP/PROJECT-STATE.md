@@ -1621,3 +1621,48 @@ Still not doing:
 - staff/country lookup migration
 - admin form/session/login changes
 - production cutover
+
+---
+
+## 42. V2 Write Isolation Architecture Plan (2026-05-11)
+
+### Purpose
+
+Created the documentation-only V2 write isolation plan before any admin CRUD migration begins.
+
+Document:
+
+```text
+Team IROUP/backend/database-v2/V2-WRITE-ISOLATION-PLAN.md
+```
+
+### Scope Covered
+
+- current V1 write surface map
+- page-level migration risk matrix for `mou.html`, `mobility.html`, `travel.html`, and `scholarship-events.html`
+- DTO normalization strategy
+- upload isolation plan
+- admin auth direction for future writes
+- rollback model
+- recommended phased write strategy
+
+### First Safe Write Candidate
+
+Recommended first future pilot:
+
+```text
+scholarship-events.html
+event metadata-only create/update
+```
+
+The first pilot should exclude delete and upload migration, keep V1 write handlers available, and use explicit V2 module write routes only after backend contracts are reviewed.
+
+Still not doing:
+
+- runtime code changes
+- frontend changes
+- backend route changes
+- V2 write activation
+- CRUD/write/upload migration
+- `IROUP.SCRIPT_URL` replacement
+- commit or push

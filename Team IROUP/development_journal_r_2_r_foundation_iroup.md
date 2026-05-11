@@ -2596,3 +2596,43 @@ Still not doing
 - staff/country lookup migration
 - admin form or login/session changes
 - push
+
+---
+
+69. V2 Write Isolation Architecture Plan (May 11, 2026)
+
+Summary
+
+Created a documentation-only architecture plan for future V2 write migration. No runtime, frontend, or backend route behavior was changed.
+
+Created
+
+- `Team IROUP/backend/database-v2/V2-WRITE-ISOLATION-PLAN.md`
+
+Plan coverage
+
+- current V1 write surface map
+- page risk matrix for `mou.html`, `mobility.html`, `travel.html`, and `scholarship-events.html`
+- DTO normalization strategy
+- upload isolation plan
+- auth direction for future V2 writes
+- rollback model
+- recommended migration phases
+
+Recommended first future write pilot
+
+- `scholarship-events.html`
+- event metadata-only create/update
+- no delete in the first pass
+- no upload migration in the first pass
+- keep V1 event write path available for rollback
+
+Still not doing
+
+- runtime code changes
+- frontend changes
+- backend route changes
+- V2 write activation
+- CRUD/write/upload migration
+- V1 `SCRIPT_URL` replacement
+- push
