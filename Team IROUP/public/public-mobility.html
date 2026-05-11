@@ -96,6 +96,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-
 <footer>© 2569 International Relations Office · University of Phayao</footer>
 <div class="modal-backdrop" id="detailModal"><div class="modal"><div class="modal-head"><div class="modal-title" id="modalTitle">รายละเอียด</div><button class="modal-close" onclick="closeDetail()">✕</button></div><div class="modal-body" id="modalBody"></div></div></div>
 <script src="iroup-config.js"></script>
+<script src="../iroup-v2-api.js"></script>
 <script>
 const FLAGS={'China':'🇨🇳','Japan':'🇯🇵','South Korea':'🇰🇷','Korea':'🇰🇷','Germany':'🇩🇪','Australia':'🇦🇺','Taiwan':'🇹🇼','USA':'🇺🇸','United States':'🇺🇸','United Kingdom':'🇬🇧','France':'🇫🇷','Vietnam':'🇻🇳','Myanmar':'🇲🇲','Indonesia':'🇮🇩','Malaysia':'🇲🇾','Philippines':'🇵🇭','Singapore':'🇸🇬','India':'🇮🇳','Thailand':'🇹🇭','Laos':'🇱🇦','Cambodia':'🇰🇭','Hong Kong':'🇭🇰'};
 const countryAlias={'china':['china','cn','จีน'],'japan':['japan','jp','ญี่ปุ่น'],'south korea':['south korea','korea','kr','เกาหลี'],'united states of america':['usa','us','united states','america','สหรัฐ'],'australia':['australia','au','ออสเตรเลีย'],'france':['france','fr','ฝรั่งเศส'],'germany':['germany','de','เยอรมนี'],'thailand':['thailand','th','ไทย'],'malaysia':['malaysia','my','มาเลเซีย'],'indonesia':['indonesia','id','อินโดนีเซีย'],'singapore':['singapore','sg','สิงคโปร์'],'india':['india','in','อินเดีย'],'vietnam':['vietnam','vn','เวียดนาม'],'laos':['laos','lao','ลาว'],'cambodia':['cambodia','kh','กัมพูชา'],'myanmar':['myanmar','mm','พม่า']};
@@ -106,47 +107,64 @@ function fmtDate(v){const d=toDate(v);return d?d.toLocaleDateString('th-TH',{day
 function dateValue(v){const d=toDate(v);return d?d.getTime():0;}
 function flag(c){return FLAGS[c]||'🌍'}
 function first(...vals){return vals.find(v=>v!==undefined && v!==null && String(v).trim()!=='')||''}
+function displayCountry(v){if(!v)return '';if(typeof v!=='object')return String(v||'');return first(v.country_name_en,v.country_name_th,v.name_en,v.name_th,v.country_id);}
+function displayContinent(v){if(!v)return '';if(typeof v!=='object')return String(v||'');return first(v.continent_en,v.continent_th,v.continent_name_en,v.continent_name_th,v.name_en,v.name_th,v.continent_id);}
+function displayUnit(v){if(!v)return '';if(typeof v!=='object')return String(v||'');return first(v.unit_name_th,v.unit_name_en,v.name_th,v.name_en,v.unit_code,v.unit_id);}
+function participantTotal(row){if(row.participant_count!==undefined&&row.participant_count!==null&&String(row.participant_count).trim()!=='')return row.participant_count;const counts=row.participant_counts;if(counts&&typeof counts==='object')return Object.values(counts).reduce((sum,v)=>sum+(Number(v)||0),0);return 0;}
+function firstPublicFileUrl(files){const list=Array.isArray(files)?files:[];const found=list.find(file=>file&&file.file_url);return found?found.file_url:'';}
 function normalizePublicMobility(row){
   const direction=row.direction==='outbound'?'outbound':'inbound';
+  const country=displayCountry(row.country);
+  const continent=displayContinent(row.continent);
+  const unit=displayUnit(row.unit);
+  const institution=first(row.institution_name,row.institution);
+  const project=first(row.project_name,row.project);
+  const participantType=first(row.participant_group,row.level,row.participant_type,'Mobility');
   return {
     _source:'public-mobility',
     _kind:direction,
-    'ประเทศ':row.country||'',
-    'ทวีป':row.continent||'',
-    'หน่วยงาน_UP':row.up_unit||'',
-    'คณะ':row.up_unit||'',
-    'สถาบัน':direction==='inbound'?(row.institution||''):'',
-    'สถาบัน_ปลายทาง':direction==='outbound'?(row.institution||''):'',
-    'โครงการ':row.project||'',
+    'ประเทศ':country||row.country||'',
+    'ทวีป':continent||row.continent||'',
+    'หน่วยงาน_UP':unit||row.up_unit||'',
+    'คณะ':unit||row.up_unit||'',
+    'สถาบัน':direction==='inbound'?institution:'',
+    'สถาบัน_ปลายทาง':direction==='outbound'?institution:'',
+    'โครงการ':project,
     'วัตถุประสงค์':row.purpose||'',
-    'ประเภท':row.participant_type||'Mobility',
-    'จำนวน':row.participant_count||0,
+    'ประเภท':participantType,
+    'จำนวน':participantTotal(row),
     'ปีงบ':row.fiscal_year||'',
     'วันมาถึง':direction==='inbound'?(row.start_date||''):'',
     'วันออก':direction==='outbound'?(row.start_date||''):'',
     'วันเริ่ม':row.start_date||'',
     'วันกลับ':row.end_date||'',
     'วันสิ้นสุด':row.end_date||'',
+    public_file_url:row.public_file_url||firstPublicFileUrl(row.files),
     status:row.status||''
   };
 }
 function normalizePublicTravel(row){
+  const country=displayCountry(row.country);
+  const continent=displayContinent(row.continent);
+  const unit=displayUnit(row.unit);
+  const project=first(row.project_name,row.project);
   return {
     _source:'public-travel',
     _kind:'travel',
-    'ประเทศ':row.country||'',
-    'ทวีป':row.continent||'',
+    'ประเทศ':country||row.country||'',
+    'ทวีป':continent||row.continent||'',
     'เมือง':row.city||'',
-    'หน่วยงาน_UP':row.up_unit||'',
-    'คณะ':row.up_unit||'',
-    'ชื่อโครงการ':row.project||'',
-    'โครงการ':row.project||'',
+    'หน่วยงาน_UP':unit||row.up_unit||'',
+    'คณะ':unit||row.up_unit||'',
+    'ชื่อโครงการ':project,
+    'โครงการ':project,
     'วัตถุประสงค์':row.purpose||'',
     'ประเภท':'การเดินทางบุคลากร',
-    'จำนวน':row.participant_count||0,
+    'จำนวน':participantTotal(row),
     'ปีงบ':row.fiscal_year||'',
     'วันเริ่ม':row.start_date||'',
     'วันสิ้นสุด':row.end_date||'',
+    public_file_url:row.public_file_url||firstPublicFileUrl(row.files),
     status:row.status||''
   };
 }
@@ -244,11 +262,13 @@ function fillCountries(){const sel=document.getElementById('countryFilter');cons
 function setLang(lang){document.querySelectorAll('.nav-lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===lang));}
 async function init(){
   try{
-    const [mobilityPayload,travelRows]=await Promise.all([IROUP.getPublicMobility(),IROUP.getPublicTravel()]);
-    const mobilityRows=(mobilityPayload.data||[]).map(normalizePublicMobility);
+    const [mobilityResponse,travelResponse]=await Promise.all([IROUP_V2.public.mobilityList(),IROUP_V2.public.travelList()]);
+    if(!mobilityResponse.success)throw new Error(mobilityResponse.error||'V2 mobility API error');
+    if(!travelResponse.success)throw new Error(travelResponse.error||'V2 travel API error');
+    const mobilityRows=(mobilityResponse.data||[]).map(normalizePublicMobility);
     inbound=mobilityRows.filter(r=>r._kind==='inbound');
     outbound=mobilityRows.filter(r=>r._kind==='outbound');
-    travel=(travelRows||[]).map(normalizePublicTravel);
+    travel=(travelResponse.data||[]).map(normalizePublicTravel);
     document.getElementById('kpi-in').textContent=sumPeople(inbound);
     document.getElementById('kpi-out').textContent=sumPeople(outbound);
     document.getElementById('kpi-travel').textContent=sumPeople(travel);

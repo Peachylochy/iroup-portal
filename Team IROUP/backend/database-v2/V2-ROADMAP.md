@@ -155,7 +155,7 @@ Purpose:
 
 Current rule:
 
-- `public-scholar.html`, `public-events.html`, and `public-mou.html` are approved Public Migration Wave 1 pages using `iroup-v2-api.js`.
+- `public-scholar.html`, `public-events.html`, `public-mou.html`, and `public-mobility.html` are approved Public Migration Wave 1 pages using `iroup-v2-api.js`.
 - Do not load `iroup-v2-api.js` into additional pages until each page migration is reviewed.
 - Configure V2 endpoint explicitly during testing; the adapter intentionally has no hardcoded deployment URL.
 
@@ -167,6 +167,7 @@ Pilot pages:
 Team IROUP/public/public-scholar.html
 Team IROUP/public/public-events.html
 Team IROUP/public/public-mou.html
+Team IROUP/public/public-mobility.html
 ```
 
 Pilot scope:
@@ -174,9 +175,11 @@ Pilot scope:
 - Primary public scholarship data-loading flow only.
 - Primary public events data-loading flow only.
 - Primary public MOU list data-loading flow only.
+- Primary public mobility/travel list data-loading flows only.
 - Existing UI/rendering/filter behavior preserved.
 - V2 DTO fields adapted locally to the old render shape.
 - Public MOU map aggregation remains page-local from list rows; `v2.public.mou.map` is not adopted yet.
+- Public mobility/travel stats, charts, and map remain page-local from list rows; `v2.public.mobility.summary`, `v2.public.travel.summary`, and `v2.public.mobility.map` are not adopted yet.
 
 Pilot blocker:
 
@@ -184,7 +187,7 @@ Pilot blocker:
 
 Next rule:
 
-- Review the public scholarship, events, and MOU list pilots before migrating another public page or any admin page.
+- Review the public scholarship, events, MOU list, and mobility/travel list pilots before migrating another public page or any admin page.
 
 ## Architecture Direction
 

@@ -1714,3 +1714,46 @@ Still not doing
 - production `Code.gs` wiring
 - deployment
 - V1 helper removal
+
+---
+
+48. Public Migration Wave 1 - Mobility/Travel List Page (May 11, 2026)
+
+Summary
+
+Completed the remaining major Public Migration Wave 1 page by moving only the public mobility and travel list data-loading flows to the V2 adapter.
+
+Target page
+
+- `Team IROUP/public/public-mobility.html`
+
+Implementation notes
+
+- Added `../iroup-v2-api.js`.
+- Replaced `IROUP.getPublicMobility()` with `IROUP_V2.public.mobilityList()`.
+- Replaced `IROUP.getPublicTravel()` with `IROUP_V2.public.travelList()`.
+- Preserved existing KPI rendering, charts, D3 map rendering, local country aggregation, country filters, top countries, detail modal, timeline, `personCount()`, and visual behavior.
+- Kept the existing page-local render shape by hardening compatibility normalization from V2 mobility/travel DTO fields.
+- Did not use `IROUP_V2.public.mobilitySummary()`, `IROUP_V2.public.travelSummary()`, or `IROUP_V2.public.mobilityMap()`.
+
+DTO mismatch discovered
+
+The old public mobility page expected V1-style list fields such as string `country`, string `continent`, `up_unit`, `institution`, `project`, `participant_type`, and `participant_count`. The V2 DTO returns normalized fields such as structured `country/continent/unit`, `institution_name`, `project_name`, `participant_group`, `level`, `participant_count`, `participant_counts`, and `files[]`.
+
+Resolution
+
+The page now maps those V2 fields locally without refactoring its KPI/chart/map/filter/modal/timeline layer.
+
+Current limitation
+
+The V2 adapter still has no hardcoded deployment URL. Live data verification requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`. Travel unit display may remain blank because the current public travel DTO does not expose a unit object. Map compatibility depends on V2 country display names matching the page's existing alias and world-atlas matching logic.
+
+Still not doing
+
+- V2 mobility/travel aggregate route adoption
+- admin migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` wiring
+- deployment
+- V1 helper removal

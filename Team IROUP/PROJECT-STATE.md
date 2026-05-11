@@ -866,7 +866,7 @@ It standardizes:
 - Existing pages were not modified.
 - `iroup-config.js` was not replaced.
 - `IROUP.SCRIPT_URL` was not changed.
-- `public/public-scholar.html`, `public/public-events.html`, and `public/public-mou.html` now load `iroup-v2-api.js` for approved public read-only pilot flows.
+- `public/public-scholar.html`, `public/public-events.html`, `public/public-mou.html`, and `public/public-mobility.html` now load `iroup-v2-api.js` for approved public read-only pilot flows.
 - The adapter has no hardcoded deployed V2 URL; it must be configured later with `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
 
 Current status:
@@ -997,6 +997,50 @@ Live data verification still requires explicit V2 endpoint configuration through
 Still not doing:
 
 - V2 MOU map aggregate route adoption
+- admin page migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` edits
+- deployment
+- V1 helper removal
+
+---
+
+## 38. Public Migration Wave 1 - Mobility/Travel List Page (2026-05-11)
+
+### Purpose
+
+Completed the remaining major Public Migration Wave 1 page by moving public mobility and travel list data sources to the V2 adapter.
+
+Target page:
+
+```text
+Team IROUP/public/public-mobility.html
+```
+
+### Changes
+
+- Added `../iroup-v2-api.js` to the public mobility page.
+- Migrated only the primary list data-loading calls from `IROUP.getPublicMobility()` / `IROUP.getPublicTravel()` to `IROUP_V2.public.mobilityList()` / `IROUP_V2.public.travelList()`.
+- Kept existing KPI rendering, charts, D3 map, local country aggregation, filters/search, top countries, detail modal, timeline, `personCount()`, and visual behavior intact.
+- Hardened only the page-local compatibility normalization paths for V2 mobility and travel DTOs.
+
+### DTO Compatibility Notes
+
+The page still renders through its existing V1-style local shape. The mapper now adapts:
+
+- structured `country`, `continent`, and `unit` objects where available
+- `institution_name` and `project_name`
+- `participant_group`, `level`, `participant_count`, and `participant_counts`
+- public `files[]` entries for file URLs, although the current public UI does not actively render those links
+
+### Current Limitation
+
+Live data verification still requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`. The page intentionally does not use `IROUP_V2.public.mobilitySummary()`, `IROUP_V2.public.travelSummary()`, or `IROUP_V2.public.mobilityMap()` yet; all stats/map/chart output remains derived from normalized list rows to preserve current behavior.
+
+Still not doing:
+
+- V2 mobility/travel aggregate route adoption
 - admin page migration
 - dashboard/report migration
 - auth flow changes
