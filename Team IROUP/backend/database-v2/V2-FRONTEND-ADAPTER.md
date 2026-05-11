@@ -24,11 +24,14 @@ Current pilot pages:
 ```text
 Team IROUP/public/public-scholar.html
 Team IROUP/public/public-events.html
+Team IROUP/public/public-mou.html
 ```
 
 `public-scholar.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.scholarshipList()` for its primary public data flow. The adapter still has no hardcoded deployment URL, so live data requires explicit V2 endpoint configuration.
 
 `public-events.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.eventList()` for its primary public data flow. It keeps existing calendar, status, filter, poster, file, and KPI behavior by mapping V2 DTO fields into the page-local render shape.
+
+`public-mou.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.mouList()` for its primary public list data flow. It keeps existing KPI, table, chart, filter/search, D3 map rendering, and local country aggregation behavior by mapping V2 DTO fields into the page-local render shape. It does not use `IROUP_V2.public.mouMap()` yet.
 
 ## Safety Rules
 
@@ -154,6 +157,7 @@ Pilot status:
 
 - `public-scholar.html` completed steps 1, 3, and 4.
 - `public-events.html` completed steps 1, 3, and 4.
+- `public-mou.html` completed steps 1, 3, and 4 for list data only.
 - Step 2 is blocked until a V2 deployment URL is available.
 - Step 5 requires live V2 endpoint verification.
 

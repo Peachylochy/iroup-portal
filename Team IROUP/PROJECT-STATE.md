@@ -866,7 +866,7 @@ It standardizes:
 - Existing pages were not modified.
 - `iroup-config.js` was not replaced.
 - `IROUP.SCRIPT_URL` was not changed.
-- `public/public-scholar.html` and `public/public-events.html` now load `iroup-v2-api.js` for approved public read-only pilot flows.
+- `public/public-scholar.html`, `public/public-events.html`, and `public/public-mou.html` now load `iroup-v2-api.js` for approved public read-only pilot flows.
 - The adapter has no hardcoded deployed V2 URL; it must be configured later with `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
 
 Current status:
@@ -953,6 +953,50 @@ Live data verification still requires explicit V2 endpoint configuration through
 
 Still not doing:
 
+- admin page migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` edits
+- deployment
+- V1 helper removal
+
+---
+
+## 37. Public Migration Wave 1 - MOU List Page (2026-05-11)
+
+### Purpose
+
+Continued public read-only migration by moving the public MOU page's primary list data source to the V2 adapter.
+
+Target page:
+
+```text
+Team IROUP/public/public-mou.html
+```
+
+### Changes
+
+- Added `../iroup-v2-api.js` to the public MOU page.
+- Migrated only the primary MOU list data-loading call from `IROUP.getPublicMou()` to `IROUP_V2.public.mouList()`.
+- Kept existing KPI, table, chart, filter/search, D3 map rendering, local country aggregation, `IROUP.getMouStatus()`, `IROUP.formatDate()`, and world-atlas CDN behavior intact.
+- Hardened the page-local compatibility normalization path for V2 MOU DTOs.
+
+### DTO Compatibility Notes
+
+The MOU page still renders through its existing V1-style local shape. The mapper now adapts:
+
+- `partner_org_name/partner_org_name_en`
+- structured `country`, `continent`, and `unit` objects
+- `mou_type`
+- public `files[]` entries for file URLs
+
+### Current Limitation
+
+Live data verification still requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`. The page intentionally does not use `IROUP_V2.public.mouMap()` yet; map counts remain derived from the normalized list rows to preserve current behavior.
+
+Still not doing:
+
+- V2 MOU map aggregate route adoption
 - admin page migration
 - dashboard/report migration
 - auth flow changes

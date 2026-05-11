@@ -293,6 +293,7 @@ footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(
 </footer>
 
 <script src="iroup-config.js"></script>
+<script src="../iroup-v2-api.js"></script>
 <script>
 let allMou = [];
 let currentStatus = '';
@@ -303,7 +304,9 @@ let mouChart = null;
 // ============================================================
 async function loadData() {
   try {
-    const data = (await IROUP.getPublicMou()).map(normalizePublicMou);
+    const response = await IROUP_V2.public.mouList();
+    if (!response.success) throw new Error(response.error || 'V2 MOU API error');
+    const data = (response.data || []).map(normalizePublicMou);
     allMou = data;
     updateKPI(data);
     renderTable(data);
@@ -316,19 +319,47 @@ async function loadData() {
 }
 
 function normalizePublicMou(row) {
+  const country = normalizePublicCountryName(row.country);
+  const continent = normalizePublicContinentName(row.continent);
+  const unit = normalizePublicUnitName(row.unit);
+  const fileUrl = firstPublicFileUrl(row.files);
   return {
     ID: row.mou_id || '',
-    'องค์กร_ตปท': row.partner_org || '',
-    'ประเทศ': row.country || '',
-    'ทวีป': row.continent || '',
-    'หน่วยงาน_UP': row.up_unit || '',
-    'ประเภท': row.type || 'MOU',
+    'องค์กร_ตปท': row.partner_org_name || row.partner_org_name_en || row.partner_org || '',
+    'ประเทศ': country || row.country || '',
+    'ทวีป': continent || row.continent || '',
+    'หน่วยงาน_UP': unit || row.up_unit || '',
+    'ประเภท': row.mou_type || row.type || 'MOU',
     'วันเริ่ม': row.start_date || '',
     'วันสิ้นสุด': row.end_date || '',
     'ปีงบ': row.fiscal_year || '',
-    public_file_url: row.public_file_url || '',
+    public_file_url: row.public_file_url || fileUrl || '',
     public_status: row.status || ''
   };
+}
+
+function normalizePublicCountryName(country) {
+  if (!country) return '';
+  if (typeof country !== 'object') return String(country || '');
+  return country.country_name_en || country.country_name_th || country.name_en || country.name_th || country.country_id || '';
+}
+
+function normalizePublicContinentName(continent) {
+  if (!continent) return '';
+  if (typeof continent !== 'object') return String(continent || '');
+  return continent.continent_name_en || continent.continent_name_th || continent.name_en || continent.name_th || continent.continent_id || '';
+}
+
+function normalizePublicUnitName(unit) {
+  if (!unit) return '';
+  if (typeof unit !== 'object') return String(unit || '');
+  return unit.unit_name_th || unit.unit_name_en || unit.name_th || unit.name_en || unit.unit_id || '';
+}
+
+function firstPublicFileUrl(files) {
+  const list = Array.isArray(files) ? files : [];
+  const found = list.find(file => file && file.file_url);
+  return found ? found.file_url : '';
 }
 
 function updateKPI(data) {

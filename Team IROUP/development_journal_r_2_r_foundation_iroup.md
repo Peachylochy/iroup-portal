@@ -1672,3 +1672,45 @@ Still not doing
 - production `Code.gs` wiring
 - deployment
 - V1 helper removal
+
+---
+
+47. Public Migration Wave 1 - MOU List Page (May 11, 2026)
+
+Summary
+
+Continued the public V2 migration by moving only the primary public MOU list data-loading flow to the V2 adapter.
+
+Target page
+
+- `Team IROUP/public/public-mou.html`
+
+Implementation notes
+
+- Added `../iroup-v2-api.js`.
+- Replaced the primary `IROUP.getPublicMou()` call with `IROUP_V2.public.mouList()`.
+- Preserved existing KPI logic, table rendering, chart rendering, D3 map rendering, local country aggregation, filters/search, `IROUP.getMouStatus()`, `IROUP.formatDate()`, and world-atlas CDN behavior.
+- Kept the existing page-local render shape by hardening compatibility normalization from V2 MOU DTO fields.
+- Did not use `IROUP_V2.public.mouMap()` yet.
+
+DTO mismatch discovered
+
+The old public MOU page expected V1-style fields such as `partner_org`, string `country`, string `continent`, `up_unit`, `type`, and `public_file_url`. The V2 DTO returns normalized fields such as `partner_org_name/partner_org_name_en`, structured `country/continent/unit`, `mou_type`, and `files[]`.
+
+Resolution
+
+The page now maps those V2 fields locally without refactoring its KPI/table/chart/map/filter layer.
+
+Current limitation
+
+The V2 adapter still has no hardcoded deployment URL. Live data verification requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`. Map compatibility depends on V2 country display names matching the page's existing alias, country ID, and coordinate tables.
+
+Still not doing
+
+- V2 MOU map aggregate route adoption
+- admin migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` wiring
+- deployment
+- V1 helper removal
