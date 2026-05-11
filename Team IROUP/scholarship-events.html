@@ -687,6 +687,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 </div>
 <div class="modal-footer">
 <button class="modal-btn modal-cancel" onclick="closeModal()">ยกเลิก</button>
+<button class="modal-btn modal-cancel" onclick="previewV2EventDraft()">Preview V2 Draft</button>
 <button class="modal-btn modal-save">💾 บันทึก</button>
 </div>
 </div>
@@ -726,6 +727,8 @@ function togglePill(el){
 }
 </script>
 <script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
 <script src="iroup-utils.js"></script>
 <script>
 /* ROUND 9 — Live CRUD for Scholarships & Events */
@@ -970,6 +973,58 @@ window.openModal=function(type,id){
   if(IROUND9_currentType==='scholar') fillScholarForm(row);
   else fillEventForm(row);
 };
+function buildV2EventDraftPayload(formData){
+  const f=formData || document.getElementById('eventForm');
+  const inputs=qsa(f,'input,textarea,select').filter(el=>el.type!=='file' && !el.classList.contains('asset-url-input'));
+  const modal=document.getElementById('modalOverlay');
+  return {
+    event_id: modal?.dataset.editId || '',
+    title: inputs[0]?.value || '',
+    type: inputs[1]?.value || '',
+    organizer: inputs[2]?.value || '',
+    start_date: inputs[3]?.value || '',
+    end_date: inputs[4]?.value || '',
+    start_time: inputs[5]?.value || '',
+    end_time: inputs[6]?.value || '',
+    location: inputs[7]?.value || '',
+    participant_count: inputs[8]?.value || '',
+    detail: inputs[9]?.value || '',
+    status: 'draft',
+    public_visible: false,
+    pin: false
+  };
+}
+async function previewV2EventDraft(payload){
+  try{
+    if(IROUND9_currentType !== 'event'){
+      alert('V2 draft preview is available for Event metadata only.');
+      return null;
+    }
+    if(!window.IROUP_V2 || typeof IROUP_V2.request !== 'function'){
+      throw new Error('IROUP_V2 adapter is not available.');
+    }
+    const draft=payload || buildV2EventDraftPayload(document.getElementById('eventForm'));
+    const action=draft.event_id ? 'v2.admin.event.update.dryRun' : 'v2.admin.event.create.dryRun';
+    const response=await IROUP_V2.request(action,{payload:draft},{auth:true,method:'POST',timeoutMs:120000});
+    const preview=response && response.data ? response.data : {};
+    console.info('IROUP V2 event draft preview', {
+      action,
+      request_payload:draft,
+      normalized_event:preview.normalized_event || null,
+      warnings:preview.warnings || [],
+      dry_run:preview.dry_run,
+      write_enabled:preview.write_enabled,
+      response
+    });
+    alert(response.success ? 'V2 draft preview ready. Check console for normalized payload and warnings.' : 'V2 draft preview unavailable: '+(response.error||'Unknown V2 error'));
+    return response;
+  }catch(err){
+    console.warn('IROUP V2 event draft preview failed; V1 save flow is unchanged.', err);
+    alert('V2 draft preview failed: '+(err && err.message ? err.message : err));
+    return null;
+  }
+}
+window.previewV2EventDraft=previewV2EventDraft;
 async function round9Save(){
   const type=IROUND9_currentType;
   const id=document.getElementById('modalOverlay').dataset.editId;

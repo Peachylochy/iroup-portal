@@ -2678,3 +2678,39 @@ Still not doing
 - V1 `Code.gs` changes
 - V1 `SCRIPT_URL` replacement
 - push
+
+---
+
+71. Event Draft Frontend Validation-Only Pilot (May 11, 2026)
+
+Summary
+
+Added a non-invasive frontend validation helper to `scholarship-events.html` for EVENT metadata dry-run preview. Existing V1 save/delete/upload flows remain unchanged.
+
+Changed
+
+- `Team IROUP/scholarship-events.html`
+- `Team IROUP/PROJECT-STATE.md`
+- `Team IROUP/backend/database-v2/V2-ROADMAP.md`
+- `Team IROUP/development_journal_r_2_r_foundation_iroup.md`
+
+Implementation
+
+- Loaded `iroup-v2-endpoint.js` and `iroup-v2-api.js` before `iroup-utils.js`.
+- Added `buildV2EventDraftPayload(formData)`.
+- Added `previewV2EventDraft(payload)`.
+- Exposed `window.previewV2EventDraft`.
+- Added a temporary `Preview V2 Draft` button in the modal footer.
+- The helper calls `v2.admin.event.create.dryRun` or `v2.admin.event.update.dryRun` through `IROUP_V2.request()`.
+
+Still not doing
+
+- replacing `round9Save()`
+- intercepting V1 save
+- real V2 create/update
+- sheet mutation
+- upload/image/file relation handling
+- delete migration
+- public rendering changes
+- export changes
+- push

@@ -1718,3 +1718,40 @@ Still not doing:
 - V1 `Code.gs` changes
 - `IROUP.SCRIPT_URL` replacement
 - commit or push
+
+---
+
+## 44. Event Draft Frontend Validation-Only Pilot (2026-05-11)
+
+### Purpose
+
+Added a frontend-side validation-only pilot to `scholarship-events.html` for EVENT metadata.
+
+### Scope
+
+- Loaded `iroup-v2-endpoint.js` and `iroup-v2-api.js` beside the existing V1 config/utils.
+- Added `buildV2EventDraftPayload(formData)` for page-local EVENT metadata mapping.
+- Added `previewV2EventDraft(payload)` for manual dry-run validation.
+- Added a temporary `Preview V2 Draft` button in the modal footer.
+- Exposed `window.previewV2EventDraft` for console-triggered testing.
+
+### Runtime Behavior
+
+- The helper collects current EVENT form fields only.
+- The helper calls `v2.admin.event.create.dryRun` for new modal state and `v2.admin.event.update.dryRun` when an edit ID is present.
+- The helper logs the request payload, normalized preview, warnings, `dry_run`, and `write_enabled` to the browser console.
+- V2 failure is caught locally and does not affect V1 UI.
+
+Still not doing:
+
+- replacing existing submit
+- intercepting save
+- real V2 create/update
+- sheet mutation
+- upload/image/file relation handling
+- delete migration
+- public rendering changes
+- export changes
+- auto-triggered dry-run
+- `IROUP.SCRIPT_URL` replacement
+- commit or push

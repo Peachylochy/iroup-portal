@@ -851,3 +851,35 @@ Next gate:
 - live smoke the dry-run routes with a valid admin token
 - review normalized preview shape against `scholarship-events.html` event form fields
 - only then consider adapter wrappers and a frontend validation sidecar
+
+## Event Draft Frontend Validation-Only Pilot
+
+Date: 2026-05-11
+
+Status: implemented for `scholarship-events.html` as a validation-only helper.
+
+Design:
+
+- loads the live V2 endpoint config and V2 adapter on `scholarship-events.html`
+- keeps the existing V1 `round9Save()` path unchanged
+- adds `buildV2EventDraftPayload(formData)` for EVENT metadata mapping
+- adds manual `previewV2EventDraft(payload)` dry-run preview
+- adds a temporary modal footer button: `Preview V2 Draft`
+- uses `IROUP_V2.request()` against `v2.admin.event.create.dryRun` or `v2.admin.event.update.dryRun`
+
+Boundaries:
+
+- no real V2 write
+- no sheet mutation
+- no upload/image/file relation handling
+- no delete migration
+- no public rendering changes
+- no export changes
+- no auto-triggered dry-run
+
+Next gate:
+
+- browser smoke the existing V1 add/edit/delete/upload behavior
+- manually test `Preview V2 Draft` from the Event modal
+- confirm returned `dry_run === true` and `write_enabled === false`
+- only then consider adapter convenience wrappers
