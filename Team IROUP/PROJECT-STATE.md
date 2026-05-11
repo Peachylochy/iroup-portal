@@ -8,45 +8,46 @@
 
 ---
 
-## Latest V2 Admin-Safe Read-Only Bridge Pilot
+## Latest V2 Backend Admin Token Auth Bridge
 
-### Session: 2026-05-11 - Dashboard V2 Aggregate Read Bridge
+### Session: 2026-05-11 - V2 Admin Token Authentication
 
-**Phase goal:** Activate the isolated V2 admin aggregate summary sidecar in `dashboard.html` only. Dashboard rendering remains V1-backed through `IROUP.getReport(year)`. No CRUD, upload, edit/delete, admin forms, auth/session logic, backend deployment, or `IROUP.SCRIPT_URL` replacement.
+**Phase goal:** Allow isolated V2 admin read-only routes to authenticate from a verifiable `adminToken` handoff when Apps Script active-user email is unavailable. No CRUD/write/upload migration, public route change, V1 runtime change, backend deployment, or `IROUP.SCRIPT_URL` replacement.
 
 Implementation:
 
-- Updated only `Team IROUP/dashboard.html`.
-- Added `Team IROUP/iroup-v2-endpoint.js` before `iroup-v2-api.js`.
-- Kept the existing `fetchV2DashboardSummary()` sidecar as a read-only readiness bridge.
-- Added a frontend-only V1 session preflight for the V2 bridge using `sessionStorage.iroup_user` and `sessionStorage.iroup_admin_token`.
-- Added isolation comments around the V2 bridge loader and summary function.
-- Kept `reloadData()`, `fetchReport(year)`, `filteredReport()`, `makeSummary()`, cards, charts, tables, and dashboard UI V1-backed.
-- `state.v2Summary` remains separate from `state.raw`.
-
-Load order:
-
-```html
-<script src="iroup-config.js"></script>
-<script src="iroup-v2-endpoint.js"></script>
-<script src="iroup-v2-api.js"></script>
-```
+- Updated only V2 backend auth/router files:
+  - `Team IROUP/backend/database-v2/IROUP_V2_AUTH.gs`
+  - `Team IROUP/backend/database-v2/IROUP_V2_ROUTER.gs`
+- `routeV2Request_(e)` now passes the normalized request to `requireV2Admin_(request)`.
+- `requireV2Admin_(request)` now tries verifiable `adminToken` auth before falling back to `Session.getActiveUser().getEmail()`.
+- Token auth supports:
+  - hashed token map via script property `IROUP_V2_ADMIN_TOKEN_MAP_JSON`
+  - signed V2 token format `v2adm.<payload>.<signature>` using script property `IROUP_V2_ADMIN_TOKEN_SECRET`
+  - Google access/ID token verification through Google token APIs
+- Authenticated token email is still checked against the V2 `ADMIN` sheet and requires `active = TRUE`.
 
 Scope boundary:
 
-- `dashboard.html` calls only `IROUP_V2.admin.dashboardSummary()` on the V2 bridge.
-- No dashboard CRUD/write/upload routes are activated.
-- Sidebar/navigation and dashboard layout remain unchanged.
-- Public page V2 activation remains unchanged.
-- `IROUP.SCRIPT_URL` remains the V1 admin production lane.
+- V2 public routes remain unchanged.
+- V1 `backend/Code.gs` remains unchanged.
+- Frontend remains unchanged for this backend pass.
+- Current V2 admin routes are read-only list/detail/summary routes; no V2 CRUD/write/upload route was added.
 
 Runtime note:
 
-- The endpoint file contains the live isolated V2 `/exec` URL.
-- V2 summary failure is graceful: badge changes to unavailable, `state.v2Summary` is cleared, and V1 dashboard rendering continues.
-- Local browser smoke returned `No active Apps Script user email available` for the V2 admin route, confirming the current admin-auth deployment caveat while preserving V1 dashboard rendering.
-- The frontend handoff does not create new auth. It only reuses the existing V1 session metadata so V2 read-only calls are attempted only from an admin session context.
-- Verification covered both no-session and session-metadata cases; V1 dashboard rendering continued in both.
+- Existing V1 opaque UUID `adminToken` values are stored in the V1 Apps Script cache and cannot be decoded by the isolated V2 deployment unless mapped by hash in `IROUP_V2_ADMIN_TOKEN_MAP_JSON`.
+- Invalid, unmapped, expired, or inactive-admin tokens are rejected before route handlers run.
+- Session active-user auth remains available as a fallback.
+
+Expected runtime checks after review/redeploy:
+
+- `v2.health` remains public and passes.
+- Public V2 routes remain public and pass.
+- `v2.admin.dashboard.summary` succeeds for a verified token mapped/signed to `panpancake17@gmail.com`.
+- Invalid or unmapped token is rejected.
+- Inactive admin email is rejected.
+- Dashboard V1 fallback still renders if V2 auth fails.
 
 Expected runtime checks:
 
@@ -1483,3 +1484,61 @@ Still not doing:
 - production `Code.gs` edits
 - deployment
 - V1 helper removal
+
+---
+
+## 39. Controlled V2 Admin Bridge Activation Milestone (2026-05-11)
+
+### Confirmed Live State
+
+The controlled V2 admin-safe sidecar bridge is now operational.
+
+Confirmed in browser:
+
+```text
+dashboard.html -> V2 admin: ready
+```
+
+### Runtime Architecture
+
+- V1 dashboard rendering remains active through `IROUP.getReport(year)`.
+- V2 is currently used only as an isolated admin-safe read-only sidecar through `IROUP_V2.admin.dashboardSummary()`.
+- V1 and V2 coexistence is preserved.
+- No admin CRUD/write/upload migration has started.
+- No production V1 runtime replacement or cutover has occurred.
+
+### Milestones Completed
+
+- Isolated V2 backend deployment is operational.
+- Public V2 endpoints are operational.
+- Controlled public frontend activation is operational.
+- Request-aware V2 admin auth bridge is operational.
+- Existing V1 session `adminToken` handoff reaches V2.
+- SHA-256 token-map validation works through isolated V2 Script Properties.
+- Apps Script `/exec` redirect-safe browser fetch handling is stabilized.
+- V2 admin summary timeout/abort handling is stabilized.
+- Dashboard runtime bridge resolves the V2 summary successfully.
+
+### Lessons Learned
+
+- Apps Script `/exec` normally returns an initial 302 redirect before the final `script.googleusercontent.com` JSON response.
+- V1 `adminToken` is ephemeral and session-scoped.
+- The current token-map bridge is a temporary coexistence mechanism.
+- Long-term admin auth should move toward signed V2 admin tokens or Google token verification handoff.
+
+### Next Recommended Phase
+
+Controlled V2 read-only expansion:
+
+1. `report.html` summary bridge.
+2. Analytics/report aggregate DTO validation.
+3. Normalized DTO rendering pilots.
+4. Later, controlled admin module migration after read-only stability.
+
+Still not doing:
+
+- forced production cutover
+- V1 `SCRIPT_URL` replacement
+- admin CRUD/write/upload migration
+- global dashboard/admin architecture rewrite
+- production `Code.gs` changes

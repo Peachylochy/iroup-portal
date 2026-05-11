@@ -131,8 +131,10 @@ For admin routes, the adapter attaches `adminToken` as a request parameter when 
 
 Current caveat:
 
-- V2 Apps Script admin auth currently uses `Session.getActiveUser()` through `requireV2Admin_()`.
-- Token-based V2 auth/session behavior still needs a deployment/auth design pass. Frontend token propagation alone is not sufficient for current V2 admin authorization.
+- V2 Apps Script admin auth now tries verifiable `adminToken` authentication before `Session.getActiveUser()` fallback.
+- Supported backend token verification paths are hashed token map, signed V2 admin token, and Google access/ID token verification.
+- Existing opaque V1 UUID admin tokens are not self-describing. The isolated V2 deployment can use them only if their SHA-256 hash is mapped to an admin email in `IROUP_V2_ADMIN_TOKEN_MAP_JSON`.
+- Any token-derived email is still checked against the V2 `ADMIN` sheet and requires `active = TRUE`.
 
 ## Helper Groups
 
@@ -198,3 +200,45 @@ Pilot status:
 - Step 5 browser verification remains required page by page after each endpoint activation.
 
 Do not migrate admin writes until V2 write routes and normalized form contracts exist.
+
+## Dashboard Admin Bridge Stabilization
+
+Date: 2026-05-11
+
+`dashboard.html` now has a browser-verified read-only V2 admin summary bridge.
+
+Confirmed live behavior:
+
+- `dashboard.html` loads the live V2 endpoint config and V2 adapter.
+- The V2 adapter attaches the existing V1 session `adminToken` to `v2.admin.*` requests.
+- `IROUP_V2.admin.dashboardSummary()` resolves successfully.
+- The dashboard readiness badge shows `V2 admin: ready`.
+- The dashboard still renders from V1 `IROUP.getReport(year)`.
+- V2 summary data remains stored separately in `state.v2Summary`.
+
+Fetch handling notes:
+
+- Apps Script `/exec` returns an initial 302 redirect in normal operation.
+- The adapter keeps browser-safe Apps Script fetch defaults:
+  - `mode: cors`
+  - `redirect: follow`
+  - `credentials: omit`
+  - `cache: no-store`
+  - `referrerPolicy: no-referrer`
+- Admin read-only summary calls use a longer timeout than public page reads.
+- Abort errors are normalized into a clear V2 client error.
+
+Auth bridge notes:
+
+- Current V1 `adminToken` is opaque and session-scoped.
+- The isolated V2 backend accepts it only when the token SHA-256 hash is mapped to an active admin email through `IROUP_V2_ADMIN_TOKEN_MAP_JSON`.
+- The token-map approach is temporary.
+- Future production direction should prefer signed V2 admin tokens or Google token verification handoff.
+
+Still not migrated:
+
+- dashboard rendering data source
+- admin CRUD/write/upload flows
+- admin forms
+- V1 runtime
+- production cutover

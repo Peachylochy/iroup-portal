@@ -10,6 +10,14 @@
 
   var API_VERSION = '2.2';
   var DEFAULT_TIMEOUT_MS = 30000;
+  var ADMIN_SUMMARY_TIMEOUT_MS = 120000;
+  var APPS_SCRIPT_FETCH_DEFAULTS = {
+    mode: 'cors',
+    redirect: 'follow',
+    credentials: 'omit',
+    cache: 'no-store',
+    referrerPolicy: 'no-referrer'
+  };
 
   var config = {
     SCRIPT_URL: global.IROUP_V2_SCRIPT_URL || ''
@@ -78,33 +86,49 @@
 
   function getJson_(scriptUrl, action, params, options) {
     var url = buildUrl_(scriptUrl, params);
-    return fetchWithTimeout_(url, {
+    return fetchWithTimeout_(url, createFetchInit_({
       method: 'GET',
-      redirect: 'follow'
-    }, options && options.timeoutMs)
+    }), options && options.timeoutMs)
       .then(function (res) { return parseJsonResponse_(res, action); })
       .catch(function (error) { return normalizeError_(error, action); });
   }
 
   function postJson_(scriptUrl, action, body, options) {
-    return fetchWithTimeout_(scriptUrl, {
+    return fetchWithTimeout_(scriptUrl, createFetchInit_({
       method: 'POST',
-      redirect: 'follow',
       body: JSON.stringify(body || {})
-    }, options && options.timeoutMs)
+    }), options && options.timeoutMs)
       .then(function (res) { return parseJsonResponse_(res, action); })
       .catch(function (error) { return normalizeError_(error, action); });
   }
 
+  function createFetchInit_(overrides) {
+    var init = copyObject_(APPS_SCRIPT_FETCH_DEFAULTS);
+    var source = overrides || {};
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        init[key] = source[key];
+      }
+    }
+    return init;
+  }
+
   function fetchWithTimeout_(url, init, timeoutMs) {
     var timeout = Number(timeoutMs || DEFAULT_TIMEOUT_MS);
+    if (!timeout || timeout < 0) {
+      return fetch(url, init);
+    }
     if (!global.AbortController) {
       return fetch(url, init);
     }
 
     var controller = new AbortController();
     var timer = setTimeout(function () {
-      controller.abort();
+      try {
+        controller.abort('IROUP_V2_TIMEOUT');
+      } catch (error) {
+        controller.abort();
+      }
     }, timeout);
     var finalInit = copyObject_(init || {});
     finalInit.signal = controller.signal;
@@ -147,6 +171,10 @@
   }
 
   function normalizeError_(error, action) {
+    if (error && (error.name === 'AbortError' || String(error.message || '').toLowerCase().indexOf('aborted') >= 0)) {
+      return createClientError_(action, 'V2 request timed out or was aborted before completion.');
+    }
+
     var message = error && error.message ? error.message : String(error || 'Unknown V2 request error.');
     return createClientError_(action, message);
   }
@@ -297,10 +325,10 @@
         return request('v2.admin.event.detail', withId_('event_id', eventId), { auth: true });
       },
       dashboardSummary: function () {
-        return request('v2.admin.dashboard.summary', {}, { auth: true });
+        return request('v2.admin.dashboard.summary', {}, { auth: true, timeoutMs: ADMIN_SUMMARY_TIMEOUT_MS });
       },
       reportSummary: function (fiscalYear) {
-        return request('v2.admin.report.summary', fiscalYear ? { fiscal_year: fiscalYear } : {}, { auth: true });
+        return request('v2.admin.report.summary', fiscalYear ? { fiscal_year: fiscalYear } : {}, { auth: true, timeoutMs: ADMIN_SUMMARY_TIMEOUT_MS });
       }
     },
 

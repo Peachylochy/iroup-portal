@@ -18,7 +18,7 @@ function routeV2Request_(e) {
 
   try {
     if (route.access === 'admin') {
-      var adminCheck = requireV2Admin_();
+      var adminCheck = requireV2Admin_(request);
       if (!adminCheck.success) {
         return createV2Response_(false, null, adminCheck.error || 'V2 admin authorization failed.', {
           action: request.action
@@ -202,6 +202,12 @@ function getV2RouteDispatch_() {
       access: 'public',
       handler: function () {
         return getV2SchemaSummary_();
+      }
+    },
+    'v2.debug.admintokenmap': {
+      access: 'public',
+      handler: function (request) {
+        return debugV2AdminTokenMap_(request);
       }
     },
     'v2.admin.mou.list': {

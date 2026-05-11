@@ -2436,3 +2436,89 @@ Still not doing
 - auth/session replacement
 - `IROUP.SCRIPT_URL` replacement
 - push
+
+---
+
+65. V2 Backend Admin Token Authentication Bridge (May 11, 2026)
+
+Summary
+
+Added controlled V2 backend admin-token authentication for read-only admin routes so the isolated V2 backend no longer depends only on `Session.getActiveUser().getEmail()`.
+
+Implementation
+
+- Updated `Team IROUP/backend/database-v2/IROUP_V2_ROUTER.gs`.
+- Updated `Team IROUP/backend/database-v2/IROUP_V2_AUTH.gs`.
+- `routeV2Request_(e)` now passes the normalized request into `requireV2Admin_(request)`.
+- `requireV2Admin_(request)` now attempts verifiable token auth before falling back to Apps Script active-user email.
+- Token-derived email is matched against the V2 `ADMIN` sheet and requires `active = TRUE`.
+
+Supported token verification paths
+
+- `IROUP_V2_ADMIN_TOKEN_MAP_JSON`: JSON object mapping `sha256(adminToken)` to admin email.
+- `IROUP_V2_ADMIN_TOKEN_SECRET`: HMAC secret for signed token format `v2adm.<payload>.<signature>`.
+- Google access token or ID token verification through Google token APIs.
+
+Important caveat
+
+- The current V1 admin token is an opaque UUID stored in the V1 Apps Script cache.
+- The isolated V2 deployment cannot decode or read that V1 cache.
+- To use an existing opaque token in V2, its SHA-256 hash must be mapped to an email in `IROUP_V2_ADMIN_TOKEN_MAP_JSON`, or the frontend must later hand off a verifiable Google/signed V2 token.
+
+Still not doing
+
+- public route changes
+- V1 `backend/Code.gs` changes
+- frontend changes
+- CRUD/write/upload migration
+- backend deployment
+- push
+
+---
+
+66. Controlled V2 Admin Bridge Activation Milestone (May 11, 2026)
+
+Summary
+
+Completed the controlled V2 admin-safe read-only bridge milestone. The live dashboard now confirms the isolated V2 admin summary sidecar is reachable and authorized while the V1 dashboard render path remains operational.
+
+Confirmed live behavior
+
+- `dashboard.html` shows `V2 admin: ready`.
+- V1 dashboard rendering still uses `IROUP.getReport(year)`.
+- V2 sidecar uses `IROUP_V2.admin.dashboardSummary()`.
+- V2 backend admin auth accepts the existing V1 session `adminToken` through the isolated SHA-256 token map.
+- V1 and V2 coexistence remains intact.
+
+Implementation milestones completed
+
+- Request-aware V2 admin auth bridge.
+- `adminToken` propagation from V1 session storage.
+- SHA-256 token-map validation through `IROUP_V2_ADMIN_TOKEN_MAP_JSON`.
+- Apps Script redirect-safe browser fetch handling.
+- AbortController and timeout stabilization for admin read-only summary calls.
+- Dashboard runtime bridge stabilization.
+- Browser verification of V2 admin summary resolution.
+
+Architecture notes
+
+- Apps Script `/exec` initial 302 redirect is expected behavior.
+- The V1 `adminToken` is ephemeral and session-scoped.
+- The token-map bridge is temporary and should not be treated as final production auth.
+- Long-term admin auth should move toward signed V2 admin tokens or Google token verification handoff.
+
+Next recommended phase
+
+- Start controlled read-only V2 expansion with `report.html` summary bridge.
+- Validate analytics/report aggregate DTOs before rendering changes.
+- Keep CRUD/write/upload migration deferred.
+- Continue page-by-page activation only.
+
+Still not doing
+
+- production cutover
+- V1 `SCRIPT_URL` replacement
+- admin CRUD/write/upload migration
+- dashboard render-source replacement
+- production `Code.gs` changes
+- push

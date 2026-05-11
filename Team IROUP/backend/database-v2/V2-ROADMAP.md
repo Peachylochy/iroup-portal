@@ -437,6 +437,12 @@ Runtime note:
 - Do not use it for admin CRUD, upload, edit/delete, write actions, or admin forms until each area receives its own reviewed activation pass.
 - Local browser smoke currently reports the expected admin-auth caveat for V2 admin routes: `No active Apps Script user email available`. V1 dashboard rendering continues.
 - Dashboard now performs a frontend-only V1 session preflight before the V2 summary sidecar. It reads `sessionStorage.iroup_user` / `sessionStorage.iroup_admin_token`, logs no token values, and keeps backend authorization with `requireV2Admin_()`.
+- V2 backend auth now supports controlled admin-token authentication for read-only admin routes:
+  - hashed token map script property: `IROUP_V2_ADMIN_TOKEN_MAP_JSON`
+  - signed V2 admin token secret: `IROUP_V2_ADMIN_TOKEN_SECRET`
+  - Google access/ID token verification
+- Any token-derived email is still matched against the V2 `ADMIN` sheet and requires `active = TRUE`.
+- The legacy V1 opaque UUID admin token cannot be decoded by the isolated V2 deployment unless its SHA-256 hash is mapped to an email in `IROUP_V2_ADMIN_TOKEN_MAP_JSON`.
 
 Verification focus:
 
@@ -666,3 +672,41 @@ Never expose publicly:
 - creator/updater identity fields
 
 Safe public outputs are aggregates and public display data only, such as country, continent, unit display name, institution/partner organization, title/project name, participant counts, public dates, derived status, and explicitly public file URLs.
+
+## Current Migration Milestone - Controlled V2 Admin Bridge Ready
+
+Date: 2026-05-11
+
+Status: achieved for read-only dashboard summary sidecar.
+
+Confirmed behavior:
+
+- Isolated V2 backend deployment is operational.
+- V2 public endpoints are operational.
+- Public V2 frontend activation is operational for major public pages.
+- V2 admin auth bridge is operational through request-aware `adminToken` handling.
+- V2 dashboard summary bridge is operational and browser-verified.
+- `dashboard.html` shows `V2 admin: ready`.
+- V1 dashboard rendering remains powered by `IROUP.getReport(year)`.
+- V2 dashboard summary remains sidecar-only through `IROUP_V2.admin.dashboardSummary()`.
+
+Architecture constraints still active:
+
+- Do not replace `IROUP.SCRIPT_URL`.
+- Do not force production cutover.
+- Do not migrate CRUD/write/upload yet.
+- Keep admin module migration page-by-page and reversible.
+- Keep V1 operational until each V2 read/write path is independently verified.
+
+Known temporary bridge:
+
+- Existing V1 opaque session `adminToken` can be accepted by V2 only through the SHA-256 token map script property.
+- This is a coexistence bridge, not the desired long-term production auth model.
+- Preferred future directions are signed V2 admin tokens or Google token verification handoff.
+
+Next recommended phase:
+
+1. Add a read-only `report.html` V2 summary bridge.
+2. Validate report/analytics aggregate DTOs.
+3. Pilot normalized DTO rendering for read-only admin views.
+4. Defer CRUD/write/upload migration until read-only admin stability is proven.
