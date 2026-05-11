@@ -2274,3 +2274,44 @@ Still not doing
 - changing V1 runtime
 - changing backend deployment
 - push
+
+---
+
+61. V2 Frontend Endpoint Activation Pilot - Public MOU Only (May 11, 2026)
+
+Summary
+
+Continued the controlled live V2 frontend rollout by activating `public/public-mou.html` only. This follows the successful scholar and events endpoint pilots and keeps the V1 production lane untouched.
+
+Implementation
+
+- Updated only `Team IROUP/public/public-mou.html`.
+- Inserted `../iroup-v2-endpoint.js` between `../iroup-config.js` and `../iroup-v2-api.js`.
+- Reused the existing `IROUP_V2.public.mouList()` primary public MOU data-loading flow.
+- Kept KPI rendering, table rendering, chart rendering, D3 map rendering, local country aggregation, filters/search, language behavior, and layout unchanged.
+- Did not use `IROUP_V2.public.mouMap()` yet.
+
+Load order
+
+```html
+<script src="../iroup-config.js"></script>
+<script src="../iroup-v2-endpoint.js"></script>
+<script src="../iroup-v2-api.js"></script>
+```
+
+Verification targets
+
+- `public-mou.html` parses.
+- MOU rows render from V2 public MOU DTOs.
+- KPI, table, chart, map, country counts, filters/search, and language behavior remain unchanged.
+- File URL mapping remains compatible.
+- Primary MOU load does not call `IROUP.getPublicMou()`.
+
+Still not doing
+
+- activating `public-mobility.html`
+- activating dashboard/admin
+- replacing `IROUP.SCRIPT_URL`
+- changing V1 runtime
+- changing backend deployment
+- push

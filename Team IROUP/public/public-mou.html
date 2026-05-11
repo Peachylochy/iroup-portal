@@ -292,7 +292,8 @@ footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(
   © 2569 International Relations Office · University of Phayao · ข้อมูลอัพเดตโดยทีมงานวิเทศฯ
 </footer>
 
-<script src="iroup-config.js"></script>
+<script src="../iroup-config.js"></script>
+<script src="../iroup-v2-endpoint.js"></script>
 <script src="../iroup-v2-api.js"></script>
 <script>
 let allMou = [];
@@ -319,14 +320,14 @@ async function loadData() {
 }
 
 function normalizePublicMou(row) {
-  const country = normalizePublicCountryName(row.country);
+  const country = normalizePublicCountryName(row.country || row.country_name || row.country_code || row.countryCode);
   const continent = normalizePublicContinentName(row.continent);
   const unit = normalizePublicUnitName(row.unit);
   const fileUrl = firstPublicFileUrl(row.files);
   return {
     ID: row.mou_id || '',
     'องค์กร_ตปท': row.partner_org_name || row.partner_org_name_en || row.partner_org || '',
-    'ประเทศ': country || row.country || '',
+    'ประเทศ': normalizeMapCountryName(country || row.country || row.country_name || row.country_code || row.countryCode || ''),
     'ทวีป': continent || row.continent || '',
     'หน่วยงาน_UP': unit || row.up_unit || '',
     'ประเภท': row.mou_type || row.type || 'MOU',
@@ -341,7 +342,63 @@ function normalizePublicMou(row) {
 function normalizePublicCountryName(country) {
   if (!country) return '';
   if (typeof country !== 'object') return String(country || '');
-  return country.country_name_en || country.country_name_th || country.name_en || country.name_th || country.country_id || '';
+  return country.country_name_en || country.country_name || country.display_name || country.name_en || country.name || country.country_name_th || country.name_th || country.iso2 || country.country_code || country.countryCode || country.country_id || '';
+}
+
+function normalizeMapCountryName(country) {
+  if (!country) return '';
+  const raw = typeof country === 'object' ? normalizePublicCountryName(country) : String(country || '');
+  const cleaned = raw
+    .replace(/^[A-Z]{2,3}\s*[-–—:]?\s+/i, '')
+    .replace(/\s*\([A-Z]{2,3}\)\s*$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const key = cleaned.toLowerCase();
+  const aliases = {
+    au: 'Australia',
+    aus: 'Australia',
+    australia: 'Australia',
+    jp: 'Japan',
+    jpn: 'Japan',
+    japan: 'Japan',
+    kr: 'South Korea',
+    kor: 'South Korea',
+    korea: 'South Korea',
+    'republic of korea': 'South Korea',
+    uk: 'United Kingdom',
+    gb: 'United Kingdom',
+    gbr: 'United Kingdom',
+    'united kingdom': 'United Kingdom',
+    us: 'USA',
+    usa: 'USA',
+    'u.s.a.': 'USA',
+    'united states': 'USA',
+    'united states of america': 'USA',
+    cn: 'China',
+    chn: 'China',
+    china: 'China',
+    'people’s republic of china': 'China',
+    "people's republic of china": 'China',
+    'pr china': 'China',
+    th: 'Thailand',
+    tha: 'Thailand',
+    thailand: 'Thailand',
+    tw: 'Taiwan',
+    twn: 'Taiwan',
+    taiwan: 'Taiwan',
+    de: 'Germany',
+    deu: 'Germany',
+    germany: 'Germany',
+    ญี่ปุ่น: 'Japan',
+    จีน: 'China',
+    เกาหลีใต้: 'South Korea',
+    ไต้หวัน: 'Taiwan',
+    เยอรมนี: 'Germany',
+    สหรัฐอเมริกา: 'USA',
+    ไทย: 'Thailand',
+    ออสเตรเลีย: 'Australia'
+  };
+  return aliases[key] || cleaned;
 }
 
 function normalizePublicContinentName(continent) {
@@ -372,7 +429,7 @@ function updateKPI(data) {
     const s = IROUP.getMouStatus(m['วันสิ้นสุด']);
     return s.status === 'soon';
   }).length;
-  const countries = [...new Set(data.map(m => m['ประเทศ']).filter(Boolean))].length;
+  const countries = [...new Set(data.map(m => normalizeMapCountryName(m['ประเทศ'])).filter(Boolean))].length;
 
   document.getElementById('kpi-total').textContent  = data.length;
   document.getElementById('kpi-active').textContent = active;
@@ -528,19 +585,22 @@ function loadMap(data) {
   const msg = document.getElementById('mouMapMsg');
   if (msg) msg.style.display = 'none';
 
-  const activeRows = (data || []).filter(m => IROUP.getMouStatus(m['วันสิ้นสุด']).status !== 'expired');
   const countryData = {};
-  activeRows.forEach(m => {
-    if (!m['ประเทศ']) return;
-    countryData[m['ประเทศ']] = (countryData[m['ประเทศ']] || 0) + 1;
+  (data || []).forEach(m => {
+    const country = normalizeMapCountryName(m['ประเทศ']);
+    if (!country) return;
+    countryData[country] = (countryData[country] || 0) + 1;
   });
 
   const alias = {
-    'Korea':'South Korea','Republic of Korea':'South Korea','UK':'United Kingdom','United States':'USA','United States of America':'USA','U.S.A.':'USA','China':'China','People’s Republic of China':'China','PR China':'China','ญี่ปุ่น':'Japan','จีน':'China','เกาหลีใต้':'South Korea','ไต้หวัน':'Taiwan','เยอรมนี':'Germany','สหรัฐอเมริกา':'USA','ไทย':'Thailand'
+    'Korea':'South Korea','Republic of Korea':'South Korea','UK':'United Kingdom','United States':'USA','United States of America':'USA','U.S.A.':'USA','China':'China','People’s Republic of China':'China','PR China':'China','AU':'Australia','AUS':'Australia','JP':'Japan','JPN':'Japan','ญี่ปุ่น':'Japan','จีน':'China','เกาหลีใต้':'South Korea','ไต้หวัน':'Taiwan','เยอรมนี':'Germany','สหรัฐอเมริกา':'USA','ไทย':'Thailand','ออสเตรเลีย':'Australia'
   };
   const cNames = {4:'Afghanistan',36:'Australia',56:'Belgium',76:'Brazil',104:'Myanmar',116:'Cambodia',124:'Canada',156:'China',170:'Colombia',208:'Denmark',276:'Germany',300:'Greece',356:'India',360:'Indonesia',372:'Ireland',376:'Israel',380:'Italy',392:'Japan',410:'South Korea',458:'Malaysia',484:'Mexico',528:'Netherlands',554:'New Zealand',578:'Norway',586:'Pakistan',608:'Philippines',616:'Poland',620:'Portugal',643:'Russia',682:'Saudi Arabia',724:'Spain',752:'Sweden',756:'Switzerland',764:'Thailand',792:'Turkey',826:'United Kingdom',840:'USA',704:'Vietnam',158:'Taiwan',250:'France'};
   const mapData = {};
-  Object.entries(countryData).forEach(([country,count]) => { mapData[alias[country] || country] = (mapData[alias[country] || country] || 0) + Number(count||0); });
+  Object.entries(countryData).forEach(([country,count]) => {
+    const mapCountry = normalizeMapCountryName(alias[country] || country);
+    mapData[mapCountry] = (mapData[mapCountry] || 0) + Number(count||0);
+  });
 
   const svg = d3.select('#svgMouMap');
   svg.selectAll('*').remove();

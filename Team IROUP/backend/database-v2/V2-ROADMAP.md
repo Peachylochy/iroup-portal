@@ -391,6 +391,7 @@ Status:
 
 - `public/public-scholar.html` is the first page wired to the V2 endpoint config.
 - `public/public-events.html` is the second page wired to the V2 endpoint config.
+- `public/public-mou.html` is the third page wired to the V2 endpoint config.
 - Other public pages remain V2-adapter migrated but not endpoint-activated.
 - Dashboard/admin remain non-activated for V2 frontend use.
 - V1 `IROUP.SCRIPT_URL` remains unchanged.
@@ -406,9 +407,10 @@ Activated only in:
 ```text
 Team IROUP/public/public-scholar.html
 Team IROUP/public/public-events.html
+Team IROUP/public/public-mou.html
 ```
 
-Script load order for `public-events.html`:
+Script load order for `public-mou.html`:
 
 ```html
 <script src="../iroup-config.js"></script>
@@ -419,7 +421,7 @@ Script load order for `public-events.html`:
 Runtime note:
 
 - `iroup-v2-endpoint.js` contains the live isolated V2 `/exec` URL.
-- Do not load it from `public-mou.html`, `public-mobility.html`, dashboard, or admin pages until each page receives its own reviewed activation pass.
+- Do not load it from `public-mobility.html`, dashboard, or admin pages until each page receives its own reviewed activation pass.
 
 Verification focus:
 
@@ -433,6 +435,9 @@ Verification focus:
 - Event status/date badges.
 - Calendar render, date selection, type filter, and KPI rendering.
 - No primary event load through `IROUP.getPublicEvents()`.
+- V2 MOU DTO render.
+- MOU KPI, table, chart, D3 map, local country aggregation, filters/search, and language behavior.
+- No primary MOU load through `IROUP.getPublicMou()`.
 
 ## Public Pilot Migration
 
