@@ -17,6 +17,25 @@ Not in scope:
 - No V1 deployment change
 - No push
 
+## Live Smoke Result
+
+Status: completed successfully.
+
+Live route outcomes:
+
+- `v2.health`: passed.
+- `v2.schema`: initially failed with `sheet.getLastColumn is not a function`, then passed after the schema wrapper fix.
+- `v2.public.scholarship.list`: passed.
+- `v2.admin.dashboard.summary`: reachable.
+- `v2.admin.dashboard.summary`: initially returned inflated counts, then passed after aggregate primary-key filtering.
+
+Safety boundary preserved:
+
+- No frontend V2 URL activation.
+- No `IROUP.SCRIPT_URL` replacement.
+- No V1 production replacement.
+- No dashboard/admin frontend activation.
+
 ## Current Readiness
 
 Prepared V2 deployment structure:

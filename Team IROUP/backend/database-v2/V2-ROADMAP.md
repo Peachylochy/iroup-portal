@@ -349,6 +349,42 @@ Still blocked from this phase:
 - Broadly exposing `v2.schema`.
 - Runtime code changes.
 
+## First Isolated V2 Backend Smoke Test Results
+
+Status:
+
+- Live isolated V2 backend deployment: successful.
+- No frontend URL activation yet.
+- No V1 replacement.
+- Production `backend/Code.gs` remains untouched.
+
+Live route results:
+
+- `v2.health`: passed.
+- `v2.schema`: initially failed, then passed after schema wrapper fix.
+- `v2.public.scholarship.list`: passed.
+- `v2.admin.dashboard.summary`: reachable.
+- `v2.admin.dashboard.summary`: initially had inflated counts, then passed after aggregate primary-key filtering fix.
+
+Live fixes confirmed:
+
+- `getV2SchemaSummary_()` now unwraps `getV2Sheet_(name).data` and verifies a real Sheet-like object before calling `getV2Headers_()`.
+- Dashboard/report aggregate counts now ignore preformatted blank rows by requiring non-empty primary keys:
+  - `mou_id`
+  - `mobility_id`
+  - `travel_id`
+  - `scholarship_id`
+  - `event_id`
+- Aggregate logic excludes `is_deleted=true` rows.
+- Participant totals now sum only from valid parent records, preventing blank parent/participant row joins from inflating totals.
+
+Next gate:
+
+- Frontend endpoint activation should be a separate reviewed pass.
+- Start with `public/public-scholar.html` only.
+- Do not activate dashboard/admin frontend yet.
+- Keep `v2.schema` as controlled diagnostic until public exposure is reviewed.
+
 ## Public Pilot Migration
 
 Pilot pages:

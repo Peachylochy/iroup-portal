@@ -2151,3 +2151,39 @@ Still not doing
 - dashboard/admin activation
 - V1 deployment changes
 - push
+
+---
+
+58. First Isolated V2 Backend Smoke Test Results (May 11, 2026)
+
+Summary
+
+Recorded the first live isolated V2 Apps Script backend smoke test outcome. The live V2 backend deployment is successful. No frontend URL activation happened, no `IROUP.SCRIPT_URL` replacement happened, no dashboard/admin frontend activation happened, and the V1 production lane remains untouched.
+
+Live route results
+
+- `v2.health`: passed.
+- `v2.schema`: initially failed with `sheet.getLastColumn is not a function`, then passed after the schema wrapper fix.
+- `v2.public.scholarship.list`: passed.
+- `v2.admin.dashboard.summary`: reachable.
+- `v2.admin.dashboard.summary`: initially returned inflated counts from preformatted/validated blank rows, then passed after the aggregate filtering fix.
+
+Fixes confirmed
+
+- `IROUP_V2_ROUTER.gs`: `getV2SchemaSummary_()` now unwraps `getV2Sheet_(name).data` and verifies a Sheet-like object before calling `getV2Headers_()`.
+- `IROUP_V2_DTO_AGGREGATE.gs`: dashboard/report aggregate rows are counted only after filtering by non-empty primary key and excluding `is_deleted=true`.
+- `IROUP_V2_ROUTER_TEST.gs`: schema response shape and aggregate blank-row filtering coverage were strengthened.
+
+Safety boundary preserved
+
+- No frontend V2 endpoint activation.
+- No V1 deployment replacement.
+- No `IROUP.SCRIPT_URL` replacement.
+- No production `backend/Code.gs` changes.
+
+Recommended next phase
+
+- Prepare a reviewed frontend endpoint activation pass for one page only.
+- Start with `public/public-scholar.html`.
+- Keep `v2.schema` controlled diagnostic only until exposure is reviewed.
+- Keep dashboard/admin frontend activation blocked until a separate admin readiness pass.

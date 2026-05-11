@@ -15,6 +15,20 @@ Decision boundary:
 
 Do not deploy automatically from this repository. This guide is for manual Apps Script execution only.
 
+## Live Execution Result
+
+Status: first isolated V2 backend deployment succeeded.
+
+Confirmed live routes:
+
+- `v2.health`: passed.
+- `v2.schema`: initially failed, then passed after the router schema wrapper fix.
+- `v2.public.scholarship.list`: passed.
+- `v2.admin.dashboard.summary`: reachable.
+- `v2.admin.dashboard.summary`: initially had inflated aggregate counts, then passed after aggregate primary-key filtering.
+
+No frontend URL activation has happened yet. `IROUP.SCRIPT_URL` and the V1 production lane remain unchanged.
+
 ## 0. Hard Safety Rules
 
 Do not:
