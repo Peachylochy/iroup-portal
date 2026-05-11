@@ -214,6 +214,15 @@ Dashboard readiness pilot:
 - V2 readiness data is stored separately in `state.v2Summary` and does not feed KPIs, rankings, budget, insights, filters, or attention tables yet.
 - This pilot validates V2 admin route access/coexistence only; full dashboard migration still requires either richer dashboard/report DTOs or a deliberate multi-route admin list mapping pass.
 
+Endpoint configuration plan:
+
+- V2 Endpoint Configuration Plan was completed on 2026-05-11.
+- Plan record: `Team IROUP/backend/database-v2/V2-ENDPOINT-CONFIG-PLAN.md`.
+- Keep `IROUP.SCRIPT_URL` unchanged for V1.
+- Use a separate V2 Apps Script deployment URL through `window.IROUP_V2_SCRIPT_URL` / `IROUP_V2.setScriptUrl(url)`.
+- Future implementation should use a dedicated `iroup-v2-endpoint.js` file loaded only by migrated pages.
+- Do not reuse the current V1 production deployment for V2 unless `v2.*` routing is explicitly wired into production `Code.gs` and reviewed.
+
 ## Architecture Direction
 
 ```text

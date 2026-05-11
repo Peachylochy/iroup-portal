@@ -1894,3 +1894,46 @@ Still not doing
 - backend route changes
 - deployment
 - push
+
+---
+
+52. V2 Endpoint / Config Activation Strategy (May 11, 2026)
+
+Summary
+
+Completed the planning pass for safely configuring live V2 frontend calls while preserving V1 pages and `IROUP.SCRIPT_URL`.
+
+Audit findings
+
+- `iroup-config.js` hardcodes the current V1 Apps Script deployment URL in `IROUP.SCRIPT_URL`.
+- `iroup-v2-api.js` intentionally has no hardcoded URL and reads `window.IROUP_V2_SCRIPT_URL` or `IROUP_V2.setScriptUrl(url)`.
+- Migrated public pages and `dashboard.html` load `iroup-v2-api.js` but do not currently configure a live V2 endpoint.
+- V1 `backend/Code.gs` handles legacy production actions.
+- V2 `IROUP_V2_ROUTER.gs` is isolated and not wired into production `Code.gs`.
+
+Plan record
+
+- `Team IROUP/backend/database-v2/V2-ENDPOINT-CONFIG-PLAN.md`
+
+Configuration decision
+
+- Do not replace `IROUP.SCRIPT_URL`.
+- Do not put the V2 URL into `iroup-config.js` during the pilot.
+- Use a separate V2 Apps Script deployment URL.
+- Future implementation should add a small dedicated frontend file such as `iroup-v2-endpoint.js` containing only `window.IROUP_V2_SCRIPT_URL = '...'`.
+- Load that endpoint config only on pages already migrated to the V2 adapter.
+
+Risks noted
+
+- V2 admin auth currently depends on Apps Script active-user email, not only the frontend admin token.
+- `v2.schema` should be reviewed before broad public deployment exposure.
+- Public page relative script paths should be verified in the real hosting context.
+
+Still not doing
+
+- config activation
+- deployment
+- production `Code.gs` wiring
+- frontend behavior changes
+- CRUD/upload migration
+- push

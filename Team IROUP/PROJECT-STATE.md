@@ -115,6 +115,44 @@ Known configuration note:
 
 ---
 
+## Latest V2 Endpoint Configuration Strategy
+
+### Session: 2026-05-11 - V2 Endpoint / Config Activation Planning
+
+**Phase goal:** Plan live V2 endpoint activation without breaking V1 pages. No config value, frontend behavior, backend route, deployment, or production `Code.gs` change.
+
+Plan record:
+
+```text
+Team IROUP/backend/database-v2/V2-ENDPOINT-CONFIG-PLAN.md
+```
+
+Configuration decision:
+
+- Keep `IROUP.SCRIPT_URL` in `iroup-config.js` unchanged for V1.
+- Use a separate V2 Apps Script deployment URL for `IROUP_V2_SCRIPT_URL`.
+- Do not reuse the current V1 production deployment unless `v2.*` routing is explicitly wired and reviewed.
+- Do not put the V2 URL into `iroup-config.js` during the pilot.
+- Future implementation should add a small dedicated endpoint config file, such as `iroup-v2-endpoint.js`, loaded only by migrated pages.
+
+Recommended future load order:
+
+```html
+<script src="iroup-config.js"></script>
+<script src="iroup-v2-endpoint.js"></script>
+<script src="iroup-v2-api.js"></script>
+```
+
+Public pages would use `../iroup-v2-endpoint.js` and `../iroup-v2-api.js`.
+
+Key risks:
+
+- V2 admin auth currently depends on Apps Script active-user email, so frontend token propagation alone may not be sufficient.
+- `v2.schema` should be reviewed before a broadly reachable deployment.
+- Public page script path behavior for `iroup-config.js` should be verified in the real hosting context.
+
+---
+
 ## 0. UI Polish Log
 
 ### Session: 2026-05-09 — Readability & Contrast Pass + Login Page Improvement
