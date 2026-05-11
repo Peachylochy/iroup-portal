@@ -30,6 +30,21 @@ const IROUP = {
     }
   },
 
+  getGoogleAccessToken() {
+    try {
+      const direct = sessionStorage.getItem('iroup_google_access_token');
+      if (direct) return direct;
+
+      const rawUser = sessionStorage.getItem('iroup_user');
+      if (!rawUser) return '';
+
+      const user = JSON.parse(rawUser);
+      return user && user.googleAccessToken ? user.googleAccessToken : '';
+    } catch (e) {
+      return '';
+    }
+  },
+
   _withAdminUrl(url) {
     const token = this.getAdminToken();
     if (!token) return url;

@@ -2714,3 +2714,44 @@ Still not doing
 - public rendering changes
 - export changes
 - push
+
+---
+
+72. V2 Admin Google Token Handoff Stabilization (May 11, 2026)
+
+Summary
+
+Stabilized V2 admin authentication by preferring Google OAuth token handoff for normal browser sessions while keeping the legacy V1 admin token-map bridge as fallback.
+
+Changed
+
+- `Team IROUP/index.html`
+- `Team IROUP/iroup-config.js`
+- `Team IROUP/iroup-v2-api.js`
+- `Team IROUP/backend/database-v2/IROUP_V2_AUTH.gs`
+- `Team IROUP/PROJECT-STATE.md`
+- `Team IROUP/backend/database-v2/V2-ROADMAP.md`
+- `Team IROUP/backend/database-v2/V2-WRITE-ISOLATION-PLAN.md`
+- `Team IROUP/development_journal_r_2_r_foundation_iroup.md`
+
+Implementation
+
+- Preserved Google OAuth `access_token` in `sessionStorage.iroup_google_access_token` after login.
+- Added `IROUP.getGoogleAccessToken()`.
+- Updated `IROUP_V2` auth attachment to send `googleAccessToken` first and legacy `adminToken` as fallback.
+- Updated V2 backend auth to verify explicit Google tokens through Google userinfo/tokeninfo before using token-map fallback.
+- V2 still validates the verified email against the V2 `ADMIN` sheet and requires `active = TRUE`.
+
+Expected result
+
+- Dashboard, report, travel, and event dry-run V2 admin sidecars should recover after fresh login without manual token hash updates.
+
+Still not doing
+
+- V1 `SCRIPT_URL` replacement
+- V1 CRUD/upload changes
+- public endpoint changes
+- save/delete behavior changes
+- real V2 writes
+- token-map removal
+- push

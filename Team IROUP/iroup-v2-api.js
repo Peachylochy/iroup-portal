@@ -55,6 +55,43 @@
     return '';
   }
 
+  function getGoogleAccessToken() {
+    if (global.IROUP && typeof global.IROUP.getGoogleAccessToken === 'function') {
+      var fromIroup = global.IROUP.getGoogleAccessToken();
+      if (fromIroup) return fromIroup;
+    }
+
+    var directKeys = ['workspace_google_access_token', 'iroup_google_access_token'];
+    for (var i = 0; i < directKeys.length; i++) {
+      var direct = safeSessionGet_(directKeys[i]);
+      if (direct) return direct;
+    }
+
+    var userKeys = ['workspace_user', 'iroup_user'];
+    for (var j = 0; j < userKeys.length; j++) {
+      var raw = safeSessionGet_(userKeys[j]);
+      if (!raw) continue;
+      try {
+        var user = JSON.parse(raw);
+        if (user && user.googleAccessToken) return user.googleAccessToken;
+        if (user && user.google_access_token) return user.google_access_token;
+        if (user && user.accessToken) return user.accessToken;
+        if (user && user.access_token) return user.access_token;
+      } catch (error) {
+        // Ignore malformed session values and keep looking.
+      }
+    }
+
+    return '';
+  }
+
+  function getAdminAuthDiagnostics() {
+    return {
+      hasGoogleAccessToken: !!getGoogleAccessToken(),
+      hasLegacyAdminToken: !!getAdminToken()
+    };
+  }
+
   function request(action, params, options) {
     var routeAction = String(action || '').trim();
     var requestParams = copyObject_(params || {});
@@ -73,8 +110,14 @@
     requestParams.action = routeAction;
 
     if (requestOptions.auth === true || routeAction.indexOf('v2.admin.') === 0) {
+      var googleToken = getGoogleAccessToken();
       var token = getAdminToken();
-      if (token) requestParams.adminToken = token;
+      if (googleToken) {
+        requestParams.googleAccessToken = googleToken;
+      }
+      if (token) {
+        requestParams.adminToken = token;
+      }
     }
 
     if (method === 'POST') {
@@ -250,6 +293,8 @@
     },
     setScriptUrl: setScriptUrl,
     getAdminToken: getAdminToken,
+    getGoogleAccessToken: getGoogleAccessToken,
+    getAdminAuthDiagnostics: getAdminAuthDiagnostics,
     request: request,
 
     health: function () {

@@ -73,10 +73,29 @@ function getV2AdminToken_(request) {
   ).trim();
 }
 
+function getV2GoogleToken_(request) {
+  return String(
+    getV2RequestParam_(request, 'googleAccessToken') ||
+    getV2RequestParam_(request, 'google_access_token') ||
+    getV2RequestParam_(request, 'accessToken') ||
+    getV2RequestParam_(request, 'access_token') ||
+    getV2RequestParam_(request, 'idToken') ||
+    getV2RequestParam_(request, 'id_token') ||
+    ''
+  ).trim();
+}
+
 function getV2AdminEmailFromToken_(request) {
+  const googleToken = getV2GoogleToken_(request);
+  let google = authResponseV2_(false, null, 'Google token missing', 'V2_AUTH_GOOGLE_TOKEN_MISSING');
+  if (googleToken) {
+    google = getV2AdminEmailFromGoogleToken_(googleToken);
+    if (google.success) return google;
+  }
+
   const token = getV2AdminToken_(request);
   if (!token) {
-    return authResponseV2_(false, null, 'Missing adminToken', 'V2_AUTH_TOKEN_REQUIRED');
+    return authResponseV2_(false, null, google.error || 'Missing Google token or legacy adminToken', google.code || 'V2_AUTH_TOKEN_REQUIRED');
   }
 
   const mapped = getV2AdminEmailFromTokenMap_(token);
@@ -85,14 +104,14 @@ function getV2AdminEmailFromToken_(request) {
   const signed = getV2AdminEmailFromSignedToken_(token);
   if (signed.success) return signed;
 
-  const google = getV2AdminEmailFromGoogleToken_(token);
-  if (google.success) return google;
+  const legacyGoogle = getV2AdminEmailFromGoogleToken_(token);
+  if (legacyGoogle.success) return legacyGoogle;
 
   return authResponseV2_(
     false,
     null,
-    mapped.error || signed.error || google.error || 'Invalid or unverifiable adminToken',
-    'V2_AUTH_TOKEN_INVALID'
+    googleToken ? (google.error || mapped.error || signed.error || 'Invalid or unverifiable admin token') : (mapped.error || signed.error || legacyGoogle.error || 'Invalid or unverifiable adminToken'),
+    googleToken ? (google.code || 'V2_AUTH_TOKEN_INVALID') : 'V2_AUTH_TOKEN_INVALID'
   );
 }
 
@@ -254,30 +273,40 @@ function getV2AdminEmailFromSignedToken_(token) {
 
 function getV2AdminEmailFromGoogleToken_(token) {
   const raw = String(token || '').trim();
-  if (!raw || raw.indexOf('.') < 0) {
-    return authResponseV2_(false, null, 'Not a Google token candidate', 'V2_AUTH_GOOGLE_TOKEN_FORMAT');
+  if (!raw) {
+    return authResponseV2_(false, null, 'Google token missing', 'V2_AUTH_GOOGLE_TOKEN_MISSING');
   }
 
+  // Browser-side Google Identity Services currently hands off an OAuth access
+  // token, not an ID token. Verify that token through Google userinfo first.
   const access = fetchV2GoogleUserInfo_(raw);
   if (access.success) return access;
+
+  if (raw.indexOf('.') < 0) {
+    return access;
+  }
 
   return fetchV2GoogleTokenInfo_(raw);
 }
 
 function fetchV2GoogleUserInfo_(token) {
   try {
-    const response = UrlFetchApp.fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    const response = UrlFetchApp.fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
       method: 'get',
       headers: { Authorization: 'Bearer ' + token },
       muteHttpExceptions: true
     });
-    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
-      return authResponseV2_(false, null, 'Invalid Google access token', 'V2_AUTH_GOOGLE_ACCESS_INVALID');
+    const status = response.getResponseCode();
+    if (status < 200 || status >= 300) {
+      return authResponseV2_(false, null, 'Invalid Google access token via userinfo (HTTP ' + status + ')', 'V2_AUTH_GOOGLE_ACCESS_INVALID');
     }
 
     const data = JSON.parse(response.getContentText() || '{}');
     const email = normalizeV2Email_(data.email);
     if (!email) return authResponseV2_(false, null, 'Google access token did not return an email', 'V2_AUTH_GOOGLE_EMAIL_REQUIRED');
+
+    const verified = data.verified_email === true || data.email_verified === true || String(data.verified_email || data.email_verified || '').toLowerCase() === 'true';
+    if (!verified) return authResponseV2_(false, null, 'Google access token email is not verified', 'V2_AUTH_GOOGLE_EMAIL_UNVERIFIED');
 
     return authResponseV2_(true, { email: email, source: 'google_access_token' }, '', '');
   } catch (err) {

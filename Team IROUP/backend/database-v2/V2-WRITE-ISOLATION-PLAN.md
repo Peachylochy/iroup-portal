@@ -240,6 +240,26 @@ Current status:
 
 The routes normalize event metadata into a preview of the current V2 `EVENT` sheet shape and return `dry_run: true` plus `write_enabled: false`.
 
+## Admin Auth Handoff Update
+
+Date: 2026-05-11
+
+V2 admin browser calls now prefer Google token handoff verification.
+
+Coexistence model:
+
+- V1 login still creates and stores the existing V1 admin session.
+- The Google OAuth access token is stored for the current browser session only.
+- V2 admin requests send `googleAccessToken` first and legacy `adminToken` as fallback.
+- V2 backend verifies Google tokens through Google userinfo/tokeninfo, extracts the email, and checks the V2 `ADMIN` sheet.
+- `IROUP_V2_ADMIN_TOKEN_MAP_JSON` remains available as fallback during coexistence.
+
+Write-pilot implication:
+
+- Event dry-run preview should recover after fresh login without manual token hash updates.
+- Future write routes must still require V2 admin authorization and role checks.
+- Token-map fallback should not be removed until signed V2 tokens or Google verification are proven across all admin sidecars.
+
 ## Explicit Non-Goals
 
 - no replacement of `IROUP.SCRIPT_URL`

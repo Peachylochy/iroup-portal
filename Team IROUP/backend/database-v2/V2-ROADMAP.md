@@ -883,3 +883,33 @@ Next gate:
 - manually test `Preview V2 Draft` from the Event modal
 - confirm returned `dry_run === true` and `write_enabled === false`
 - only then consider adapter convenience wrappers
+
+## V2 Admin Google Token Handoff Stabilization
+
+Date: 2026-05-11
+
+Status: implemented for coexistence auth stabilization.
+
+Design:
+
+- V1 login continues to create the existing V1 admin session.
+- The Google OAuth access token from login is preserved in session storage for V2 admin verification.
+- `IROUP.getGoogleAccessToken()` exposes the token to frontend adapters without changing V1 write helpers.
+- `iroup-v2-api.js` sends `googleAccessToken` on V2 admin requests and keeps legacy `adminToken` as fallback.
+- `IROUP_V2_AUTH.gs` verifies Google tokens first, extracts the verified email, and checks the V2 `ADMIN` sheet for active access.
+- `IROUP_V2_ADMIN_TOKEN_MAP_JSON` remains as fallback only.
+
+Expected recovery:
+
+- dashboard V2 sidecar after fresh login
+- report V2 sidecar after fresh login
+- travel V2 sidecar after fresh login
+- event draft dry-run preview after fresh login
+
+Still deferred:
+
+- V2 CRUD/write/upload migration
+- token-map removal
+- auth hard cutover
+- V1 runtime replacement
+- public endpoint changes

@@ -797,52 +797,55 @@ async function handleGoogleResponse(response) {
     const name    = profile.name;
     const session = await IROUP.createAdminSession(response.access_token);
     if (session && session.success && session.allowed && session.adminToken) {
-      completeAdminLogin(email, name, session.adminToken);
+      completeAdminLogin(email, name, session.adminToken, response.access_token);
       return;
     }
 
-    await checkAdminAccess(email, name);
+    await checkAdminAccess(email, name, response.access_token);
   } catch(e) {
     try {
       const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${response.access_token}` }
       });
       const profile = await profileRes.json();
-      await checkAdminAccess(profile.email, profile.name);
+      await checkAdminAccess(profile.email, profile.name, response.access_token);
     } catch (fallbackError) {
       showStatus('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่');
     }
   }
 }
 
-function completeAdminLogin(email, name, adminToken) {
+function completeAdminLogin(email, name, adminToken, googleAccessToken) {
   if (adminToken) sessionStorage.setItem('iroup_admin_token', adminToken);
   else sessionStorage.removeItem('iroup_admin_token');
+  if (googleAccessToken) sessionStorage.setItem('iroup_google_access_token', googleAccessToken);
+  else sessionStorage.removeItem('iroup_google_access_token');
   sessionStorage.setItem('iroup_user', JSON.stringify({
     email,
     name,
     adminToken: adminToken || '',
+    googleAccessToken: googleAccessToken || '',
     loginAt: new Date().toISOString()
   }));
   showStatus('success');
   setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
 }
 
-async function checkAdminAccess(email, name) {
+async function checkAdminAccess(email, name, googleAccessToken) {
   try {
     const url = `${IROUP.SCRIPT_URL}?action=checkAdmin&email=${encodeURIComponent(email)}`;
     const res  = await fetch(url);
     const data = await res.json();
 
     if (data.allowed) {
-      completeAdminLogin(email, name, '');
+      completeAdminLogin(email, name, '', googleAccessToken);
     } else {
       showStatus('denied', email);
     }
   } catch(e) {
     const ALLOWED = ['panpancake17@gmail.com'];
     if (ALLOWED.includes(email)) {
-      completeAdminLogin(email, name, '');
+      completeAdminLogin(email, name, '', googleAccessToken);
     } else {
       showStatus('denied', email);
     }

@@ -1755,3 +1755,41 @@ Still not doing:
 - auto-triggered dry-run
 - `IROUP.SCRIPT_URL` replacement
 - commit or push
+
+---
+
+## 45. V2 Admin Google Token Handoff Stabilization (2026-05-11)
+
+### Purpose
+
+Stabilized V2 admin authentication so browser-session V2 admin sidecars no longer depend primarily on manually maintained `IROUP_V2_ADMIN_TOKEN_MAP_JSON` entries.
+
+### Changes
+
+- `index.html` now preserves the Google OAuth `access_token` in `sessionStorage.iroup_google_access_token` after successful login.
+- `iroup-config.js` exposes `IROUP.getGoogleAccessToken()`.
+- `iroup-v2-api.js` prefers `googleAccessToken` for V2 admin requests and still sends legacy `adminToken` when available.
+- `IROUP_V2_AUTH.gs` verifies explicit Google tokens through Google userinfo/tokeninfo and then validates the resolved email against the V2 `ADMIN` sheet.
+- Legacy token-map auth remains available as fallback.
+
+### Expected Impact
+
+Fresh login should restore:
+
+- dashboard V2 summary sidecar
+- report V2 summary sidecar
+- travel V2 list sidecar
+- event draft dry-run preview
+
+without manually updating the V2 token-map script property.
+
+Still not doing:
+
+- V1 `SCRIPT_URL` replacement
+- V1 CRUD/upload changes
+- public route changes
+- save/delete behavior changes
+- real V2 writes
+- token-map removal
+- hard auth cutover
+- commit or push
