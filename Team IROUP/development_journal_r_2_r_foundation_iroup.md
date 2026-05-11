@@ -1851,3 +1851,46 @@ Still not doing
 - backend route changes
 - deployment
 - push
+
+---
+
+51. Dashboard V2 Admin-Read Readiness Pilot (May 11, 2026)
+
+Summary
+
+Implemented the smallest safe admin-read pilot in `dashboard.html` to validate V2 admin endpoint access and V1/V2 coexistence without replacing the existing dashboard render architecture.
+
+Implementation notes
+
+- Added `iroup-v2-api.js` after `iroup-config.js`.
+- Added `fetchV2DashboardSummary()` using `IROUP_V2.admin.dashboardSummary()`.
+- Added `state.v2Summary` as a sidecar storage field.
+- Added a tiny readiness chip showing `V2 admin: checking`, `ready`, or `unavailable`.
+- V2 failures are caught and logged; the existing V1 dashboard render continues through `IROUP.getReport(year)`.
+
+Intentionally unchanged
+
+- `fetchReport(year)`
+- `reloadData()`
+- `filteredReport()`
+- `makeSummary()`
+- KPI rendering from `state.raw`
+- budget snapshot
+- top rankings
+- attention tables
+- auto insights
+- quick search
+- fiscal-year generation
+
+Configuration note
+
+The V2 adapter still needs `IROUP_V2_SCRIPT_URL` or `IROUP_V2.setScriptUrl(url)` for a live V2 endpoint. Without that configuration, the readiness check fails gracefully and reports unavailable.
+
+Still not doing
+
+- full dashboard migration
+- report page migration
+- CRUD/upload migration
+- backend route changes
+- deployment
+- push

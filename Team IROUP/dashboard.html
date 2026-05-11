@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="iroup-config.js"></script>
+<script src="iroup-v2-api.js"></script>
 <script src="iroup-utils.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -124,6 +125,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-
             <span class="hero-chip" id="lastUpdated">กำลังโหลดข้อมูล...</span>
             <span class="hero-chip" id="yearChip">ทุกปีงบประมาณ</span>
             <span class="hero-chip">⚡ Fast Report API</span>
+            <span class="hero-chip" id="v2Readiness">V2 admin: checking</span>
           </div>
         </div>
         <div class="globy-box">
@@ -154,6 +156,7 @@ const state = {
   view:null,
   year:'',
   query:'',
+  v2Summary:null,
   loading:false
 };
 
@@ -171,6 +174,29 @@ async function fetchReport(year=''){
   const json = await IROUP.getReport(year);
   if(!json.success) throw new Error(json.error || 'API error');
   return json;
+}
+
+async function fetchV2DashboardSummary(){
+  const badge=$('#v2Readiness');
+  try{
+    if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.dashboardSummary){
+      throw new Error('IROUP_V2 admin adapter is not available');
+    }
+    const response=await IROUP_V2.admin.dashboardSummary();
+    if(!response.success) throw new Error(response.error || 'V2 dashboard summary API error');
+    state.v2Summary=response.data || null;
+    if(badge) badge.textContent='V2 admin: ready';
+    console.info('IROUP V2 dashboard summary readiness OK', {
+      counts: state.v2Summary && state.v2Summary.counts,
+      participants: state.v2Summary && state.v2Summary.participants
+    });
+    return state.v2Summary;
+  }catch(err){
+    state.v2Summary=null;
+    if(badge) badge.textContent='V2 admin: unavailable';
+    console.warn('IROUP V2 dashboard summary readiness failed; V1 dashboard render continues.', err);
+    return null;
+  }
 }
 
 async function reloadData(force=false){
@@ -457,6 +483,7 @@ function mouTable(rows){
 document.addEventListener('DOMContentLoaded',()=>{
   $('#yearSelect').addEventListener('change',()=>{state.year=$('#yearSelect').value; reloadData(true)});
   $('#quickSearch').addEventListener('keydown',e=>{if(e.key==='Enter')applyFilter()});
+  fetchV2DashboardSummary();
   reloadData(false);
 });
 </script>

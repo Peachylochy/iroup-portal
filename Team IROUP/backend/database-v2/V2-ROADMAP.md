@@ -207,6 +207,13 @@ Admin/dashboard audit:
 - Upload migration should wait until V2 file upload plus normalized `FILES` relation workflow is locked.
 - `mou.html`, `scholarship-events.html`, `travel.html`, and `mobility.html` should begin with read-list/detail-only coexistence; keep V1 writes/uploads during the transition.
 
+Dashboard readiness pilot:
+
+- `dashboard.html` now runs a sidecar V2 admin-read readiness check through `IROUP_V2.admin.dashboardSummary()`.
+- The existing dashboard render remains V1-backed through `IROUP.getReport(year)`.
+- V2 readiness data is stored separately in `state.v2Summary` and does not feed KPIs, rankings, budget, insights, filters, or attention tables yet.
+- This pilot validates V2 admin route access/coexistence only; full dashboard migration still requires either richer dashboard/report DTOs or a deliberate multi-route admin list mapping pass.
+
 ## Architecture Direction
 
 ```text

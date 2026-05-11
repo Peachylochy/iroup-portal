@@ -26,6 +26,7 @@ Team IROUP/public/public-scholar.html
 Team IROUP/public/public-events.html
 Team IROUP/public/public-mou.html
 Team IROUP/public/public-mobility.html
+Team IROUP/dashboard.html
 ```
 
 `public-scholar.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.scholarshipList()` for its primary public data flow. The adapter still has no hardcoded deployment URL, so live data requires explicit V2 endpoint configuration.
@@ -35,6 +36,8 @@ Team IROUP/public/public-mobility.html
 `public-mou.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.mouList()` for its primary public list data flow. It keeps existing KPI, table, chart, filter/search, D3 map rendering, and local country aggregation behavior by mapping V2 DTO fields into the page-local render shape. It does not use `IROUP_V2.public.mouMap()` yet.
 
 `public-mobility.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.mobilityList()` plus `IROUP_V2.public.travelList()` for its primary public list data flow. It keeps existing KPI, charts, D3 map rendering, top countries, filters/search, detail modal, and timeline behavior by mapping V2 DTO fields into the page-local render shape. It does not use public summary or map aggregate helpers yet.
+
+`dashboard.html` now loads `iroup-v2-api.js` for an admin-read readiness pilot only. It calls `IROUP_V2.admin.dashboardSummary()` as a sidecar check, stores the result in `state.v2Summary`, and leaves the existing V1 `IROUP.getReport(year)` dashboard rendering path unchanged.
 
 ## Safety Rules
 
@@ -162,6 +165,7 @@ Pilot status:
 - `public-events.html` completed steps 1, 3, and 4.
 - `public-mou.html` completed steps 1, 3, and 4 for list data only.
 - `public-mobility.html` completed steps 1, 3, and 4 for mobility/travel list data only.
+- `dashboard.html` completed an admin-read readiness pilot using `IROUP_V2.admin.dashboardSummary()` without migrating dashboard rendering.
 - Step 2 is blocked until a V2 deployment URL is available.
 - Step 5 requires live V2 endpoint verification.
 

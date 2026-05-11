@@ -86,6 +86,35 @@ Recommended migration order:
 
 ---
 
+## Latest Dashboard V2 Readiness Pilot
+
+### Session: 2026-05-11 - Dashboard V2 Admin-Read Readiness Pilot
+
+**Phase goal:** Validate V2 admin endpoint access, admin token propagation, and V1/V2 coexistence inside `dashboard.html`. No dashboard render architecture migration.
+
+Implementation:
+
+- `dashboard.html` now loads `iroup-v2-api.js` after `iroup-config.js`.
+- Added a sidecar `fetchV2DashboardSummary()` call using `IROUP_V2.admin.dashboardSummary()`.
+- V2 summary result is stored separately in `state.v2Summary`.
+- Added a tiny readiness chip: `V2 admin: checking/ready/unavailable`.
+- V2 failure is graceful and does not block the existing V1 `IROUP.getReport(year)` dashboard render.
+
+Intentionally unchanged:
+
+- `fetchReport(year)`
+- `reloadData()`
+- `filteredReport()`
+- `makeSummary()`
+- KPI rendering from `state.raw`
+- budget snapshot, rankings, attention tables, auto insights, quick search, and fiscal-year generation
+
+Known configuration note:
+
+- The V2 adapter still requires `IROUP_V2_SCRIPT_URL` or `IROUP_V2.setScriptUrl(url)` for live V2 access. Without it, the readiness chip reports unavailable while V1 dashboard rendering continues.
+
+---
+
 ## 0. UI Polish Log
 
 ### Session: 2026-05-09 — Readability & Contrast Pass + Login Page Improvement
