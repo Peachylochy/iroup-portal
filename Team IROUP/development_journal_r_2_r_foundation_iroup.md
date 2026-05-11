@@ -1983,3 +1983,44 @@ Still not doing
 - frontend V2 endpoint activation
 - admin CRUD/upload migration
 - push
+
+---
+
+54. V2 Deployment Smoke Test Planning Pass (May 11, 2026)
+
+Summary
+
+Prepared the smoke-test strategy for the first live V2 Apps Script deployment without deploying, changing URLs, activating frontend V2 endpoint config, touching V1 deployment, or pushing.
+
+Plan record
+
+- `Team IROUP/backend/database-v2/V2-SMOKE-TEST-PLAN.md`
+
+Smoke-test sequence
+
+1. Run Apps Script editor-level `routeV2Request_()` checks.
+2. Create the separate V2 web-app deployment only after review approval.
+3. Test direct endpoint URLs before frontend activation.
+4. Start with `v2.health`.
+5. Treat `v2.schema` as a controlled diagnostic until public exposure is reviewed.
+6. Test public list routes and inspect DTO privacy.
+7. Test admin auth failure before admin auth success.
+8. Activate the V2 URL for one frontend page only.
+9. Start frontend activation with `public/public-scholar.html`.
+
+Key recommendation
+
+Do not add automatic V1 public fallback inside migrated public pages. Keep rollback at the endpoint config or page activation layer so V2 failures stay visible during the migration.
+
+Critical risk noted
+
+The current V2 admin guard uses Apps Script active-user email through `Session.getActiveUser().getEmail()`. Public access requirements and admin identity requirements may conflict depending on the web-app deployment settings. If a single deployment cannot safely satisfy both, public and admin deployment strategies should be split before dashboard/admin activation.
+
+Still not doing
+
+- deployment
+- production URL change
+- frontend endpoint activation
+- frontend behavior changes
+- V1 deployment changes
+- push

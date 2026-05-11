@@ -8,6 +8,44 @@
 
 ---
 
+## Latest V2 Deployment Smoke-Test Plan
+
+### Session: 2026-05-11 - V2 Deployment Smoke Test Planning Pass
+
+**Phase goal:** Plan the first live V2 deployment smoke test. No deployment, no production URL change, no frontend endpoint activation, no V1 deployment change, and no push.
+
+Smoke-test plan:
+
+```text
+Team IROUP/backend/database-v2/V2-SMOKE-TEST-PLAN.md
+```
+
+Recommended sequence:
+
+1. Run editor-level `routeV2Request_()` checks before web deployment.
+2. Deploy the separate V2 web app only after review approval.
+3. Test direct V2 endpoint URLs before any frontend page receives the live URL.
+4. Start with `v2.health`.
+5. Test public list routes and inspect DTO privacy.
+6. Test admin route failure for unauthorized access.
+7. Test admin route success only with an active V2 admin account.
+8. Activate the V2 URL for one frontend page only, starting with `public/public-scholar.html`.
+9. Expand page activation one page at a time.
+
+Important recommendation:
+
+- Do not add automatic V1 public fallback inside migrated public pages.
+- Keep rollback at the V2 endpoint config/page activation layer.
+- Keep dashboard V2 as readiness-only until admin auth behavior is proven under the exact Apps Script deployment settings.
+
+Critical risk to resolve before frontend activation:
+
+- V2 admin auth currently depends on `Session.getActiveUser().getEmail()`.
+- Apps Script web-app access settings must be tested because public unauthenticated routes and active-user admin identity may require different deployment behavior.
+- If one deployment cannot safely support both, split public and admin deployment strategies before admin activation.
+
+---
+
 ## Latest V2 Deployment Preparation
 
 ### Session: 2026-05-11 - V2 Deployment Preparation Pass

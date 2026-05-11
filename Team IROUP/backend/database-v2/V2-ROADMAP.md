@@ -203,6 +203,49 @@ Remaining deployment gates:
 - Review whether `v2.schema` should remain public.
 - Smoke-test public-safe file DTO filtering with representative public/private files.
 
+## V2 Deployment Smoke-Test Plan
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/V2-SMOKE-TEST-PLAN.md
+```
+
+Smoke-test direction:
+
+- Test the V2 deployment directly before any frontend page receives the live V2 URL.
+- Use `v2.health` as the first public liveness check.
+- Use `v2.schema` only as a controlled diagnostic until its public exposure is reviewed.
+- Test public DTO routes before admin routes.
+- Test admin auth failure before admin auth success.
+- Activate the frontend V2 URL on one page only after direct endpoint tests pass.
+
+Safest first frontend page:
+
+```text
+Team IROUP/public/public-scholar.html
+```
+
+Reason:
+
+- It uses one public V2 list route.
+- It has no map/chart dependency.
+- It has no mobility/travel coupling.
+- It has contained card/filter rendering.
+
+Fallback rule:
+
+- Do not add automatic V1 public fallback to migrated pages.
+- Public page rollback should happen by removing or blanking the V2 endpoint config, not by silently reintroducing `IROUP.getPublic*` reads.
+- `dashboard.html` remains the exception because its current V1 render architecture intentionally stays active while the V2 readiness chip is tested.
+
+Critical deployment setting risk:
+
+- Current admin auth uses `Session.getActiveUser().getEmail()`.
+- A public web-app deployment may not provide a reliable end-user email.
+- An execute-as-owner deployment could make admin routes unsafe if the owner email is treated as active for every request.
+- If one deployment cannot safely support both public pages and admin auth, split public and admin deployment strategies before dashboard/admin activation.
+
 ## Public Pilot Migration
 
 Pilot pages:
