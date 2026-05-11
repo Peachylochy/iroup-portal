@@ -866,13 +866,13 @@ It standardizes:
 - Existing pages were not modified.
 - `iroup-config.js` was not replaced.
 - `IROUP.SCRIPT_URL` was not changed.
-- No page currently loads `iroup-v2-api.js`.
+- `public/public-scholar.html` and `public/public-events.html` now load `iroup-v2-api.js` for approved public read-only pilot flows.
 - The adapter has no hardcoded deployed V2 URL; it must be configured later with `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
 
 Current status:
 
 - V1 and V2 clients can coexist safely.
-- Frontend migration is still not started.
+- Frontend migration has started in limited public read-only pilot form.
 - Admin write migration remains blocked until V2 write routes and normalized form contracts exist.
 
 ---
@@ -911,7 +911,48 @@ The V2 adapter still has no hardcoded deployed V2 URL. Live browser data loading
 
 Still not doing:
 
-- public events migration
+- admin page migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` edits
+- deployment
+- V1 helper removal
+
+---
+
+## 36. Public Migration Wave 1 - Events Page (2026-05-11)
+
+### Purpose
+
+Continued the gradual public-page migration using the isolated V2 adapter.
+
+Target page:
+
+```text
+Team IROUP/public/public-events.html
+```
+
+### Changes
+
+- Added `../iroup-v2-api.js` to the public events page.
+- Migrated only the primary events data-loading call from `IROUP.getPublicEvents()` to `IROUP_V2.public.eventList()`.
+- Kept existing calendar, status calculation, sorting, filters, poster fallback, file button, KPI rendering, and page UI behavior intact.
+- Hardened the page-local compatibility normalization path for V2 event DTOs.
+
+### DTO Compatibility Notes
+
+The events page still renders through its existing V1-style local shape. The mapper now adapts:
+
+- `title_th/title_en`, `event_type`, `detail_th/detail_en`, `link_url/meeting_url`
+- structured `organizer`, `country`, and `continent` objects
+- public `files[]` entries for poster and file URLs
+
+### Current Limitation
+
+Live data verification still requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
+
+Still not doing:
+
 - admin page migration
 - dashboard/report migration
 - auth flow changes

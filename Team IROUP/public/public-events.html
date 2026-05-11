@@ -220,6 +220,7 @@ footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(
 <footer style="display:block">© 2569 International Relations Office · University of Phayao</footer>
 
 <script src="iroup-config.js"></script>
+<script src="../iroup-v2-api.js"></script>
 <script>
 let allEvents = [];
 let currentFilter = '';
@@ -251,7 +252,9 @@ function simpleLink(url,label){
 
 async function loadData() {
   try {
-    const data = (await IROUP.getPublicEvents()).map(normalizePublicEvent);
+    const response = await IROUP_V2.public.eventList();
+    if (!response.success) throw new Error(response.error || 'V2 event API error');
+    const data = (response.data || []).map(normalizePublicEvent);
     allEvents = data.sort((a,b) => new Date(a['วันเริ่ม']) - new Date(b['วันเริ่ม']));
     const today = new Date();
     const upcoming = data.filter(e => new Date(e['วันเริ่ม']) > today).length;
@@ -270,26 +273,63 @@ async function loadData() {
 }
 
 function normalizePublicEvent(row) {
+  const country = normalizePublicCountryName(row.country);
+  const continent = normalizePublicContinentName(row.continent);
+  const organizer = normalizePublicUnitName(row.organizer);
+  const fileUrl = firstPublicFileUrl(row.files);
   return {
     ID: row.event_id || '',
-    'ชื่อกิจกรรม': row.title || '',
-    'ประเภท': row.type || '',
-    'ประเทศ': row.country || '',
-    'ทวีป': row.continent || '',
-    'หน่วยงาน': row.organizer || row.institution || '',
-    'สถานที่': row.location || row.country || '',
+    'ชื่อกิจกรรม': row.title_th || row.title_en || row.title || '',
+    'ประเภท': row.event_type || row.type || '',
+    'ประเทศ': country || row.country || '',
+    'ทวีป': continent || row.continent || '',
+    'หน่วยงาน': organizer || row.institution || '',
+    'สถานที่': row.location || country || row.country || '',
     'จำนวน': row.participant_count || '',
     'วันเริ่ม': row.start_date || '',
     'วันสิ้นสุด': row.end_date || row.start_date || '',
     'เวลาเริ่ม': row.start_time || '',
     'เวลาสิ้นสุด': row.end_time || '',
-    'รายละเอียด': row.detail || '',
-    Link: row.detail_url || row.link_url || '',
-    Poster_URL: row.poster_url || '',
-    'ไฟล์_URL': row.public_file_url || '',
+    'รายละเอียด': row.detail_th || row.detail_en || row.detail || '',
+    Link: row.link_url || row.meeting_url || row.detail_url || '',
+    Poster_URL: row.poster_url || firstPublicImageUrl(row.files) || '',
+    'ไฟล์_URL': row.public_file_url || fileUrl || '',
     Pin: isPublicTruthy(row.pin) ? 'TRUE' : '',
     Status: row.status || ''
   };
+}
+
+function normalizePublicCountryName(country) {
+  if (!country) return '';
+  if (typeof country !== 'object') return String(country || '');
+  return country.country_name_en || country.country_name_th || country.country_id || '';
+}
+
+function normalizePublicContinentName(continent) {
+  if (!continent) return '';
+  if (typeof continent !== 'object') return String(continent || '');
+  return continent.continent_name_en || continent.continent_name_th || continent.continent_id || '';
+}
+
+function normalizePublicUnitName(unit) {
+  if (!unit) return '';
+  if (typeof unit !== 'object') return String(unit || '');
+  return unit.unit_name_th || unit.unit_name_en || unit.unit_id || '';
+}
+
+function firstPublicFileUrl(files) {
+  const list = Array.isArray(files) ? files : [];
+  const found = list.find(file => file && file.file_url);
+  return found ? found.file_url : '';
+}
+
+function firstPublicImageUrl(files) {
+  const list = Array.isArray(files) ? files : [];
+  const found = list.find(file => {
+    const mime = String(file && file.mime_type || '').toLowerCase();
+    return file && file.file_url && mime.indexOf('image/') === 0;
+  });
+  return found ? found.file_url : '';
 }
 
 function isPublicTruthy(value) {

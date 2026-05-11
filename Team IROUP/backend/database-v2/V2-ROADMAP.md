@@ -155,21 +155,23 @@ Purpose:
 
 Current rule:
 
-- `public-scholar.html` is the first approved pilot page using `iroup-v2-api.js`.
-- Do not load `iroup-v2-api.js` into additional pages until the pilot is reviewed.
+- `public-scholar.html` and `public-events.html` are approved Public Migration Wave 1 pages using `iroup-v2-api.js`.
+- Do not load `iroup-v2-api.js` into additional pages until each page migration is reviewed.
 - Configure V2 endpoint explicitly during testing; the adapter intentionally has no hardcoded deployment URL.
 
 ## Public Pilot Migration
 
-Pilot page:
+Pilot pages:
 
 ```text
 Team IROUP/public/public-scholar.html
+Team IROUP/public/public-events.html
 ```
 
 Pilot scope:
 
 - Primary public scholarship data-loading flow only.
+- Primary public events data-loading flow only.
 - Existing UI/rendering/filter behavior preserved.
 - V2 DTO fields adapted locally to the old render shape.
 
@@ -179,7 +181,7 @@ Pilot blocker:
 
 Next rule:
 
-- Review the scholarship pilot before migrating `public-events.html` or any admin page.
+- Review the public scholarship and events pilots before migrating another public page or any admin page.
 
 ## Architecture Direction
 

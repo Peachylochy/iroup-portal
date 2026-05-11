@@ -1632,3 +1632,43 @@ Still not doing
 - production `Code.gs` wiring
 - deployment
 - V1 helper removal
+
+---
+
+46. Public Migration Wave 1 - Events Page (May 11, 2026)
+
+Summary
+
+Continued the public V2 migration by moving only the primary public events data-loading flow to the V2 adapter.
+
+Target page
+
+- `Team IROUP/public/public-events.html`
+
+Implementation notes
+
+- Added `../iroup-v2-api.js`.
+- Replaced the primary `IROUP.getPublicEvents()` call with `IROUP_V2.public.eventList()`.
+- Preserved existing calendar rendering, date selection, status filtering, type filter, poster fallback, file button, KPI rendering, sorting, styling, and layout.
+- Kept the existing page-local render shape by hardening compatibility normalization from V2 event DTO fields.
+
+DTO mismatch discovered
+
+The old public events page expected V1-style fields such as `title`, `type`, `country`, `continent`, `organizer`, `detail`, `poster_url`, and `public_file_url`. The V2 DTO returns normalized fields such as `title_th/title_en`, `event_type`, structured `organizer/country/continent`, `detail_th/detail_en`, `link_url/meeting_url`, and `files[]`.
+
+Resolution
+
+The page now maps those V2 fields locally without refactoring its render/calendar/filter layer.
+
+Current limitation
+
+The V2 adapter still has no hardcoded deployment URL. Live data verification requires explicit V2 endpoint configuration through `IROUP_V2.setScriptUrl(url)` or `window.IROUP_V2_SCRIPT_URL`.
+
+Still not doing
+
+- admin migration
+- dashboard/report migration
+- auth flow changes
+- production `Code.gs` wiring
+- deployment
+- V1 helper removal
