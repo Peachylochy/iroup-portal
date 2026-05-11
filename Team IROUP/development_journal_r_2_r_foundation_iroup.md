@@ -2232,3 +2232,45 @@ Still not doing
 - replacing `IROUP.SCRIPT_URL`
 - changing V1 runtime
 - changing backend deployment
+
+---
+
+60. V2 Frontend Endpoint Activation Pilot - Public Events Only (May 11, 2026)
+
+Summary
+
+Continued the controlled live V2 frontend rollout by activating `public/public-events.html` only. This follows the successful `public/public-scholar.html` pilot and keeps the V1 production lane untouched.
+
+Implementation
+
+- Updated only `Team IROUP/public/public-events.html`.
+- Inserted `../iroup-v2-endpoint.js` between `../iroup-config.js` and `../iroup-v2-api.js`.
+- Reused the existing `IROUP_V2.public.eventList()` primary data-loading flow.
+- Kept `IROUP.getStatus()` and all page-local calendar, filter, KPI, poster, file, and render behavior unchanged.
+
+Load order
+
+```html
+<script src="../iroup-config.js"></script>
+<script src="../iroup-v2-endpoint.js"></script>
+<script src="../iroup-v2-api.js"></script>
+```
+
+Verification targets
+
+- `public-events.html` parses.
+- Event cards render from V2 event DTOs.
+- Poster/file URL mapping works.
+- Status/date badges still work.
+- Calendar render, date selection, type filter, and KPI rendering still work.
+- Primary event load does not call `IROUP.getPublicEvents()`.
+
+Still not doing
+
+- activating `public-mou.html`
+- activating `public-mobility.html`
+- activating dashboard/admin
+- replacing `IROUP.SCRIPT_URL`
+- changing V1 runtime
+- changing backend deployment
+- push

@@ -385,11 +385,12 @@ Next gate:
 - Do not activate dashboard/admin frontend yet.
 - Keep `v2.schema` as controlled diagnostic until public exposure is reviewed.
 
-## Public Scholar V2 Endpoint Activation Pilot
+## Public Frontend V2 Endpoint Activation Pilot
 
 Status:
 
-- `public/public-scholar.html` is the first and only page wired to the V2 endpoint config.
+- `public/public-scholar.html` is the first page wired to the V2 endpoint config.
+- `public/public-events.html` is the second page wired to the V2 endpoint config.
 - Other public pages remain V2-adapter migrated but not endpoint-activated.
 - Dashboard/admin remain non-activated for V2 frontend use.
 - V1 `IROUP.SCRIPT_URL` remains unchanged.
@@ -404,20 +405,21 @@ Activated only in:
 
 ```text
 Team IROUP/public/public-scholar.html
+Team IROUP/public/public-events.html
 ```
 
-Script load order:
+Script load order for `public-events.html`:
 
 ```html
-<script src="iroup-config.js"></script>
+<script src="../iroup-config.js"></script>
 <script src="../iroup-v2-endpoint.js"></script>
 <script src="../iroup-v2-api.js"></script>
 ```
 
 Runtime note:
 
-- `iroup-v2-endpoint.js` currently contains `LIVE_V2_EXEC_URL`.
-- Replace that placeholder with the actual live V2 `/exec` URL before browser verification.
+- `iroup-v2-endpoint.js` contains the live isolated V2 `/exec` URL.
+- Do not load it from `public-mou.html`, `public-mobility.html`, dashboard, or admin pages until each page receives its own reviewed activation pass.
 
 Verification focus:
 
@@ -426,6 +428,11 @@ Verification focus:
 - Status badges.
 - Search/filter behavior.
 - No primary scholarship load through `IROUP.getPublicScholarships()`.
+- V2 event DTO render.
+- Event poster/file URLs.
+- Event status/date badges.
+- Calendar render, date selection, type filter, and KPI rendering.
+- No primary event load through `IROUP.getPublicEvents()`.
 
 ## Public Pilot Migration
 

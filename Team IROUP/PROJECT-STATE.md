@@ -10,26 +10,27 @@
 
 ## Latest V2 Frontend Endpoint Activation Pilot
 
-### Session: 2026-05-11 - Public Scholar Live V2 Endpoint Pilot
+### Session: 2026-05-11 - Public Events Live V2 Endpoint Pilot
 
-**Phase goal:** Activate the live V2 backend endpoint path for `public/public-scholar.html` only. No other public pages, dashboard/admin pages, V1 runtime, backend deployment, or `IROUP.SCRIPT_URL` replacement.
+**Phase goal:** Continue the controlled live V2 frontend rollout by activating `public/public-events.html` only after the successful `public/public-scholar.html` pilot. No MOU, mobility, dashboard/admin, V1 runtime, backend deployment, or `IROUP.SCRIPT_URL` replacement.
 
 Implementation:
 
-- Added `Team IROUP/iroup-v2-endpoint.js`.
-- `iroup-v2-endpoint.js` sets `window.IROUP_V2_SCRIPT_URL`.
-- Updated only `Team IROUP/public/public-scholar.html`.
-- Load order is now:
+- Reused `Team IROUP/iroup-v2-endpoint.js`.
+- Updated only `Team IROUP/public/public-events.html` for this pass.
+- `public-events.html` already used `IROUP_V2.public.eventList()` for its primary event data load.
+- Inserted the endpoint config between `../iroup-config.js` and `../iroup-v2-api.js`.
+- Load order for `public-events.html` is now:
 
 ```html
-<script src="iroup-config.js"></script>
+<script src="../iroup-config.js"></script>
 <script src="../iroup-v2-endpoint.js"></script>
 <script src="../iroup-v2-api.js"></script>
 ```
 
 Scope boundary:
 
-- `public/public-events.html` remains unchanged.
+- `public/public-scholar.html` remains the first live V2 frontend endpoint pilot.
 - `public/public-mou.html` remains unchanged.
 - `public/public-mobility.html` remains unchanged.
 - `dashboard.html` remains unchanged.
@@ -37,16 +38,16 @@ Scope boundary:
 
 Runtime note:
 
-- The endpoint file currently contains the reviewed placeholder `LIVE_V2_EXEC_URL`.
-- Replace that placeholder with the actual live V2 `/exec` URL before browser runtime verification.
+- The endpoint file contains the live isolated V2 `/exec` URL.
+- Only `public-scholar.html` and `public-events.html` should load `iroup-v2-endpoint.js` at this stage.
 
 Expected runtime checks:
 
-- `public-scholar.html` renders V2 scholarship DTOs.
+- `public-events.html` renders V2 event DTOs.
 - Poster/file mapping works.
-- Status badges still work.
-- Search/filter still work.
-- No primary scholarship load uses `IROUP.getPublicScholarships()`.
+- Status/date badges still work.
+- Calendar render, date selection, type filter, and KPI rendering still work.
+- No primary event load uses `IROUP.getPublicEvents()`.
 
 ---
 

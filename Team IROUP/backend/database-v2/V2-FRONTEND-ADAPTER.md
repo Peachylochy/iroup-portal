@@ -31,7 +31,7 @@ Team IROUP/dashboard.html
 
 `public-scholar.html` now loads `iroup-v2-endpoint.js` before `iroup-v2-api.js` and uses `IROUP_V2.public.scholarshipList()` for its primary public data flow. It is the first single-page V2 endpoint activation pilot.
 
-`public-events.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.eventList()` for its primary public data flow. It keeps existing calendar, status, filter, poster, file, and KPI behavior by mapping V2 DTO fields into the page-local render shape.
+`public-events.html` now loads `iroup-v2-endpoint.js` before `iroup-v2-api.js` and uses `IROUP_V2.public.eventList()` for its primary public data flow. It is the second single-page V2 endpoint activation pilot and keeps existing calendar, status, filter, poster, file, and KPI behavior by mapping V2 DTO fields into the page-local render shape.
 
 `public-mou.html` now loads `iroup-v2-api.js` and uses `IROUP_V2.public.mouList()` for its primary public list data flow. It keeps existing KPI, table, chart, filter/search, D3 map rendering, and local country aggregation behavior by mapping V2 DTO fields into the page-local render shape. It does not use `IROUP_V2.public.mouMap()` yet.
 
@@ -61,15 +61,15 @@ The dedicated endpoint config file is:
 Team IROUP/iroup-v2-endpoint.js
 ```
 
-Current pilot load order for `public/public-scholar.html`:
+Current endpoint activation load order for `public/public-scholar.html` and `public/public-events.html`:
 
 ```html
-<script src="iroup-config.js"></script>
+<script src="../iroup-config.js"></script>
 <script src="../iroup-v2-endpoint.js"></script>
 <script src="../iroup-v2-api.js"></script>
 ```
 
-`iroup-v2-endpoint.js` currently contains the reviewed placeholder `LIVE_V2_EXEC_URL`; replace it with the actual live V2 `/exec` URL before runtime browser verification.
+`iroup-v2-endpoint.js` contains the live isolated V2 `/exec` URL. Keep it loaded only by reviewed pilot pages until the rollout advances.
 
 If no V2 URL is configured, calls return a normalized client error:
 
@@ -178,11 +178,11 @@ Recommended pilot pattern:
 Pilot status:
 
 - `public-scholar.html` completed steps 1, 2, 3, and 4 for the single-page endpoint activation pilot.
-- `public-events.html` completed steps 1, 3, and 4.
+- `public-events.html` completed steps 1, 2, 3, and 4 for the second single-page endpoint activation pilot.
 - `public-mou.html` completed steps 1, 3, and 4 for list data only.
 - `public-mobility.html` completed steps 1, 3, and 4 for mobility/travel list data only.
 - `dashboard.html` completed an admin-read readiness pilot using `IROUP_V2.admin.dashboardSummary()` without migrating dashboard rendering.
-- Step 2 remains inactive for all other migrated pages.
-- Step 5 for `public-scholar.html` requires browser verification after the placeholder endpoint is replaced with the actual live V2 `/exec` URL.
+- Step 2 remains inactive for `public-mou.html`, `public-mobility.html`, and dashboard/admin pages.
+- Step 5 browser verification remains required page by page after each endpoint activation.
 
 Do not migrate admin writes until V2 write routes and normalized form contracts exist.
