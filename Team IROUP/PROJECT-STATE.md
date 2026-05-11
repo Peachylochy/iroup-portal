@@ -8,6 +8,47 @@
 
 ---
 
+## Latest V2 Deployment Readiness Review
+
+### Session: 2026-05-11 - V2 Live Deployment Readiness Review
+
+**Phase goal:** Final architecture/safety review before the first live isolated V2 Apps Script deployment. No deployment, URL activation, runtime behavior change, production `Code.gs` touch, or push.
+
+Readiness review:
+
+```text
+Team IROUP/backend/database-v2/V2-DEPLOYMENT-READINESS-REVIEW.md
+```
+
+Decision:
+
+- **GO** for first isolated V2 backend deployment only, after manual checklist confirmation.
+- **NO-GO** for frontend V2 URL activation during the deployment step.
+- **NO-GO** for admin/dashboard V2 activation until admin auth is proven under the exact Apps Script deployment settings.
+
+Findings:
+
+- Required V2 runtime files are present.
+- V2 web-app entrypoints `doGet(e)` and `doPost(e)` exist in `IROUP_V2_ENTRYPOINT.gs`.
+- V2 router entrypoint `routeV2Request_(e)` exists.
+- V2 admin routes are guarded through `requireV2Admin_()`.
+- V2 remains isolated from production `backend/Code.gs`.
+- `IROUP.SCRIPT_URL` remains a V1 lane and should not be replaced.
+- Public/admin route separation is structurally sufficient for smoke testing, but live DTO privacy must still be verified.
+
+Main risk:
+
+- Admin auth depends on Apps Script `Session.getActiveUser().getEmail()`. Public route access and admin identity enforcement may conflict depending on deployment settings.
+
+Recommendation:
+
+- Run direct backend endpoint smoke tests first.
+- Keep `v2.schema` controlled diagnostic only.
+- Activate public V2 before admin V2.
+- Start future frontend activation with `public/public-scholar.html` only.
+
+---
+
 ## Latest V2 First Deployment Checklist
 
 ### Session: 2026-05-11 - V2 First Deployment Dry Run Checklist

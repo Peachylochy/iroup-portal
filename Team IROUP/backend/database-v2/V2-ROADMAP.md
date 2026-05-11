@@ -271,6 +271,44 @@ Checklist gates:
 - Do not activate frontend V2 URL during the dry run.
 - Roll back by disabling/removing only the V2 deployment or future endpoint config.
 
+## V2 Deployment Readiness Review
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/V2-DEPLOYMENT-READINESS-REVIEW.md
+```
+
+Final readiness decision:
+
+- GO for first isolated V2 backend deployment only, after manual checklist confirmation.
+- NO-GO for frontend V2 URL activation during the deployment step.
+- NO-GO for admin/dashboard V2 activation until admin auth behavior is proven under the exact Apps Script deployment settings.
+
+Readiness findings:
+
+- Required V2 runtime files are present.
+- `IROUP_V2_ENTRYPOINT.gs` defines `doGet(e)` and `doPost(e)`.
+- `IROUP_V2_ROUTER.gs` defines `routeV2Request_(e)`.
+- Admin routes are structurally guarded by `requireV2Admin_()`.
+- V2 remains isolated from production `backend/Code.gs`.
+- `IROUP.SCRIPT_URL` remains unchanged as the V1 lane.
+
+Remaining gates:
+
+- Prove the deployment opens `IROUP_DATABASE_V2`, not the V1 production spreadsheet.
+- Prove public DTO privacy against live representative rows.
+- Prove `v2.admin.dashboard.summary` fails for unauthorized users.
+- Prove `v2.admin.dashboard.summary` succeeds only for an active V2 admin.
+- Keep `v2.schema` as controlled diagnostic until public exposure is reviewed.
+
+Recommended activation order after direct endpoint success:
+
+1. Public-only V2 activation.
+2. Start with `public/public-scholar.html`.
+3. Expand public pages one at a time.
+4. Keep dashboard/admin readiness-only until admin auth is stable.
+
 ## Public Pilot Migration
 
 Pilot pages:

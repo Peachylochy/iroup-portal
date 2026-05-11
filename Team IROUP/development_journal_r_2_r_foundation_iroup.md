@@ -2060,3 +2060,50 @@ Still not doing
 - frontend endpoint activation
 - V1 deployment changes
 - push
+
+---
+
+56. V2 Live Deployment Readiness Review (May 11, 2026)
+
+Summary
+
+Completed the final architecture/safety review before the first live isolated V2 Apps Script deployment. This was a review/documentation pass only: no deployment, URL activation, runtime behavior change, production `Code.gs` touch, or push.
+
+Review record
+
+- `Team IROUP/backend/database-v2/V2-DEPLOYMENT-READINESS-REVIEW.md`
+
+Decision
+
+- GO for first isolated V2 backend deployment only, after manual checklist confirmation.
+- NO-GO for frontend V2 URL activation during the deployment step.
+- NO-GO for admin/dashboard V2 activation until admin auth behavior is proven under the exact Apps Script deployment settings.
+
+Findings
+
+- Required V2 runtime files are present.
+- `IROUP_V2_ENTRYPOINT.gs` defines `doGet(e)` and `doPost(e)`.
+- `IROUP_V2_ROUTER.gs` defines `routeV2Request_(e)`.
+- Admin routes are structurally guarded by `requireV2Admin_()`.
+- V2 deployment remains isolated from production `backend/Code.gs`.
+- `IROUP.SCRIPT_URL` remains the V1 lane and must not be replaced.
+- Public/admin separation is sufficient for controlled backend smoke testing.
+
+Main risk
+
+V2 admin auth depends on `Session.getActiveUser().getEmail()`. The chosen Apps Script deployment settings must prove both unauthorized failure and authorized success before any dashboard/admin activation.
+
+Recommendation
+
+- Run backend direct endpoint tests first.
+- Keep `v2.schema` controlled diagnostic only.
+- Activate public V2 before admin V2.
+- Start any future frontend activation with `public/public-scholar.html` only.
+
+Still not doing
+
+- deployment
+- frontend endpoint activation
+- runtime behavior changes
+- production `Code.gs` changes
+- push
