@@ -2024,3 +2024,39 @@ Still not doing
 - frontend behavior changes
 - V1 deployment changes
 - push
+
+---
+
+55. V2 First Deployment Dry Run Checklist (May 11, 2026)
+
+Summary
+
+Created an exact manual checklist for the first isolated V2 Apps Script deployment and smoke test. This was documentation/checklist only: no runtime code changes, no deployment, no URL changes, no frontend activation, no V1 deployment changes, and no push.
+
+Checklist record
+
+- `Team IROUP/backend/database-v2/V2-FIRST-DEPLOYMENT-CHECKLIST.md`
+
+Checklist contents
+
+- Required V2 runtime files to copy into the separate Apps Script project.
+- Apps Script project setup steps.
+- Bound project vs standalone `IROUP_V2_SPREADSHEET_ID` checks.
+- V2 `ADMIN` sheet pre-checks.
+- Deployment setting cautions for `Session.getActiveUser().getEmail()`.
+- First direct route tests:
+  - `v2.health`
+  - `v2.schema`
+  - `v2.public.scholarship.list`
+- Admin auth expected-fail and expected-success test sequence.
+- Rollback steps that avoid V1 production changes.
+- Explicit "what not to do" list.
+
+Still not doing
+
+- runtime code changes
+- deployment
+- production URL changes
+- frontend endpoint activation
+- V1 deployment changes
+- push

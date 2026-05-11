@@ -246,6 +246,31 @@ Critical deployment setting risk:
 - An execute-as-owner deployment could make admin routes unsafe if the owner email is treated as active for every request.
 - If one deployment cannot safely support both public pages and admin auth, split public and admin deployment strategies before dashboard/admin activation.
 
+## V2 First Deployment Dry Run Checklist
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/V2-FIRST-DEPLOYMENT-CHECKLIST.md
+```
+
+Purpose:
+
+- Convert the smoke-test strategy into exact manual steps for the first isolated V2 Apps Script deployment.
+- Keep the first deployment execution separate from frontend endpoint activation.
+- Preserve V1 rollback by leaving `IROUP.SCRIPT_URL` and production `backend/Code.gs` untouched.
+
+Checklist gates:
+
+- Copy only required V2 runtime files into the separate Apps Script project.
+- Decide bound spreadsheet vs standalone `IROUP_V2_SPREADSHEET_ID` explicitly.
+- Confirm `ADMIN` sheet test accounts before admin smoke testing.
+- Run editor-level checks before creating a web deployment.
+- Test only `v2.health`, `v2.schema`, and `v2.public.scholarship.list` first.
+- Run admin expected-fail tests before admin expected-success tests.
+- Do not activate frontend V2 URL during the dry run.
+- Roll back by disabling/removing only the V2 deployment or future endpoint config.
+
 ## Public Pilot Migration
 
 Pilot pages:
