@@ -189,6 +189,15 @@ Next rule:
 
 - Review the public scholarship, events, MOU list, and mobility/travel list pilots before migrating another public page or any admin page.
 
+Verification pass:
+
+- Public Migration Wave 1 source-pattern verification was completed on 2026-05-11.
+- Verification record: `Team IROUP/backend/database-v2/PUBLIC-MIGRATION-VERIFICATION.md`.
+- The four migrated public pages use `IROUP_V2.public.*` for primary public data loads.
+- No remaining `IROUP.getPublic*`, direct `SCRIPT_URL`, or `action=getPublic*` bypass was found in the migrated public pages.
+- Remaining V1 dependencies are utility-only status/date helpers from `iroup-config.js`.
+- Before admin/dashboard migration, resolve or consciously accept the documented public cleanup items: continent helper parity, utility-helper ownership, public normalization helper duplication, local hosting script-path behavior, and live V2 endpoint visual smoke testing.
+
 ## Architecture Direction
 
 ```text

@@ -8,6 +8,43 @@
 
 ---
 
+## Latest V2 Public Migration Verification
+
+### Session: 2026-05-11 - Public Migration Wave 1 Verification Pass
+
+**Phase goal:** Stabilization/audit only. No UI refactor, backend route change, admin/dashboard migration, deployment, or push.
+
+Verified migrated public pages:
+
+- `public/public-scholar.html`
+- `public/public-events.html`
+- `public/public-mou.html`
+- `public/public-mobility.html`
+
+Verification result:
+
+- All primary public data loads now use `IROUP_V2.public.*`.
+- No remaining `IROUP.getPublic*` calls were found in the four migrated public pages.
+- No direct `SCRIPT_URL` or `action=getPublic*` bypass was found in the four migrated public pages.
+- All migrated V2 list calls check `response.success` before consuming `response.data || []`.
+- Remaining V1 dependencies are utility-only: status/date helpers from `iroup-config.js`.
+- Public/private leakage scan found no direct page references to person IDs, student IDs, staff IDs, gender, budget, audit, creator, or updater fields.
+
+Verification record:
+
+```text
+Team IROUP/backend/database-v2/PUBLIC-MIGRATION-VERIFICATION.md
+```
+
+Known cleanup before admin/dashboard migration:
+
+- Add `continent_en` / `continent_th` support to the events and MOU page-local continent helpers.
+- Decide whether V1 `IROUP` utility helpers should remain during admin migration or move to `IU`/page-local helpers.
+- Standardize public country/continent/unit/file normalization helpers after behavior is visually verified.
+- Run live V2 endpoint browser smoke tests for all four public pages.
+
+---
+
 ## 0. UI Polish Log
 
 ### Session: 2026-05-09 — Readability & Contrast Pass + Login Page Improvement

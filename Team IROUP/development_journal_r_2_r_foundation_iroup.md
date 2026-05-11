@@ -1757,3 +1757,48 @@ Still not doing
 - production `Code.gs` wiring
 - deployment
 - V1 helper removal
+
+---
+
+49. Public Migration Wave 1 - Verification Pass (May 11, 2026)
+
+Summary
+
+Completed a stabilization/audit pass across all migrated Public Migration Wave 1 pages before moving toward admin/dashboard migration.
+
+Scope
+
+- `Team IROUP/public/public-scholar.html`
+- `Team IROUP/public/public-events.html`
+- `Team IROUP/public/public-mou.html`
+- `Team IROUP/public/public-mobility.html`
+
+Verification notes
+
+- Confirmed all primary migrated public data loads use `IROUP_V2.public.*`.
+- Confirmed no remaining `IROUP.getPublic*` calls in the four migrated public pages.
+- Confirmed no direct `SCRIPT_URL` or `action=getPublic*` bypass in the four migrated public pages.
+- Confirmed all migrated V2 list calls check `response.success` before consuming `response.data || []`.
+- Confirmed remaining V1 usage is utility-only status/date behavior from `iroup-config.js`.
+- Confirmed no direct page references to private participant/person IDs, student IDs, staff IDs, row-level gender, budget, audit, creator, or updater fields.
+
+Verification record
+
+- `Team IROUP/backend/database-v2/PUBLIC-MIGRATION-VERIFICATION.md`
+
+DTO gaps and cleanup items
+
+- `public-events.html` and `public-mou.html` continent helpers should support V2 `continent_en` / `continent_th`.
+- Public travel DTOs still do not expose a unit object, so travel unit display can remain blank on `public-mobility.html`.
+- Public file extraction remains page-local and duplicated.
+- MOU and mobility/travel map/stat flows remain list-backed; V2 aggregate/map routes are intentionally not adopted yet.
+- Live V2 endpoint browser smoke tests are still needed before admin/dashboard migration.
+
+Still not doing
+
+- admin migration
+- dashboard/report migration
+- backend route changes
+- production `Code.gs` wiring
+- deployment
+- push
