@@ -159,6 +159,50 @@ Current rule:
 - Do not load `iroup-v2-api.js` into additional pages until each page migration is reviewed.
 - Configure V2 endpoint explicitly during testing; the adapter intentionally has no hardcoded deployment URL.
 
+## V2 Deployment Preparation
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/IROUP_V2_ENTRYPOINT.gs
+Team IROUP/backend/database-v2/V2-DEPLOYMENT-PREP.md
+```
+
+Deployment direction:
+
+- Use a separate V2 Apps Script deployment URL.
+- Do not replace `IROUP.SCRIPT_URL`.
+- Do not wire V2 routes into production `backend/Code.gs` during the pilot.
+- Keep V1 and V2 deployments independently reversible.
+
+V2 runtime files required for the future deployment:
+
+- `IROUP_V2_ENTRYPOINT.gs`
+- `IROUP_V2_CONFIG.gs`
+- `IROUP_V2_DB.gs`
+- `IROUP_V2_VALIDATION.gs`
+- `IROUP_V2_AUTH.gs`
+- `IROUP_V2_ROUTER.gs`
+- `IROUP_V2_ADMIN_API.gs`
+- `IROUP_V2_PUBLIC_API.gs`
+- `IROUP_V2_DTO_AGGREGATE.gs`
+- `IROUP_V2_DTO_LOOKUP.gs`
+- `IROUP_V2_DTO_TRAVEL.gs`
+
+V2 entrypoint status:
+
+- `doGet(e)` and `doPost(e)` now exist in the V2-only entrypoint file.
+- Both entrypoints route through `routeV2Request_(e)`.
+- JSON output is returned through `ContentService.MimeType.JSON`.
+- Production V1 `backend/Code.gs` remains untouched.
+
+Remaining deployment gates:
+
+- Confirm whether the V2 Apps Script project is bound to `IROUP_DATABASE_V2` or needs `IROUP_V2_SPREADSHEET_ID` set explicitly.
+- Test `Session.getActiveUser().getEmail()` behavior under the exact web-app deployment access settings.
+- Review whether `v2.schema` should remain public.
+- Smoke-test public-safe file DTO filtering with representative public/private files.
+
 ## Public Pilot Migration
 
 Pilot pages:

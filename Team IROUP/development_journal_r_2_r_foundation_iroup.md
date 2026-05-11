@@ -1937,3 +1937,49 @@ Still not doing
 - frontend behavior changes
 - CRUD/upload migration
 - push
+
+---
+
+53. V2 Deployment Preparation Pass (May 11, 2026)
+
+Summary
+
+Prepared the V2 Apps Script deployment structure for a future separate V2 web-app deployment without touching production V1 `Code.gs`, deploying, pushing, or activating a frontend endpoint.
+
+Implementation notes
+
+- Added `Team IROUP/backend/database-v2/IROUP_V2_ENTRYPOINT.gs`.
+- Added V2-only `doGet(e)` and `doPost(e)` entrypoints.
+- Both entrypoints call `routeV2Request_(e)` and return JSON through `ContentService.MimeType.JSON`.
+- Added top-level graceful failure wrapping so unexpected entrypoint errors still return the standard V2 response shape.
+- Created `Team IROUP/backend/database-v2/V2-DEPLOYMENT-PREP.md`.
+
+Required V2 runtime bundle
+
+- `IROUP_V2_ENTRYPOINT.gs`
+- `IROUP_V2_CONFIG.gs`
+- `IROUP_V2_DB.gs`
+- `IROUP_V2_VALIDATION.gs`
+- `IROUP_V2_AUTH.gs`
+- `IROUP_V2_ROUTER.gs`
+- `IROUP_V2_ADMIN_API.gs`
+- `IROUP_V2_PUBLIC_API.gs`
+- `IROUP_V2_DTO_AGGREGATE.gs`
+- `IROUP_V2_DTO_LOOKUP.gs`
+- `IROUP_V2_DTO_TRAVEL.gs`
+
+Deployment risks noted
+
+- `IROUP_V2_SPREADSHEET_ID` must match the deployment project model: blank only works safely for a bound `IROUP_DATABASE_V2` Apps Script project.
+- V2 admin routes depend on Apps Script active-user email, so the web-app access setting must be tested before endpoint activation.
+- `v2.schema` is currently public and should be reviewed before broad public exposure.
+- Public file DTO filtering should be smoke-tested against representative public/private file rows.
+
+Still not doing
+
+- deployment
+- V1 production `Code.gs` edits
+- `IROUP.SCRIPT_URL` replacement
+- frontend V2 endpoint activation
+- admin CRUD/upload migration
+- push

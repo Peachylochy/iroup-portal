@@ -8,6 +8,56 @@
 
 ---
 
+## Latest V2 Deployment Preparation
+
+### Session: 2026-05-11 - V2 Deployment Preparation Pass
+
+**Phase goal:** Prepare a separate V2 Apps Script deployment structure. No deployment, no V1 `Code.gs` change, no frontend endpoint activation, and no push.
+
+Prepared deployment record:
+
+```text
+Team IROUP/backend/database-v2/V2-DEPLOYMENT-PREP.md
+```
+
+Implementation:
+
+- Added V2-only web-app entrypoint file: `Team IROUP/backend/database-v2/IROUP_V2_ENTRYPOINT.gs`.
+- The entrypoint defines `doGet(e)` and `doPost(e)` for the separate V2 deployment only.
+- Both entrypoints call `routeV2Request_(e)` and return JSON through `ContentService.MimeType.JSON`.
+- Unexpected top-level failures are wrapped in the standard V2 `{ success, data, error, meta }` shape.
+
+Required V2 runtime files for the future separate Apps Script deployment:
+
+- `IROUP_V2_ENTRYPOINT.gs`
+- `IROUP_V2_CONFIG.gs`
+- `IROUP_V2_DB.gs`
+- `IROUP_V2_VALIDATION.gs`
+- `IROUP_V2_AUTH.gs`
+- `IROUP_V2_ROUTER.gs`
+- `IROUP_V2_ADMIN_API.gs`
+- `IROUP_V2_PUBLIC_API.gs`
+- `IROUP_V2_DTO_AGGREGATE.gs`
+- `IROUP_V2_DTO_LOOKUP.gs`
+- `IROUP_V2_DTO_TRAVEL.gs`
+
+Important risks before deployment:
+
+- `IROUP_V2_SPREADSHEET_ID` is blank by design and must be valid for the selected project type.
+- V2 admin auth depends on Apps Script active-user email, so deployment access settings must be tested.
+- `v2.schema` is currently public and should be reviewed before broad public exposure.
+- Public file DTO behavior should be smoke-tested with representative public/private file rows.
+
+Still not doing:
+
+- deploying the V2 web app
+- changing `IROUP.SCRIPT_URL`
+- editing production `backend/Code.gs`
+- activating a live frontend V2 endpoint
+- pushing changes
+
+---
+
 ## Latest V2 Public Migration Verification
 
 ### Session: 2026-05-11 - Public Migration Wave 1 Verification Pass
