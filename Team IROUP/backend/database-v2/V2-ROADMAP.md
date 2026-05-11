@@ -309,6 +309,46 @@ Recommended activation order after direct endpoint success:
 3. Expand public pages one at a time.
 4. Keep dashboard/admin readiness-only until admin auth is stable.
 
+## First Isolated V2 Backend Deployment Execution Guide
+
+Created:
+
+```text
+Team IROUP/backend/database-v2/V2-FIRST-LIVE-DEPLOYMENT.md
+```
+
+Purpose:
+
+- Provide the exact manual procedure for creating the first isolated V2 Apps Script web app.
+- Keep deployment execution limited to backend direct endpoint smoke testing.
+- Keep frontend endpoint activation, dashboard/admin activation, and V1 changes out of this phase.
+
+Execution guide includes:
+
+- Apps Script creation steps.
+- File copy/import order.
+- Required V2 config values.
+- Bound spreadsheet and standalone deployment paths.
+- Deployment settings and execute/access recommendations.
+- How to obtain the `/exec` V2 deployment URL.
+- Temporary test URLs for:
+  - `v2.health`
+  - `v2.schema`
+  - `v2.public.scholarship.list`
+  - `v2.admin.dashboard.summary`
+- Expected JSON response shapes.
+- Admin auth expected-fail and expected-success checks.
+- Rollback procedure.
+- Post-deployment verification checklist.
+
+Still blocked from this phase:
+
+- Replacing `IROUP.SCRIPT_URL`.
+- Activating frontend pages.
+- Wiring dashboard/admin.
+- Broadly exposing `v2.schema`.
+- Runtime code changes.
+
 ## Public Pilot Migration
 
 Pilot pages:

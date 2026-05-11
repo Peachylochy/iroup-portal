@@ -2107,3 +2107,47 @@ Still not doing
 - runtime behavior changes
 - production `Code.gs` changes
 - push
+
+---
+
+57. First Isolated V2 Backend Deployment Execution Guide (May 11, 2026)
+
+Summary
+
+Created the exact manual execution guide for the first isolated V2 Apps Script backend deployment and smoke test. This was documentation only: no automatic deployment, no runtime logic changes, no URL activation, no frontend/admin activation, no V1 changes, and no push.
+
+Guide record
+
+- `Team IROUP/backend/database-v2/V2-FIRST-LIVE-DEPLOYMENT.md`
+
+Guide contents
+
+- Exact Apps Script creation steps.
+- Exact V2 runtime file copy/import order.
+- Required config values for bound and standalone Apps Script project models.
+- Deployment setting recommendations, including execute/access cautions.
+- How to obtain and privately record the V2 `/exec` deployment URL.
+- Temporary direct test URL examples.
+- Expected JSON outputs for:
+  - `v2.health`
+  - `v2.schema`
+  - `v2.public.scholarship.list`
+- Admin auth expected-fail and expected-success test procedures.
+- Rollback procedure.
+- Post-deployment verification checklist.
+
+Warnings reiterated
+
+- Do not replace `IROUP.SCRIPT_URL`.
+- Do not activate frontend pages yet.
+- Do not wire dashboard/admin yet.
+- Do not expose `v2.schema` broadly yet.
+
+Still not doing
+
+- deployment
+- runtime logic changes
+- frontend endpoint activation
+- dashboard/admin activation
+- V1 deployment changes
+- push

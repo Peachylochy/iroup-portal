@@ -8,6 +8,47 @@
 
 ---
 
+## Latest V2 First Live Deployment Guide
+
+### Session: 2026-05-11 - First Isolated V2 Backend Deployment Execution Guide
+
+**Phase goal:** Prepare the exact manual execution procedure for the first isolated V2 Apps Script backend deployment and smoke test. Documentation only.
+
+Execution guide:
+
+```text
+Team IROUP/backend/database-v2/V2-FIRST-LIVE-DEPLOYMENT.md
+```
+
+Guide coverage:
+
+- exact Apps Script project creation steps
+- required V2 file copy/import order
+- bound spreadsheet vs standalone `IROUP_V2_SPREADSHEET_ID` configuration
+- deployment setting recommendations
+- who should execute as and who should have access
+- how to obtain and privately store the V2 `/exec` deployment URL
+- temporary direct test URL examples
+- expected JSON outputs for:
+  - `v2.health`
+  - `v2.schema`
+  - `v2.public.scholarship.list`
+- admin auth expected-fail and expected-success tests
+- rollback procedure
+- post-deployment verification checklist
+
+Safety boundary:
+
+- Do not replace `IROUP.SCRIPT_URL`.
+- Do not activate frontend pages yet.
+- Do not wire dashboard/admin yet.
+- Do not expose `v2.schema` broadly yet.
+- Do not modify runtime logic.
+- Do not deploy automatically.
+- Do not push until reviewed.
+
+---
+
 ## Latest V2 Deployment Readiness Review
 
 ### Session: 2026-05-11 - V2 Live Deployment Readiness Review
