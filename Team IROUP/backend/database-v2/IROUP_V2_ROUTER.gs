@@ -270,6 +270,24 @@ function getV2RouteDispatch_() {
         return getV2AdminEvent_(getV2RequestId_(request, 'event_id'));
       }
     },
+    'v2.admin.event.validate': {
+      access: 'admin',
+      handler: function (request) {
+        return validateV2AdminEventWrite_(request, 'validate');
+      }
+    },
+    'v2.admin.event.create.dryrun': {
+      access: 'admin',
+      handler: function (request) {
+        return validateV2AdminEventWrite_(request, 'create.dryRun');
+      }
+    },
+    'v2.admin.event.update.dryrun': {
+      access: 'admin',
+      handler: function (request) {
+        return validateV2AdminEventWrite_(request, 'update.dryRun');
+      }
+    },
     'v2.admin.dashboard.summary': {
       access: 'admin',
       handler: function () {

@@ -812,3 +812,42 @@ Next gate before implementation:
 - add isolated backend test routes only after approval
 - add explicit adapter wrappers only after backend contract review
 - keep all frontend write handlers V1-backed until the pilot is explicitly approved
+
+## Event Metadata Write Dry-Run Contract
+
+Date: 2026-05-11
+
+Status: backend dry-run contract implemented.
+
+Routes:
+
+```text
+v2.admin.event.validate
+v2.admin.event.create.dryRun
+v2.admin.event.update.dryRun
+```
+
+Design:
+
+- admin-only through existing `requireV2Admin_()` router guard
+- validates event metadata payload shape
+- normalizes into the current `EVENT` sheet preview shape
+- resolves country/unit IDs where possible from V2 lookup tables
+- preserves display fallbacks as warnings when IDs cannot be resolved
+- returns `dry_run: true` and `write_enabled: false`
+
+Blocked in this phase:
+
+- sheet writes
+- real create/update
+- delete
+- upload/image/file relation handling
+- frontend submit wiring
+- public route changes
+- V1 runtime changes
+
+Next gate:
+
+- live smoke the dry-run routes with a valid admin token
+- review normalized preview shape against `scholarship-events.html` event form fields
+- only then consider adapter wrappers and a frontend validation sidecar

@@ -591,6 +591,146 @@ TODO status:
 
 - Implemented through existing Admin DTO helper.
 
+### `v2.admin.event.validate`
+
+Purpose:
+
+- Validate and normalize an Event metadata-only write payload without writing to any sheet.
+
+Classification:
+
+- Admin.
+- Dry-run/validation only.
+
+Required params:
+
+- Authenticated V2 admin session through `requireV2Admin_()`.
+- `title`, `title_th`, or `title_en`.
+- `start_date`.
+
+Optional params:
+
+- `event_id` or `id`
+- `type` or `event_type`
+- `event_mode`
+- `country_id` or country display fallback through `country`, `country_name`, or `countryName`
+- `continent`
+- `organizer_unit_id`, `unit_id`, or organizer/unit display fallback through `organizer`, `unit`, or `organizer_unit`
+- `location`
+- `meeting_url`
+- `end_date`
+- `time` or explicit `start_time` / `end_time`
+- `participant_count`
+- `detail`, `detail_th`, or `detail_en`
+- `link`, `link_url`, or `detail_url`
+- `public_visible`
+- `status`
+- `pin`
+
+Response shape:
+
+- Standard router response.
+- `data.dry_run === true`.
+- `data.write_enabled === false`.
+- `data.normalized_event` previews the normalized `EVENT` row shape:
+
+```javascript
+{
+  event_id: string,
+  title_th: string,
+  title_en: string,
+  event_type: string,
+  event_mode: string,
+  organizer_unit_id: string,
+  organizer_display: string,
+  country_id: string,
+  country_display: string,
+  continent: string,
+  location: string,
+  meeting_url: string,
+  start_date: string,
+  end_date: string,
+  start_time: string,
+  end_time: string,
+  participant_count: number,
+  detail_th: string,
+  detail_en: string,
+  link_url: string,
+  pin: boolean,
+  status: string,
+  public_visible: boolean,
+  is_deleted: false
+}
+```
+
+Blocked operations:
+
+- sheet write
+- file upload
+- image upload
+- file relation write
+- delete
+
+TODO status:
+
+- Implemented as a validation/dry-run route only.
+- No frontend wiring.
+- No write route.
+
+### `v2.admin.event.create.dryRun`
+
+Purpose:
+
+- Preview a future Event metadata-only create payload without writing to any sheet.
+
+Classification:
+
+- Admin.
+- Dry-run only.
+
+Required params:
+
+- Same payload contract as `v2.admin.event.validate`.
+
+Response shape:
+
+- Same as `v2.admin.event.validate`.
+- `data.mode === "create.dryRun"`.
+- `data.write_enabled === false`.
+
+TODO status:
+
+- Implemented as dry-run only.
+- No real create route exists yet.
+
+### `v2.admin.event.update.dryRun`
+
+Purpose:
+
+- Preview a future Event metadata-only update payload without writing to any sheet.
+
+Classification:
+
+- Admin.
+- Dry-run only.
+
+Required params:
+
+- Authenticated V2 admin session through `requireV2Admin_()`.
+- `event_id` or `id`.
+- Same metadata payload contract as `v2.admin.event.validate`.
+
+Response shape:
+
+- Same as `v2.admin.event.validate`.
+- `data.mode === "update.dryRun"`.
+- `data.write_enabled === false`.
+
+TODO status:
+
+- Implemented as dry-run only.
+- No real update route exists yet.
+
 ### `v2.admin.dashboard.summary`
 
 Purpose:

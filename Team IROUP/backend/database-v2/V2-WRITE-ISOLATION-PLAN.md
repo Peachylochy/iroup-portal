@@ -214,6 +214,32 @@ Required preconditions:
 - backend validates admin role, required fields, status/date fields, visibility flags, and audit fields
 - browser smoke confirms V1 event and scholarship flows still work if V2 is unavailable
 
+## Event Dry-Run Contract Preparation
+
+Date: 2026-05-11
+
+The first backend-only preparation step is now the event metadata dry-run contract.
+
+Routes:
+
+```text
+v2.admin.event.validate
+v2.admin.event.create.dryRun
+v2.admin.event.update.dryRun
+```
+
+Current status:
+
+- validation and dry-run only
+- admin auth required
+- no real create route
+- no real update route
+- no delete route
+- no upload/image/file relation handling
+- no frontend submit wiring
+
+The routes normalize event metadata into a preview of the current V2 `EVENT` sheet shape and return `dry_run: true` plus `write_enabled: false`.
+
 ## Explicit Non-Goals
 
 - no replacement of `IROUP.SCRIPT_URL`

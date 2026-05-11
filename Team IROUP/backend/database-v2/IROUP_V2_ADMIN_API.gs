@@ -138,6 +138,263 @@ function listV2AdminEvents_(includeArchived) {
   return adminResponseV2_(true, dtos, dtos.length, '');
 }
 
+function validateV2AdminEventWrite_(request, mode) {
+  const context = buildV2AdminContext_();
+  if (!context.success) return context;
+
+  const result = buildV2EventWritePreview_(request, context.data, mode || 'validate');
+  return adminResponseV2_(result.success, result.data, result.success ? 1 : 0, result.error);
+}
+
+function buildV2EventWritePreview_(request, ctx, mode) {
+  const payload = extractV2EventWritePayload_(request);
+  const normalized = normalizeV2EventWritePayload_(payload, ctx);
+  const errors = [];
+  const warnings = normalized.warnings || [];
+  const data = normalized.data || {};
+  const actionMode = String(mode || 'validate').trim();
+
+  if (actionMode === 'update.dryRun' && !data.event_id) {
+    errors.push({ field: 'event_id', code: 'EVENT_ID_REQUIRED', message: 'event_id is required for event update dry-run.' });
+  }
+
+  if (!data.title_th && !data.title_en) {
+    errors.push({ field: 'title', code: 'TITLE_REQUIRED', message: 'title, title_th, or title_en is required.' });
+  }
+
+  if (!data.start_date) {
+    errors.push({ field: 'start_date', code: 'START_DATE_REQUIRED', message: 'start_date is required.' });
+  }
+
+  if (data.end_date && data.start_date && data.end_date < data.start_date) {
+    errors.push({ field: 'end_date', code: 'END_BEFORE_START', message: 'end_date must be the same as or after start_date.' });
+  }
+
+  if (data.status) {
+    const statusCheck = validateEnumV2_(data.status, IROUP_V2_ENUMS.status, 'status');
+    if (!statusCheck.success) errors.push({ field: 'status', code: statusCheck.code, message: statusCheck.error });
+  }
+
+  if (data.event_mode) {
+    const modeCheck = validateEnumV2_(data.event_mode, IROUP_V2_ENUMS.event_mode, 'event_mode');
+    if (!modeCheck.success) errors.push({ field: 'event_mode', code: modeCheck.code, message: modeCheck.error });
+  }
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'Event metadata payload validation failed.' : '',
+    data: {
+      dry_run: true,
+      mode: actionMode,
+      target_sheet: IROUP_V2_SHEETS.EVENT,
+      write_enabled: false,
+      valid: errors.length === 0,
+      errors: errors,
+      warnings: warnings,
+      normalized_event: data,
+      relation_writes: {
+        files: [],
+        budgets: []
+      },
+      blocked_operations: [
+        'sheet_write',
+        'file_upload',
+        'image_upload',
+        'file_relation_write',
+        'delete'
+      ]
+    }
+  };
+}
+
+function extractV2EventWritePayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.event || params.payload || params.event || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
+function normalizeV2EventWritePayload_(payload, ctx) {
+  const source = payload || {};
+  const warnings = [];
+  if (source.payload_parse_error) {
+    warnings.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  }
+
+  const country = resolveV2EventCountryRef_(source, ctx, warnings);
+  const unit = resolveV2EventUnitRef_(source, ctx, warnings);
+  const time = normalizeV2EventTime_(source.time || source.event_time || '');
+
+  const title = cleanV2EventText_(pickV2EventValue_(source, ['title', 'title_th', 'title_en']));
+  const detail = cleanV2EventText_(pickV2EventValue_(source, ['detail', 'detail_th', 'detail_en']));
+  const normalized = {
+    event_id: cleanV2EventText_(pickV2EventValue_(source, ['event_id', 'id'])),
+    title_th: cleanV2EventText_(source.title_th || title),
+    title_en: cleanV2EventText_(source.title_en || ''),
+    event_type: cleanV2EventText_(pickV2EventValue_(source, ['event_type', 'type'])),
+    event_mode: cleanV2EventText_(pickV2EventValue_(source, ['event_mode', 'mode'])),
+    organizer_unit_id: unit.unit_id,
+    organizer_display: unit.display,
+    country_id: country.country_id,
+    country_display: country.display,
+    continent: cleanV2EventText_(pickV2EventValue_(source, ['continent', 'continent_en', 'continent_th'])),
+    location: cleanV2EventText_(source.location || ''),
+    meeting_url: cleanV2EventText_(pickV2EventValue_(source, ['meeting_url', 'meetingUrl'])),
+    start_date: normalizeV2EventDate_(pickV2EventValue_(source, ['start_date', 'startDate', 'date'])),
+    end_date: normalizeV2EventDate_(pickV2EventValue_(source, ['end_date', 'endDate'])) || normalizeV2EventDate_(pickV2EventValue_(source, ['start_date', 'startDate', 'date'])),
+    start_time: cleanV2EventText_(source.start_time || time.start_time),
+    end_time: cleanV2EventText_(source.end_time || time.end_time),
+    participant_count: toNumberV2_(pickV2EventValue_(source, ['participant_count', 'participantCount', 'count'])),
+    detail_th: cleanV2EventText_(source.detail_th || detail),
+    detail_en: cleanV2EventText_(source.detail_en || ''),
+    link_url: cleanV2EventText_(pickV2EventValue_(source, ['link_url', 'linkUrl', 'link', 'detail_url', 'detailUrl'])),
+    pin: isTruthyV2_(source.pin),
+    status: cleanV2EventText_(source.status || 'draft'),
+    public_visible: isTruthyV2_(source.public_visible),
+    is_deleted: false
+  };
+
+  return { data: normalized, warnings: warnings };
+}
+
+function resolveV2EventCountryRef_(source, ctx, warnings) {
+  const countryId = cleanV2EventText_(pickV2EventValue_(source, ['country_id', 'countryId']));
+  const display = cleanV2EventText_(pickV2EventValue_(source, ['country', 'country_name', 'countryName']));
+  if (countryId && ctx.countriesById[countryId]) {
+    return { country_id: countryId, display: display };
+  }
+  if (countryId) {
+    warnings.push({ field: 'country_id', code: 'COUNTRY_ID_NOT_FOUND', message: 'country_id was not found in COUNTRY_MASTER.' });
+    return { country_id: countryId, display: display };
+  }
+  if (!display) return { country_id: '', display: '' };
+
+  const found = findV2CountryByDisplay_(ctx, display);
+  if (found) return { country_id: found.country_id || '', display: display };
+
+  warnings.push({ field: 'country', code: 'COUNTRY_DISPLAY_UNRESOLVED', message: 'country display fallback could not be resolved to country_id.' });
+  return { country_id: '', display: display };
+}
+
+function resolveV2EventUnitRef_(source, ctx, warnings) {
+  const unitId = cleanV2EventText_(pickV2EventValue_(source, ['organizer_unit_id', 'unit_id', 'unitId']));
+  const display = cleanV2EventText_(pickV2EventValue_(source, ['organizer', 'unit', 'organizer_unit']));
+  if (unitId && ctx.unitsById[unitId]) {
+    return { unit_id: unitId, display: display };
+  }
+  if (unitId) {
+    warnings.push({ field: 'organizer_unit_id', code: 'UNIT_ID_NOT_FOUND', message: 'organizer_unit_id was not found in UP_UNIT_MASTER.' });
+    return { unit_id: unitId, display: display };
+  }
+  if (!display) return { unit_id: '', display: '' };
+
+  const found = findV2UnitByDisplay_(ctx, display);
+  if (found) return { unit_id: found.unit_id || '', display: display };
+
+  warnings.push({ field: 'organizer', code: 'UNIT_DISPLAY_UNRESOLVED', message: 'organizer/unit display fallback could not be resolved to organizer_unit_id.' });
+  return { unit_id: '', display: display };
+}
+
+function findV2CountryByDisplay_(ctx, display) {
+  const target = cleanV2EventText_(display).toLowerCase();
+  const rows = ctx.tables[IROUP_V2_SHEETS.COUNTRY_MASTER] || [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const values = [
+      row.country_id,
+      row.iso2,
+      row.iso3,
+      row.country_name_en,
+      row.country_name_th
+    ].map(function (value) {
+      return cleanV2EventText_(value).toLowerCase();
+    });
+    if (values.indexOf(target) >= 0) return row;
+  }
+  return null;
+}
+
+function findV2UnitByDisplay_(ctx, display) {
+  const target = cleanV2EventText_(display).toLowerCase();
+  const rows = ctx.tables[IROUP_V2_SHEETS.UP_UNIT_MASTER] || [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const values = [
+      row.unit_id,
+      row.unit_code,
+      row.unit_name_th,
+      row.unit_name_en
+    ].map(function (value) {
+      return cleanV2EventText_(value).toLowerCase();
+    });
+    if (values.indexOf(target) >= 0) return row;
+  }
+  return null;
+}
+
+function normalizeV2EventDate_(value) {
+  const text = cleanV2EventText_(value);
+  if (!text) return '';
+  const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) return text;
+
+  const local = text.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if (local) {
+    let year = Number(local[3]);
+    if (year > 2400) year -= 543;
+    if (year < 100) year += 2000;
+    const month = String(Number(local[2])).padStart(2, '0');
+    const day = String(Number(local[1])).padStart(2, '0');
+    return String(year).padStart(4, '0') + '-' + month + '-' + day;
+  }
+
+  const parsed = new Date(text);
+  if (isNaN(parsed.getTime())) return text;
+  return Utilities.formatDate(parsed, 'Asia/Bangkok', 'yyyy-MM-dd');
+}
+
+function normalizeV2EventTime_(value) {
+  const text = cleanV2EventText_(value);
+  if (!text) return { start_time: '', end_time: '' };
+  const parts = text.split(/[-–—]/).map(function (part) {
+    return cleanV2EventText_(part);
+  }).filter(function (part) {
+    return !!part;
+  });
+  return {
+    start_time: parts[0] || text,
+    end_time: parts[1] || ''
+  };
+}
+
+function pickV2EventValue_(source, keys) {
+  const payload = source || {};
+  for (let i = 0; i < (keys || []).length; i++) {
+    const key = keys[i];
+    if (payload[key] !== undefined && payload[key] !== null && String(payload[key]).trim() !== '') {
+      return payload[key];
+    }
+  }
+  return '';
+}
+
+function cleanV2EventText_(value) {
+  return String(value === null || value === undefined ? '' : value).trim();
+}
+
 function buildV2AdminContext_() {
   const sheetNames = [
     IROUP_V2_SHEETS.COUNTRY_MASTER,

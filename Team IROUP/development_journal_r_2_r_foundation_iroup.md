@@ -2636,3 +2636,45 @@ Still not doing
 - CRUD/write/upload migration
 - V1 `SCRIPT_URL` replacement
 - push
+
+---
+
+70. Event Metadata Write Dry-Run Contract (May 11, 2026)
+
+Summary
+
+Prepared the backend contract for the first controlled V2 write pilot target, `scholarship-events.html` event metadata-only create/update. This pass added validation and dry-run routes only; it did not add real writes or frontend wiring.
+
+Changed
+
+- `Team IROUP/backend/database-v2/IROUP_V2_ROUTER.gs`
+- `Team IROUP/backend/database-v2/IROUP_V2_ADMIN_API.gs`
+- `Team IROUP/backend/database-v2/V2-API-CONTRACT.md`
+- `Team IROUP/PROJECT-STATE.md`
+- `Team IROUP/backend/database-v2/V2-ROADMAP.md`
+
+Routes added
+
+- `v2.admin.event.validate`
+- `v2.admin.event.create.dryRun`
+- `v2.admin.event.update.dryRun`
+
+Behavior
+
+- Requires existing V2 admin auth.
+- Validates payload shape.
+- Normalizes event metadata into a preview of the V2 `EVENT` row shape.
+- Resolves country and organizer unit references where possible.
+- Returns warnings for unresolved display fallbacks.
+- Returns `dry_run: true` and `write_enabled: false`.
+
+Still not doing
+
+- real event create/update
+- delete
+- upload/image/file relation handling
+- frontend submit wiring
+- public route changes
+- V1 `Code.gs` changes
+- V1 `SCRIPT_URL` replacement
+- push
