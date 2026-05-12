@@ -973,7 +973,65 @@ window.openModal=function(type,id){
   if(IROUND9_currentType==='scholar') fillScholarForm(row);
   else fillEventForm(row);
 };
-function buildV2EventDraftPayload(formData){
+function v2EventFirstValue(row, keys){
+  const source=row || {};
+  for(const key of keys){
+    if(Object.prototype.hasOwnProperty.call(source,key) && source[key] !== undefined && source[key] !== null && source[key] !== '') return source[key];
+  }
+  return '';
+}
+function normalizeV2EventBoolean(value, fallback){
+  if(value === true || value === false) return value;
+  const text=String(value ?? '').trim().toLowerCase();
+  if(['true','1','yes','y','public','published','เผยแพร่'].includes(text)) return true;
+  if(['false','0','no','n','private','draft',''].includes(text)) return false;
+  return fallback === true;
+}
+function normalizeV2EventPayload(payload){
+  const source=payload || {};
+  return {
+    event_id: v2EventFirstValue(source,['event_id','id','ID']),
+    title: v2EventFirstValue(source,['title','title_th','title_en','ชื่อกิจกรรม']),
+    type: v2EventFirstValue(source,['type','event_type','ประเภท']),
+    organizer: v2EventFirstValue(source,['organizer','organizer_display','unit','unit_name','หน่วยงาน']),
+    organizer_unit_id: v2EventFirstValue(source,['organizer_unit_id','unit_id']),
+    country_id: v2EventFirstValue(source,['country_id']),
+    country: v2EventFirstValue(source,['country','country_name','countryName','ประเทศ']),
+    continent: v2EventFirstValue(source,['continent','ทวีป']),
+    start_date: v2EventFirstValue(source,['start_date','วันเริ่ม']),
+    end_date: v2EventFirstValue(source,['end_date','วันสิ้นสุด']),
+    start_time: v2EventFirstValue(source,['start_time','เวลาเริ่ม']),
+    end_time: v2EventFirstValue(source,['end_time','เวลาสิ้นสุด']),
+    location: v2EventFirstValue(source,['location','place','venue','สถานที่']),
+    participant_count: v2EventFirstValue(source,['participant_count','participants','จำนวน']),
+    detail: v2EventFirstValue(source,['detail','detail_th','detail_en','รายละเอียด']),
+    link: v2EventFirstValue(source,['link','link_url','detail_url','Link']),
+    status: v2EventFirstValue(source,['status','สถานะ']) || 'draft',
+    public_visible: normalizeV2EventBoolean(v2EventFirstValue(source,['public_visible','เผยแพร่']), false),
+    pin: normalizeV2EventBoolean(v2EventFirstValue(source,['pin','Pin']), false)
+  };
+}
+function mergeV2EventPayload(existingEventRow, formPayload){
+  const base=normalizeV2EventPayload(existingEventRow);
+  const patch=normalizeV2EventPayload(formPayload);
+  const merged={};
+  Object.keys(base).forEach(key=>{ merged[key]=base[key]; });
+  Object.keys(patch).forEach(key=>{
+    if(patch[key] !== '' && patch[key] !== undefined && patch[key] !== null) merged[key]=patch[key];
+  });
+  if(!merged.event_id) merged.event_id=patch.event_id || base.event_id || '';
+  if(!merged.status) merged.status='draft';
+  merged.public_visible=normalizeV2EventBoolean(merged.public_visible, false);
+  merged.pin=normalizeV2EventBoolean(merged.pin, false);
+  return merged;
+}
+function getCurrentV2EventRow(){
+  const modal=document.getElementById('modalOverlay');
+  const id=modal?.dataset.editId || '';
+  if(!id) return null;
+  return IROUND9_events.find(x=>String(x['ID'])===String(id) || String(x.event_id||'')===String(id)) || null;
+}
+function buildV2EventFormPayload(formData){
   const f=formData || document.getElementById('eventForm');
   const inputs=qsa(f,'input,textarea,select').filter(el=>el.type!=='file' && !el.classList.contains('asset-url-input'));
   const modal=document.getElementById('modalOverlay');
@@ -994,6 +1052,16 @@ function buildV2EventDraftPayload(formData){
     pin: false
   };
 }
+function buildV2EventDraftPayload(formData){
+  return normalizeV2EventPayload(buildV2EventFormPayload(formData));
+}
+function buildHydratedV2EventUpdatePayload(existingEventRow, formPayload){
+  return mergeV2EventPayload(existingEventRow || getCurrentV2EventRow(), formPayload || buildV2EventFormPayload(document.getElementById('eventForm')));
+}
+function buildV2EventDryRunPayload(){
+  const formPayload=buildV2EventFormPayload(document.getElementById('eventForm'));
+  return formPayload.event_id ? buildHydratedV2EventUpdatePayload(getCurrentV2EventRow(), formPayload) : normalizeV2EventPayload(formPayload);
+}
 async function previewV2EventDraft(payload){
   try{
     if(IROUND9_currentType !== 'event'){
@@ -1003,9 +1071,11 @@ async function previewV2EventDraft(payload){
     if(!window.IROUP_V2 || typeof IROUP_V2.request !== 'function'){
       throw new Error('IROUP_V2 adapter is not available.');
     }
-    const draft=payload || buildV2EventDraftPayload(document.getElementById('eventForm'));
-    const action=draft.event_id ? 'v2.admin.event.update.dryRun' : 'v2.admin.event.create.dryRun';
-    const response=await IROUP_V2.request(action,{payload:draft},{auth:true,method:'POST',timeoutMs:120000});
+    const draft=payload || buildV2EventDryRunPayload();
+    const response=draft.event_id
+      ? await IROUP_V2.admin.eventUpdateDryRun(draft)
+      : await IROUP_V2.admin.eventCreateDryRun(draft);
+    const action=response?.meta?.action || (draft.event_id ? 'v2.admin.event.update.dryRun' : 'v2.admin.event.create.dryRun');
     const preview=response && response.data ? response.data : {};
     console.info('IROUP V2 event draft preview', {
       action,
@@ -1025,6 +1095,9 @@ async function previewV2EventDraft(payload){
   }
 }
 window.previewV2EventDraft=previewV2EventDraft;
+window.buildV2EventDraftPayload=buildV2EventDraftPayload;
+window.buildHydratedV2EventUpdatePayload=buildHydratedV2EventUpdatePayload;
+window.buildV2EventDryRunPayload=buildV2EventDryRunPayload;
 async function round9Save(){
   const type=IROUND9_currentType;
   const id=document.getElementById('modalOverlay').dataset.editId;
