@@ -298,3 +298,105 @@ Write-pilot implication:
 - no upload migration in the first write pilot
 - no multi-page write activation
 - no production `Code.gs` changes
+
+## Event Metadata Real Write Pilot — Smoke Test Results
+
+Date: 2026-05-12
+
+Status: smoke test completed. Feature flag set to FALSE.
+
+Pre-deployment issues resolved before smoke test:
+
+- Live Apps Script deployment was running outdated IROUP_V2_AUTH.gs (pre-session 45,
+  no Google token verification). All admin routes fell through to Session.getActiveUser()
+  which always returns empty in "Execute as: Me, Anyone" deployment mode.
+- Resolution: replaced IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs
+  with current local versions and redeployed.
+- appsscript.json lacked https://www.googleapis.com/auth/script.external_request required
+  for UrlFetchApp.fetch(). Resolution: added scope to oauthScopes, saved the manifest,
+  and re-authorized the deployment.
+
+Smoke test results:
+
+| Route                              | Result             | Notes                                                    |
+|------------------------------------|--------------------|----------------------------------------------------------|
+| v2.admin.dashboard.summary         | passed             | Google token auth confirmed, role: superadmin through Google token verified admin mapping |
+| v2.admin.event.create              | passed             | EVT-20260512185836-15148654, row 5, draft, not public    |
+| v2.admin.event.update (attempt 1)  | failed validation  | TITLE_REQUIRED + START_DATE_REQUIRED in partial payload  |
+| v2.admin.event.update (corrected)  | passed             | status: cancelled, updated_at advanced, created_at kept  |
+
+Sheet verification: EVENT row 5 confirmed — correct event_id, status: cancelled,
+created_by/updated_by: panpancake17@gmail.com, updated_at refreshed.
+
+Update payload behavior:
+
+The update validator normalizes the incoming payload alone. It does not load and merge
+the existing row before running validation. This is acceptable for the backend isolation
+pilot. The frontend adapter must hydrate the existing row before update submission.
+This requirement must be documented in the frontend adapter before activation.
+
+Post-smoke-test state:
+
+- IROUP_V2_EVENT_WRITE_ENABLED: FALSE.
+- Test row EVT-20260512185836-15148654 remains in EVENT sheet for reference
+  until cleanup policy is defined.
+- V1 event write flow remains active production fallback.
+
+Frontend activation preconditions status:
+
+- V2 backend routes exist and tested outside frontend: confirmed.
+- Backend validates role, required fields, visibility flags, audit fields: confirmed.
+- V2 adapter exposes explicit create/update wrappers: pending.
+- V1 event and scholarship flows confirmed working if V2 unavailable: pending.
+- Update payload hydration pattern documented in frontend adapter: pending.
+
+## Event Metadata Real Write Pilot — Smoke Test Results
+
+Date: 2026-05-12
+
+Status: smoke test completed. Feature flag set to FALSE.
+
+Pre-deployment issues resolved before smoke test:
+
+- Live Apps Script deployment was running outdated IROUP_V2_AUTH.gs (pre-session 45,
+  no Google token verification). All admin routes fell through to Session.getActiveUser()
+  which always returns empty in "Execute as: Me, Anyone" deployment mode.
+- Resolution: replaced IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs
+  with current local versions and redeployed.
+- appsscript.json lacked https://www.googleapis.com/auth/script.external_request required
+  for UrlFetchApp.fetch(). Resolution: added scope to oauthScopes, saved the manifest,
+  and re-authorized the deployment.
+
+Smoke test results:
+
+| Route                              | Result             | Notes                                                                      |
+|------------------------------------|--------------------|----------------------------------------------------------------------------|
+| v2.admin.dashboard.summary         | passed             | Google token auth confirmed, role: superadmin through Google token verified admin mapping |
+| v2.admin.event.create              | passed             | EVT-20260512185836-15148654, row 5, draft, not public                      |
+| v2.admin.event.update (attempt 1)  | failed validation  | TITLE_REQUIRED + START_DATE_REQUIRED in partial payload                    |
+| v2.admin.event.update (corrected)  | passed             | status: cancelled, updated_at advanced, created_at kept                    |
+
+Sheet verification: EVENT row 5 confirmed — correct event_id, status: cancelled,
+created_by/updated_by: panpancake17@gmail.com, updated_at refreshed.
+
+Update payload behavior:
+
+The update validator normalizes the incoming payload alone. It does not load and merge
+the existing row before running validation. This is acceptable for the backend isolation
+pilot. The frontend adapter must hydrate the existing row before update submission.
+This requirement must be documented in the frontend adapter before activation.
+
+Post-smoke-test state:
+
+- IROUP_V2_EVENT_WRITE_ENABLED: FALSE.
+- Test row EVT-20260512185836-15148654 remains in EVENT sheet for reference
+  until cleanup policy is defined.
+- V1 event write flow remains active production fallback.
+
+Frontend activation preconditions status:
+
+- V2 backend routes exist and tested outside frontend: confirmed.
+- Backend validates role, required fields, visibility flags, audit fields: confirmed.
+- V2 adapter exposes explicit create/update wrappers: pending.
+- V1 event and scholarship flows confirmed working if V2 unavailable: pending.
+- Update payload hydration pattern documented in frontend adapter: pending.

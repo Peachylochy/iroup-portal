@@ -1,10 +1,85 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-09 | Session: Login Experience Redesign — v1 Concept (split-layout, SaaS-inspired)**
+**Last updated: 2026-05-12 | Session: V2 Event Write Pilot — First Live Smoke Test**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2 Event Write Pilot — First Live Smoke Test
+
+### Session: 2026-05-12 — V2 Admin Event Metadata Real Write Pilot Live Smoke Test
+
+**Phase goal:** Run the first controlled browser-console smoke test of V2 real event
+create and update routes against the live isolated V2 Apps Script deployment. No frontend
+submit wiring, no FILES/BUDGET relation writes, no upload migration, no V1 production
+change, no IROUP.SCRIPT_URL replacement.
+
+Pre-smoke-test issues discovered and resolved:
+
+- The live V2 Apps Script deployment was running outdated backend files (pre-session 45).
+  IROUP_V2_AUTH.gs did not include Google token verification (fetchV2GoogleUserInfo_ /
+  fetchV2GoogleTokenInfo_), causing all admin routes to fall through to
+  Session.getActiveUser().getEmail() which always returns empty under
+  "Execute as: Me, Anyone" deployment settings.
+- Fix: replaced IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs in the
+  Apps Script editor with current local versions and redeployed.
+- appsscript.json did not declare https://www.googleapis.com/auth/script.external_request.
+  This scope is required for UrlFetchApp.fetch() used in Google token verification.
+  Fix: added oauthScopes to appsscript.json including the scope, saved the manifest,
+  and re-authorized the deployment.
+- IROUP_V2_EVENT_WRITE_ENABLED=TRUE was confirmed set in Script Properties before smoke test.
+
+Smoke test results:
+
+- v2.admin.dashboard.summary: success: true. Auth confirmed end-to-end via Google access
+  token through fetchV2GoogleUserInfo_. Actor: panpancake17@gmail.com,
+  role: superadmin through Google token verified admin mapping.
+- v2.admin.event.create: success: true, dry_run: false, write_enabled: true.
+  Generated ID: EVT-20260512185836-15148654. Status: draft. public_visible: false.
+  Written to EVENT sheet row 5. created_by/updated_by: panpancake17@gmail.com.
+  Relation writes: none. Skipped: file_upload, image_upload, file_relation_write,
+  budget_relation_write, delete.
+- v2.admin.event.update (first attempt): success: false. Validation failed —
+  TITLE_REQUIRED and START_DATE_REQUIRED. The update validator normalizes the incoming
+  payload alone without merging with the existing row. This behavior is acceptable for
+  the backend isolation pilot. The frontend adapter must hydrate the existing row before
+  update submission.
+- v2.admin.event.update (corrected full payload): success: true, dry_run: false.
+  Status patched draft → cancelled. detail_th updated. created_at preserved,
+  updated_at advanced to 2026-05-12T12:03:45.526Z.
+- EVENT sheet row 5 verified: EVT-20260512185836-15148654, status: cancelled,
+  created_by/updated_by correct, updated_at refreshed.
+
+Post-smoke-test:
+
+- IROUP_V2_EVENT_WRITE_ENABLED set to FALSE in Script Properties.
+- Test row EVT-20260512185836-15148654 remains in EVENT sheet for reference
+  until cleanup policy is defined.
+
+Key findings:
+
+- Update requires full required-field set in payload. The update validator does not load
+  and merge the existing row. This is acceptable for the backend isolation pilot.
+  The frontend adapter must hydrate the existing row before update submission.
+- appsscript.json must explicitly declare https://www.googleapis.com/auth/script.external_request
+  for Google token verification to work. Adding the scope to oauthScopes and
+  re-authorizing the deployment is sufficient — a full redeploy is not required solely
+  for this change.
+- Google OAuth access tokens expire after 3600 seconds. Smoke tests should be run within
+  the same login session.
+
+Safety boundary preserved:
+
+- No frontend submit wiring.
+- No FILES, BUDGET, upload, or image relation writes.
+- No delete route tested.
+- No V1 production Code.gs changes.
+- No IROUP.SCRIPT_URL replacement.
+- V2 deployment URL unchanged.
+- V1 scholarship/event flows remain operational as production fallback.
 
 ---
 

@@ -954,3 +954,91 @@ Still deferred:
 - scholarship writes
 - V1 runtime changes
 - production cutover
+
+## Event Metadata Real Write Pilot — Live Smoke Test
+
+Date: 2026-05-12
+
+Status: completed. Feature flag disabled. Results verified.
+
+Routes tested live:
+
+- v2.admin.dashboard.summary: passed — Google token auth end-to-end confirmed
+- v2.admin.event.create: passed — EVT-20260512185836-15148654, row 5, draft, not public
+- v2.admin.event.update: passed — status patched to cancelled, audit fields correct
+
+Deployment state after this session:
+
+- IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs are now current in
+  the live V2 Apps Script project.
+- appsscript.json now explicitly declares https://www.googleapis.com/auth/script.external_request
+  in oauthScopes. The scope was activated by saving the manifest and re-authorizing
+  the deployment — not by redeploy alone.
+- Google access token verification through fetchV2GoogleUserInfo_ is confirmed working
+  in the live deployment.
+
+Key behavioral finding:
+
+- v2.admin.event.update validates the normalized payload as a complete event shape. It does
+  not load and merge the existing row before validation. This is acceptable for the backend
+  isolation pilot. The frontend adapter must hydrate the existing row before update
+  submission.
+
+Actor confirmation:
+
+- All write routes confirmed actor role: superadmin through Google token verified admin
+  mapping. Role authorization was enforced correctly and not bypassed.
+
+Feature flag:
+
+- IROUP_V2_EVENT_WRITE_ENABLED is now FALSE.
+- Set to TRUE in Script Properties to re-enable when frontend activation is approved.
+
+Next gate:
+
+- Frontend event write submit wiring requires: rollback checklist confirmation, V1 event
+  flow smoke test, and update payload hydration pattern documented in the frontend adapter.
+
+## Event Metadata Real Write Pilot — Live Smoke Test
+
+Date: 2026-05-12
+
+Status: completed. Feature flag disabled. Results verified.
+
+Routes tested live:
+
+- v2.admin.dashboard.summary: passed — Google token auth end-to-end confirmed
+- v2.admin.event.create: passed — EVT-20260512185836-15148654, row 5, draft, not public
+- v2.admin.event.update: passed — status patched to cancelled, audit fields correct
+
+Deployment state after this session:
+
+- IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs are now current in
+  the live V2 Apps Script project.
+- appsscript.json now explicitly declares https://www.googleapis.com/auth/script.external_request
+  in oauthScopes. The scope was activated by saving the manifest and re-authorizing
+  the deployment — not by redeploy alone.
+- Google access token verification through fetchV2GoogleUserInfo_ is confirmed working
+  in the live deployment.
+
+Key behavioral finding:
+
+- v2.admin.event.update validates the normalized payload as a complete event shape. It does
+  not load and merge the existing row before validation. This is acceptable for the backend
+  isolation pilot. The frontend adapter must hydrate the existing row before update
+  submission.
+
+Actor confirmation:
+
+- All write routes confirmed actor role: superadmin through Google token verified admin
+  mapping. Role authorization was enforced correctly and not bypassed.
+
+Feature flag:
+
+- IROUP_V2_EVENT_WRITE_ENABLED is now FALSE.
+- Set to TRUE in Script Properties to re-enable when frontend activation is approved.
+
+Next gate:
+
+- Frontend event write submit wiring requires: rollback checklist confirmation, V1 event
+  flow smoke test, and update payload hydration pattern documented in the frontend adapter.

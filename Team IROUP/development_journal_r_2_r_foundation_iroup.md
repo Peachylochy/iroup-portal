@@ -2795,3 +2795,97 @@ Still not doing
 - V1 runtime changes
 - production cutover
 - push
+
+---
+
+## V2 Admin Event Metadata Write Pilot — First Live Smoke Test (2026-05-12)
+
+Context:
+
+The V2 normalized backend has been live in an isolated Apps Script deployment since
+early May 2026. Public routes were migrated and verified. Admin read routes (dashboard
+summary, event/scholarship/MOU/mobility lists) were operational via Google token auth.
+This session completed the first backend-only real write route smoke test against the
+live deployment.
+
+What happened:
+
+- Discovered the live deployment was running outdated IROUP_V2_AUTH.gs (pre-session 45)
+  without Google token verification.
+- Updated IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs in the
+  Apps Script editor with current local versions.
+- Added https://www.googleapis.com/auth/script.external_request to appsscript.json
+  oauthScopes, saved the manifest, and re-authorized the deployment.
+- v2.admin.dashboard.summary passed — auth working end-to-end via Google OAuth token,
+  role: superadmin through Google token verified admin mapping.
+- v2.admin.event.create passed — first live V2 event row written to EVENT sheet.
+  ID: EVT-20260512185836-15148654.
+- v2.admin.event.update passed after correcting the payload to include all required
+  fields (title, start_date, status).
+- EVENT sheet row verified directly in Google Sheets.
+- Feature flag IROUP_V2_EVENT_WRITE_ENABLED set to FALSE after test.
+
+Key lessons from this session:
+
+- The V2 update validator normalizes the incoming payload without merging with the
+  existing row. This is acceptable for the backend isolation pilot. The frontend adapter
+  must hydrate the existing row before update submission.
+- Apps Script oauthScopes must be explicitly declared in appsscript.json when adding
+  UrlFetchApp to a project. Adding the scope and re-authorizing is sufficient — a full
+  redeploy is not required solely for the scope change.
+- Google OAuth access tokens expire after 3600 seconds. Browser console smoke tests
+  should be run within the same login session.
+
+V2 backend write readiness status:
+
+- Backend-only write routes: confirmed working in live deployment.
+- Frontend write wiring: not activated. V1 remains the active production write path.
+- Remaining before frontend activation: frontend adapter wrappers, V1 rollback
+  confirmation, and update payload hydration pattern design.
+
+---
+
+## V2 Admin Event Metadata Write Pilot — First Live Smoke Test (2026-05-12)
+
+Context:
+
+The V2 normalized backend has been live in an isolated Apps Script deployment since
+early May 2026. Public routes were migrated and verified. Admin read routes (dashboard
+summary, event/scholarship/MOU/mobility lists) were operational via Google token auth.
+This session completed the first backend-only real write route smoke test against the
+live deployment.
+
+What happened:
+
+- Discovered the live deployment was running outdated IROUP_V2_AUTH.gs (pre-session 45)
+  without Google token verification.
+- Updated IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs in the
+  Apps Script editor with current local versions.
+- Added https://www.googleapis.com/auth/script.external_request to appsscript.json
+  oauthScopes, saved the manifest, and re-authorized the deployment.
+- v2.admin.dashboard.summary passed — auth working end-to-end via Google OAuth token,
+  role: superadmin through Google token verified admin mapping.
+- v2.admin.event.create passed — first live V2 event row written to EVENT sheet.
+  ID: EVT-20260512185836-15148654.
+- v2.admin.event.update passed after correcting the payload to include all required
+  fields (title, start_date, status).
+- EVENT sheet row verified directly in Google Sheets.
+- Feature flag IROUP_V2_EVENT_WRITE_ENABLED set to FALSE after test.
+
+Key lessons from this session:
+
+- The V2 update validator normalizes the incoming payload without merging with the
+  existing row. This is acceptable for the backend isolation pilot. The frontend adapter
+  must hydrate the existing row before update submission.
+- Apps Script oauthScopes must be explicitly declared in appsscript.json when adding
+  UrlFetchApp to a project. Adding the scope and re-authorizing is sufficient — a full
+  redeploy is not required solely for the scope change.
+- Google OAuth access tokens expire after 3600 seconds. Browser console smoke tests
+  should be run within the same login session.
+
+V2 backend write readiness status:
+
+- Backend-only write routes: confirmed working in live deployment.
+- Frontend write wiring: not activated. V1 remains the active production write path.
+- Remaining before frontend activation: frontend adapter wrappers, V1 rollback
+  confirmation, and update payload hydration pattern design.
