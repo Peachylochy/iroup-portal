@@ -183,6 +183,12 @@ Event write wrapper notes:
 - Update hydration merges the existing event row with the current form payload, with form values taking precedence, before calling `IROUP_V2.admin.eventUpdateDryRun()`.
 - The production save path remains `round9Save()` through V1 `IROUP.add()` / `IROUP.edit()`. Real V2 `eventCreate()` / `eventUpdate()` wrappers remain unused by the UI.
 
+`scholarship-events.html` disabled EVENT save pilot branch:
+
+- A page-local `V2_EVENT_WRITE_UI_ENABLED` flag exists and is set to `false` by default.
+- When the flag is false, `round9Save()` continues through the existing V1 `IROUP.add()` / `IROUP.edit()` save path.
+- If a reviewed test deliberately flips the flag to true, only EVENT metadata create/update calls the V2 `eventCreate()` / `eventUpdate()` wrappers with hydrated payloads. Scholarship, upload/image, FILES/BUDGET, and delete flows remain V1-only.
+
 ### `IROUP_V2.lookup.*`
 
 - `countries()`

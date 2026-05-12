@@ -735,6 +735,8 @@ function togglePill(el){
 let IROUND9_currentType = 'scholar';
 let IROUND9_scholars = [];
 let IROUND9_events = [];
+// Disabled V2 EVENT metadata save pilot. Keep false until a reviewed activation pass.
+const V2_EVENT_WRITE_UI_ENABLED = false;
 function qs(root, sel){ return root.querySelector(sel); }
 function qsa(root, sel){ return Array.from(root.querySelectorAll(sel)); }
 // TODO: migrate to IU.* — esc, fmtDate/IROUP.formatDate call sites not yet migrated to IU.*
@@ -1098,6 +1100,23 @@ window.previewV2EventDraft=previewV2EventDraft;
 window.buildV2EventDraftPayload=buildV2EventDraftPayload;
 window.buildHydratedV2EventUpdatePayload=buildHydratedV2EventUpdatePayload;
 window.buildV2EventDryRunPayload=buildV2EventDryRunPayload;
+async function saveV2EventMetadataPilot(id){
+  if(!window.IROUP_V2 || !IROUP_V2.admin || typeof IROUP_V2.admin.eventCreate !== 'function' || typeof IROUP_V2.admin.eventUpdate !== 'function'){
+    throw new Error('IROUP_V2 event write adapter is not available.');
+  }
+  const formPayload=buildV2EventFormPayload(document.getElementById('eventForm'));
+  const payload=id ? buildHydratedV2EventUpdatePayload(getCurrentV2EventRow(), formPayload) : normalizeV2EventPayload(formPayload);
+  const response=id ? await IROUP_V2.admin.eventUpdate(payload) : await IROUP_V2.admin.eventCreate(payload);
+  console.info('IROUP V2 EVENT metadata save pilot result', {
+    mode:id ? 'update' : 'create',
+    request_payload:payload,
+    response
+  });
+  if(!response || !response.success){
+    throw new Error((response && response.error) || 'V2 EVENT metadata save failed.');
+  }
+  return response;
+}
 async function round9Save(){
   const type=IROUND9_currentType;
   const id=document.getElementById('modalOverlay').dataset.editId;
@@ -1145,6 +1164,16 @@ async function round9Save(){
   const btn=document.querySelector('.modal-footer .modal-save');
   if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก...';}
   try{
+    // Disabled pilot branch: only EVENT metadata may use V2, and only when
+    // V2_EVENT_WRITE_UI_ENABLED is deliberately changed to true for a reviewed test.
+    // The default false path below preserves the existing V1 save behavior.
+    if(type==='event' && V2_EVENT_WRITE_UI_ENABLED){
+      await saveV2EventMetadataPilot(id);
+      alert('V2 EVENT metadata pilot save succeeded. V1 remains the default data source.');
+      closeModal();
+      await round9LoadScholarEvent();
+      return;
+    }
     const res=id?await IROUP.edit(sheet,id,data):await IROUP.add(sheet,data);
     if(res.success){ alert('บันทึกสำเร็จ'); closeModal(); await round9LoadScholarEvent(); }
     else alert(res.error||'บันทึกไม่สำเร็จ');
