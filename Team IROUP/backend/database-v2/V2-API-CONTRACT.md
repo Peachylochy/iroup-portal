@@ -675,7 +675,7 @@ TODO status:
 
 - Implemented as a validation/dry-run route only.
 - No frontend wiring.
-- No write route.
+- Real create/update routes now exist separately and are feature-flagged.
 
 ### `v2.admin.event.create.dryRun`
 
@@ -701,7 +701,7 @@ Response shape:
 TODO status:
 
 - Implemented as dry-run only.
-- No real create route exists yet.
+- Real create route exists separately as `v2.admin.event.create` and is feature-flagged.
 
 ### `v2.admin.event.update.dryRun`
 
@@ -729,7 +729,120 @@ Response shape:
 TODO status:
 
 - Implemented as dry-run only.
-- No real update route exists yet.
+- Real update route exists separately as `v2.admin.event.update` and is feature-flagged.
+
+### `v2.admin.event.create`
+
+Purpose:
+
+- Create one V2 `EVENT` metadata row.
+
+Classification:
+
+- Admin.
+- Real write.
+- Feature-flagged.
+
+Required controls:
+
+- Authenticated V2 admin session through `requireV2Admin_()`.
+- Admin role must be `admin`, `superadmin`, `super_admin`, or `owner`.
+- Isolated Apps Script Script Property must be set:
+
+```text
+IROUP_V2_EVENT_WRITE_ENABLED=TRUE
+```
+
+Required params:
+
+- Same payload contract as `v2.admin.event.validate`.
+- `title`, `title_th`, or `title_en`.
+- `start_date`.
+
+Response shape:
+
+- Standard router response.
+- `data.dry_run === false`.
+- `data.write_enabled === true`.
+- `data.mode === "create"`.
+- `data.target_sheet === "EVENT"`.
+- `data.persisted_event` contains the inserted V2 `EVENT` row.
+- `data.event` contains the admin event DTO summary.
+- `data.actor.email` is the verified V2 admin email used for audit fields.
+- `data.relation_writes.files` and `data.relation_writes.budgets` are empty.
+
+Writes:
+
+- `EVENT` only.
+- Generates `event_id` with the V2 `EVT` prefix.
+- Populates `created_by`, `updated_by`, `created_at`, and `updated_at`.
+
+Explicitly not included:
+
+- upload
+- image upload
+- `FILES` relation write
+- budget relation write
+- delete
+- scholarship writes
+- frontend submit wiring
+
+### `v2.admin.event.update`
+
+Purpose:
+
+- Update one existing non-deleted V2 `EVENT` metadata row.
+
+Classification:
+
+- Admin.
+- Real write.
+- Feature-flagged.
+
+Required controls:
+
+- Authenticated V2 admin session through `requireV2Admin_()`.
+- Admin role must be `admin`, `superadmin`, `super_admin`, or `owner`.
+- Isolated Apps Script Script Property must be set:
+
+```text
+IROUP_V2_EVENT_WRITE_ENABLED=TRUE
+```
+
+Required params:
+
+- `event_id` or `id`.
+- Same metadata payload contract as `v2.admin.event.validate`.
+
+Response shape:
+
+- Standard router response.
+- `data.dry_run === false`.
+- `data.write_enabled === true`.
+- `data.mode === "update"`.
+- `data.target_sheet === "EVENT"`.
+- `data.persisted_event` contains the updated V2 `EVENT` row.
+- `data.event` contains the admin event DTO summary.
+- `data.actor.email` is the verified V2 admin email used for audit fields.
+- `data.relation_writes.files` and `data.relation_writes.budgets` are empty.
+
+Writes:
+
+- `EVENT` only.
+- Updates by `event_id`.
+- Refuses deleted rows.
+- Preserves `event_id`, `created_by`, and `created_at`.
+- Updates `updated_by` and `updated_at`.
+
+Explicitly not included:
+
+- upload
+- image upload
+- `FILES` relation write
+- budget relation write
+- delete
+- scholarship writes
+- frontend submit wiring.
 
 ### `v2.admin.dashboard.summary`
 

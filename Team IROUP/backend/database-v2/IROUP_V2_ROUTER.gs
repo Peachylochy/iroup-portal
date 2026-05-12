@@ -288,6 +288,18 @@ function getV2RouteDispatch_() {
         return validateV2AdminEventWrite_(request, 'update.dryRun');
       }
     },
+    'v2.admin.event.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminEvent_(request);
+      }
+    },
+    'v2.admin.event.update': {
+      access: 'admin',
+      handler: function (request) {
+        return updateV2AdminEvent_(request);
+      }
+    },
     'v2.admin.dashboard.summary': {
       access: 'admin',
       handler: function () {

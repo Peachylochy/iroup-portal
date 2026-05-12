@@ -146,6 +146,163 @@ function validateV2AdminEventWrite_(request, mode) {
   return adminResponseV2_(result.success, result.data, result.success ? 1 : 0, result.error);
 }
 
+function createV2AdminEvent_(request) {
+  return writeV2AdminEventMetadata_(request, 'create');
+}
+
+function updateV2AdminEvent_(request) {
+  return writeV2AdminEventMetadata_(request, 'update');
+}
+
+function writeV2AdminEventMetadata_(request, mode) {
+  const flag = getV2EventWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2EventWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const context = buildV2AdminContext_();
+  if (!context.success) return context;
+
+  const writeMode = String(mode || '').trim().toLowerCase();
+  const previewMode = writeMode === 'update' ? 'update' : 'create';
+  const preview = buildV2EventWritePreview_(request, context.data, previewMode);
+  if (!preview.success) {
+    return adminResponseV2_(false, preview.data, 0, preview.error);
+  }
+
+  const now = new Date().toISOString();
+  const adminEmail = actor.user.email || '';
+  const normalized = preview.data.normalized_event || {};
+  let persisted;
+
+  if (writeMode === 'update') {
+    const eventId = cleanV2EventText_(normalized.event_id);
+    if (!eventId) {
+      return adminResponseV2_(false, preview.data, 0, 'event_id is required for event update.');
+    }
+
+    const existing = findV2RowById_(IROUP_V2_SHEETS.EVENT, 'event_id', eventId);
+    if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+    if (isSoftDeletedV2_(existing.data)) return adminResponseV2_(false, null, 0, 'Cannot update a deleted event.');
+
+    const patch = buildV2EventSheetRow_(normalized);
+    delete patch.event_id;
+    delete patch.created_by;
+    delete patch.created_at;
+    patch.updated_by = adminEmail;
+    patch.updated_at = now;
+
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.EVENT, 'event_id', eventId, patch);
+  } else {
+    const row = buildV2EventSheetRow_(normalized);
+    row.event_id = generateV2Id_(IROUP_V2_ID_PREFIXES.EVENT);
+    row.created_by = adminEmail;
+    row.updated_by = adminEmail;
+    row.created_at = now;
+    row.updated_at = now;
+
+    persisted = appendV2Row_(IROUP_V2_SHEETS.EVENT, row, {
+      idField: 'event_id',
+      requiredFields: ['event_id', 'start_date', 'status']
+    });
+  }
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      write_enabled: true,
+      mode: writeMode,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  const dto = mapV2AdminEventDto_(persisted.data, context.data, false);
+  return adminResponseV2_(true, {
+    dry_run: false,
+    write_enabled: true,
+    mode: writeMode,
+    target_sheet: IROUP_V2_SHEETS.EVENT,
+    event: dto,
+    persisted_event: persisted.data,
+    actor: {
+      email: adminEmail,
+      role: actor.user.role || ''
+    },
+    relation_writes: {
+      files: [],
+      budgets: []
+    },
+    skipped_operations: [
+      'file_upload',
+      'image_upload',
+      'file_relation_write',
+      'budget_relation_write',
+      'delete'
+    ],
+    diagnostics: persisted.diagnostics || {}
+  }, 1, '');
+}
+
+function getV2EventWriteFeatureFlag_() {
+  const property = 'IROUP_V2_EVENT_WRITE_ENABLED';
+  const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
+  return {
+    enabled: value === 'TRUE',
+    property: property,
+    error: value === 'TRUE' ? '' : 'V2 event metadata writes are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
+  };
+}
+
+function authorizeV2EventWriteActor_(request) {
+  const user = request && request.user ? request.user : null;
+  if (!user || !user.email) {
+    return { success: false, user: null, error: 'V2 admin identity is required for event writes.' };
+  }
+
+  const role = String(user.role || '').trim().toLowerCase();
+  const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
+  if (allowed.indexOf(role) < 0) {
+    return { success: false, user: null, error: 'V2 admin role is not allowed for event writes.' };
+  }
+
+  return { success: true, user: user, error: '' };
+}
+
+function buildV2EventSheetRow_(normalized) {
+  const data = normalized || {};
+  return {
+    event_id: cleanV2EventText_(data.event_id),
+    title_th: cleanV2EventText_(data.title_th),
+    title_en: cleanV2EventText_(data.title_en),
+    event_type: cleanV2EventText_(data.event_type),
+    event_mode: cleanV2EventText_(data.event_mode),
+    organizer_unit_id: cleanV2EventText_(data.organizer_unit_id),
+    country_id: cleanV2EventText_(data.country_id),
+    location: cleanV2EventText_(data.location),
+    meeting_url: cleanV2EventText_(data.meeting_url),
+    start_date: cleanV2EventText_(data.start_date),
+    end_date: cleanV2EventText_(data.end_date),
+    start_time: cleanV2EventText_(data.start_time),
+    end_time: cleanV2EventText_(data.end_time),
+    participant_count: toNumberV2_(data.participant_count),
+    detail_th: cleanV2EventText_(data.detail_th),
+    detail_en: cleanV2EventText_(data.detail_en),
+    link_url: cleanV2EventText_(data.link_url),
+    pin: isTruthyV2_(data.pin),
+    status: cleanV2EventText_(data.status || 'draft'),
+    public_visible: isTruthyV2_(data.public_visible),
+    is_deleted: false
+  };
+}
+
 function buildV2EventWritePreview_(request, ctx, mode) {
   const payload = extractV2EventWritePayload_(request);
   const normalized = normalizeV2EventWritePayload_(payload, ctx);
@@ -153,9 +310,10 @@ function buildV2EventWritePreview_(request, ctx, mode) {
   const warnings = normalized.warnings || [];
   const data = normalized.data || {};
   const actionMode = String(mode || 'validate').trim();
+  const normalizedMode = actionMode.toLowerCase();
 
-  if (actionMode === 'update.dryRun' && !data.event_id) {
-    errors.push({ field: 'event_id', code: 'EVENT_ID_REQUIRED', message: 'event_id is required for event update dry-run.' });
+  if (normalizedMode.indexOf('update') === 0 && !data.event_id) {
+    errors.push({ field: 'event_id', code: 'EVENT_ID_REQUIRED', message: 'event_id is required for event update.' });
   }
 
   if (!data.title_th && !data.title_en) {

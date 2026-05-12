@@ -240,6 +240,34 @@ Current status:
 
 The routes normalize event metadata into a preview of the current V2 `EVENT` sheet shape and return `dry_run: true` plus `write_enabled: false`.
 
+## Event Metadata Real Write Pilot
+
+Date: 2026-05-12
+
+Backend-only real write routes now exist for the first controlled EVENT metadata pilot:
+
+```text
+v2.admin.event.create
+v2.admin.event.update
+```
+
+Isolation controls:
+
+- disabled by default
+- requires isolated Apps Script Script Property `IROUP_V2_EVENT_WRITE_ENABLED=TRUE`
+- requires verified V2 admin identity
+- allows `admin`, `superadmin`, `super_admin`, and `owner` roles only
+- writes only to `EVENT`
+- does not write `FILES`, `BUDGET`, uploads, images, or delete state
+- preserves dry-run validation routes
+- does not wire any frontend submit handler yet
+
+Rollback model:
+
+- remove or set `IROUP_V2_EVENT_WRITE_ENABLED` to any value other than `TRUE`
+- leave dry-run routes and V1 save flow untouched
+- continue using V1 as authoritative production fallback
+
 ## Admin Auth Handoff Update
 
 Date: 2026-05-11

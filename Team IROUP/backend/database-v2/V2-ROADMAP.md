@@ -913,3 +913,44 @@ Still deferred:
 - auth hard cutover
 - V1 runtime replacement
 - public endpoint changes
+
+## Backend-Only Real V2 Event Metadata Write Pilot
+
+Date: 2026-05-12
+
+Status: backend route contract implemented, frontend activation deferred.
+
+Routes:
+
+```text
+v2.admin.event.create
+v2.admin.event.update
+```
+
+Design:
+
+- uses the existing event metadata normalizer from the dry-run contract
+- writes only to the V2 `EVENT` sheet
+- creates V2 event IDs with the `EVT` prefix
+- updates existing non-deleted EVENT rows by `event_id`
+- appends `created_by`, `updated_by`, `created_at`, and `updated_at` from the verified V2 admin identity
+- returns `dry_run: false`, `write_enabled: true`, the persisted EVENT row, and skipped relation-operation markers
+
+Feature flag:
+
+```text
+IROUP_V2_EVENT_WRITE_ENABLED=TRUE
+```
+
+The real routes fail closed unless this Script Property is set in the isolated V2 Apps Script deployment.
+
+Still deferred:
+
+- frontend submit wiring
+- upload/image/file relation handling
+- delete
+- `FILES` writes
+- budget relation writes
+- scholarship writes
+- V1 runtime changes
+- production cutover

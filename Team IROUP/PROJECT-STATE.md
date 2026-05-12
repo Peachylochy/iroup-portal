@@ -1793,3 +1793,37 @@ Still not doing:
 - token-map removal
 - hard auth cutover
 - commit or push
+
+---
+
+## 46. Backend-Only Real V2 Event Metadata Write Pilot (2026-05-12)
+
+### Purpose
+
+Added backend-only real V2 EVENT metadata create/update routes as the first controlled write pilot.
+
+### Routes
+
+- `v2.admin.event.create`
+- `v2.admin.event.update`
+
+### Safety Controls
+
+- Real writes are feature-flagged by isolated Apps Script Script Property:
+  - `IROUP_V2_EVENT_WRITE_ENABLED=TRUE`
+- Existing dry-run routes remain unchanged and available.
+- Admin auth is still required through the V2 router.
+- Write actors must be `admin`, `superadmin`, `super_admin`, or `owner`.
+- Created/updated audit fields are populated from the verified V2 admin identity.
+
+Still not doing:
+
+- frontend submit wiring
+- upload/image/file handling
+- `FILES` relation writes
+- budget relation writes
+- delete migration
+- scholarship write migration
+- V1 `SCRIPT_URL` replacement
+- V1 runtime changes
+- production cutover

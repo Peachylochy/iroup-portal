@@ -2755,3 +2755,43 @@ Still not doing
 - real V2 writes
 - token-map removal
 - push
+
+---
+
+73. Backend-Only Real V2 Event Metadata Write Pilot (May 12, 2026)
+
+Summary
+
+Added feature-flagged backend routes for the first real V2 write pilot: EVENT metadata-only create/update.
+
+Changed
+
+- `Team IROUP/backend/database-v2/IROUP_V2_ADMIN_API.gs`
+- `Team IROUP/backend/database-v2/IROUP_V2_ROUTER.gs`
+- `Team IROUP/backend/database-v2/V2-API-CONTRACT.md`
+- `Team IROUP/PROJECT-STATE.md`
+- `Team IROUP/backend/database-v2/V2-ROADMAP.md`
+- `Team IROUP/backend/database-v2/V2-WRITE-ISOLATION-PLAN.md`
+- `Team IROUP/development_journal_r_2_r_foundation_iroup.md`
+
+Implementation
+
+- Added `v2.admin.event.create`.
+- Added `v2.admin.event.update`.
+- Reused the validated event metadata normalizer from dry-run routes.
+- Added the `IROUP_V2_EVENT_WRITE_ENABLED=TRUE` feature gate.
+- Restricted writes to verified V2 admin roles.
+- Populated `created_by`, `updated_by`, `created_at`, and `updated_at` from the verified V2 admin identity.
+- Wrote only to the V2 `EVENT` sheet.
+
+Still not doing
+
+- frontend submit wiring
+- upload/image/file relation handling
+- `FILES` writes
+- budget relation writes
+- delete migration
+- scholarship write migration
+- V1 runtime changes
+- production cutover
+- push
