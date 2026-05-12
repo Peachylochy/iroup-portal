@@ -163,8 +163,19 @@ Current caveat:
 - `scholarshipDetail(scholarshipId)`
 - `eventList(params)`
 - `eventDetail(eventId)`
+- `eventValidate(payload)`
+- `eventCreateDryRun(payload)`
+- `eventUpdateDryRun(payload)`
+- `eventCreate(payload)`
+- `eventUpdate(payload)`
 - `dashboardSummary()`
 - `reportSummary(fiscalYear)`
+
+Event write wrapper notes:
+
+- The event validation, dry-run, and real create/update wrappers post `{ payload }` to the explicit V2 admin event routes with admin auth.
+- `eventCreate(payload)` and `eventUpdate(payload)` are adapter surface only at this stage. They are not wired to any frontend save button.
+- `eventUpdate(payload)` callers must hydrate the full required event payload before calling the wrapper. The backend update route validates the incoming payload as a complete event shape and does not merge with the existing row first.
 
 ### `IROUP_V2.lookup.*`
 

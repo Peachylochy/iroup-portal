@@ -11,6 +11,7 @@
   var API_VERSION = '2.2';
   var DEFAULT_TIMEOUT_MS = 30000;
   var ADMIN_SUMMARY_TIMEOUT_MS = 120000;
+  var ADMIN_EVENT_WRITE_TIMEOUT_MS = 120000;
   var APPS_SCRIPT_FETCH_DEFAULTS = {
     mode: 'cors',
     redirect: 'follow',
@@ -283,6 +284,14 @@
     return params;
   }
 
+  function adminEventWrite_(action, payload) {
+    return request(action, { payload: payload || {} }, {
+      auth: true,
+      method: 'POST',
+      timeoutMs: ADMIN_EVENT_WRITE_TIMEOUT_MS
+    });
+  }
+
   var IROUP_V2 = {
     API_VERSION: API_VERSION,
     get SCRIPT_URL() {
@@ -368,6 +377,21 @@
       },
       eventDetail: function (eventId) {
         return request('v2.admin.event.detail', withId_('event_id', eventId), { auth: true });
+      },
+      eventValidate: function (payload) {
+        return adminEventWrite_('v2.admin.event.validate', payload);
+      },
+      eventCreateDryRun: function (payload) {
+        return adminEventWrite_('v2.admin.event.create.dryRun', payload);
+      },
+      eventUpdateDryRun: function (payload) {
+        return adminEventWrite_('v2.admin.event.update.dryRun', payload);
+      },
+      eventCreate: function (payload) {
+        return adminEventWrite_('v2.admin.event.create', payload);
+      },
+      eventUpdate: function (payload) {
+        return adminEventWrite_('v2.admin.event.update', payload);
       },
       dashboardSummary: function () {
         return request('v2.admin.dashboard.summary', {}, { auth: true, timeoutMs: ADMIN_SUMMARY_TIMEOUT_MS });
