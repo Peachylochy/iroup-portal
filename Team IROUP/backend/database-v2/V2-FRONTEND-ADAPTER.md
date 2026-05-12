@@ -189,6 +189,14 @@ Event write wrapper notes:
 - When the flag is false, `round9Save()` continues through the existing V1 `IROUP.add()` / `IROUP.edit()` save path.
 - If a reviewed test deliberately flips the flag to true, only EVENT metadata create/update calls the V2 `eventCreate()` / `eventUpdate()` wrappers with hydrated payloads. Scholarship, upload/image, FILES/BUDGET, and delete flows remain V1-only.
 
+Local activation test result:
+
+- The flag was temporarily flipped to `true` for a local browser-only EVENT metadata UI pilot and restored to `false` afterward.
+- The EVENT create flow succeeded through the intended path: UI form -> hydration helpers -> gated V2 branch -> `IROUP_V2.admin.eventCreate()` -> V2 auth -> validation -> isolated V2 backend -> EVENT sheet write.
+- The observed UI success message was `V2 EVENT metadata pilot save succeeded. V1 remains the default data source.`
+- The test confirmed the V2 branch is reachable only through the page-local flag and that default production save behavior remains V1-backed.
+- No scholarship save, upload/image, delete, FILES, or BUDGET flow was migrated or activated.
+
 ### `IROUP_V2.lookup.*`
 
 - `countries()`

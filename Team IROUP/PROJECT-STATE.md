@@ -8,6 +8,59 @@
 
 ---
 
+## Latest V2 EVENT Metadata UI Pilot - Local Activation Test
+
+### Session: 2026-05-12 - Controlled Page-Local V2 EVENT Metadata Save Pilot
+
+**Phase goal:** Temporarily activate the disabled page-local EVENT metadata write branch
+in `scholarship-events.html` for a local browser UI smoke test only, then roll it back.
+No production activation, no commit, no push, no scholarship write migration, no upload
+migration, no delete migration, no FILES/BUDGET relation writes, and no `IROUP.SCRIPT_URL`
+replacement.
+
+Local test result:
+
+- Temporarily changed `V2_EVENT_WRITE_UI_ENABLED` from `false` to `true`.
+- Browser UI EVENT metadata create path succeeded end to end:
+  UI form -> hydration helpers -> gated V2 branch -> `IROUP_V2.admin.eventCreate()` ->
+  Google-token-backed V2 admin auth -> validation -> isolated V2 backend -> EVENT sheet write.
+- The observed success message was:
+  `V2 EVENT metadata pilot save succeeded. V1 remains the default data source.`
+- Hydration helpers successfully prepared full V2-compatible EVENT payloads for the
+  UI pilot path.
+
+Validation and behavior findings:
+
+- The V2 backend update validator still requires a full required-field payload and does
+  not merge with the existing EVENT row before validation.
+- The frontend hydration helper pattern is therefore required before any future
+  `IROUP_V2.admin.eventUpdate()` activation.
+- The page-local V2 branch calls only EVENT metadata `eventCreate()` / `eventUpdate()`
+  when the local flag is deliberately enabled.
+
+Rollback and safety confirmation:
+
+- `V2_EVENT_WRITE_UI_ENABLED` has been restored to `false`.
+- Default `round9Save()` behavior remains V1-backed through `IROUP.add()` /
+  `IROUP.edit()`.
+- Scholarship save remains V1-only.
+- Upload/image flows remain V1-only through `IROUP.uploadImage()` / `IROUP.uploadFile()`.
+- Delete remains V1-only through `IROUP.delete()`.
+- No FILES or BUDGET relation writes were activated.
+- `IROUP_V2_EVENT_WRITE_ENABLED` is expected to remain `FALSE` in isolated Apps Script
+  Script Properties before any future reviewed activation.
+
+Still not doing:
+
+- production frontend V2 save activation
+- scholarship V2 writes
+- upload/image/FILES/BUDGET/delete migration
+- `IROUP.SCRIPT_URL` replacement
+- V1 runtime replacement
+- commit or push
+
+---
+
 ## Latest V2 Event Write Pilot — First Live Smoke Test
 
 ### Session: 2026-05-12 — V2 Admin Event Metadata Real Write Pilot Live Smoke Test

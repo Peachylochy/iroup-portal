@@ -2845,47 +2845,54 @@ V2 backend write readiness status:
 
 ---
 
-## V2 Admin Event Metadata Write Pilot — First Live Smoke Test (2026-05-12)
+## V2 EVENT Metadata UI Pilot — Controlled Page-Local Activation Test (2026-05-12)
 
 Context:
 
-The V2 normalized backend has been live in an isolated Apps Script deployment since
-early May 2026. Public routes were migrated and verified. Admin read routes (dashboard
-summary, event/scholarship/MOU/mobility lists) were operational via Google token auth.
-This session completed the first backend-only real write route smoke test against the
-live deployment.
+The V2 isolated backend write routes (`v2.admin.event.create` / `v2.admin.event.update`)
+were confirmed working in the previous session via direct backend smoke test.
+This session performed the first controlled browser UI activation: temporarily enabling
+the page-local `V2_EVENT_WRITE_UI_ENABLED` flag in `scholarship-events.html` to
+exercise the full UI-to-V2-backend path, then rolling it back.
 
 What happened:
 
-- Discovered the live deployment was running outdated IROUP_V2_AUTH.gs (pre-session 45)
-  without Google token verification.
-- Updated IROUP_V2_AUTH.gs, IROUP_V2_ROUTER.gs, and IROUP_V2_ADMIN_API.gs in the
-  Apps Script editor with current local versions.
-- Added https://www.googleapis.com/auth/script.external_request to appsscript.json
-  oauthScopes, saved the manifest, and re-authorized the deployment.
-- v2.admin.dashboard.summary passed — auth working end-to-end via Google OAuth token,
-  role: superadmin through Google token verified admin mapping.
-- v2.admin.event.create passed — first live V2 event row written to EVENT sheet.
-  ID: EVT-20260512185836-15148654.
-- v2.admin.event.update passed after correcting the payload to include all required
-  fields (title, start_date, status).
-- EVENT sheet row verified directly in Google Sheets.
-- Feature flag IROUP_V2_EVENT_WRITE_ENABLED set to FALSE after test.
+- `V2_EVENT_WRITE_UI_ENABLED` was temporarily changed from `false` to `true` in
+  `scholarship-events.html` for a local browser-only test. Not committed, not pushed.
+- Opened `scholarship-events.html` in the browser and used the EVENT create modal.
+- First create attempt failed correctly — the V2 backend validator rejected the payload
+  because required fields (`title`, `start_date`) were missing from the initial submission.
+  This confirmed the backend validation is enforced at the UI path, not just the API level.
+- After completing the required metadata fields, the EVENT create succeeded.
+- The observed browser success message was:
+  `V2 EVENT metadata pilot save succeeded. V1 remains the default data source.`
+- The full path was exercised: UI form -> hydration helpers -> gated V2 branch ->
+  `IROUP_V2.admin.eventCreate()` -> Google-token-backed V2 admin auth -> validation ->
+  isolated V2 backend -> EVENT sheet write.
+- `V2_EVENT_WRITE_UI_ENABLED` was immediately restored to `false` after the test.
+  No modified files were committed.
 
-Key lessons from this session:
+Key findings from the UI pilot:
 
-- The V2 update validator normalizes the incoming payload without merging with the
-  existing row. This is acceptable for the backend isolation pilot. The frontend adapter
-  must hydrate the existing row before update submission.
-- Apps Script oauthScopes must be explicitly declared in appsscript.json when adding
-  UrlFetchApp to a project. Adding the scope and re-authorizing is sufficient — a full
-  redeploy is not required solely for the scope change.
-- Google OAuth access tokens expire after 3600 seconds. Browser console smoke tests
-  should be run within the same login session.
+- The hydration helpers successfully prepare complete V2-compatible EVENT payloads from
+  the existing UI form fields. The hydration pattern is required before any future update
+  activation because the V2 update validator does not merge with the existing row.
+- The page-local flag gate is effective: default `round9Save()` uses V1 at all times
+  unless the flag is deliberately set to `true` for a test.
+- The V2 branch is reachable from the UI. The end-to-end path is confirmed working.
 
-V2 backend write readiness status:
+Isolation confirmed:
 
-- Backend-only write routes: confirmed working in live deployment.
-- Frontend write wiring: not activated. V1 remains the active production write path.
-- Remaining before frontend activation: frontend adapter wrappers, V1 rollback
-  confirmation, and update payload hydration pattern design.
+- Scholarship save: V1-only through `IROUP.add()` / `IROUP.edit()`.
+- Upload/image flows: V1-only through `IROUP.uploadImage()` / `IROUP.uploadFile()`.
+- Delete: V1-only through `IROUP.delete()`.
+- FILES and BUDGET relation writes: not activated.
+- `IROUP.SCRIPT_URL`: unchanged.
+- `IROUP_V2_EVENT_WRITE_ENABLED` in Apps Script Script Properties: remains `FALSE`.
+
+V2 frontend write readiness status:
+
+- End-to-end UI path from form to V2 backend write: confirmed (page-local flag only).
+- Frontend production activation: NOT activated. `V2_EVENT_WRITE_UI_ENABLED = false`.
+- Apps Script Script Property: `IROUP_V2_EVENT_WRITE_ENABLED = FALSE`.
+- Next step: plan controlled production activation criteria and rollout phase.
