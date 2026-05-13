@@ -18,6 +18,19 @@ Planning outcome:
 - Intended relation: `EVENT.event_type_id -> MASTER_EVENT_TYPES.event_type_id`.
 - Proposed fields: `event_type_id`, `name_th`, `name_en`, `icon`, `color_token`,
   `is_active`, `sort_order`, `created_at`, and `updated_at`.
+- Builder foundation added in `IROUP_DATABASE_V2_BUILDER.gs` for the
+  `MASTER_EVENT_TYPES` header schema and `is_active` checkbox validation.
+
+Country/unit master audit:
+
+- `COUNTRY_MASTER` already provides stable `country_id` rows with ISO codes,
+  Thai/English names, continent metadata, `active`, and `sort_order`.
+- `UP_UNIT_MASTER` already provides stable `unit_id` rows with code, Thai/English
+  names, unit type, parent unit, `active`, and `sort_order`.
+- EVENT already has `country_id` and `organizer_unit_id` columns, but the frontend
+  still needs dynamic master-bound selectors before production V2 save activation.
+- Location text remains separate from country identity and must not be auto-derived
+  into `country_id`.
 
 Future frontend behavior:
 

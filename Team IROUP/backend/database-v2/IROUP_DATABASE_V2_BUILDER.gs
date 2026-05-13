@@ -8,7 +8,7 @@ function generateIROUPDatabaseV2() {
 
   const groups = {
     SYSTEM: ["SYSTEM_SETTINGS", "AUDIT_LOG", "PUBLIC_CACHE"],
-    MASTER: ["ADMIN", "COUNTRY_MASTER", "UP_UNIT_MASTER", "PERSON_STUDENT", "PERSON_STAFF", "PERSON_MANUAL", "BUDGET_TYPE_MASTER", "FILE_ROLE_MASTER"],
+    MASTER: ["ADMIN", "COUNTRY_MASTER", "UP_UNIT_MASTER", "MASTER_EVENT_TYPES", "PERSON_STUDENT", "PERSON_STAFF", "PERSON_MANUAL", "BUDGET_TYPE_MASTER", "FILE_ROLE_MASTER"],
     TRANSACTION: ["MOU", "MOBILITY_PROJECT", "MOBILITY_PARTICIPANT", "TRAVEL", "TRAVEL_PARTICIPANT", "SCHOLARSHIP", "EVENT"],
     RELATION: ["BUDGET", "FILES"]
   };
@@ -25,6 +25,7 @@ function generateIROUPDatabaseV2() {
     "ADMIN": ["admin_id", "email", "name", "role", "active", "created_at"],
     "COUNTRY_MASTER": ["country_id", "iso2", "iso3", "country_name_en", "country_name_th", "continent_en", "continent_th", "flag_emoji", "search_alias", "active", "sort_order"],
     "UP_UNIT_MASTER": ["unit_id", "unit_code", "unit_name_th", "unit_name_en", "unit_type", "parent_unit_id", "active", "sort_order"],
+    "MASTER_EVENT_TYPES": ["event_type_id", "name_th", "name_en", "icon", "color_token", "is_active", "sort_order", "created_at", "updated_at"],
     "PERSON_STUDENT": ["student_id", "prefix_th", "first_name_th", "last_name_th", "full_name_th", "gender", "unit_id", "program_th", "degree_level", "student_status", "active", "source_system", "updated_at"],
     "PERSON_STAFF": ["staff_id", "prefix_th", "first_name_th", "last_name_th", "full_name_th", "first_name_en", "last_name_en", "full_name_en", "gender", "unit_id", "position", "staff_type", "active", "source_system", "updated_at"],
     "PERSON_MANUAL": ["person_id", "person_type", "prefix", "first_name", "last_name", "full_name", "gender", "unit_id", "program_or_position", "source_note", "created_at", "created_by", "active"],
@@ -49,6 +50,7 @@ function generateIROUPDatabaseV2() {
   const dv = SpreadsheetApp.newDataValidation;
   const validations = {
     "active": dv().requireCheckbox().build(),
+    "is_active": dv().requireCheckbox().build(),
     "is_deleted": dv().requireCheckbox().build(),
     "public_visible": dv().requireCheckbox().build(),
     "public_file_allowed": dv().requireCheckbox().build(),

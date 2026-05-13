@@ -887,8 +887,7 @@ Current frontend state:
 
 Current V2 backend state:
 
-- No `EVENT_TYPE_MASTER`, `MASTER_EVENT_TYPES`, or equivalent sheet exists in the V2
-  database builder/config.
+- `MASTER_EVENT_TYPES` is now planned in the V2 database builder header schema.
 - `EVENT.event_type` is currently a plain text field.
 - Existing V2 seed rows use free-text/code-like values such as `seminar`, `meeting`,
   and `workshop`.
@@ -915,6 +914,23 @@ EVENT.event_type_id -> MASTER_EVENT_TYPES.event_type_id
 
 During the coexistence phase, `EVENT.event_type` may remain available as a legacy
 plain-text display/code field while new writes move toward `event_type_id`.
+
+Builder foundation:
+
+- `IROUP_DATABASE_V2_BUILDER.gs` includes `MASTER_EVENT_TYPES` in the `MASTER`
+  group with the planned headers above.
+- The builder applies checkbox validation to `is_active`.
+- `EVENT.event_type_id` is still a planned relationship field, not an active EVENT
+  header migration in this pass. Existing EVENT rows and adapters must continue to
+  tolerate legacy `event_type`.
+
+Current country/unit master audit:
+
+| Area | Exists now | Missing for EVENT binding |
+|------|------------|---------------------------|
+| Country master | `COUNTRY_MASTER` has `country_id`, ISO fields, Thai/English names, continent fields, flag/search metadata, `active`, and `sort_order`. | EVENT form still needs a dynamic master selector that stores a stable `country_id`; location text must not be treated as country identity. |
+| Unit master | `UP_UNIT_MASTER` has `unit_id`, code, Thai/English names, `unit_type`, parent unit, `active`, and `sort_order`. | EVENT organizer selection still needs binding to a stable `organizer_unit_id` from the V2 unit lookup. |
+| EVENT schema | EVENT already has `country_id` and `organizer_unit_id` columns. | Frontend readiness must ensure selected master IDs are present before V2 metadata save activation. |
 
 Future frontend behavior:
 
