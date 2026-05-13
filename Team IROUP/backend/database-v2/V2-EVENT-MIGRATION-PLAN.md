@@ -9,6 +9,12 @@ Operating constraint:
 - `V2_EVENT_WRITE_UI_ENABLED = false`
 - `IROUP_V2_EVENT_WRITE_ENABLED = FALSE` (Apps Script Script Property)
 
+Source-of-truth direction:
+- V2 is the intended source of truth for the new EVENT workflow.
+- V1 remains a legacy fallback/runtime comparison source only.
+- Legacy V1/V2 row parity is informational and is not a migration gate.
+- Activation gates are V2 master readiness, V2 render stability, and V2 save stability.
+
 ---
 
 ## 1. Current V1 EVENT Lifecycle Audit
@@ -669,24 +675,43 @@ Fields missing in V1 but present in V2:
 
 Use a staged render migration with an adapter normalization layer.
 
-1. Keep the existing V2 read sidecar and enhance it into a dual-source compare:
+1. Keep the existing V2 read sidecar and use V1 only as a legacy comparison source:
    compare counts and sampled normalized fields (`ID/event_id`, title, date, status,
-   visibility), but keep rendering from V1.
+   visibility), but treat mismatches as informational unless they reveal malformed
+   V2 source data.
 2. Add a page-local adapter such as `adaptV2EventForRound9Render(v2Row)` that maps
    V2 DTO rows into the existing V1-compatible flat render shape. This lets
    `round9RenderEvents()`, `fillEventForm()`, and search continue to run without a
    large simultaneous refactor.
 3. In a controlled test only, render an adapted V2 shadow list in console or a hidden
    comparison object first; do not switch `IROUND9_events` yet.
-4. When the adapter output matches V1 behavior, co-activate EVENT metadata write and
-   EVENT read source together for create/update only. Keep scholarship, uploads,
-   delete, FILES, and BUDGET on V1.
+4. When V2 master data is ready and the adapter output is stable, co-activate EVENT
+   metadata write and EVENT read source together for create/update only. Keep
+   scholarship, uploads, delete, FILES, and BUDGET on V1.
 5. Keep V1 read fallback available during the first activation window.
-6. Defer full render-source swap until adapter parity is verified across list render,
-   modal edit loading, search, post-save reload, and post-delete reload.
+6. Defer full render-source swap until V2 render stability is verified across list
+   render, modal edit loading, search, post-save reload, and post-delete reload.
 
 Rejected for now:
 
 - Full raw render source swap: too risky because render and modal code are V1-shaped.
 - Dual-write: adds partial-write failure states and does not solve render compatibility.
 - Immediate delete migration: no V2 soft-delete route exists yet.
+
+### 12.6 Revised Gate Criteria
+
+Legacy V1/V2 row parity is no longer required for EVENT migration because V2 is the
+source of truth for the new EVENT workflow. V1 mismatches should be logged as legacy
+comparison diagnostics only.
+
+Required gates before EVENT render/source activation:
+
+- V2 master data readiness: required EVENT records exist in V2 with valid `event_id`,
+  title, type, organizer, start date, status, and visibility metadata.
+- V2 render stability: adapted V2 rows pass field-completeness diagnostics and hidden
+  shadow render without errors.
+- V2 save stability: controlled create/update tests succeed with hydrated payloads and
+  `IROUP_V2_EVENT_WRITE_ENABLED` deliberately enabled for the test window.
+- Rollback readiness: `V2_EVENT_WRITE_UI_ENABLED` can be restored to `false`, V1
+  fallback remains available, and scholarship/upload/delete/FILES/BUDGET flows remain
+  outside the activation.

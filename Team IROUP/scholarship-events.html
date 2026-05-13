@@ -908,7 +908,7 @@ async function round9LoadScholarEvent(){
         round9V2Events = Array.isArray(v2Res.data) ? v2Res.data : [];
         round9V2EventsForRender = round9V2Events.map(normalizeV2EventForRound9Render);
         compareV2EventRenderCompatibility(IROUND9_events, round9V2EventsForRender);
-        compareV2EventDatasetParity(IROUND9_events, round9V2EventsForRender);
+        logLegacyV1EventCoverageDiagnostics(IROUND9_events, round9V2EventsForRender);
         runV2EventShadowRenderTest(round9V2EventsForRender);
         const sample=round9V2EventsForRender[0] || null;
         console.log('[V2 Sidecar] EVENT list — V1:', IROUND9_events.length, '| raw V2:', round9V2Events.length, '| adapted V2:', round9V2EventsForRender.length, '| sample:', sample ? `${sample.ID || '-'} | ${sample['ชื่อกิจกรรม'] || '-'}` : 'none', '| status: ok');
@@ -1083,7 +1083,7 @@ function compareV2EventRenderCompatibility(v1Rows, adaptedV2Rows){
   console.log('[V2 Sidecar] EVENT render compatibility:', summary);
   return summary;
 }
-function compareV2EventDatasetParity(v1Rows, adaptedV2Rows){
+function logLegacyV1EventCoverageDiagnostics(v1Rows, adaptedV2Rows){
   const toSummaryRow=row=>({
     id:String(row?.ID || row?.event_id || '').trim(),
     title:String(row?.['ชื่อกิจกรรม'] || row?.title || row?.title_th || row?.title_en || '').trim(),
@@ -1105,8 +1105,9 @@ function compareV2EventDatasetParity(v1Rows, adaptedV2Rows){
     missing_in_v2:missingInV2,
     extra_in_v2:v2List.filter(row=>!v1Ids.has(row.id))
   };
-  console.log('[V2 Sidecar] EVENT dataset parity:', summary);
-  console.log('[V2 Sidecar] EVENT missing V1 classification:', missingClassifications);
+  console.log('[V2 Sidecar] EVENT legacy comparison diagnostics:', summary);
+  console.log('[V2 Sidecar] EVENT legacy V1 missing classification:', missingClassifications);
+  console.log('[V2 Sidecar] EVENT legacy comparison note: V1 parity mismatch is informational only because V2 is the new source of truth.');
   return summary;
 }
 function runV2EventShadowRenderTest(adaptedV2Rows){

@@ -1,10 +1,52 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-12 | Session: V2 Event Write Pilot — First Live Smoke Test**
+**Last updated: 2026-05-13 | Session: V2 EVENT Source-of-Truth Alignment**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2 EVENT Source-of-Truth Direction
+
+### Session: 2026-05-13 - Align EVENT Migration Strategy Around V2
+
+Current latest EVENT-sidecar commits:
+
+- `76365e4 feat(v2-sidecar): classify V2 event parity gaps`
+- `d9301d4 feat(v2-sidecar): add V2 event dataset parity audit`
+- `732abff feat(v2-sidecar): add hidden V2 event shadow render test`
+- `ec15e45 feat(v2-sidecar): add V2 event render compatibility diagnostics`
+- `7258961 feat(v2-sidecar): add V2 event render adapter groundwork`
+- `870db82 docs: audit EVENT render compatibility for V2 co-activation`
+
+Direction change:
+
+- V2 is the intended source of truth for the new EVENT workflow.
+- V1 remains a legacy fallback/runtime comparison source only.
+- V1/V2 row parity is informational and is no longer a migration gate.
+- Legacy comparison diagnostics in `scholarship-events.html` classify unmigrated or
+  malformed V1 rows, but mismatches do not block the V2 path by default.
+
+Current gates for future EVENT activation:
+
+- V2 master readiness: target EVENT records exist in V2 with valid required metadata.
+- V2 render stability: adapted V2 rows pass completeness diagnostics and hidden shadow
+  render tests.
+- V2 save stability: controlled V2 create/update succeeds with hydrated payloads during
+  an explicitly enabled test window.
+- Rollback readiness: `V2_EVENT_WRITE_UI_ENABLED` remains restorable to `false`, V1
+  fallback remains available, and scholarship/upload/delete/FILES/BUDGET flows stay
+  outside activation.
+
+Still not doing:
+
+- no V2 render-source switch yet
+- no V2 write activation by default
+- no scholarship migration
+- no upload/delete/FILES/BUDGET migration
+- no `IROUP.SCRIPT_URL` replacement
 
 ---
 
