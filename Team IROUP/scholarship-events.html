@@ -750,6 +750,8 @@ let round9V2Events = []; // V2 sidecar — read-only comparison store, not rende
 let round9V2EventsForRender = []; // V2 sidecar — adapted V1-shape preview, not rendered
 // Disabled V2 EVENT metadata save pilot. Keep false until a reviewed activation pass.
 const V2_EVENT_WRITE_UI_ENABLED = false;
+// Disabled V2 EVENT render-source pilot. Keep false unless explicitly testing adapted V2 rendering.
+const V2_EVENT_RENDER_UI_ENABLED = false;
 function qs(root, sel){ return root.querySelector(sel); }
 function qsa(root, sel){ return Array.from(root.querySelectorAll(sel)); }
 // TODO: migrate to IU.* — esc, fmtDate/IROUP.formatDate call sites not yet migrated to IU.*
@@ -894,7 +896,7 @@ async function round9LoadScholarEvent(){
     IROUND9_scholars = await IROUP.getAll(IROUP.SHEETS.SCHOLAR);
     IROUND9_events = await IROUP.getAll(IROUP.SHEETS.EVENT);
     round9RenderScholars(IROUND9_scholars);
-    round9RenderEvents(IROUND9_events);
+    renderRound9EventsWithPilotSource('initial-load');
     const nums=document.querySelectorAll('.kpi-num');
     if(nums[0]) nums[0].textContent=IROUND9_scholars.length;
     if(nums[1]) nums[1].textContent=IROUND9_scholars.filter(x=>getStatusByDate(x['วันเปิดรับ'],x['วันปิดรับ'])[1]==='กำลังรับสมัคร').length;
@@ -910,6 +912,7 @@ async function round9LoadScholarEvent(){
         compareV2EventRenderCompatibility(IROUND9_events, round9V2EventsForRender);
         logLegacyV1EventCoverageDiagnostics(IROUND9_events, round9V2EventsForRender);
         runV2EventShadowRenderTest(round9V2EventsForRender);
+        if(V2_EVENT_RENDER_UI_ENABLED) renderRound9EventsWithPilotSource('v2-sidecar-ready');
         const sample=round9V2EventsForRender[0] || null;
         console.log('[V2 Sidecar] EVENT list — V1:', IROUND9_events.length, '| raw V2:', round9V2Events.length, '| adapted V2:', round9V2EventsForRender.length, '| sample:', sample ? `${sample.ID || '-'} | ${sample['ชื่อกิจกรรม'] || '-'}` : 'none', '| status: ok');
       } else {
@@ -1082,6 +1085,22 @@ function compareV2EventRenderCompatibility(v1Rows, adaptedV2Rows){
   };
   console.log('[V2 Sidecar] EVENT render compatibility:', summary);
   return summary;
+}
+function hasUsableV2EventRenderRows(rows){
+  return Array.isArray(rows) && rows.some(row=>
+    String(row?.ID || row?.event_id || '').trim()
+    && String(row?.['ชื่อกิจกรรม'] || '').trim()
+    && String(row?.['วันเริ่ม'] || '').trim()
+  );
+}
+function getRound9EventRenderSource(){
+  const useV2=V2_EVENT_RENDER_UI_ENABLED && hasUsableV2EventRenderRows(round9V2EventsForRender);
+  return { source:useV2 ? 'V2_ADAPTED' : 'V1', rows:useV2 ? round9V2EventsForRender : IROUND9_events };
+}
+function renderRound9EventsWithPilotSource(reason){
+  const selected=getRound9EventRenderSource();
+  console.log('[V2 Render Pilot] EVENT render source:', selected.source, '| reason:', reason || 'unspecified');
+  round9RenderEvents(selected.rows);
 }
 function logLegacyV1EventCoverageDiagnostics(v1Rows, adaptedV2Rows){
   const toSummaryRow=row=>({
@@ -1350,7 +1369,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   const btn=document.querySelector('.modal-footer .modal-save'); if(btn) btn.onclick=round9Save;
   const searchInputs=document.querySelectorAll('.filter-bar input[type=text]');
   if(searchInputs[0]) searchInputs[0].addEventListener('input',e=>round9RenderScholars(IROUND9_scholars.filter(x=>scholarSearchText(x).includes(e.target.value.toLowerCase()))));
-  if(searchInputs[1]) searchInputs[1].addEventListener('input',e=>round9RenderEvents(IROUND9_events.filter(x=>scholarSearchText(x).includes(e.target.value.toLowerCase()))));
+  if(searchInputs[1]) searchInputs[1].addEventListener('input',e=>{
+    const selected=getRound9EventRenderSource();
+    console.log('[V2 Render Pilot] EVENT render source:', selected.source, '| reason: search');
+    round9RenderEvents(selected.rows.filter(x=>scholarSearchText(x).includes(e.target.value.toLowerCase())));
+  });
   document.getElementById('scholarCards') && (document.getElementById('scholarCards').innerHTML='<div class="empty-state">กำลังโหลดข้อมูลทุนจาก Google Sheet...</div>');
   document.getElementById('eventCards') && (document.getElementById('eventCards').innerHTML='<div class="empty-state">กำลังโหลดข้อมูลกิจกรรมจาก Google Sheet...</div>');
   round9LoadScholarEvent();
