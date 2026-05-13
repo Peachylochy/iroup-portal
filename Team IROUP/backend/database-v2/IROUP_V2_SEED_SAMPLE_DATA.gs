@@ -354,6 +354,113 @@ function seedMasterEventTypes() {
   };
 }
 
+function seedUPUnitMaster() {
+  const rows = [
+    { unit_id: 'UNIT-IR-001', unit_code: 'IR', unit_name_th: 'งานวิเทศสัมพันธ์', unit_name_en: 'International Relations Office', unit_type: 'office', active: true, sort_order: 10 },
+    { unit_id: 'UNIT-SCI-001', unit_code: 'SCI', unit_name_th: 'คณะวิทยาศาสตร์', unit_name_en: 'Faculty of Science', unit_type: 'faculty', active: true, sort_order: 20 },
+    { unit_id: 'UNIT-ENG-001', unit_code: 'ENG', unit_name_th: 'คณะวิศวกรรมศาสตร์', unit_name_en: 'Faculty of Engineering', unit_type: 'faculty', active: true, sort_order: 30 },
+    { unit_id: 'UNIT-MED-001', unit_code: 'MED', unit_name_th: 'คณะแพทยศาสตร์', unit_name_en: 'Faculty of Medicine', unit_type: 'faculty', active: true, sort_order: 40 },
+    { unit_id: 'UNIT-NUR-001', unit_code: 'NUR', unit_name_th: 'คณะพยาบาลศาสตร์', unit_name_en: 'Faculty of Nursing', unit_type: 'faculty', active: true, sort_order: 50 },
+    { unit_id: 'UNIT-LAW-001', unit_code: 'LAW', unit_name_th: 'คณะนิติศาสตร์', unit_name_en: 'Faculty of Law', unit_type: 'faculty', active: true, sort_order: 60 },
+    { unit_id: 'UNIT-BUS-001', unit_code: 'BUS', unit_name_th: 'คณะบริหารธุรกิจและนิเทศศาสตร์', unit_name_en: 'Faculty of Business Administration and Communication Arts', unit_type: 'faculty', active: true, sort_order: 70 },
+    { unit_id: 'UNIT-EDU-001', unit_code: 'EDU', unit_name_th: 'คณะครุศาสตร์', unit_name_en: 'Faculty of Education', unit_type: 'faculty', active: true, sort_order: 80 },
+    { unit_id: 'UNIT-DEN-001', unit_code: 'DEN', unit_name_th: 'คณะทันตแพทยศาสตร์', unit_name_en: 'Faculty of Dentistry', unit_type: 'faculty', active: true, sort_order: 90 },
+    { unit_id: 'UNIT-PHA-001', unit_code: 'PHA', unit_name_th: 'คณะเภสัชศาสตร์', unit_name_en: 'Faculty of Pharmaceutical Sciences', unit_type: 'faculty', active: true, sort_order: 100 },
+    { unit_id: 'UNIT-AGR-001', unit_code: 'AGR', unit_name_th: 'คณะเกษตรศาสตร์และทรัพยากรธรรมชาติ', unit_name_en: 'Faculty of Agriculture and Natural Resources', unit_type: 'faculty', active: true, sort_order: 110 },
+    { unit_id: 'UNIT-ARC-001', unit_code: 'ARC', unit_name_th: 'คณะสถาปัตยกรรมศาสตร์และศิลปกรรมศาสตร์', unit_name_en: 'Faculty of Architecture and Fine Arts', unit_type: 'faculty', active: true, sort_order: 120 },
+    { unit_id: 'UNIT-ICT-001', unit_code: 'ICT', unit_name_th: 'คณะเทคโนโลยีสารสนเทศและการสื่อสาร', unit_name_en: 'Faculty of Information and Communication Technology', unit_type: 'faculty', active: true, sort_order: 130 },
+    { unit_id: 'UNIT-HUM-001', unit_code: 'HUM', unit_name_th: 'คณะรัฐศาสตร์และสังคมศาสตร์', unit_name_en: 'Faculty of Political Science and Social Science', unit_type: 'faculty', active: true, sort_order: 140 },
+    { unit_id: 'UNIT-REG-001', unit_code: 'REG', unit_name_th: 'สำนักทะเบียนและประมวลผล', unit_name_en: 'Office of the Registrar', unit_type: 'office', active: true, sort_order: 150 }
+  ];
+
+  return seedV2MasterRowsSkippingDuplicates_(IROUP_V2_SHEETS.UP_UNIT_MASTER, 'unit_id', rows, 'UP_UNIT_MASTER');
+}
+
+function seedCountryMaster() {
+  const rows = [
+    { country_id: 'CTRY-TH', iso2: 'TH', country_name_en: 'Thailand', country_name_th: 'ไทย', active: true, sort_order: 10 },
+    { country_id: 'CTRY-JP', iso2: 'JP', country_name_en: 'Japan', country_name_th: 'ญี่ปุ่น', active: true, sort_order: 20 },
+    { country_id: 'CTRY-CN', iso2: 'CN', country_name_en: 'China', country_name_th: 'จีน', active: true, sort_order: 30 },
+    { country_id: 'CTRY-KR', iso2: 'KR', country_name_en: 'South Korea', country_name_th: 'เกาหลีใต้', active: true, sort_order: 40 },
+    { country_id: 'CTRY-AU', iso2: 'AU', country_name_en: 'Australia', country_name_th: 'ออสเตรเลีย', active: true, sort_order: 50 },
+    { country_id: 'CTRY-US', iso2: 'US', country_name_en: 'United States', country_name_th: 'สหรัฐอเมริกา', active: true, sort_order: 60 },
+    { country_id: 'CTRY-GB', iso2: 'GB', country_name_en: 'United Kingdom', country_name_th: 'สหราชอาณาจักร', active: true, sort_order: 70 },
+    { country_id: 'CTRY-FR', iso2: 'FR', country_name_en: 'France', country_name_th: 'ฝรั่งเศส', active: true, sort_order: 80 },
+    { country_id: 'CTRY-DE', iso2: 'DE', country_name_en: 'Germany', country_name_th: 'เยอรมนี', active: true, sort_order: 90 },
+    { country_id: 'CTRY-TW', iso2: 'TW', country_name_en: 'Taiwan', country_name_th: 'ไต้หวัน', active: true, sort_order: 100 }
+  ];
+
+  return seedV2MasterRowsSkippingDuplicates_(IROUP_V2_SHEETS.COUNTRY_MASTER, 'country_id', rows, 'COUNTRY_MASTER');
+}
+
+function seedV2MasterRowsSkippingDuplicates_(sheetName, idField, rows, label) {
+  const sheetResult = getV2Sheet_(sheetName);
+  if (!sheetResult.success) {
+    return { success: false, inserted: 0, skipped: 0, error: sheetResult.error, data: [] };
+  }
+
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  const idIndex = headers.indexOf(idField);
+  const missingHeaders = Object.keys(rows[0] || {}).filter(function (field) {
+    return headers.indexOf(field) < 0;
+  });
+
+  if (idIndex < 0 || missingHeaders.length) {
+    return {
+      success: false,
+      inserted: 0,
+      skipped: 0,
+      error: label + ' seed headers are missing',
+      diagnostics: {
+        missingIdField: idIndex < 0 ? idField : '',
+        missingHeaders: missingHeaders,
+        headers: headers
+      },
+      data: []
+    };
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const existingIds = {};
+  for (let rowIndex = 1; rowIndex < values.length; rowIndex++) {
+    const existingId = String(values[rowIndex][idIndex] || '').trim();
+    if (existingId) existingIds[existingId] = true;
+  }
+
+  const insertedRows = [];
+  const skippedIds = [];
+  rows.forEach(function (row) {
+    const id = String(row[idField] || '').trim();
+    if (existingIds[id]) {
+      skippedIds.push(id);
+      return;
+    }
+
+    const targetRow = findFirstEmptyRowByKey_(sheet, idIndex + 1);
+    const rowValues = headers.map(function (header) {
+      return row[header] !== undefined ? row[header] : '';
+    });
+    sheet.getRange(targetRow, 1, 1, headers.length).setValues([rowValues]);
+    existingIds[id] = true;
+    insertedRows.push(row);
+  });
+
+  SpreadsheetApp.flush();
+  Logger.log('[V2 SEED][' + label + '] inserted=' + insertedRows.length +
+    ' skipped=' + skippedIds.length +
+    ' skippedIds=' + JSON.stringify(skippedIds));
+
+  return {
+    success: true,
+    inserted: insertedRows.length,
+    skipped: skippedIds.length,
+    skippedIds: skippedIds,
+    data: insertedRows,
+    error: ''
+  };
+}
+
 function getV2SampleDataBatches_() {
   const now = v2SeedDate_(0);
   const yesterday = v2SeedDate_(-1);
