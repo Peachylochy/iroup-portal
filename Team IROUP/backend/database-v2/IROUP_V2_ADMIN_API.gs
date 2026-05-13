@@ -127,6 +127,7 @@ function listV2AdminEvents_(includeArchived) {
   const rows = ctx.tables[IROUP_V2_SHEETS.EVENT] || [];
   const dtos = rows
     .filter(function (row) {
+      if (!String(row.event_id || '').trim()) return false;
       if (isSoftDeletedV2_(row)) return false;
       if (includeArchived === true) return true;
       return ['archived'].indexOf(String(row.status || '').trim()) < 0;
