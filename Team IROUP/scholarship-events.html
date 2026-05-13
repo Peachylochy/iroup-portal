@@ -737,7 +737,7 @@ let IROUND9_scholars = [];
 let IROUND9_events = [];
 let round9V2Events = []; // V2 sidecar — read-only comparison store, not rendered
 // Disabled V2 EVENT metadata save pilot. Keep false until a reviewed activation pass.
-const V2_EVENT_WRITE_UI_ENABLED = false;
+const V2_EVENT_WRITE_UI_ENABLED = true;
 function qs(root, sel){ return root.querySelector(sel); }
 function qsa(root, sel){ return Array.from(root.querySelectorAll(sel)); }
 // TODO: migrate to IU.* — esc, fmtDate/IROUP.formatDate call sites not yet migrated to IU.*
