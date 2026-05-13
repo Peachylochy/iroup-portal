@@ -1025,14 +1025,14 @@ async function loadV2NativeMasterData(){
 }
 function handleV2NativeModalOpen(){
   const modal=document.getElementById('v2NativeModal');
-  if(modal && modal.classList.contains('show')) loadV2NativeMasterData();
+  if(modal && (modal.classList.contains('show') || modal.style.display === 'flex')) loadV2NativeMasterData();
 }
 function bindV2NativeModalMasterLoad(){
   const modal=document.getElementById('v2NativeModal');
   if(!modal || modal.dataset.masterLoadObserver === '1') return;
   modal.dataset.masterLoadObserver='1';
   const observer=new MutationObserver(handleV2NativeModalOpen);
-  observer.observe(modal,{ attributes:true, attributeFilter:['class'] });
+  observer.observe(modal,{ attributes:true, attributeFilter:['class','style'] });
   handleV2NativeModalOpen();
 }
 function switchV2NativeType(type){
@@ -1050,11 +1050,15 @@ function openV2NativeForm(type, id){
   modal.dataset.recordId=id || '';
   switchV2NativeType(type || 'event');
   modal.classList.add('show');
-  handleV2NativeModalOpen();
+  modal.style.display='flex';
+  loadV2NativeMasterData();
 }
 function closeV2NativeForm(){
   const modal=document.getElementById('v2NativeModal');
-  if(modal) modal.classList.remove('show');
+  if(modal){
+    modal.classList.remove('show');
+    modal.style.display='';
+  }
 }
 function getV2NativeFieldMap(form){
   const payload={};
