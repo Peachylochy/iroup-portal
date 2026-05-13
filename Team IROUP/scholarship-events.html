@@ -662,6 +662,16 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="form-group"><label>สถานที่</label><input placeholder="เช่น Shanghai, China" type="text"/></div>
 <div class="form-group"><label>จำนวนผู้เข้าร่วม</label><input placeholder="เช่น 25" type="number"/></div>
 <div class="form-group form-full"><label>รายละเอียด</label><textarea placeholder="วัตถุประสงค์ กำหนดการ หรือรายละเอียดเพิ่มเติม..."></textarea></div>
+<div class="form-group"><label>V2 Status</label>
+<select name="v2_status"><option value="draft">draft</option><option value="published">published</option><option value="cancelled">cancelled</option></select>
+</div>
+<div class="form-group"><label>Link URL</label><input name="v2_link_url" placeholder="https://..." type="url"/></div>
+<div class="form-group"><label>Public visible</label>
+<div class="check-item"><input name="v2_public_visible" type="checkbox"/><label>Visible in public V2 metadata</label></div>
+</div>
+<div class="form-group"><label>Pin</label>
+<div class="check-item"><input name="v2_pin" type="checkbox"/><label>Pin in V2 metadata</label></div>
+</div>
 <div class="form-group form-full">
 <label>Poster / Banner รูปปกกิจกรรม</label>
 <div class="asset-upload-wrap">
@@ -737,7 +747,7 @@ let IROUND9_scholars = [];
 let IROUND9_events = [];
 let round9V2Events = []; // V2 sidecar — read-only comparison store, not rendered
 // Disabled V2 EVENT metadata save pilot. Keep false until a reviewed activation pass.
-const V2_EVENT_WRITE_UI_ENABLED = true;
+const V2_EVENT_WRITE_UI_ENABLED = false;
 function qs(root, sel){ return root.querySelector(sel); }
 function qsa(root, sel){ return Array.from(root.querySelectorAll(sel)); }
 // TODO: migrate to IU.* — esc, fmtDate/IROUP.formatDate call sites not yet migrated to IU.*
@@ -862,6 +872,12 @@ function fillEventForm(row){
   setInputValue(inputs[7],row['สถานที่']);
   setInputValue(inputs[8],row['จำนวน']);
   setInputValue(inputs[9],row['รายละเอียด']);
+  setInputValue(f.querySelector('select[name="v2_status"]'),v2EventFirstValue(row,['status','สถานะ']) || 'draft');
+  setInputValue(f.querySelector('input[name="v2_link_url"]'),v2EventFirstValue(row,['link_url','link','detail_url','Link']));
+  const publicVisible=f.querySelector('input[name="v2_public_visible"]');
+  if(publicVisible) publicVisible.checked=normalizeV2EventBoolean(v2EventFirstValue(row,['public_visible','เผยแพร่']), false);
+  const pin=f.querySelector('input[name="v2_pin"]');
+  if(pin) pin.checked=normalizeV2EventBoolean(v2EventFirstValue(row,['pin','Pin']), false);
   setAssetField(f,'Poster_URL',iroupPickImage(row));
   setAssetField(f,'ไฟล์_URL',row['ไฟล์_URL']);
 }
@@ -1004,6 +1020,7 @@ function normalizeV2EventBoolean(value, fallback){
 }
 function normalizeV2EventPayload(payload){
   const source=payload || {};
+  const linkUrl=v2EventFirstValue(source,['link_url','link','detail_url','Link']);
   return {
     event_id: v2EventFirstValue(source,['event_id','id','ID']),
     title: v2EventFirstValue(source,['title','title_th','title_en','ชื่อกิจกรรม']),
@@ -1020,7 +1037,8 @@ function normalizeV2EventPayload(payload){
     location: v2EventFirstValue(source,['location','place','venue','สถานที่']),
     participant_count: v2EventFirstValue(source,['participant_count','participants','จำนวน']),
     detail: v2EventFirstValue(source,['detail','detail_th','detail_en','รายละเอียด']),
-    link: v2EventFirstValue(source,['link','link_url','detail_url','Link']),
+    link: linkUrl,
+    link_url: linkUrl,
     status: v2EventFirstValue(source,['status','สถานะ']) || 'draft',
     public_visible: normalizeV2EventBoolean(v2EventFirstValue(source,['public_visible','เผยแพร่']), false),
     pin: normalizeV2EventBoolean(v2EventFirstValue(source,['pin','Pin']), false)
@@ -1050,6 +1068,8 @@ function buildV2EventFormPayload(formData){
   const f=formData || document.getElementById('eventForm');
   const inputs=qsa(f,'input,textarea,select').filter(el=>el.type!=='file' && !el.classList.contains('asset-url-input'));
   const modal=document.getElementById('modalOverlay');
+  const publicVisible=f.querySelector('input[name="v2_public_visible"]');
+  const pin=f.querySelector('input[name="v2_pin"]');
   return {
     event_id: modal?.dataset.editId || '',
     title: inputs[0]?.value || '',
@@ -1062,9 +1082,10 @@ function buildV2EventFormPayload(formData){
     location: inputs[7]?.value || '',
     participant_count: inputs[8]?.value || '',
     detail: inputs[9]?.value || '',
-    status: 'draft',
-    public_visible: false,
-    pin: false
+    link_url: getFormValue(f,'input[name="v2_link_url"]'),
+    status: getFormValue(f,'select[name="v2_status"]') || 'draft',
+    public_visible: !!(publicVisible && publicVisible.checked),
+    pin: !!(pin && pin.checked)
   };
 }
 function buildV2EventDraftPayload(formData){
