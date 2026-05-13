@@ -1,10 +1,40 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-13 | Session: V2 EVENT Render Pilot Validation**
+**Last updated: 2026-05-13 | Session: V2 EVENT Production Render Activation Planning**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2 EVENT Production Render Activation Planning
+
+### Session: 2026-05-13 - Controlled Production-Safe Render Plan
+
+Current state:
+
+- Local-only V2 EVENT render activation is proven.
+- Adapted V2 EVENT rows rendered successfully through the existing EVENT render path.
+- Production render activation has not been enabled.
+- `V2_EVENT_RENDER_UI_ENABLED` must remain `false` in committed repository state until
+  a reviewed activation decision.
+- `V2_EVENT_WRITE_UI_ENABLED` remains `false`.
+
+Planning outcome:
+
+- Production render activation must be one-flag reversible.
+- Activation should follow: local test -> manual temporary activation -> monitor
+  runtime/search/render -> rollback if unstable -> controlled adoption.
+- V2 remains the intended EVENT source of truth.
+- V1 remains legacy fallback/runtime comparison during the render-only phase.
+
+Still not doing:
+
+- no production render activation yet
+- no V2 write activation
+- no save/upload/delete/FILES/BUDGET migration
+- no `IROUP.SCRIPT_URL` replacement
 
 ---
 

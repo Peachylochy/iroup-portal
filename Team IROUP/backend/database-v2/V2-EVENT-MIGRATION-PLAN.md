@@ -734,3 +734,67 @@ Next phase:
 - Controlled production-safe activation planning for the V2 EVENT render source.
 - Keep V2 as the EVENT source of truth for the new workflow.
 - Keep V1 as fallback/runtime comparison only.
+
+### 12.8 Controlled Production Render Activation
+
+Status: planning only. Do not enable production rendering from this section alone.
+
+Purpose: define the conditions and rollback protections required before enabling
+adapted V2 EVENT rows as the visible admin EVENT render source.
+
+Repository default:
+
+- `V2_EVENT_RENDER_UI_ENABLED` must remain `false` in committed repository state.
+- `V2_EVENT_WRITE_UI_ENABLED` must remain `false` unless a separate controlled write
+  activation window is explicitly approved.
+- Activation should first be local-only/manual, then reviewed before any production
+  adoption.
+
+Activation prerequisites:
+
+- V2 master data readiness is confirmed for target production EVENT records:
+  `event_id`, title, type, organizer display, start date, status, and visibility are
+  populated enough for admin rendering.
+- Local render validation has passed with `V2_EVENT_RENDER_UI_ENABLED = true`.
+- Hidden shadow render diagnostics pass without exceptions.
+- Search over the selected render source remains stable.
+- Legacy comparison diagnostics show only explainable V1 fallback differences.
+- V1 fallback still renders correctly with `V2_EVENT_RENDER_UI_ENABLED = false`.
+- No save/upload/delete/FILES/BUDGET behavior is part of the render activation.
+
+Recommended activation sequence:
+
+1. Local test: temporarily set `V2_EVENT_RENDER_UI_ENABLED = true` locally and verify
+   render, search, edit modal open, and reload behavior.
+2. Manual temporary activation: enable the flag only for a reviewed test window.
+3. Monitor runtime/search/render: watch console diagnostics, visible EVENT cards,
+   search behavior, and fallback logs.
+4. Roll back if unstable: restore `V2_EVENT_RENDER_UI_ENABLED = false` and verify V1
+   rows render again.
+5. Controlled adoption: after a stable test window, plan the smallest reviewed commit
+   that changes the default only if the team accepts V2 render as production-ready.
+
+Monitoring expectations:
+
+- Console must show `[V2 Render Pilot] EVENT render source: V2_ADAPTED` only during an
+  intentional activation window.
+- V2 sidecar diagnostics should continue to log render compatibility, legacy comparison,
+  and shadow render status.
+- Any adapted-row render exception, empty visible list, broken search, or missing core
+  card fields should trigger rollback.
+- V1 mismatch logs are informational unless they reveal malformed V2 source data.
+
+Safe fallback behavior:
+
+- The page must automatically use V1 when the render flag is false.
+- The page must automatically use V1 when adapted V2 rows are unavailable or fail the
+  basic usable-row check.
+- Rollback must be one-flag reversible by setting `V2_EVENT_RENDER_UI_ENABLED = false`.
+
+Temporary coexistence behavior:
+
+- V2 is the source of truth for the new EVENT workflow.
+- V1 remains available as legacy fallback/runtime comparison while render activation is
+  evaluated.
+- Save, upload, delete, FILES, and BUDGET flows remain on their existing paths during
+  this render-only phase.
