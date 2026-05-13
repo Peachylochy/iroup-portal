@@ -1247,6 +1247,39 @@ function buildV2EventDryRunPayload(){
   const formPayload=buildV2EventFormPayload(document.getElementById('eventForm'));
   return formPayload.event_id ? buildHydratedV2EventUpdatePayload(getCurrentV2EventRow(), formPayload) : normalizeV2EventPayload(formPayload);
 }
+function validateV2EventSavePilotPayload(payload){
+  const source=payload || {};
+  const required=[
+    { field:'title', label:'title', value:v2EventFirstValue(source,['title','title_th','title_en']) },
+    { field:'event_type', label:'event type', value:v2EventFirstValue(source,['type','event_type']) },
+    { field:'organizer_unit', label:'organizer unit', value:v2EventFirstValue(source,['organizer_unit_id','organizer','organizer_display','unit','unit_name']) },
+    { field:'country', label:'country', value:v2EventFirstValue(source,['country_id','country','country_display','country_name','countryName']) },
+    { field:'start_date', label:'date/start_date', value:v2EventFirstValue(source,['start_date','date']) }
+  ];
+  return required.filter(item=>String(item.value || '').trim() === '');
+}
+function prepareV2EventSavePilotRoute(id){
+  if(!V2_EVENT_WRITE_UI_ENABLED){
+    console.log('[V2 Save Pilot] EVENT save route: V1_LEGACY');
+    return { route:'V1_LEGACY', payload:null, missing:[] };
+  }
+  const form=document.getElementById('eventForm');
+  const formPayload=buildV2EventFormPayload(form);
+  const payload=id
+    ? buildHydratedV2EventUpdatePayload(getCurrentV2EventRow(), formPayload)
+    : buildV2EventDraftPayload(form);
+  const missing=validateV2EventSavePilotPayload(payload);
+  if(missing.length){
+    console.warn('[V2 Save Pilot] EVENT V2 metadata route aborted; falling back to V1_LEGACY.', {
+      missing_required_fields:missing.map(item=>item.label),
+      payload
+    });
+    console.log('[V2 Save Pilot] EVENT save route: V1_LEGACY');
+    return { route:'V1_LEGACY', payload:null, missing };
+  }
+  console.log('[V2 Save Pilot] EVENT save route: V2_METADATA');
+  return { route:'V2_METADATA', payload, missing:[] };
+}
 async function previewV2EventDraft(payload){
   try{
     if(IROUND9_currentType !== 'event'){
@@ -1345,15 +1378,13 @@ async function round9Save(){
   const btn=document.querySelector('.modal-footer .modal-save');
   if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก...';}
   try{
-    const v2EventPayload = type==='event' && V2_EVENT_WRITE_UI_ENABLED
-      ? (id ? buildHydratedV2EventUpdatePayload(getCurrentV2EventRow(), buildV2EventFormPayload(document.getElementById('eventForm'))) : buildV2EventDraftPayload(document.getElementById('eventForm')))
-      : null;
+    const v2EventSavePilot = type==='event' ? prepareV2EventSavePilotRoute(id) : { route:'V1_LEGACY', payload:null };
     const res=id?await IROUP.edit(sheet,id,data):await IROUP.add(sheet,data);
     if(res.success){
-      if(v2EventPayload){
+      if(v2EventSavePilot.payload){
         // Disabled Phase B sidecar: V1 save is authoritative and always runs first.
         // When the local flag is enabled for testing, V2 logs metadata write results only.
-        runV2EventMetadataSaveSidecar(id, v2EventPayload);
+        runV2EventMetadataSaveSidecar(id, v2EventSavePilot.payload);
       }
       alert('บันทึกสำเร็จ'); closeModal(); await round9LoadScholarEvent();
     }
