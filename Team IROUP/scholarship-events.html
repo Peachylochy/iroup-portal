@@ -906,6 +906,7 @@ async function round9LoadScholarEvent(){
       if(v2Res && v2Res.success){
         round9V2Events = Array.isArray(v2Res.data) ? v2Res.data : [];
         round9V2EventsForRender = round9V2Events.map(normalizeV2EventForRound9Render);
+        compareV2EventRenderCompatibility(IROUND9_events, round9V2EventsForRender);
         const sample=round9V2EventsForRender[0] || null;
         console.log('[V2 Sidecar] EVENT list — V1:', IROUND9_events.length, '| raw V2:', round9V2Events.length, '| adapted V2:', round9V2EventsForRender.length, '| sample:', sample ? `${sample.ID || '-'} | ${sample['ชื่อกิจกรรม'] || '-'}` : 'none', '| status: ok');
       } else {
@@ -1047,11 +1048,37 @@ function normalizeV2EventForRound9Render(v2Event){
     Link: linkUrl,
     link_url: linkUrl,
     status: v2EventFirstValue(source,['status','สถานะ']),
+    'สถานะ': v2EventFirstValue(source,['status','สถานะ']),
     public_visible: normalizeV2EventBoolean(v2EventFirstValue(source,['public_visible','เผยแพร่']), false),
     pin: normalizeV2EventBoolean(v2EventFirstValue(source,['pin','Pin']), false),
     Poster_URL: '',
     'ไฟล์_URL': ''
   };
+}
+function compareV2EventRenderCompatibility(v1Rows, adaptedV2Rows){
+  const v1List=Array.isArray(v1Rows) ? v1Rows : [];
+  const adaptedList=Array.isArray(adaptedV2Rows) ? adaptedV2Rows : [];
+  const requiredFields=['ID','ชื่อกิจกรรม','ประเภท','หน่วยงาน','ประเทศ','วันเริ่ม','สถานะ'];
+  const missingByField=requiredFields.reduce((acc, field)=>{
+    acc[field]=adaptedList.filter(row=>String(row?.[field] ?? '').trim() === '').length;
+    return acc;
+  }, {});
+  const missingRows=adaptedList
+    .map(row=>({
+      id: row.ID || row.event_id || '',
+      missing: requiredFields.filter(field=>String(row?.[field] ?? '').trim() === '')
+    }))
+    .filter(item=>item.missing.length);
+  const summary={
+    v1_count:v1List.length,
+    adapted_v2_count:adaptedList.length,
+    count_mismatch:v1List.length !== adaptedList.length,
+    missing_by_field:missingByField,
+    rows_with_missing_fields:missingRows.length,
+    sample_missing_rows:missingRows.slice(0,3)
+  };
+  console.log('[V2 Sidecar] EVENT render compatibility:', summary);
+  return summary;
 }
 function normalizeV2EventBoolean(value, fallback){
   if(value === true || value === false) return value;
