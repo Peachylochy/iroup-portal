@@ -735,6 +735,7 @@ function togglePill(el){
 let IROUND9_currentType = 'scholar';
 let IROUND9_scholars = [];
 let IROUND9_events = [];
+let round9V2Events = []; // V2 sidecar — read-only comparison store, not rendered
 // Disabled V2 EVENT metadata save pilot. Keep false until a reviewed activation pass.
 const V2_EVENT_WRITE_UI_ENABLED = false;
 function qs(root, sel){ return root.querySelector(sel); }
@@ -881,6 +882,18 @@ async function round9LoadScholarEvent(){
     if(nums[1]) nums[1].textContent=IROUND9_scholars.filter(x=>getStatusByDate(x['วันเปิดรับ'],x['วันปิดรับ'])[1]==='กำลังรับสมัคร').length;
     if(nums[2]) nums[2].textContent=IROUND9_events.length;
   }catch(e){ console.warn('Round9 load scholar/events failed',e); }
+  // V2 EVENT list sidecar — comparison only, does not affect V1 render or save paths
+  try{
+    if(window.IROUP_V2 && window.IROUP_V2.admin && typeof IROUP_V2.admin.eventList === 'function'){
+      const v2Res = await IROUP_V2.admin.eventList();
+      if(v2Res && v2Res.success){
+        round9V2Events = Array.isArray(v2Res.data) ? v2Res.data : [];
+        console.log('[V2 Sidecar] EVENT list — V1:', IROUND9_events.length, '| V2:', round9V2Events.length, '| status: ok');
+      } else {
+        console.warn('[V2 Sidecar] EVENT list failed:', (v2Res && v2Res.error) || 'unknown error');
+      }
+    }
+  }catch(e){ console.warn('[V2 Sidecar] EVENT list error:', e); }
 }
 function round9RenderScholars(list){
   const wrap=document.getElementById('scholarCards'); if(!wrap) return;
