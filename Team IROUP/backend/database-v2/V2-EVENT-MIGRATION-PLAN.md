@@ -798,3 +798,73 @@ Temporary coexistence behavior:
   evaluated.
 - Save, upload, delete, FILES, and BUDGET flows remain on their existing paths during
   this render-only phase.
+
+### 12.9 V2 EVENT Save Activation Readiness
+
+Status: readiness audit only. No write activation.
+
+Purpose: verify whether the current admin EVENT form and V2 master data are ready for a
+future controlled `v2.admin.event.create` / `v2.admin.event.update` activation.
+
+Required V2 create/update contract:
+
+- Required: `title` / `title_th` / `title_en`, and `start_date`.
+- Optional metadata currently relevant to the form: `event_id`, `event_type`, organizer
+  display or `organizer_unit_id`, country display or `country_id`, `location`,
+  `start_time`, `end_time`, `participant_count`, `detail`, `link_url`, `status`,
+  `public_visible`, and `pin`.
+- Update requires a hydrated full payload. The backend validator does not merge partial
+  update payloads with the existing EVENT row before validation.
+
+Current form readiness:
+
+| V2 field | Current form/source | Readiness |
+|----------|---------------------|-----------|
+| `title_th` / `title` | EVENT title input | Ready |
+| `event_type` | Event type select | Ready as display value; master-coded type normalization still preferred |
+| `organizer_unit_id` / organizer fallback | Organizer unit select | Ready as display fallback; V2 unit lookup/id selection deferred |
+| `country_id` / country fallback | No dedicated country field | Deferred; can use location text only for now |
+| `location` | Location input | Ready |
+| `start_date` | Start date input | Ready and required |
+| `end_date` | End date input | Ready |
+| `start_time` / `end_time` | Time inputs | Ready |
+| `participant_count` | Participant count input | Ready |
+| `detail_th` / `detail` | Detail textarea | Ready |
+| `link_url` | V2 link URL field | Ready |
+| `status` | V2 status dropdown | Ready |
+| `public_visible` | V2 visibility checkbox | Ready |
+| `pin` | V2 pin checkbox | Ready |
+| `event_mode` | No current form field | Deferred |
+| `meeting_url` | No dedicated meeting URL field | Deferred; do not overload unless semantics are agreed |
+
+Master data dependencies:
+
+- Country: not ready for first-class V2 ID writes. A V2 country lookup/select is needed
+  before production-quality `country_id` writes.
+- Organizer unit / faculty / division: display fallback exists, but production-quality
+  writes should use V2 `UNIT_MASTER` IDs.
+- Event type: current select provides display/type text; final production writes should
+  normalize against the V2 accepted event-type vocabulary if one is formalized.
+- Status: ready with controlled dropdown values.
+- `public_visible`: ready with checkbox.
+- `pin`: ready with checkbox.
+
+Deferred capabilities:
+
+- Files/posters: deferred. Current page still uses V1 upload/image URL behavior. Do not
+  write V2 `FILES` relations in the metadata save activation.
+- Budget: deferred. No V2 BUDGET relation write should occur in the EVENT metadata
+  save activation.
+- Delete: deferred. EVENT delete remains V1 until a V2 soft-delete route is designed,
+  implemented, and separately validated.
+
+Readiness conclusion:
+
+- EVENT metadata create/update can be tested in a controlled V2-only save window after
+  V2 master data readiness is reviewed.
+- The first production-safe write activation should remain metadata-only and should use
+  hydrated payloads for updates.
+- `V2_EVENT_WRITE_UI_ENABLED` must remain `false` in committed repository state until
+  the activation window is explicitly approved.
+- `IROUP_V2_EVENT_WRITE_ENABLED` must remain `FALSE` in Script Properties until the
+  backend write window is deliberately opened.

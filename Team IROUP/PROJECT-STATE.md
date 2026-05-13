@@ -1,10 +1,47 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-13 | Session: V2 EVENT Production Render Activation Planning**
+**Last updated: 2026-05-13 | Session: V2 EVENT Save Activation Readiness**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2 EVENT Save Activation Readiness
+
+### Session: 2026-05-13 - Metadata Save Readiness Audit
+
+Current state:
+
+- V2 EVENT render pilot is proven locally.
+- V2 remains the intended source of truth for the new EVENT workflow.
+- `V2_EVENT_RENDER_UI_ENABLED` remains `false` in repository state.
+- `V2_EVENT_WRITE_UI_ENABLED` remains `false`.
+- No production save switch has been enabled.
+
+Readiness finding:
+
+- Current EVENT form fields cover the core V2 metadata create/update contract:
+  title, type display, organizer display fallback, location, dates, times,
+  participant count, detail, link URL, status, visibility, and pin.
+- V2 update activation must continue to use hydrated full payloads because the backend
+  validator does not merge partial updates with existing EVENT rows.
+- Country and organizer unit should move to V2 master-data-backed selects before
+  production-quality ID writes.
+
+Deferred from metadata save activation:
+
+- files/posters and V2 `FILES` relations
+- budget relations
+- delete / V2 soft-delete
+- scholarship migration
+- upload/image migration
+
+Next recommended phase:
+
+- Review V2 country/unit/event-type master readiness, then plan a controlled
+  metadata-only V2 EVENT save activation window.
 
 ---
 
