@@ -1,10 +1,42 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-13 | Session: MASTER_EVENT_TYPES Foundation Planning**
+**Last updated: 2026-05-13 | Session: V2-Native EVENT Form Save Wiring**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2-Native EVENT Form Save Wiring
+
+### Session: 2026-05-13 - V2-Native EVENT Create Path
+
+Current outcome:
+
+- V2-native EVENT form save works end-to-end in the controlled V2 path.
+- V2-native master dropdowns load from V2 lookup data:
+  `event_types`, `units`, and `countries`.
+- The topbar `+ เพิ่มกิจกรรม` button is now gated by
+  `V2_EVENT_WRITE_UI_ENABLED`.
+- When `V2_EVENT_WRITE_UI_ENABLED === true`, the EVENT create button opens the
+  V2-native EVENT modal.
+- When `V2_EVENT_WRITE_UI_ENABLED === false`, the EVENT create button keeps opening
+  the existing V1 form.
+- V2-native save feedback now alerts `บันทึกสำเร็จ (V2)` on success and shows
+  `response.error` on failure.
+
+Still safe/default:
+
+- `V2_EVENT_WRITE_UI_ENABLED` remains false in repository state.
+- V1 remains the default production lane while the flag is false.
+- The scholarship create button and V1 form/save path were not changed.
+
+Next:
+
+- Test the V2-native SCHOLARSHIP form.
+- Add the same controlled button wiring for scholarship after scholarship V2 form
+  testing is complete.
 
 ---
 

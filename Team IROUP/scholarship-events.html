@@ -419,7 +419,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="lang-btn active">TH</div>
 <div class="lang-btn">EN</div>
 </div>
-<button class="add-btn" onclick="openModal('event')">+ เพิ่มกิจกรรม</button>
+<button class="add-btn" onclick="openEventCreateModal()">+ เพิ่มกิจกรรม</button>
 <button class="add-btn" onclick="openModal('scholar')" style="background:linear-gradient(135deg,var(--gold),var(--gold-light))">+ เพิ่มทุน</button>
 </div>
 </div>
@@ -1053,6 +1053,13 @@ function openV2NativeForm(type, id){
   modal.style.display='flex';
   loadV2NativeMasterData();
 }
+function openEventCreateModal(){
+  if(V2_EVENT_WRITE_UI_ENABLED === true){
+    openV2NativeForm('event');
+    return;
+  }
+  openModal('event');
+}
 function closeV2NativeForm(){
   const modal=document.getElementById('v2NativeModal');
   if(modal){
@@ -1110,11 +1117,25 @@ async function saveV2NativeForm(){
     console.warn('[V2 Native Form] V2 admin write wrapper unavailable.', { type });
     return null;
   }
-  const response=recordId ? await updateFn(payload) : await createFn(payload);
-  console.info('[V2 Native Form] save result', { type, mode:recordId ? 'update' : 'create', payload, response });
-  return response;
+  try{
+    const response=recordId ? await updateFn(payload) : await createFn(payload);
+    console.info('[V2 Native Form] save result', { type, mode:recordId ? 'update' : 'create', payload, response });
+    if(response && response.success){
+      alert('บันทึกสำเร็จ (V2)');
+      closeV2NativeForm();
+    }else{
+      alert((response && response.error) || 'V2 save failed.');
+    }
+    return response;
+  }catch(err){
+    const message=err && err.message ? err.message : String(err || 'V2 save failed.');
+    alert(message);
+    console.warn('[V2 Native Form] save failed', err);
+    return null;
+  }
 }
 window.openV2NativeForm=openV2NativeForm;
+window.openEventCreateModal=openEventCreateModal;
 window.closeV2NativeForm=closeV2NativeForm;
 window.switchV2NativeType=switchV2NativeType;
 window.saveV2NativeForm=saveV2NativeForm;
