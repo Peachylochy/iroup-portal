@@ -378,19 +378,51 @@ function seedUPUnitMaster() {
 
 function seedCountryMaster() {
   const rows = [
-    { country_id: 'CTRY-TH', iso2: 'TH', country_name_en: 'Thailand', country_name_th: 'ไทย', active: true, sort_order: 10 },
-    { country_id: 'CTRY-JP', iso2: 'JP', country_name_en: 'Japan', country_name_th: 'ญี่ปุ่น', active: true, sort_order: 20 },
-    { country_id: 'CTRY-CN', iso2: 'CN', country_name_en: 'China', country_name_th: 'จีน', active: true, sort_order: 30 },
-    { country_id: 'CTRY-KR', iso2: 'KR', country_name_en: 'South Korea', country_name_th: 'เกาหลีใต้', active: true, sort_order: 40 },
-    { country_id: 'CTRY-AU', iso2: 'AU', country_name_en: 'Australia', country_name_th: 'ออสเตรเลีย', active: true, sort_order: 50 },
-    { country_id: 'CTRY-US', iso2: 'US', country_name_en: 'United States', country_name_th: 'สหรัฐอเมริกา', active: true, sort_order: 60 },
-    { country_id: 'CTRY-GB', iso2: 'GB', country_name_en: 'United Kingdom', country_name_th: 'สหราชอาณาจักร', active: true, sort_order: 70 },
-    { country_id: 'CTRY-FR', iso2: 'FR', country_name_en: 'France', country_name_th: 'ฝรั่งเศส', active: true, sort_order: 80 },
-    { country_id: 'CTRY-DE', iso2: 'DE', country_name_en: 'Germany', country_name_th: 'เยอรมนี', active: true, sort_order: 90 },
-    { country_id: 'CTRY-TW', iso2: 'TW', country_name_en: 'Taiwan', country_name_th: 'ไต้หวัน', active: true, sort_order: 100 }
+    { country_id: 'CTRY-TH', iso2: 'TH', country_name_en: 'Thailand', country_name_th: 'ไทย', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇹🇭', search_alias: 'thailand thai', active: true, sort_order: 10 },
+    { country_id: 'CTRY-JP', iso2: 'JP', country_name_en: 'Japan', country_name_th: 'ญี่ปุ่น', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇯🇵', search_alias: 'japan japanese', active: true, sort_order: 20 },
+    { country_id: 'CTRY-CN', iso2: 'CN', country_name_en: 'China', country_name_th: 'จีน', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇨🇳', search_alias: 'china chinese', active: true, sort_order: 30 },
+    { country_id: 'CTRY-KR', iso2: 'KR', country_name_en: 'South Korea', country_name_th: 'เกาหลีใต้', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇰🇷', search_alias: 'korea korean', active: true, sort_order: 40 },
+    { country_id: 'CTRY-TW', iso2: 'TW', country_name_en: 'Taiwan', country_name_th: 'ไต้หวัน', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇹🇼', search_alias: 'taiwan', active: true, sort_order: 50 },
+    { country_id: 'CTRY-AU', iso2: 'AU', country_name_en: 'Australia', country_name_th: 'ออสเตรเลีย', continent_en: 'Oceania', continent_th: 'โอเชียเนีย', flag_emoji: '🇦🇺', search_alias: 'australia', active: true, sort_order: 60 },
+    { country_id: 'CTRY-US', iso2: 'US', country_name_en: 'United States', country_name_th: 'สหรัฐอเมริกา', continent_en: 'North America', continent_th: 'อเมริกาเหนือ', flag_emoji: '🇺🇸', search_alias: 'usa america', active: true, sort_order: 70 },
+    { country_id: 'CTRY-GB', iso2: 'GB', country_name_en: 'United Kingdom', country_name_th: 'สหราชอาณาจักร', continent_en: 'Europe', continent_th: 'ยุโรป', flag_emoji: '🇬🇧', search_alias: 'uk england britain', active: true, sort_order: 80 },
+    { country_id: 'CTRY-FR', iso2: 'FR', country_name_en: 'France', country_name_th: 'ฝรั่งเศส', continent_en: 'Europe', continent_th: 'ยุโรป', flag_emoji: '🇫🇷', search_alias: 'france french', active: true, sort_order: 90 },
+    { country_id: 'CTRY-DE', iso2: 'DE', country_name_en: 'Germany', country_name_th: 'เยอรมนี', continent_en: 'Europe', continent_th: 'ยุโรป', flag_emoji: '🇩🇪', search_alias: 'germany german', active: true, sort_order: 100 }
   ];
 
+  const cleanup = deleteV2RowsByKeyPrefix_(IROUP_V2_SHEETS.COUNTRY_MASTER, 'country_id', 'CTRY-');
+  if (!cleanup.success) {
+    return { success: false, inserted: 0, skipped: 0, error: cleanup.error, data: [] };
+  }
+
   return seedV2MasterRowsSkippingDuplicates_(IROUP_V2_SHEETS.COUNTRY_MASTER, 'country_id', rows, 'COUNTRY_MASTER');
+}
+
+function deleteV2RowsByKeyPrefix_(sheetName, idField, prefix) {
+  const sheetResult = getV2Sheet_(sheetName);
+  if (!sheetResult.success) {
+    return { success: false, deleted: 0, error: sheetResult.error };
+  }
+
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  const idIndex = headers.indexOf(idField);
+  if (idIndex < 0) {
+    return { success: false, deleted: 0, error: 'Missing cleanup id field: ' + idField };
+  }
+
+  const values = sheet.getDataRange().getValues();
+  let deleted = 0;
+  for (let rowIndex = values.length - 1; rowIndex >= 1; rowIndex--) {
+    const idValue = String(values[rowIndex][idIndex] || '').trim();
+    if (idValue.indexOf(prefix) === 0) {
+      sheet.deleteRow(rowIndex + 1);
+      deleted++;
+    }
+  }
+
+  Logger.log('[V2 SEED][' + sheetName + '] deleted existing ' + prefix + ' rows=' + deleted);
+  return { success: true, deleted: deleted, error: '' };
 }
 
 function seedV2MasterRowsSkippingDuplicates_(sheetName, idField, rows, label) {
