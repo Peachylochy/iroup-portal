@@ -407,6 +407,9 @@
       eventUpdate: function (payload) {
         return adminEventWrite_('v2.admin.event.update', payload);
       },
+      eventDelete: function (eventId) {
+        return adminEventWrite_('v2.admin.event.delete', { event_id: eventId });
+      },
       fileUpload: function (payload) {
         return request('v2.admin.file.upload', { payload: payload || {} }, {
           auth: true,

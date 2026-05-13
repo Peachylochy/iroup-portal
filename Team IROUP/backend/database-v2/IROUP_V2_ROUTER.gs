@@ -312,6 +312,12 @@ function getV2RouteDispatch_() {
         return updateV2AdminEvent_(request);
       }
     },
+    'v2.admin.event.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminEvent_(request);
+      }
+    },
     'v2.admin.file.upload': {
       access: 'admin',
       handler: function (request) {

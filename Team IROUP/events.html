@@ -392,6 +392,7 @@ function renderCard(event) {
       ${detail ? `<div class="card-sub">${esc(truncate(detail, 150))}</div>` : ''}
       <div class="card-actions">
         <button class="btn" type="button" onclick="openEditModal('${escAttr(event.event_id)}')">แก้ไข</button>
+        <button class="btn danger" type="button" onclick="deleteV2Event('${escAttr(event.event_id)}')">ลบ</button>
       </div>
     </article>
   `;
@@ -410,7 +411,10 @@ function renderList(rows) {
         <td>${esc(displayDate(event.start_date))}</td>
         <td>${esc(unitDisplay(event) || '-')}</td>
         <td><span class="badge ${esc(status)}">${esc(status)}</span></td>
-        <td><button class="btn" type="button" onclick="openEditModal('${escAttr(event.event_id)}')">แก้ไข</button></td>
+        <td>
+          <button class="btn" type="button" onclick="openEditModal('${escAttr(event.event_id)}')">แก้ไข</button>
+          <button class="btn danger" type="button" onclick="deleteV2Event('${escAttr(event.event_id)}')">ลบ</button>
+        </td>
       </tr>
     `;
   }).join('');
@@ -425,7 +429,7 @@ function renderList(rows) {
           <th>วันที่</th>
           <th>หน่วยงาน</th>
           <th>สถานะ</th>
-          <th>แก้ไข</th>
+          <th>จัดการ</th>
         </tr>
       </thead>
       <tbody>${body}</tbody>
@@ -519,6 +523,10 @@ async function saveEvent(evt) {
 
 async function deleteEvent() {
   const eventId = $('#eventId').value;
+  await deleteV2Event(eventId);
+}
+
+async function deleteV2Event(eventId) {
   if (!eventId) return;
   if (!confirm('ยืนยันลบกิจกรรมนี้หรือไม่')) return;
   if (!IROUP_V2.admin.eventDelete) {
@@ -530,7 +538,9 @@ async function deleteEvent() {
     alert(res?.error || 'ลบไม่สำเร็จ');
     return;
   }
-  closeModal();
+  if ($('#eventModal').classList.contains('open') && $('#eventId').value === eventId) {
+    closeModal();
+  }
   await loadEvents(true);
 }
 

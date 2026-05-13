@@ -155,6 +155,67 @@ function updateV2AdminEvent_(request) {
   return writeV2AdminEventMetadata_(request, 'update');
 }
 
+function deleteV2AdminEvent_(request) {
+  const flag = getV2EventWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2EventWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const eventId = extractV2EventDeleteId_(request);
+  if (!eventId) {
+    return adminResponseV2_(false, null, 0, 'event_id is required for event delete.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.EVENT, 'event_id', eventId);
+  if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+  if (isSoftDeletedV2_(existing.data)) {
+    const alreadyDeletedContext = buildV2AdminContext_();
+    return adminResponseV2_(true, {
+      soft_deleted: true,
+      already_deleted: true,
+      event_id: eventId,
+      event: alreadyDeletedContext.success ? mapV2AdminEventDto_(existing.data, alreadyDeletedContext.data, false) : existing.data
+    }, 1, '');
+  }
+
+  const patch = {
+    is_deleted: true,
+    updated_by: actor.user.email || '',
+    updated_at: new Date().toISOString()
+  };
+  const persisted = updateV2RowById_(IROUP_V2_SHEETS.EVENT, 'event_id', eventId, patch);
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      soft_deleted: false,
+      event_id: eventId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  const context = buildV2AdminContext_();
+  const dto = context.success ? mapV2AdminEventDto_(persisted.data, context.data, false) : persisted.data;
+  return adminResponseV2_(true, {
+    soft_deleted: true,
+    physical_delete: false,
+    event_id: eventId,
+    event: dto,
+    actor: {
+      email: actor.user.email || '',
+      role: actor.user.role || ''
+    },
+    diagnostics: persisted.diagnostics || {}
+  }, 1, '');
+}
+
 function createV2AdminScholarship_(request) {
   return writeV2AdminScholarshipMetadata_(request, 'create');
 }
@@ -738,6 +799,24 @@ function extractV2FileUploadPayload_(request) {
   }
 
   return params;
+}
+
+function extractV2EventDeleteId_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.event || params.payload || params.event || null;
+  if (candidate && typeof candidate === 'object') {
+    return cleanV2EventText_(candidate.event_id || candidate.id || candidate.record_id || '');
+  }
+  if (candidate && typeof candidate === 'string') {
+    try {
+      const parsed = JSON.parse(candidate);
+      return cleanV2EventText_(parsed.event_id || parsed.id || parsed.record_id || '');
+    } catch (err) {
+      return cleanV2EventText_(params.event_id || params.id || params.record_id || '');
+    }
+  }
+  return cleanV2EventText_(body.event_id || params.event_id || body.id || params.id || body.record_id || params.record_id || '');
 }
 
 function normalizeV2FileUploadPayload_(payload) {
