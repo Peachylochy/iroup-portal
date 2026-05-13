@@ -651,7 +651,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="form-grid">
 <div class="form-group form-full"><label>ชื่อกิจกรรม / โครงการ</label><input placeholder="เช่น Immersion Hub @ Shanghai Open University" type="text"/></div>
 <div class="form-group"><label>ประเภทกิจกรรม</label>
-<select><option>✈️ การเดินทาง</option><option>🌏 Inbound</option><option>🤝 ประชุม</option><option>📚 อบรม</option><option>🔄 Exchange</option></select>
+<select id="round9EventTypeSelect"><option>✈️ การเดินทาง</option><option>🌏 Inbound</option><option>🤝 ประชุม</option><option>📚 อบรม</option><option>🔄 Exchange</option></select>
 </div>
 <div class="form-group"><label>หน่วยงานที่เกี่ยวข้อง</label>
 <select><option>สำนักงานวิเทศสัมพันธ์</option><option>คณะวิทยาศาสตร์</option><option>คณะวิศวกรรมศาสตร์</option><option>คณะแพทยศาสตร์</option></select>
@@ -753,6 +753,13 @@ let round9V2EventsForRender = []; // V2 sidecar — adapted V1-shape preview, no
 const V2_EVENT_WRITE_UI_ENABLED = false;
 // Disabled V2 EVENT render-source pilot. Keep false unless explicitly testing adapted V2 rendering.
 const V2_EVENT_RENDER_UI_ENABLED = false;
+const ROUND9_EVENT_TYPE_FALLBACK_OPTIONS = [
+  { event_type_id:'legacy-travel', name_th:'การเดินทาง', name_en:'Travel', icon:'✈️', sort_order:10 },
+  { event_type_id:'legacy-inbound', name_th:'Inbound', name_en:'Inbound', icon:'🌏', sort_order:20 },
+  { event_type_id:'legacy-meeting', name_th:'ประชุม', name_en:'Meeting', icon:'🤝', sort_order:30 },
+  { event_type_id:'legacy-workshop', name_th:'อบรม', name_en:'Workshop', icon:'📚', sort_order:40 },
+  { event_type_id:'legacy-exchange', name_th:'Exchange', name_en:'Exchange', icon:'🔄', sort_order:50 }
+];
 function qs(root, sel){ return root.querySelector(sel); }
 function qsa(root, sel){ return Array.from(root.querySelectorAll(sel)); }
 // TODO: migrate to IU.* — esc, fmtDate/IROUP.formatDate call sites not yet migrated to IU.*
@@ -815,6 +822,80 @@ function getFormValue(root, selector, fallback=''){
   return el ? el.value : fallback;
 }
 function setInputValue(el, value){ if(el) el.value = value || ''; }
+function getRound9LanguageMode(){
+  const active=document.querySelector('.lang-toggle .lang-btn.active');
+  return String(active?.textContent || document.documentElement.lang || 'TH').trim().toUpperCase().startsWith('EN') ? 'EN' : 'TH';
+}
+function normalizeRound9EventTypeRows(rows){
+  const source=Array.isArray(rows) ? rows : [];
+  return source
+    .map(item=>({
+      event_type_id:String(item?.event_type_id || item?.id || '').trim(),
+      name_th:String(item?.name_th || item?.label_th || item?.name || '').trim(),
+      name_en:String(item?.name_en || item?.label_en || item?.name || item?.name_th || '').trim(),
+      icon:String(item?.icon || '').trim(),
+      color_token:String(item?.color_token || item?.color || '').trim(),
+      is_active:item?.is_active !== false && String(item?.is_active || '').toUpperCase() !== 'FALSE',
+      sort_order:Number(item?.sort_order || 999)
+    }))
+    .filter(item=>item.is_active && (item.name_th || item.name_en));
+}
+function getRound9EventTypeResponseRows(response){
+  const data=response && response.data !== undefined ? response.data : response;
+  if(Array.isArray(data)) return data;
+  if(Array.isArray(data?.items)) return data.items;
+  if(Array.isArray(data?.rows)) return data.rows;
+  if(Array.isArray(data?.event_types)) return data.event_types;
+  return [];
+}
+function formatRound9EventTypeOption(item){
+  const lang=getRound9LanguageMode();
+  const label=lang === 'EN' ? (item.name_en || item.name_th) : (item.name_th || item.name_en);
+  return `${item.icon ? item.icon + ' ' : ''}${label}`.trim();
+}
+function populateRound9EventTypeSelect(items, selectedValue){
+  const select=document.getElementById('round9EventTypeSelect');
+  if(!select) return;
+  const previous=String(selectedValue || select.value || '').trim();
+  const normalized=normalizeRound9EventTypeRows(items).sort((a,b)=>a.sort_order-b.sort_order || formatRound9EventTypeOption(a).localeCompare(formatRound9EventTypeOption(b)));
+  const options=normalized.length ? normalized : ROUND9_EVENT_TYPE_FALLBACK_OPTIONS;
+  select.innerHTML='';
+  options.forEach(item=>{
+    const option=document.createElement('option');
+    const label=formatRound9EventTypeOption(item);
+    option.value=label;
+    option.textContent=label;
+    option.dataset.eventTypeId=item.event_type_id || '';
+    option.dataset.colorToken=item.color_token || '';
+    select.appendChild(option);
+  });
+  if(previous){
+    const hasPrevious=Array.from(select.options).some(option=>option.value===previous || option.textContent===previous);
+    if(!hasPrevious){
+      const option=document.createElement('option');
+      option.value=previous;
+      option.textContent=previous;
+      option.dataset.eventTypeId='';
+      select.appendChild(option);
+    }
+    select.value=previous;
+  }
+}
+async function refreshRound9EventTypeOptions(selectedValue){
+  populateRound9EventTypeSelect(ROUND9_EVENT_TYPE_FALLBACK_OPTIONS, selectedValue);
+  try{
+    const lookup=window.IROUP_V2 && IROUP_V2.lookup && typeof IROUP_V2.lookup.eventTypes === 'function'
+      ? IROUP_V2.lookup.eventTypes()
+      : (window.IROUP_V2 && typeof IROUP_V2.request === 'function' ? IROUP_V2.request('v2.lookup.event_types') : null);
+    if(!lookup) return;
+    const response=await lookup;
+    const rows=getRound9EventTypeResponseRows(response);
+    if(response && response.success === false) return;
+    if(rows.length) populateRound9EventTypeSelect(rows, selectedValue);
+  }catch(err){
+    populateRound9EventTypeSelect(ROUND9_EVENT_TYPE_FALLBACK_OPTIONS, selectedValue);
+  }
+}
 function setAssetField(form, name, value){
   const input=form.querySelector(`input[name="${name}"]`);
   setInputValue(input,value);
@@ -1014,7 +1095,10 @@ window.openModal=function(type,id){
   modal.dataset.editId=id||'';
   const row=id ? (IROUND9_currentType==='scholar' ? IROUND9_scholars : IROUND9_events).find(x=>String(x['ID'])===String(id)) : null;
   if(IROUND9_currentType==='scholar') fillScholarForm(row);
-  else fillEventForm(row);
+  else {
+    fillEventForm(row);
+    refreshRound9EventTypeOptions(row?.['ประเภท']);
+  }
 };
 function v2EventFirstValue(row, keys){
   const source=row || {};

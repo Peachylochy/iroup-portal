@@ -413,6 +413,9 @@
       },
       budgetTypes: function () {
         return request('v2.lookup.budgetTypes');
+      },
+      eventTypes: function () {
+        return request('v2.lookup.event_types');
       }
     }
   };

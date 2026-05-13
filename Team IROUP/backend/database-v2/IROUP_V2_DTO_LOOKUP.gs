@@ -20,6 +20,29 @@ function listV2LookupBudgetTypes_() {
   return listV2LookupSheet_(IROUP_V2_SHEETS.BUDGET_TYPE_MASTER, mapV2LookupBudgetTypeDto_);
 }
 
+function listV2LookupEventTypes_() {
+  const read = readV2Sheet_('MASTER_EVENT_TYPES');
+  if (!read.success) {
+    return publicResponseV2_(false, null, 0, read.error || 'Unable to read V2 lookup sheet', 'V2_LOOKUP_READ_FAILED');
+  }
+
+  const rows = read.data || [];
+  const dtos = rows
+    .filter(function (row) {
+      if (isSoftDeletedV2_(row)) return false;
+      return isTruthyV2_(row.is_active);
+    })
+    .map(mapV2LookupEventTypeDto_)
+    .sort(function (a, b) {
+      const aSort = typeof a.sort_order === 'undefined' ? 999999 : Number(a.sort_order);
+      const bSort = typeof b.sort_order === 'undefined' ? 999999 : Number(b.sort_order);
+      if (aSort !== bSort) return aSort - bSort;
+      return String(a.name_en || a.name_th || '').localeCompare(String(b.name_en || b.name_th || ''));
+    });
+
+  return publicResponseV2_(true, dtos, dtos.length, '');
+}
+
 function listV2LookupSheet_(sheetName, mapper) {
   const read = readV2Sheet_(sheetName);
   if (!read.success) {
@@ -87,6 +110,17 @@ function mapV2LookupBudgetTypeDto_(row) {
     budget_type_id: row.budget_type_id || '',
     budget_type_name: row.budget_type_name || '',
     label: row.budget_type_name || row.budget_type_id || '',
+    sort_order: toNumberV2_(row.sort_order)
+  };
+}
+
+function mapV2LookupEventTypeDto_(row) {
+  return {
+    event_type_id: row.event_type_id || '',
+    name_th: row.name_th || '',
+    name_en: row.name_en || '',
+    icon: row.icon || '',
+    color_token: row.color_token || '',
     sort_order: toNumberV2_(row.sort_order)
   };
 }

@@ -324,6 +324,12 @@ function getV2RouteDispatch_() {
         return listV2LookupUnits_();
       }
     },
+    'v2.lookup.event_types': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupEventTypes_();
+      }
+    },
     'v2.lookup.fileRoles': {
       access: 'public',
       handler: function () {
