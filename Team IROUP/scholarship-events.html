@@ -1053,8 +1053,11 @@ function openV2NativeForm(type, id){
   modal.style.display='flex';
   loadV2NativeMasterData();
 }
+function isV2EventWriteUiEnabled(){
+  return V2_EVENT_WRITE_UI_ENABLED === true || window.V2_EVENT_WRITE_UI_ENABLED === true;
+}
 function openEventCreateModal(){
-  if(V2_EVENT_WRITE_UI_ENABLED === true){
+  if(isV2EventWriteUiEnabled()){
     openV2NativeForm('event');
     return;
   }
@@ -1102,7 +1105,7 @@ async function saveV2NativeForm(){
     console.warn('[V2 Native Form] required fields missing', { type, missing, payload });
     return null;
   }
-  if(!V2_EVENT_WRITE_UI_ENABLED){
+  if(!isV2EventWriteUiEnabled()){
     console.log('[V2 Native Form] V2 write route disabled; V1 remains default.', { type, payload });
     return null;
   }
@@ -1279,7 +1282,7 @@ function round9RenderScholars(list){
 }
 function round9RenderEvents(list){
   const wrap=document.getElementById('eventCards'); if(!wrap) return;
-  if(!list.length){ wrap.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลกิจกรรมในชีต<br><button class="add-btn" style="display:inline-flex;margin-top:12px" onclick="openModal(\'event\')">+ Add data</button></div>'; return; }
+  if(!list.length){ wrap.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลกิจกรรมในชีต<br><button class="add-btn" style="display:inline-flex;margin-top:12px" onclick="openEventCreateModal()">+ Add data</button></div>'; return; }
   function eventTimeBadge(start, end){
   const today = new Date();
   today.setHours(0,0,0,0);
