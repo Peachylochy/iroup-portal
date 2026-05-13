@@ -908,6 +908,7 @@ async function round9LoadScholarEvent(){
         round9V2Events = Array.isArray(v2Res.data) ? v2Res.data : [];
         round9V2EventsForRender = round9V2Events.map(normalizeV2EventForRound9Render);
         compareV2EventRenderCompatibility(IROUND9_events, round9V2EventsForRender);
+        compareV2EventDatasetParity(IROUND9_events, round9V2EventsForRender);
         runV2EventShadowRenderTest(round9V2EventsForRender);
         const sample=round9V2EventsForRender[0] || null;
         console.log('[V2 Sidecar] EVENT list — V1:', IROUND9_events.length, '| raw V2:', round9V2Events.length, '| adapted V2:', round9V2EventsForRender.length, '| sample:', sample ? `${sample.ID || '-'} | ${sample['ชื่อกิจกรรม'] || '-'}` : 'none', '| status: ok');
@@ -1080,6 +1081,23 @@ function compareV2EventRenderCompatibility(v1Rows, adaptedV2Rows){
     sample_missing_rows:missingRows.slice(0,3)
   };
   console.log('[V2 Sidecar] EVENT render compatibility:', summary);
+  return summary;
+}
+function compareV2EventDatasetParity(v1Rows, adaptedV2Rows){
+  const toSummaryRow=row=>({
+    id:String(row?.ID || row?.event_id || '').trim(),
+    title:String(row?.['ชื่อกิจกรรม'] || row?.title || row?.title_th || row?.title_en || '').trim(),
+    type:String(row?.['ประเภท'] || row?.type || row?.event_type || '').trim()
+  });
+  const v1List=(Array.isArray(v1Rows) ? v1Rows : []).map(toSummaryRow).filter(row=>row.id);
+  const v2List=(Array.isArray(adaptedV2Rows) ? adaptedV2Rows : []).map(toSummaryRow).filter(row=>row.id);
+  const v1Ids=new Set(v1List.map(row=>row.id));
+  const v2Ids=new Set(v2List.map(row=>row.id));
+  const summary={
+    missing_in_v2:v1List.filter(row=>!v2Ids.has(row.id)),
+    extra_in_v2:v2List.filter(row=>!v1Ids.has(row.id))
+  };
+  console.log('[V2 Sidecar] EVENT dataset parity:', summary);
   return summary;
 }
 function runV2EventShadowRenderTest(adaptedV2Rows){
