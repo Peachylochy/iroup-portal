@@ -163,6 +163,83 @@ function updateV2AdminScholarship_(request) {
   return writeV2AdminScholarshipMetadata_(request, 'update');
 }
 
+function uploadV2AdminFile_(request) {
+  const flag = getV2FileUploadFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      upload_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2FileUploadActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const payload = extractV2FileUploadPayload_(request);
+  const normalized = normalizeV2FileUploadPayload_(payload);
+  if (!normalized.success) {
+    return adminResponseV2_(false, sanitizeV2FileUploadDiagnostics_(normalized.data), 0, normalized.error);
+  }
+
+  try {
+    const data = normalized.data;
+    const folder = getOrCreateV2FileUploadFolder_('IROUP_V2_FILES');
+    const bytes = Utilities.base64Decode(data.base64_data);
+    const blob = Utilities.newBlob(bytes, data.mime_type, data.filename);
+    const driveFile = folder.createFile(blob);
+    driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    const now = new Date().toISOString();
+    const row = {
+      file_id: generateV2Id_(IROUP_V2_ID_PREFIXES.FILES),
+      module: data.module,
+      record_id: data.record_id,
+      file_role_id: data.file_role_id,
+      file_name: data.filename,
+      mime_type: data.mime_type,
+      drive_file_id: driveFile.getId(),
+      file_url: driveFile.getUrl(),
+      thumbnail_url: '',
+      visibility_level: data.visibility_level,
+      is_deleted: false,
+      uploaded_by: actor.user.email || '',
+      uploaded_at: now,
+      note: data.note || ''
+    };
+
+    const persisted = appendV2Row_(IROUP_V2_SHEETS.FILES, row, {
+      idField: 'file_id',
+      requiredFields: ['file_id', 'module', 'record_id', 'file_role_id', 'file_name', 'mime_type', 'drive_file_id', 'file_url', 'visibility_level']
+    });
+
+    if (!persisted.success) {
+      return adminResponseV2_(false, {
+        upload_enabled: true,
+        drive_file_id: driveFile.getId(),
+        diagnostics: persisted.diagnostics || {}
+      }, 0, persisted.error);
+    }
+
+    return adminResponseV2_(true, {
+      upload_enabled: true,
+      file_id: row.file_id,
+      file_url: row.file_url,
+      drive_file_id: row.drive_file_id,
+      file: persisted.data,
+      actor: {
+        email: actor.user.email || '',
+        role: actor.user.role || ''
+      },
+      diagnostics: persisted.diagnostics || {}
+    }, 1, '');
+  } catch (error) {
+    return adminResponseV2_(false, sanitizeV2FileUploadDiagnostics_(normalized.data), 0, error && error.message ? error.message : String(error));
+  }
+}
+
 function writeV2AdminEventMetadata_(request, mode) {
   const flag = getV2EventWriteFeatureFlag_();
   if (!flag.enabled) {
@@ -377,6 +454,16 @@ function getV2ScholarshipWriteFeatureFlag_() {
   };
 }
 
+function getV2FileUploadFeatureFlag_() {
+  const property = 'IROUP_V2_FILE_UPLOAD_ENABLED';
+  const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
+  return {
+    enabled: value === 'TRUE',
+    property: property,
+    error: value === 'TRUE' ? '' : 'V2 file uploads are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
+  };
+}
+
 function authorizeV2EventWriteActor_(request) {
   const user = request && request.user ? request.user : null;
   if (!user || !user.email) {
@@ -402,6 +489,21 @@ function authorizeV2ScholarshipWriteActor_(request) {
   const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
   if (allowed.indexOf(role) < 0) {
     return { success: false, user: null, error: 'V2 admin role is not allowed for scholarship writes.' };
+  }
+
+  return { success: true, user: user, error: '' };
+}
+
+function authorizeV2FileUploadActor_(request) {
+  const user = request && request.user ? request.user : null;
+  if (!user || !user.email) {
+    return { success: false, user: null, error: 'V2 admin identity is required for file uploads.' };
+  }
+
+  const role = String(user.role || '').trim().toLowerCase();
+  const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
+  if (allowed.indexOf(role) < 0) {
+    return { success: false, user: null, error: 'V2 admin role is not allowed for file uploads.' };
   }
 
   return { success: true, user: user, error: '' };
@@ -616,6 +718,95 @@ function extractV2ScholarshipWritePayload_(request) {
   }
 
   return params;
+}
+
+function extractV2FileUploadPayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.file || params.payload || params.file || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
+function normalizeV2FileUploadPayload_(payload) {
+  const source = payload || {};
+  const errors = [];
+  const normalized = {
+    base64_data: cleanV2Base64Data_(pickV2EventValue_(source, ['base64_data', 'base64', 'data'])),
+    filename: cleanV2EventText_(pickV2EventValue_(source, ['filename', 'file_name', 'name'])),
+    mime_type: cleanV2EventText_(pickV2EventValue_(source, ['mime_type', 'mimeType', 'type'])) || 'application/octet-stream',
+    module: cleanV2EventText_(source.module || '').toLowerCase(),
+    record_id: cleanV2EventText_(pickV2EventValue_(source, ['record_id', 'recordId'])),
+    file_role_id: cleanV2EventText_(pickV2EventValue_(source, ['file_role_id', 'fileRoleId', 'role'])),
+    visibility_level: cleanV2EventText_(pickV2EventValue_(source, ['visibility_level', 'visibilityLevel'])) || 'internal',
+    note: cleanV2EventText_(source.note || '')
+  };
+
+  if (source.payload_parse_error) errors.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  if (!normalized.base64_data) errors.push({ field: 'base64_data', code: 'BASE64_DATA_REQUIRED', message: 'base64 data is required.' });
+  if (!normalized.filename) errors.push({ field: 'filename', code: 'FILENAME_REQUIRED', message: 'filename is required.' });
+  if (!normalized.module) errors.push({ field: 'module', code: 'MODULE_REQUIRED', message: 'module is required.' });
+  if (normalized.module && IROUP_V2_MODULES.indexOf(normalized.module) < 0) errors.push({ field: 'module', code: 'MODULE_INVALID', message: 'module is not supported.' });
+  if (!normalized.record_id) errors.push({ field: 'record_id', code: 'RECORD_ID_REQUIRED', message: 'record_id is required.' });
+  if (!normalized.file_role_id) errors.push({ field: 'file_role_id', code: 'FILE_ROLE_ID_REQUIRED', message: 'file_role_id is required.' });
+
+  const visibilityCheck = validateVisibilityLevelV2_(normalized.visibility_level);
+  if (!visibilityCheck.success) errors.push({ field: 'visibility_level', code: visibilityCheck.code, message: visibilityCheck.error });
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'File upload payload validation failed.' : '',
+    data: {
+      valid: errors.length === 0,
+      errors: errors,
+      base64_data: normalized.base64_data,
+      filename: normalized.filename,
+      mime_type: normalized.mime_type,
+      module: normalized.module,
+      record_id: normalized.record_id,
+      file_role_id: normalized.file_role_id,
+      visibility_level: normalized.visibility_level,
+      note: normalized.note
+    }
+  };
+}
+
+function cleanV2Base64Data_(value) {
+  const text = cleanV2EventText_(value);
+  if (!text) return '';
+  const commaIndex = text.indexOf(',');
+  if (text.indexOf('base64') >= 0 && commaIndex >= 0) {
+    return text.slice(commaIndex + 1).trim();
+  }
+  return text;
+}
+
+function sanitizeV2FileUploadDiagnostics_(data) {
+  const source = data || {};
+  return {
+    valid: source.valid === true,
+    errors: source.errors || [],
+    base64_size: source.base64_data ? String(source.base64_data).length : 0,
+    filename: source.filename || '',
+    mime_type: source.mime_type || '',
+    module: source.module || '',
+    record_id: source.record_id || '',
+    file_role_id: source.file_role_id || '',
+    visibility_level: source.visibility_level || '',
+    note: source.note || ''
+  };
 }
 
 function normalizeV2EventWritePayload_(payload, ctx) {
@@ -872,6 +1063,13 @@ function findV2RelationRows_(ctx, sheetName, module, recordId) {
       && String(row.record_id || '').trim() === String(recordId || '').trim()
       && !isSoftDeletedV2_(row);
   });
+}
+
+function getOrCreateV2FileUploadFolder_(folderName) {
+  const name = cleanV2EventText_(folderName || 'IROUP_V2_FILES');
+  const existing = DriveApp.getFoldersByName(name);
+  if (existing.hasNext()) return existing.next();
+  return DriveApp.createFolder(name);
 }
 
 function findV2MobilityParticipants_(ctx, mobilityId) {

@@ -407,6 +407,13 @@
       eventUpdate: function (payload) {
         return adminEventWrite_('v2.admin.event.update', payload);
       },
+      fileUpload: function (payload) {
+        return request('v2.admin.file.upload', { payload: payload || {} }, {
+          auth: true,
+          method: 'POST',
+          timeoutMs: ADMIN_EVENT_WRITE_TIMEOUT_MS
+        });
+      },
       dashboardSummary: function () {
         return request('v2.admin.dashboard.summary', {}, { auth: true, timeoutMs: ADMIN_SUMMARY_TIMEOUT_MS });
       },

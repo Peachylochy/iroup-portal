@@ -30,15 +30,17 @@ button,input,select,textarea{font:inherit}
 .topbar{display:flex;align-items:center;gap:16px;margin-bottom:18px}.title{font-size:28px;font-weight:900;color:var(--navy);line-height:1.1}.subtitle{font-size:13px;color:var(--muted);margin-top:4px}.spacer{flex:1}
 .btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;min-height:42px}
 .btn:hover{border-color:#BBD7EF;box-shadow:0 6px 16px rgba(15,45,90,.08)}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{background:#fff;color:var(--red);border-color:#F5C4C0}.btn.ghost{background:transparent}
-.lang-toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px}.lang-toggle button{border:0;background:transparent;border-radius:9px;padding:7px 10px;font-weight:900;cursor:pointer;color:var(--muted)}.lang-toggle button.active{background:var(--blue);color:#fff}
+.lang-toggle,.view-toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px}.lang-toggle button,.view-toggle button{border:0;background:transparent;border-radius:9px;padding:7px 10px;font-weight:900;cursor:pointer;color:var(--muted)}.lang-toggle button.active,.view-toggle button.active{background:var(--blue);color:#fff}
 .toolbar{display:grid;grid-template-columns:1.3fr .8fr .8fr .6fr auto;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:16px}
 .input,.select,.textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;color:var(--text);outline:none}.textarea{min-height:98px;resize:vertical;font-family:'Sarabun',sans-serif}.input:focus,.select:focus,.textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,109,181,.12)}
 .notice{display:none;margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid #BBD7EF;background:#F1F8FE;color:#174B7A;font-weight:700}.notice.error{background:#FFF5F4;border-color:#F5C4C0;color:#A62C25}.notice.ok{background:#F4FBF2;border-color:#C7E8BC;color:#356D27}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.event-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(15,45,90,.06);display:flex;flex-direction:column;gap:12px;min-height:230px}
 .card-head{display:flex;gap:12px;align-items:flex-start}.type-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--soft);color:var(--blue);font-size:22px;flex:0 0 42px}.card-title{font-weight:900;line-height:1.35;font-size:16px}.card-sub{font-size:12px;color:var(--muted);margin-top:4px}
 .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meta-item{font-size:12px;color:var(--muted);background:#F8FBFE;border:1px solid #EDF3F8;border-radius:12px;padding:8px}.meta-item b{display:block;color:var(--text);font-size:13px;margin-top:2px}
-.badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.active{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.draft{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.cancelled{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.pin{color:#6D43BA;background:#F6F0FF;border-color:#D8C8FF}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.active{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.draft{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.cancelled{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.pin{color:#6D43BA;background:#F6F0FF;border-color:#D8C8FF}.badge.mode{color:#174B7A;background:#F1F8FE;border-color:#BBD7EF}.badge.days-green{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.days-yellow{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.days-red{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.done{color:#56657A;background:#F3F6FA;border-color:#D7E1EA}
 .card-actions{margin-top:auto;display:flex;justify-content:flex-end;gap:8px}.empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}
+.list-wrap{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:auto;box-shadow:0 6px 20px rgba(15,45,90,.06)}.event-table{width:100%;border-collapse:collapse;min-width:920px}.event-table th,.event-table td{padding:12px 14px;border-bottom:1px solid #EDF3F8;text-align:left;vertical-align:middle;font-size:13px}.event-table th{background:#F8FBFE;color:#344761;font-weight:900}.event-table tr:last-child td{border-bottom:0}.event-title-cell{font-weight:900;color:var(--navy)}
+.file-picker-row{display:flex;gap:10px;flex-wrap:wrap}.file-list{display:grid;gap:8px;margin-top:8px}.file-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);background:#F8FBFE;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:800;color:var(--muted)}.file-chip button{min-height:30px;padding:5px 9px}
 .modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1080px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.checks{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding-top:22px}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}
 .loading{display:grid;place-items:center;padding:36px;color:var(--muted);font-weight:800}.spinner{width:28px;height:28px;border:3px solid #D8E7F4;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:auto auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
@@ -82,6 +84,10 @@ button,input,select,textarea{font:inherit}
       <div class="lang-toggle" aria-label="Language">
         <button type="button" id="langThBtn" class="active" onclick="setLang('th')">TH</button>
         <button type="button" id="langEnBtn" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="view-toggle" aria-label="View mode">
+        <button type="button" id="cardViewBtn" class="active" onclick="setViewMode('card')">Card</button>
+        <button type="button" id="listViewBtn" onclick="setViewMode('list')">List</button>
       </div>
       <button class="btn" type="button" onclick="loadEvents(true)">↻ <span data-i18n-th="โหลดใหม่" data-i18n-en="Reload">โหลดใหม่</span></button>
       <button class="btn primary" type="button" onclick="openCreateModal()">+ <span data-i18n-th="เพิ่มกิจกรรม" data-i18n-en="Add Event">เพิ่มกิจกรรม</span></button>
@@ -209,6 +215,16 @@ button,input,select,textarea{font:inherit}
             <label class="label" for="linkUrl">ลิงก์ไฟล์แนบ</label>
             <input id="linkUrl" class="input" type="url" name="link_url">
           </div>
+          <div class="field full">
+            <label class="label">ไฟล์กิจกรรม</label>
+            <div class="file-picker-row">
+              <button class="btn" type="button" onclick="chooseEventFile('attachment')">แนบไฟล์</button>
+              <button class="btn" type="button" onclick="chooseEventFile('poster')">แนบรูปปก</button>
+            </div>
+            <input id="attachmentFileInput" type="file" hidden onchange="handleEventFileSelected(event, 'attachment')">
+            <input id="posterFileInput" type="file" accept="image/*" hidden onchange="handleEventFileSelected(event, 'poster')">
+            <div id="selectedFiles" class="file-list"></div>
+          </div>
           <div class="field checks">
             <label class="check"><input id="publicVisible" type="checkbox" name="public_visible"> แสดงสาธารณะ</label>
             <label class="check"><input id="pinInput" type="checkbox" name="pin"> ปักหมุด</label>
@@ -233,6 +249,8 @@ const state = {
   units: [],
   countries: [],
   editingId: '',
+  viewMode: 'card',
+  pendingFiles: [],
   loading: false
 };
 
@@ -326,7 +344,20 @@ function renderEvents() {
     return true;
   });
 
-  $('#eventCards').innerHTML = rows.length ? rows.map(renderCard).join('') : '<div class="empty">ไม่พบข้อมูลกิจกรรม</div>';
+  if (!rows.length) {
+    $('#eventCards').className = 'cards';
+    $('#eventCards').innerHTML = '<div class="empty">ไม่พบข้อมูลกิจกรรม</div>';
+    return;
+  }
+
+  if (state.viewMode === 'list') {
+    $('#eventCards').className = 'list-wrap';
+    $('#eventCards').innerHTML = renderList(rows);
+    return;
+  }
+
+  $('#eventCards').className = 'cards';
+  $('#eventCards').innerHTML = rows.map(renderCard).join('');
 }
 
 function renderCard(event) {
@@ -334,6 +365,8 @@ function renderCard(event) {
   const status = event.status || 'draft';
   const title = displayTitle(event);
   const detail = state.lang === 'en' ? event.detail_en || event.detail_th : event.detail_th || event.detail_en;
+  const mode = eventModeBadge(event.event_mode);
+  const days = daysBadge(event.start_date);
   return `
     <article class="event-card">
       <div class="card-head">
@@ -345,6 +378,8 @@ function renderCard(event) {
       </div>
       <div class="badge-row">
         <span class="badge ${esc(status)}">${esc(status)}</span>
+        <span class="badge mode">${esc(mode.label)}</span>
+        <span class="badge ${esc(days.className)}">${esc(days.label)}</span>
         ${event.pin ? '<span class="badge pin">ปักหมุด</span>' : ''}
         ${event.public_visible ? '<span class="badge active">Public</span>' : ''}
       </div>
@@ -362,9 +397,46 @@ function renderCard(event) {
   `;
 }
 
+function renderList(rows) {
+  const body = rows.map(event => {
+    const type = findEventType(event.event_type_id, event.event_type);
+    const status = event.status || 'draft';
+    const mode = eventModeBadge(event.event_mode);
+    return `
+      <tr>
+        <td class="event-title-cell">${esc(displayTitle(event) || '-')}</td>
+        <td>${esc(type ? typeLabel(type) : event.event_type || '-')}</td>
+        <td><span class="badge mode">${esc(mode.label)}</span></td>
+        <td>${esc(displayDate(event.start_date))}</td>
+        <td>${esc(unitDisplay(event) || '-')}</td>
+        <td><span class="badge ${esc(status)}">${esc(status)}</span></td>
+        <td><button class="btn" type="button" onclick="openEditModal('${escAttr(event.event_id)}')">แก้ไข</button></td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <table class="event-table">
+      <thead>
+        <tr>
+          <th>ชื่อ</th>
+          <th>ประเภท</th>
+          <th>รูปแบบ</th>
+          <th>วันที่</th>
+          <th>หน่วยงาน</th>
+          <th>สถานะ</th>
+          <th>แก้ไข</th>
+        </tr>
+      </thead>
+      <tbody>${body}</tbody>
+    </table>
+  `;
+}
+
 function openCreateModal() {
   state.editingId = '';
   $('#eventForm').reset();
+  state.pendingFiles = [];
   $('#eventId').value = '';
   $('#modalTitle').textContent = state.lang === 'en' ? 'Add Event' : 'เพิ่มกิจกรรม';
   $('#modalSub').textContent = 'V2-native EVENT metadata';
@@ -373,6 +445,7 @@ function openCreateModal() {
   $('#eventModeSelect').value = 'onsite';
   updateFiscalPreview();
   updateEventModeFields();
+  renderSelectedFiles();
   $('#eventModal').classList.add('open');
 }
 
@@ -381,6 +454,7 @@ function openEditModal(eventId) {
   if (!event) return;
   state.editingId = eventId;
   $('#eventForm').reset();
+  state.pendingFiles = [];
   $('#eventId').value = event.event_id || '';
   $('#titleTh').value = event.title_th || '';
   $('#titleEn').value = event.title_en || '';
@@ -408,6 +482,7 @@ function openEditModal(eventId) {
   $('#deleteBtn').style.display = '';
   updateFiscalPreview();
   updateEventModeFields();
+  renderSelectedFiles();
   $('#eventModal').classList.add('open');
 }
 
@@ -427,6 +502,10 @@ async function saveEvent(evt) {
       ? await IROUP_V2.admin.eventUpdate(payload)
       : await IROUP_V2.admin.eventCreate(payload);
     if (!res || !res.success) throw new Error(res?.error || 'บันทึกไม่สำเร็จ');
+    const savedEventId = isUpdate ? payload.event_id : extractSavedEventId(res);
+    if (state.pendingFiles.length) {
+      await uploadPendingEventFiles(savedEventId);
+    }
     alert('บันทึกสำเร็จ');
     closeModal();
     await loadEvents(true);
@@ -453,6 +532,80 @@ async function deleteEvent() {
   }
   closeModal();
   await loadEvents(true);
+}
+
+function chooseEventFile(role) {
+  const input = role === 'poster' ? $('#posterFileInput') : $('#attachmentFileInput');
+  if (input) input.click();
+}
+
+function handleEventFileSelected(evt, role) {
+  const file = evt && evt.target && evt.target.files ? evt.target.files[0] : null;
+  if (!file) return;
+  state.pendingFiles = state.pendingFiles.filter(item => role !== 'poster' || item.role !== 'poster');
+  state.pendingFiles.push({
+    role: role === 'poster' ? 'poster' : 'attachment',
+    file: file
+  });
+  evt.target.value = '';
+  renderSelectedFiles();
+}
+
+function renderSelectedFiles() {
+  const box = $('#selectedFiles');
+  if (!box) return;
+  if (!state.pendingFiles.length) {
+    box.innerHTML = '';
+    return;
+  }
+  box.innerHTML = state.pendingFiles.map((item, index) => `
+    <div class="file-chip">
+      <span>${esc(item.role === 'poster' ? 'รูปปก' : 'ไฟล์แนบ')} · ${esc(item.file.name)}</span>
+      <button class="btn" type="button" onclick="removeSelectedFile(${index})">ลบ</button>
+    </div>
+  `).join('');
+}
+
+function removeSelectedFile(index) {
+  state.pendingFiles.splice(index, 1);
+  renderSelectedFiles();
+}
+
+async function uploadPendingEventFiles(recordId) {
+  if (!recordId) throw new Error('ไม่พบรหัสกิจกรรมสำหรับแนบไฟล์');
+  const uploads = [];
+  for (const item of state.pendingFiles) {
+    const dataUrl = await readFileAsDataUrl(item.file);
+    const payload = {
+      base64_data: dataUrl,
+      filename: item.file.name,
+      mime_type: item.file.type || 'application/octet-stream',
+      module: 'event',
+      record_id: recordId,
+      file_role_id: item.role === 'poster' ? 'poster' : 'attachment',
+      visibility_level: item.role === 'poster' ? 'public' : 'internal'
+    };
+    const res = await IROUP_V2.admin.fileUpload(payload);
+    if (!res || !res.success) throw new Error(res?.error || 'อัปโหลดไฟล์ไม่สำเร็จ');
+    uploads.push(res.data || {});
+  }
+  state.pendingFiles = [];
+  renderSelectedFiles();
+  return uploads;
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error || new Error('อ่านไฟล์ไม่สำเร็จ'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function extractSavedEventId(res) {
+  const data = res && res.data ? res.data : {};
+  return data.event?.event_id || data.persisted_event?.event_id || data.event_id || '';
 }
 
 function buildPayloadFromForm() {
@@ -562,6 +715,27 @@ function countryDisplay(event) {
   return event.country_display || '';
 }
 
+function eventModeBadge(mode) {
+  const normalized = String(mode || 'onsite').trim().toLowerCase();
+  if (normalized === 'online') return { value: 'online', label: '💻 ออนไลน์' };
+  if (normalized === 'hybrid') return { value: 'hybrid', label: '🔀 ไฮบริด' };
+  return { value: 'onsite', label: '🏢 ออนไซต์' };
+}
+
+function daysBadge(dateText) {
+  const parts = String(dateText || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parts) return { label: '-', className: 'done' };
+  const today = new Date();
+  const start = new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]));
+  today.setHours(0, 0, 0, 0);
+  start.setHours(0, 0, 0, 0);
+  const days = Math.ceil((start.getTime() - today.getTime()) / 86400000);
+  if (days < 0) return { label: 'เสร็จสิ้น', className: 'done' };
+  if (days > 30) return { label: `เหลืออีก ${days} วัน`, className: 'days-green' };
+  if (days >= 7) return { label: `เหลืออีก ${days} วัน`, className: 'days-yellow' };
+  return { label: `เหลืออีก ${days} วัน`, className: 'days-red' };
+}
+
 function fiscalYear(dateText) {
   if (!dateText) return '';
   const parts = String(dateText).match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -603,6 +777,13 @@ function setLang(lang) {
     node.textContent = node.getAttribute(state.lang === 'en' ? 'data-i18n-en' : 'data-i18n-th');
   });
   populateMasterControls();
+  renderEvents();
+}
+
+function setViewMode(mode) {
+  state.viewMode = mode === 'list' ? 'list' : 'card';
+  $('#cardViewBtn').classList.toggle('active', state.viewMode === 'card');
+  $('#listViewBtn').classList.toggle('active', state.viewMode === 'list');
   renderEvents();
 }
 
