@@ -1089,15 +1089,24 @@ function compareV2EventDatasetParity(v1Rows, adaptedV2Rows){
     title:String(row?.['ชื่อกิจกรรม'] || row?.title || row?.title_th || row?.title_en || '').trim(),
     type:String(row?.['ประเภท'] || row?.type || row?.event_type || '').trim()
   });
-  const v1List=(Array.isArray(v1Rows) ? v1Rows : []).map(toSummaryRow).filter(row=>row.id);
+  const v1List=(Array.isArray(v1Rows) ? v1Rows : []).map(toSummaryRow);
   const v2List=(Array.isArray(adaptedV2Rows) ? adaptedV2Rows : []).map(toSummaryRow).filter(row=>row.id);
-  const v1Ids=new Set(v1List.map(row=>row.id));
+  const v1Ids=new Set(v1List.filter(row=>row.id).map(row=>row.id));
   const v2Ids=new Set(v2List.map(row=>row.id));
+  const missingInV2=v1List.filter(row=>!row.id || !v2Ids.has(row.id));
+  const missingClassifications=missingInV2.reduce((acc, row)=>{
+    if(!row.id) acc.missing_id += 1;
+    if(!row.title) acc.missing_title += 1;
+    if(row.id && row.title) acc.likely_unmigrated += 1;
+    if(!row.id || !row.title) acc.malformed_v1_row += 1;
+    return acc;
+  }, { missing_id:0, missing_title:0, likely_unmigrated:0, malformed_v1_row:0 });
   const summary={
-    missing_in_v2:v1List.filter(row=>!v2Ids.has(row.id)),
+    missing_in_v2:missingInV2,
     extra_in_v2:v2List.filter(row=>!v1Ids.has(row.id))
   };
   console.log('[V2 Sidecar] EVENT dataset parity:', summary);
+  console.log('[V2 Sidecar] EVENT missing V1 classification:', missingClassifications);
   return summary;
 }
 function runV2EventShadowRenderTest(adaptedV2Rows){
