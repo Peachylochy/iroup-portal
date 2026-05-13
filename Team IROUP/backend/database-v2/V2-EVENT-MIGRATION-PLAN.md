@@ -303,12 +303,12 @@ Pre-conditions:
 - [ ] V2 backend field requirements reviewed against current form
 
 Tasks:
-- [ ] Add `status` dropdown to event form (values: `draft`, `published`, `cancelled`)
-- [ ] Add `public_visible` toggle/checkbox to event form
-- [ ] Add `pin` toggle/checkbox to event form
-- [ ] Add `link` text input to event form
-- [ ] Update `buildV2EventFormPayload()` to read these new inputs instead of hardcoding
-- [ ] Update `fillEventForm(row)` to populate these new fields from the existing V1 row
+- [x] Add `status` dropdown to event form (values: `draft`, `published`, `cancelled`)
+- [x] Add `public_visible` toggle/checkbox to event form
+- [x] Add `pin` toggle/checkbox to event form
+- [x] Add `link` text input to event form
+- [x] Update `buildV2EventFormPayload()` to read these new inputs instead of hardcoding
+- [x] Update `fillEventForm(row)` to populate these new fields from the existing V1 row
       (map V1 flat values to new form inputs; V1 may not have all fields)
 - [ ] Verify dry-run preview (`previewV2EventDraft`) returns correct normalized shape
       for payloads that include `status`, `public_visible`, `pin`, and `link`
@@ -546,3 +546,147 @@ Team IROUP/backend/database-v2/V2-EVENT-MIGRATION-PLAN.md  (new — this documen
 ```
 
 No runtime files are modified by this planning document.
+
+---
+
+## 12. Phase B.5 - Controlled Co-Activation Preparation Audit
+
+Status: planning only. No runtime behavior changes.
+
+This audit prepares `scholarship-events.html` for future V1/V2 EVENT
+co-activation without switching the render source yet.
+
+### 12.1 Current EVENT Rendering Lifecycle
+
+```
+round9LoadScholarEvent()
+  -> IROUP.getAll(IROUP.SHEETS.SCHOLAR)
+  -> IROUP.getAll(IROUP.SHEETS.EVENT)
+  -> round9RenderScholars(IROUND9_scholars)
+  -> round9RenderEvents(IROUND9_events)
+  -> update KPI cards from V1 arrays
+  -> IROUP_V2.admin.eventList() sidecar
+       -> round9V2Events = v2Res.data
+       -> console count comparison only
+```
+
+- V1 remains the only rendered EVENT source.
+- V2 `eventList()` is read-only sidecar data and is not fed into `IROUND9_events`.
+- Event reload after save/delete still calls `round9LoadScholarEvent()` and reloads
+  `IROUND9_events` from V1.
+- Modal edit loading uses `IROUND9_events.find(x => String(x['ID']) === String(id))`.
+- Event search uses `Object.values(row).join(' ').toLowerCase()` over the current
+  V1 row object, then re-renders with `round9RenderEvents(filteredV1Rows)`.
+- Status pills and filter selects currently change visual state only; they do not
+  apply data filtering or sorting.
+- No active event sort routine was found.
+
+### 12.2 V1 Row-Shape Assumptions
+
+| Area | Current assumption | V2 impact |
+|------|--------------------|-----------|
+| Event identity | Card edit/delete buttons pass `x['ID']` | V2 rows use `event_id`; adapter must expose a stable `ID` alias or update all callers together. |
+| Render title | `x['ชื่อกิจกรรม']` | V2 uses `title_th` / `title_en`. |
+| Render type | `x['ประเภท']` | V2 uses `event_type`. |
+| Render organizer | `x['หน่วยงาน']` | V2 uses nested `organizer_unit` with `unit_name_th` / `unit_name_en`. |
+| Render location | `x['สถานที่']` | V2 uses `location`. |
+| Render dates | `x['วันเริ่ม']`, `x['วันสิ้นสุด']` | V2 uses `start_date`, `end_date`. |
+| Render times | `x['เวลาเริ่ม']`, `x['เวลาสิ้นสุด']` | V2 uses `start_time`, `end_time`. |
+| Render participants | `x['จำนวน']` | V2 uses numeric `participant_count`. |
+| Render detail | `x['รายละเอียด']` | V2 uses `detail_th` / `detail_en`. |
+| Poster/file buttons | `assetUrl(x,'Poster_URL')`, `assetUrl(x,'ไฟล์_URL')` | V2 admin DTO uses `file_summary`/`files`; current metadata bridge may not provide these flat URL keys. |
+| Edit modal | `fillEventForm(row)` reads V1 Thai keys by input position | Must accept V2 keys or receive an adapted V1-compatible render row. |
+| Hydrated update | `getCurrentV2EventRow()` currently reads from `IROUND9_events` | If `IROUND9_events` becomes V2 rows, hydration must use V2 identity and normalized fields. |
+| Delete | `round9Delete('event', id)` calls V1 hard delete | V2 needs a future soft-delete route; do not switch delete with read/render. |
+| Search | `Object.values(row)` assumes a flat row | V2 rows contain nested `organizer_unit`, `country`, `audit`, and summaries; plain object values can stringify as `[object Object]`. |
+
+### 12.3 Compatibility Checklist
+
+Fields already compatible or low-risk:
+
+| UI need | V1 field | V2 field | Notes |
+|---------|----------|----------|-------|
+| Start date | `วันเริ่ม` | `start_date` | Same date semantics after adapter aliasing. |
+| End date | `วันสิ้นสุด` | `end_date` | Same date semantics after adapter aliasing. |
+| Start time | `เวลาเริ่ม` | `start_time` | Same time semantics after adapter aliasing. |
+| End time | `เวลาสิ้นสุด` | `end_time` | Same time semantics after adapter aliasing. |
+| Location | `สถานที่` | `location` | Direct string mapping. |
+| Participant count | `จำนวน` | `participant_count` | Convert to display-safe string/number. |
+| Status | optional V1 `สถานะ` | `status` | New form field reads both; render still derives timing badge from dates. |
+| Public visible | optional V1 `เผยแพร่` | `public_visible` | New form field reads both; not rendered yet. |
+| Pin | optional V1 `Pin` | `pin` | New form field reads both; event render does not display pin yet. |
+| Link URL | optional V1 `Link` / `link_url` | `link_url` | New form field reads both; not rendered yet. |
+
+Fields needing adapter normalization before any render-source swap:
+
+| UI need | V2 source | Proposed page-local alias |
+|---------|-----------|---------------------------|
+| Edit/delete id | `event_id` | `ID` and `event_id` |
+| Title | `title_th || title_en` | `ชื่อกิจกรรม` |
+| Type | `event_type` | `ประเภท` |
+| Organizer | `organizer_unit.unit_name_th || organizer_unit.unit_name_en || organizer_unit.unit_code` | `หน่วยงาน` |
+| Country display | `country.country_name_th || country.country_name_en` | optional `ประเทศ` |
+| Detail | `detail_th || detail_en` | `รายละเอียด` |
+| Poster URL | `file_summary` / future `files.public` role | transitional `Poster_URL` |
+| Attachment URL | `file_summary` / future `files.public` role | transitional `ไฟล์_URL` |
+| Search text | selected scalar fields from V2 DTO | explicit `_searchText` or search helper |
+
+Fields missing or not yet first-class in V2 list for current admin rendering:
+
+| Current UI expectation | Gap |
+|------------------------|-----|
+| `Poster_URL` flat image URL | V2 list returns file summaries, not the V1 flat URL used by `assetUrl()`. |
+| `ไฟล์_URL` flat attachment URL | V2 list returns file summaries, not the V1 flat URL used by `assetUrl()`. |
+| Thai organizer display as a scalar | V2 returns nested unit reference; page expects a flat string. |
+| V1 row `ID` | V2 uses `event_id`; aliases are required for edit/delete buttons. |
+
+Fields missing in V1 but present in V2:
+
+| V2 field | V1 status | Current handling |
+|----------|-----------|------------------|
+| `event_id` | V1 uses generic `ID` | Hydration accepts both, but render/edit still expects `ID`. |
+| `event_mode` | no current EVENT form field | Not rendered; can remain hidden for metadata phase. |
+| `organizer_unit_id` | no ID column in V1 form | Display-name fallback only until lookup UI exists. |
+| `country_id` and nested `country` | no ID column in current form | Needed later for country-aware UX. |
+| `meeting_url` | no current form field | Could map from `link_url` only if semantics are agreed. |
+| `detail_en`, `title_en` | no current form fields | TH-first fallback is acceptable for current page. |
+| `audit`, `file_summary`, `budget_summary` | no V1 equivalent | Must stay ignored until dedicated UI exists. |
+
+### 12.4 Risky Assumptions
+
+- Do not feed raw V2 DTOs directly into `round9RenderEvents()`; it expects V1 Thai
+  field names and flat URL fields.
+- Do not rely on `Object.values(row)` for search after V2 rows are introduced because
+  nested objects will not produce useful search text.
+- Do not update edit/delete buttons to use `event_id` in only one place; modal lookup,
+  hydration lookup, and delete all need the same identity contract.
+- Do not switch read source while delete remains V1 unless event delete is explicitly
+  left in V1 and documented as a temporary mismatch.
+- Do not let V2 `file_summary`/`files` touch upload/delete/FILES/BUDGET flows during
+  the metadata co-activation stage.
+
+### 12.5 Recommended Co-Activation Strategy
+
+Use a staged render migration with an adapter normalization layer.
+
+1. Keep the existing V2 read sidecar and enhance it into a dual-source compare:
+   compare counts and sampled normalized fields (`ID/event_id`, title, date, status,
+   visibility), but keep rendering from V1.
+2. Add a page-local adapter such as `adaptV2EventForRound9Render(v2Row)` that maps
+   V2 DTO rows into the existing V1-compatible flat render shape. This lets
+   `round9RenderEvents()`, `fillEventForm()`, and search continue to run without a
+   large simultaneous refactor.
+3. In a controlled test only, render an adapted V2 shadow list in console or a hidden
+   comparison object first; do not switch `IROUND9_events` yet.
+4. When the adapter output matches V1 behavior, co-activate EVENT metadata write and
+   EVENT read source together for create/update only. Keep scholarship, uploads,
+   delete, FILES, and BUDGET on V1.
+5. Keep V1 read fallback available during the first activation window.
+6. Defer full render-source swap until adapter parity is verified across list render,
+   modal edit loading, search, post-save reload, and post-delete reload.
+
+Rejected for now:
+
+- Full raw render source swap: too risky because render and modal code are V1-shaped.
+- Dual-write: adds partial-write failure states and does not solve render compatibility.
+- Immediate delete migration: no V2 soft-delete route exists yet.
