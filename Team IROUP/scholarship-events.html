@@ -1270,13 +1270,23 @@ function prepareV2EventSavePilotRoute(id){
     : buildV2EventDraftPayload(form);
   const missing=validateV2EventSavePilotPayload(payload);
   if(missing.length){
+    console.warn('[V2 Save Pilot] validation failed', {
+      missing_required_fields:missing.map(item=>item.label)
+    });
     console.warn('[V2 Save Pilot] EVENT V2 metadata route aborted; falling back to V1_LEGACY.', {
       missing_required_fields:missing.map(item=>item.label),
       payload
     });
+    console.log('[V2 Save Pilot] fallback to V1');
     console.log('[V2 Save Pilot] EVENT save route: V1_LEGACY');
     return { route:'V1_LEGACY', payload:null, missing };
   }
+  console.log('[V2 Save Pilot] validation passed');
+  console.info('[V2 Save Pilot] payload preview', {
+    mode:id ? 'update' : 'create',
+    selected_route:'V2_METADATA',
+    payload
+  });
   console.log('[V2 Save Pilot] EVENT save route: V2_METADATA');
   return { route:'V2_METADATA', payload, missing:[] };
 }
@@ -1322,13 +1332,19 @@ async function runV2EventMetadataSaveSidecar(id, payload){
       throw new Error('IROUP_V2 event write adapter is not available.');
     }
     const response=id ? await IROUP_V2.admin.eventUpdate(payload) : await IROUP_V2.admin.eventCreate(payload);
+    if(!response || typeof response !== 'object'){
+      console.warn('[V2 Save Pilot] malformed V2 response; V1 save already completed.', response);
+      return null;
+    }
     console.info('IROUP V2 EVENT metadata save sidecar result', {
       mode:id ? 'update' : 'create',
       request_payload:payload,
       response
     });
+    return response;
   }catch(err){
     console.warn('IROUP V2 EVENT metadata save sidecar failed; V1 save already completed.', err);
+    return null;
   }
 }
 async function round9Save(){
