@@ -1,10 +1,38 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-13 | Session: V2 EVENT Type Master Readiness**
+**Last updated: 2026-05-13 | Session: MASTER_EVENT_TYPES Foundation Planning**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest MASTER_EVENT_TYPES Foundation Planning
+
+### Session: 2026-05-13 - Dynamic EVENT Type Master Architecture
+
+Planning outcome:
+
+- Proposed dedicated V2 master sheet: `MASTER_EVENT_TYPES`.
+- Intended relation: `EVENT.event_type_id -> MASTER_EVENT_TYPES.event_type_id`.
+- Proposed fields: `event_type_id`, `name_th`, `name_en`, `icon`, `color_token`,
+  `is_active`, `sort_order`, `created_at`, and `updated_at`.
+
+Future frontend behavior:
+
+- EVENT type dropdown should load dynamically from V2 lookup data.
+- Dropdown should support search, active/inactive filtering, stable sort order, and
+  fallback to existing hardcoded values if lookup data is unavailable.
+- Existing adapters should temporarily support legacy plain-text `event_type` while
+  new records move toward `event_type_id`.
+
+Still not doing:
+
+- no runtime dropdown refactor yet
+- no Apps Script deployment changes
+- no V2 write activation
+- no production behavior change
 
 ---
 

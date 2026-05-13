@@ -893,7 +893,7 @@ Current V2 backend state:
 - Existing V2 seed rows use free-text/code-like values such as `seminar`, `meeting`,
   and `workshop`.
 
-Proposed V2 event type master schema:
+Proposed V2 master sheet: `MASTER_EVENT_TYPES`
 
 | Field | Purpose |
 |-------|---------|
@@ -901,12 +901,44 @@ Proposed V2 event type master schema:
 | `name_th` | Thai display label |
 | `name_en` | English display label |
 | `icon` | Optional UI icon/emoji used by admin/public renderers |
+| `color_token` | Optional UI color token for badges/filters, e.g. `blue`, `green`, `orange` |
 | `is_active` | Boolean availability flag |
 | `sort_order` | Numeric ordering for dropdowns and filters |
+| `created_at` | Audit timestamp for master row creation |
+| `updated_at` | Audit timestamp for latest master row update |
+
+Intended relationship:
+
+```
+EVENT.event_type_id -> MASTER_EVENT_TYPES.event_type_id
+```
+
+During the coexistence phase, `EVENT.event_type` may remain available as a legacy
+plain-text display/code field while new writes move toward `event_type_id`.
+
+Future frontend behavior:
+
+- Load active event types dynamically from V2 lookup data.
+- Render a searchable dropdown using `name_th`, `name_en`, `icon`, and optional
+  `color_token`.
+- Filter out inactive rows by default while keeping existing values visible when
+  editing old records.
+- Sort options by `sort_order`, then display name.
+- If the lookup fails, fall back to the current hardcoded options and log a warning
+  instead of blocking the V1 fallback path.
+
+Migration compatibility:
+
+- Temporarily accept legacy plain-text `event_type` values from existing V2 rows and
+  V1 fallback rows.
+- Adapter logic should map either `event_type_id` or legacy `event_type` into the
+  existing render field `ประเภท`.
+- Backend normalization should accept both `event_type_id` and legacy `event_type`
+  during the transition, preferring `event_type_id` when present.
 
 Recommended normalization path:
 
-1. Add an `EVENT_TYPE_MASTER` sheet to V2 schema/config in a backend planning pass.
+1. Add a `MASTER_EVENT_TYPES` sheet to V2 schema/config in a backend planning pass.
 2. Seed the current frontend values as master rows, mapping labels to stable
    `event_type_id` values.
 3. Add a lookup route/wrapper for active event types.
