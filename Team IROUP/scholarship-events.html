@@ -715,9 +715,9 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="form-grid">
 <div class="form-group form-full"><label>title_th *</label><input name="title_th" type="text"/></div>
 <div class="form-group form-full"><label>title_en</label><input name="title_en" type="text"/></div>
-<div class="form-group"><label>event_type_id *</label><select name="event_type_id"></select></div>
-<div class="form-group"><label>organizer_unit_id *</label><select name="organizer_unit_id"></select></div>
-<div class="form-group"><label>country_id</label><input list="v2CountryOptions" name="country_id" type="search"/></div>
+<div class="form-group"><label>event_type_id *</label><select id="v2EventTypeSelect" name="event_type_id"></select></div>
+<div class="form-group"><label>organizer_unit_id *</label><select id="v2OrganizerUnitSelect" name="organizer_unit_id"></select></div>
+<div class="form-group"><label>country_id</label><input list="v2CountryDatalist" name="country_id" type="search"/></div>
 <div class="form-group"><label>start_date *</label><input name="start_date" type="date"/></div>
 <div class="form-group"><label>end_date</label><input name="end_date" type="date"/></div>
 <div class="form-group"><label>start_time</label><input name="start_time" type="time"/></div>
@@ -739,7 +739,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="form-group form-full"><label>title_th *</label><input name="title_th" type="text"/></div>
 <div class="form-group form-full"><label>title_en</label><input name="title_en" type="text"/></div>
 <div class="form-group"><label>institution_name *</label><input name="institution_name" type="text"/></div>
-<div class="form-group"><label>country_id *</label><input list="v2CountryOptions" name="country_id" type="search"/></div>
+<div class="form-group"><label>country_id *</label><input list="v2CountryDatalist" name="country_id" type="search"/></div>
 <div class="form-group"><label>scholarship_type *</label><input name="scholarship_type" type="text"/></div>
 <div class="form-group"><label>funding_type</label><input name="funding_type" type="text"/></div>
 <div class="form-group"><label>target_group</label><input name="target_group" type="text"/></div>
@@ -757,7 +757,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 <div class="form-group"><label>pin</label><div class="check-item"><input name="pin" type="checkbox"/><label>Pin</label></div></div>
 </div>
 </div>
-<datalist id="v2CountryOptions"></datalist>
+<datalist id="v2CountryDatalist"></datalist>
 <div class="modal-footer">
 <button class="modal-btn modal-cancel" onclick="closeV2NativeForm()">Cancel</button>
 <button class="modal-btn modal-save" onclick="saveV2NativeForm()">Save V2 Metadata</button>
@@ -980,7 +980,7 @@ function setV2NativeSelectOptions(select, rows, valueKey, labelKeys){
   if(previous && Array.from(select.options).some(option=>option.value===previous)) select.value=previous;
 }
 function setV2NativeCountryOptions(rows){
-  const list=document.getElementById('v2CountryOptions');
+  const list=document.getElementById('v2CountryDatalist');
   if(!list) return;
   list.innerHTML='';
   rows.forEach(row=>{
@@ -995,7 +995,6 @@ function setV2NativeCountryOptions(rows){
 }
 async function loadV2NativeMasterData(){
   if(!window.IROUP_V2 || !IROUP_V2.lookup) return;
-  const eventForm=document.getElementById('v2NativeEventForm');
   try{
     const eventTypes=typeof IROUP_V2.lookup.eventTypes === 'function'
       ? IROUP_V2.lookup.eventTypes()
@@ -1006,9 +1005,20 @@ async function loadV2NativeMasterData(){
     const eventTypeRows=results[0].status === 'fulfilled' ? getV2NativeResponseRows(results[0].value, 'event_types') : [];
     const unitRows=results[1].status === 'fulfilled' ? getV2NativeResponseRows(results[1].value, 'units') : [];
     const countryRows=results[2].status === 'fulfilled' ? getV2NativeResponseRows(results[2].value, 'countries') : [];
-    setV2NativeSelectOptions(eventForm?.querySelector('select[name="event_type_id"]'), eventTypeRows, 'event_type_id', ['name_th','name_en']);
-    setV2NativeSelectOptions(eventForm?.querySelector('select[name="organizer_unit_id"]'), unitRows, 'unit_id', ['unit_name_th','unit_name_en','label']);
+    const eventTypeSelect=document.getElementById('v2EventTypeSelect');
+    const organizerUnitSelect=document.getElementById('v2OrganizerUnitSelect');
+    const countryDatalist=document.getElementById('v2CountryDatalist');
+    setV2NativeSelectOptions(eventTypeSelect, eventTypeRows, 'event_type_id', ['name_th','name_en']);
+    setV2NativeSelectOptions(organizerUnitSelect, unitRows, 'unit_id', ['unit_name_th','unit_name_en','label']);
     setV2NativeCountryOptions(countryRows);
+    console.log('[V2 Native Form] master dropdowns populated', {
+      event_type_rows:eventTypeRows.length,
+      event_type_options:eventTypeSelect ? eventTypeSelect.options.length : 0,
+      organizer_unit_rows:unitRows.length,
+      organizer_unit_options:organizerUnitSelect ? organizerUnitSelect.options.length : 0,
+      country_rows:countryRows.length,
+      country_options:countryDatalist ? countryDatalist.options.length : 0
+    });
   }catch(err){
     console.warn('[V2 Native Form] master lookup unavailable; V2 form remains inactive.', err);
   }
