@@ -514,6 +514,7 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 </div>
 <!-- EVENT CARDS VIEW -->
 <div class="events-grid" id="eventCards"><div class="empty-state">กำลังโหลดข้อมูลกิจกรรมจาก Google Sheet...</div></div><!-- end eventCards -->
+<div id="eventCardsShadowRender" style="display:none"></div>
 <!-- CALENDAR VIEW (hidden by default) -->
 <div class="calendar-wrap" id="calendarView">
 <div class="cal-header">
@@ -907,6 +908,7 @@ async function round9LoadScholarEvent(){
         round9V2Events = Array.isArray(v2Res.data) ? v2Res.data : [];
         round9V2EventsForRender = round9V2Events.map(normalizeV2EventForRound9Render);
         compareV2EventRenderCompatibility(IROUND9_events, round9V2EventsForRender);
+        runV2EventShadowRenderTest(round9V2EventsForRender);
         const sample=round9V2EventsForRender[0] || null;
         console.log('[V2 Sidecar] EVENT list — V1:', IROUND9_events.length, '| raw V2:', round9V2Events.length, '| adapted V2:', round9V2EventsForRender.length, '| sample:', sample ? `${sample.ID || '-'} | ${sample['ชื่อกิจกรรม'] || '-'}` : 'none', '| status: ok');
       } else {
@@ -1079,6 +1081,37 @@ function compareV2EventRenderCompatibility(v1Rows, adaptedV2Rows){
   };
   console.log('[V2 Sidecar] EVENT render compatibility:', summary);
   return summary;
+}
+function runV2EventShadowRenderTest(adaptedV2Rows){
+  const adaptedList=Array.isArray(adaptedV2Rows) ? adaptedV2Rows : [];
+  const visible=document.getElementById('eventCards');
+  const shadow=document.getElementById('eventCardsShadowRender');
+  const result={
+    shadow_render_attempted:false,
+    adapted_v2_count:adaptedList.length,
+    success:false,
+    error_message:''
+  };
+  if(!visible || !shadow){
+    result.error_message='Shadow or visible EVENT container not found.';
+    console.log('[V2 Sidecar] EVENT shadow render test:', result);
+    return result;
+  }
+  result.shadow_render_attempted=true;
+  try{
+    visible.id='eventCardsVisible';
+    shadow.id='eventCards';
+    shadow.innerHTML='';
+    round9RenderEvents(adaptedList);
+    result.success=shadow.innerHTML.trim().length > 0 || adaptedList.length === 0;
+  }catch(err){
+    result.error_message=err && err.message ? err.message : String(err);
+  }finally{
+    shadow.id='eventCardsShadowRender';
+    visible.id='eventCards';
+  }
+  console.log('[V2 Sidecar] EVENT shadow render test:', result);
+  return result;
 }
 function normalizeV2EventBoolean(value, fallback){
   if(value === true || value === false) return value;
