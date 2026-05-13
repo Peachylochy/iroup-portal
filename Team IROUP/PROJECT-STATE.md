@@ -1,10 +1,37 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-13 | Session: V2 EVENT Save Activation Readiness**
+**Last updated: 2026-05-13 | Session: V2 EVENT Type Master Readiness**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2 EVENT Type Master Readiness
+
+### Session: 2026-05-13 - EVENT Type UX/Data Normalization Audit
+
+Current finding:
+
+- The EVENT modal still uses a hardcoded frontend type dropdown:
+  `การเดินทาง`, `Inbound`, `ประชุม`, `อบรม`, and `Exchange`.
+- V2 currently has no `EVENT_TYPE_MASTER` / `MASTER_EVENT_TYPES` equivalent.
+- V2 `EVENT.event_type` is a plain text field today.
+
+Planned normalization task:
+
+- Add an `EVENT_TYPE_MASTER` concept with `event_type_id`, `name_th`, `name_en`,
+  `icon`, `is_active`, and `sort_order`.
+- Move the EVENT type dropdown from hardcoded frontend options to a V2 master-driven
+  lookup before broad production save adoption.
+- Keep current hardcoded values usable only for local/controlled metadata pilot work.
+
+Still not doing:
+
+- no runtime dropdown refactor yet
+- no V2 write activation
+- no production behavior change
 
 ---
 

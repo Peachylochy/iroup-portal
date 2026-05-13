@@ -868,3 +868,55 @@ Readiness conclusion:
   the activation window is explicitly approved.
 - `IROUP_V2_EVENT_WRITE_ENABLED` must remain `FALSE` in Script Properties until the
   backend write window is deliberately opened.
+
+### 12.10 EVENT Type Master-Data Readiness Plan
+
+Status: readiness audit only. No runtime refactor.
+
+Current frontend state:
+
+- `scholarship-events.html` uses a hardcoded EVENT type dropdown in the EVENT modal.
+- The current hardcoded values are:
+  - `✈️ การเดินทาง`
+  - `🌏 Inbound`
+  - `🤝 ประชุม`
+  - `📚 อบรม`
+  - `🔄 Exchange`
+- `buildV2EventFormPayload()` sends the selected display value as `type`, which the V2
+  normalizer maps into `event_type`.
+
+Current V2 backend state:
+
+- No `EVENT_TYPE_MASTER`, `MASTER_EVENT_TYPES`, or equivalent sheet exists in the V2
+  database builder/config.
+- `EVENT.event_type` is currently a plain text field.
+- Existing V2 seed rows use free-text/code-like values such as `seminar`, `meeting`,
+  and `workshop`.
+
+Proposed V2 event type master schema:
+
+| Field | Purpose |
+|-------|---------|
+| `event_type_id` | Stable machine ID, e.g. `travel`, `inbound`, `meeting`, `training`, `exchange` |
+| `name_th` | Thai display label |
+| `name_en` | English display label |
+| `icon` | Optional UI icon/emoji used by admin/public renderers |
+| `is_active` | Boolean availability flag |
+| `sort_order` | Numeric ordering for dropdowns and filters |
+
+Recommended normalization path:
+
+1. Add an `EVENT_TYPE_MASTER` sheet to V2 schema/config in a backend planning pass.
+2. Seed the current frontend values as master rows, mapping labels to stable
+   `event_type_id` values.
+3. Add a lookup route/wrapper for active event types.
+4. Replace the hardcoded frontend dropdown with a V2 master-driven dropdown.
+5. Submit `event_type_id` or a backend-accepted event type code to V2 writes while
+   preserving display labels for render.
+
+Readiness conclusion:
+
+- EVENT type is usable for local metadata pilot as display text.
+- EVENT type is not yet production-normalized because there is no V2 event-type master.
+- Production-quality V2 EVENT save activation should treat event type master-data work
+  as a UX/data normalization task before broad adoption.
