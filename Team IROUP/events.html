@@ -150,6 +150,14 @@ button,input,select,textarea{font:inherit}
             </select>
           </div>
           <div class="field">
+            <label class="label" for="eventModeSelect">รูปแบบกิจกรรม</label>
+            <select id="eventModeSelect" class="select" name="event_mode" onchange="updateEventModeFields()">
+              <option value="onsite">ออนไซต์</option>
+              <option value="online">ออนไลน์</option>
+              <option value="hybrid">ไฮบริด</option>
+            </select>
+          </div>
+          <div class="field">
             <label class="label" for="startDate">วันที่เริ่ม <span class="req">*</span></label>
             <input id="startDate" class="input" type="date" name="start_date" required onchange="updateFiscalPreview()">
           </div>
@@ -165,11 +173,11 @@ button,input,select,textarea{font:inherit}
             <label class="label" for="endTime">เวลาสิ้นสุด</label>
             <input id="endTime" class="input" type="time" name="end_time">
           </div>
-          <div class="field">
+          <div class="field" id="locationField">
             <label class="label" for="locationInput">สถานที่</label>
             <input id="locationInput" class="input" name="location">
           </div>
-          <div class="field">
+          <div class="field" id="meetingUrlField">
             <label class="label" for="meetingUrl">ลิงก์ online</label>
             <input id="meetingUrl" class="input" type="url" name="meeting_url">
           </div>
@@ -362,7 +370,9 @@ function openCreateModal() {
   $('#modalSub').textContent = 'V2-native EVENT metadata';
   $('#deleteBtn').style.display = 'none';
   $('#statusSelect').value = 'draft';
+  $('#eventModeSelect').value = 'onsite';
   updateFiscalPreview();
+  updateEventModeFields();
   $('#eventModal').classList.add('open');
 }
 
@@ -378,6 +388,7 @@ function openEditModal(eventId) {
   $('#unitInput').value = unitDisplay(event) || '';
   $('#countryInput').value = countryDisplay(event) || '';
   $('#statusSelect').value = event.status || 'draft';
+  $('#eventModeSelect').value = event.event_mode || 'onsite';
   $('#startDate').value = event.start_date || '';
   $('#endDate').value = event.end_date || '';
   $('#startTime').value = event.start_time || '';
@@ -396,6 +407,7 @@ function openEditModal(eventId) {
   $('#modalSub').textContent = event.event_id || '';
   $('#deleteBtn').style.display = '';
   updateFiscalPreview();
+  updateEventModeFields();
   $('#eventModal').classList.add('open');
 }
 
@@ -453,6 +465,7 @@ function buildPayloadFromForm() {
     title_en: $('#titleEn').value.trim(),
     event_type_id: $('#eventTypeSelect').value.trim(),
     event_type: typeLabel(type) || $('#eventTypeSelect').value.trim(),
+    event_mode: $('#eventModeSelect').value,
     organizer_unit_id: unit?.unit_id || '',
     organizer: $('#unitInput').value.trim(),
     country_id: country?.country_id || '',
@@ -570,6 +583,16 @@ function displayDate(dateText) {
 function updateFiscalPreview() {
   const fy = fiscalYear($('#startDate').value);
   $('#fiscalPreview').value = fy ? `ปีงบประมาณ ${fy}` : '';
+}
+
+function updateEventModeFields() {
+  const mode = $('#eventModeSelect') ? $('#eventModeSelect').value : 'onsite';
+  const showLocation = mode === 'onsite' || mode === 'hybrid';
+  const showMeetingUrl = mode === 'online' || mode === 'hybrid';
+  const locationField = $('#locationField');
+  const meetingUrlField = $('#meetingUrlField');
+  if (locationField) locationField.style.display = showLocation ? '' : 'none';
+  if (meetingUrlField) meetingUrlField.style.display = showMeetingUrl ? '' : 'none';
 }
 
 function setLang(lang) {
