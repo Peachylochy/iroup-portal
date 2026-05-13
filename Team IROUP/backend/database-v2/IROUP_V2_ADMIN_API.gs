@@ -155,6 +155,14 @@ function updateV2AdminEvent_(request) {
   return writeV2AdminEventMetadata_(request, 'update');
 }
 
+function createV2AdminScholarship_(request) {
+  return writeV2AdminScholarshipMetadata_(request, 'create');
+}
+
+function updateV2AdminScholarship_(request) {
+  return writeV2AdminScholarshipMetadata_(request, 'update');
+}
+
 function writeV2AdminEventMetadata_(request, mode) {
   const flag = getV2EventWriteFeatureFlag_();
   if (!flag.enabled) {
@@ -252,6 +260,103 @@ function writeV2AdminEventMetadata_(request, mode) {
   }, 1, '');
 }
 
+function writeV2AdminScholarshipMetadata_(request, mode) {
+  const flag = getV2ScholarshipWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2ScholarshipWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const context = buildV2AdminContext_();
+  if (!context.success) return context;
+
+  const writeMode = String(mode || '').trim().toLowerCase();
+  const previewMode = writeMode === 'update' ? 'update' : 'create';
+  const preview = buildV2ScholarshipWritePreview_(request, context.data, previewMode);
+  if (!preview.success) {
+    return adminResponseV2_(false, preview.data, 0, preview.error);
+  }
+
+  const now = new Date().toISOString();
+  const adminEmail = actor.user.email || '';
+  const normalized = preview.data.normalized_scholarship || {};
+  let persisted;
+
+  if (writeMode === 'update') {
+    const scholarshipId = cleanV2EventText_(normalized.scholarship_id);
+    if (!scholarshipId) {
+      return adminResponseV2_(false, preview.data, 0, 'scholarship_id is required for scholarship update.');
+    }
+
+    const existing = findV2RowById_(IROUP_V2_SHEETS.SCHOLARSHIP, 'scholarship_id', scholarshipId);
+    if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+    if (isSoftDeletedV2_(existing.data)) return adminResponseV2_(false, null, 0, 'Cannot update a deleted scholarship.');
+
+    const patch = buildV2ScholarshipSheetRow_(normalized);
+    delete patch.scholarship_id;
+    delete patch.created_by;
+    delete patch.created_at;
+    patch.updated_by = adminEmail;
+    patch.updated_at = now;
+
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.SCHOLARSHIP, 'scholarship_id', scholarshipId, patch);
+  } else {
+    const row = buildV2ScholarshipSheetRow_(normalized);
+    row.scholarship_id = generateV2Id_(IROUP_V2_ID_PREFIXES.SCHOLARSHIP);
+    row.created_by = adminEmail;
+    row.updated_by = adminEmail;
+    row.created_at = now;
+    row.updated_at = now;
+
+    persisted = appendV2Row_(IROUP_V2_SHEETS.SCHOLARSHIP, row, {
+      idField: 'scholarship_id',
+      requiredFields: ['scholarship_id', 'title_th', 'institution_name', 'country_id', 'scholarship_type', 'open_date', 'close_date', 'status']
+    });
+  }
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      write_enabled: true,
+      mode: writeMode,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  const dto = mapV2AdminScholarshipDto_(persisted.data, context.data, false);
+  return adminResponseV2_(true, {
+    dry_run: false,
+    write_enabled: true,
+    mode: writeMode,
+    target_sheet: IROUP_V2_SHEETS.SCHOLARSHIP,
+    scholarship: dto,
+    persisted_scholarship: persisted.data,
+    actor: {
+      email: adminEmail,
+      role: actor.user.role || ''
+    },
+    relation_writes: {
+      files: [],
+      budgets: []
+    },
+    skipped_operations: [
+      'file_upload',
+      'image_upload',
+      'file_relation_write',
+      'budget_relation_write',
+      'delete'
+    ],
+    diagnostics: persisted.diagnostics || {}
+  }, 1, '');
+}
+
 function getV2EventWriteFeatureFlag_() {
   const property = 'IROUP_V2_EVENT_WRITE_ENABLED';
   const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
@@ -259,6 +364,16 @@ function getV2EventWriteFeatureFlag_() {
     enabled: value === 'TRUE',
     property: property,
     error: value === 'TRUE' ? '' : 'V2 event metadata writes are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
+  };
+}
+
+function getV2ScholarshipWriteFeatureFlag_() {
+  const property = 'IROUP_V2_SCHOLARSHIP_WRITE_ENABLED';
+  const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
+  return {
+    enabled: value === 'TRUE',
+    property: property,
+    error: value === 'TRUE' ? '' : 'V2 scholarship metadata writes are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
   };
 }
 
@@ -272,6 +387,21 @@ function authorizeV2EventWriteActor_(request) {
   const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
   if (allowed.indexOf(role) < 0) {
     return { success: false, user: null, error: 'V2 admin role is not allowed for event writes.' };
+  }
+
+  return { success: true, user: user, error: '' };
+}
+
+function authorizeV2ScholarshipWriteActor_(request) {
+  const user = request && request.user ? request.user : null;
+  if (!user || !user.email) {
+    return { success: false, user: null, error: 'V2 admin identity is required for scholarship writes.' };
+  }
+
+  const role = String(user.role || '').trim().toLowerCase();
+  const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
+  if (allowed.indexOf(role) < 0) {
+    return { success: false, user: null, error: 'V2 admin role is not allowed for scholarship writes.' };
   }
 
   return { success: true, user: user, error: '' };
@@ -296,6 +426,33 @@ function buildV2EventSheetRow_(normalized) {
     participant_count: toNumberV2_(data.participant_count),
     detail_th: cleanV2EventText_(data.detail_th),
     detail_en: cleanV2EventText_(data.detail_en),
+    link_url: cleanV2EventText_(data.link_url),
+    pin: isTruthyV2_(data.pin),
+    status: cleanV2EventText_(data.status || 'draft'),
+    public_visible: isTruthyV2_(data.public_visible),
+    is_deleted: false
+  };
+}
+
+function buildV2ScholarshipSheetRow_(normalized) {
+  const data = normalized || {};
+  return {
+    scholarship_id: cleanV2EventText_(data.scholarship_id),
+    title_th: cleanV2EventText_(data.title_th),
+    title_en: cleanV2EventText_(data.title_en),
+    institution_name: cleanV2EventText_(data.institution_name),
+    country_id: cleanV2EventText_(data.country_id),
+    scholarship_type: cleanV2EventText_(data.scholarship_type),
+    funding_type: cleanV2EventText_(data.funding_type),
+    target_group: cleanV2EventText_(data.target_group),
+    cover_summary: cleanV2EventText_(data.cover_summary),
+    coverage_th: cleanV2EventText_(data.coverage_th),
+    coverage_en: cleanV2EventText_(data.coverage_en),
+    publish_date: cleanV2EventText_(data.publish_date),
+    open_date: cleanV2EventText_(data.open_date),
+    close_date: cleanV2EventText_(data.close_date),
+    detail_url: cleanV2EventText_(data.detail_url),
+    apply_url: cleanV2EventText_(data.apply_url),
     link_url: cleanV2EventText_(data.link_url),
     pin: isTruthyV2_(data.pin),
     status: cleanV2EventText_(data.status || 'draft'),
@@ -366,10 +523,85 @@ function buildV2EventWritePreview_(request, ctx, mode) {
   };
 }
 
+function buildV2ScholarshipWritePreview_(request, ctx, mode) {
+  const payload = extractV2ScholarshipWritePayload_(request);
+  const normalized = normalizeV2ScholarshipWritePayload_(payload, ctx);
+  const errors = [];
+  const warnings = normalized.warnings || [];
+  const data = normalized.data || {};
+  const actionMode = String(mode || 'validate').trim();
+  const normalizedMode = actionMode.toLowerCase();
+
+  if (normalizedMode.indexOf('update') === 0 && !data.scholarship_id) {
+    errors.push({ field: 'scholarship_id', code: 'SCHOLARSHIP_ID_REQUIRED', message: 'scholarship_id is required for scholarship update.' });
+  }
+
+  ['title_th', 'institution_name', 'country_id', 'scholarship_type', 'open_date', 'close_date'].forEach(function (field) {
+    if (!data[field]) {
+      errors.push({ field: field, code: field.toUpperCase() + '_REQUIRED', message: field + ' is required.' });
+    }
+  });
+
+  if (data.close_date && data.open_date && data.close_date < data.open_date) {
+    errors.push({ field: 'close_date', code: 'CLOSE_BEFORE_OPEN', message: 'close_date must be the same as or after open_date.' });
+  }
+
+  if (data.status) {
+    const statusCheck = validateEnumV2_(data.status, IROUP_V2_ENUMS.status, 'status');
+    if (!statusCheck.success) errors.push({ field: 'status', code: statusCheck.code, message: statusCheck.error });
+  }
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'Scholarship metadata payload validation failed.' : '',
+    data: {
+      dry_run: true,
+      mode: actionMode,
+      target_sheet: IROUP_V2_SHEETS.SCHOLARSHIP,
+      write_enabled: false,
+      valid: errors.length === 0,
+      errors: errors,
+      warnings: warnings,
+      normalized_scholarship: data,
+      relation_writes: {
+        files: [],
+        budgets: []
+      },
+      blocked_operations: [
+        'sheet_write',
+        'file_upload',
+        'image_upload',
+        'file_relation_write',
+        'delete'
+      ]
+    }
+  };
+}
+
 function extractV2EventWritePayload_(request) {
   const params = request && request.params ? request.params : {};
   const body = request && request.body ? request.body : {};
   const candidate = body.payload || body.event || params.payload || params.event || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
+function extractV2ScholarshipWritePayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.scholarship || params.payload || params.scholarship || null;
 
   if (candidate && typeof candidate === 'object') {
     return candidate;
@@ -420,6 +652,42 @@ function normalizeV2EventWritePayload_(payload, ctx) {
     detail_th: cleanV2EventText_(source.detail_th || detail),
     detail_en: cleanV2EventText_(source.detail_en || ''),
     link_url: cleanV2EventText_(pickV2EventValue_(source, ['link_url', 'linkUrl', 'link', 'detail_url', 'detailUrl'])),
+    pin: isTruthyV2_(source.pin),
+    status: cleanV2EventText_(source.status || 'draft'),
+    public_visible: isTruthyV2_(source.public_visible),
+    is_deleted: false
+  };
+
+  return { data: normalized, warnings: warnings };
+}
+
+function normalizeV2ScholarshipWritePayload_(payload, ctx) {
+  const source = payload || {};
+  const warnings = [];
+  if (source.payload_parse_error) {
+    warnings.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  }
+
+  const country = resolveV2EventCountryRef_(source, ctx, warnings);
+  const normalized = {
+    scholarship_id: cleanV2EventText_(pickV2EventValue_(source, ['scholarship_id', 'id'])),
+    title_th: cleanV2EventText_(source.title_th || pickV2EventValue_(source, ['title', 'title_en'])),
+    title_en: cleanV2EventText_(source.title_en || ''),
+    institution_name: cleanV2EventText_(source.institution_name || ''),
+    country_id: country.country_id,
+    country_display: country.display,
+    scholarship_type: cleanV2EventText_(source.scholarship_type || ''),
+    funding_type: cleanV2EventText_(source.funding_type || ''),
+    target_group: cleanV2EventText_(source.target_group || ''),
+    cover_summary: cleanV2EventText_(source.cover_summary || ''),
+    coverage_th: cleanV2EventText_(source.coverage_th || ''),
+    coverage_en: cleanV2EventText_(source.coverage_en || ''),
+    publish_date: normalizeV2EventDate_(source.publish_date || ''),
+    open_date: normalizeV2EventDate_(source.open_date || ''),
+    close_date: normalizeV2EventDate_(source.close_date || ''),
+    detail_url: cleanV2EventText_(source.detail_url || ''),
+    apply_url: cleanV2EventText_(source.apply_url || ''),
+    link_url: cleanV2EventText_(pickV2EventValue_(source, ['link_url', 'linkUrl', 'link'])),
     pin: isTruthyV2_(source.pin),
     status: cleanV2EventText_(source.status || 'draft'),
     public_visible: isTruthyV2_(source.public_visible),

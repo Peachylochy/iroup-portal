@@ -968,3 +968,29 @@ Readiness conclusion:
 - EVENT type is not yet production-normalized because there is no V2 event-type master.
 - Production-quality V2 EVENT save activation should treat event type master-data work
   as a UX/data normalization task before broad adoption.
+
+### 12.11 V2-Native Form Pivot
+
+Decision: stop patching the legacy V1 scholarship/event modal for new V2 metadata
+requirements.
+
+Current direction:
+
+- Keep the existing V1 form and `round9Save()` path as the default runtime lane while
+  migration flags remain false.
+- Build V2-native EVENT and SCHOLARSHIP forms as a parallel module.
+- EVENT V2-native form uses required metadata fields: `title_th`, `event_type_id`,
+  `organizer_unit_id`, and `start_date`.
+- SCHOLARSHIP V2-native form uses required metadata fields: `title_th`,
+  `institution_name`, `country_id`, `scholarship_type`, `open_date`, and `close_date`.
+- V2-native dropdowns load from V2 master data: `v2.lookup.event_types`,
+  `v2.lookup.units`, and `v2.lookup.countries`.
+- Poster/banner/FILES remain deferred and must not be mixed into metadata activation.
+
+Safety:
+
+- `V2_EVENT_WRITE_UI_ENABLED` remains false in repository state.
+- V2-native save functions must not call `IROUP_V2.admin.*Create/Update()` unless the
+  write flag is explicitly enabled.
+- Legacy V1 scholarship/event save, upload, delete, FILES, BUDGET, and render paths
+  remain the rollback-safe default.

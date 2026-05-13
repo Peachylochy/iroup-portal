@@ -704,6 +704,66 @@ body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray
 </div>
 </div>
 </div>
+<div class="modal-overlay" id="v2NativeModal">
+<div class="modal">
+<div class="modal-type-tabs">
+<button class="type-tab active" id="v2NativeEventTab" onclick="switchV2NativeType('event')">V2 Event</button>
+<button class="type-tab" id="v2NativeScholarshipTab" onclick="switchV2NativeType('scholarship')">V2 Scholarship</button>
+</div>
+<div id="v2NativeEventForm">
+<div class="modal-title">V2 EVENT Metadata</div>
+<div class="form-grid">
+<div class="form-group form-full"><label>title_th *</label><input name="title_th" type="text"/></div>
+<div class="form-group form-full"><label>title_en</label><input name="title_en" type="text"/></div>
+<div class="form-group"><label>event_type_id *</label><select name="event_type_id"></select></div>
+<div class="form-group"><label>organizer_unit_id *</label><select name="organizer_unit_id"></select></div>
+<div class="form-group"><label>country_id</label><input list="v2CountryOptions" name="country_id" type="search"/></div>
+<div class="form-group"><label>start_date *</label><input name="start_date" type="date"/></div>
+<div class="form-group"><label>end_date</label><input name="end_date" type="date"/></div>
+<div class="form-group"><label>start_time</label><input name="start_time" type="time"/></div>
+<div class="form-group"><label>end_time</label><input name="end_time" type="time"/></div>
+<div class="form-group"><label>location</label><input name="location" type="text"/></div>
+<div class="form-group"><label>meeting_url</label><input name="meeting_url" type="url"/></div>
+<div class="form-group"><label>participant_count</label><input name="participant_count" type="number"/></div>
+<div class="form-group"><label>link_url</label><input name="link_url" type="url"/></div>
+<div class="form-group"><label>status</label><select name="status"><option value="draft">draft</option><option value="active">active</option><option value="cancelled">cancelled</option></select></div>
+<div class="form-group form-full"><label>detail_th</label><textarea name="detail_th"></textarea></div>
+<div class="form-group form-full"><label>detail_en</label><textarea name="detail_en"></textarea></div>
+<div class="form-group"><label>public_visible</label><div class="check-item"><input name="public_visible" type="checkbox"/><label>Public visible</label></div></div>
+<div class="form-group"><label>pin</label><div class="check-item"><input name="pin" type="checkbox"/><label>Pin</label></div></div>
+</div>
+</div>
+<div id="v2NativeScholarshipForm" style="display:none">
+<div class="modal-title">V2 SCHOLARSHIP Metadata</div>
+<div class="form-grid">
+<div class="form-group form-full"><label>title_th *</label><input name="title_th" type="text"/></div>
+<div class="form-group form-full"><label>title_en</label><input name="title_en" type="text"/></div>
+<div class="form-group"><label>institution_name *</label><input name="institution_name" type="text"/></div>
+<div class="form-group"><label>country_id *</label><input list="v2CountryOptions" name="country_id" type="search"/></div>
+<div class="form-group"><label>scholarship_type *</label><input name="scholarship_type" type="text"/></div>
+<div class="form-group"><label>funding_type</label><input name="funding_type" type="text"/></div>
+<div class="form-group"><label>target_group</label><input name="target_group" type="text"/></div>
+<div class="form-group"><label>publish_date</label><input name="publish_date" type="date"/></div>
+<div class="form-group"><label>open_date *</label><input name="open_date" type="date"/></div>
+<div class="form-group"><label>close_date *</label><input name="close_date" type="date"/></div>
+<div class="form-group"><label>detail_url</label><input name="detail_url" type="url"/></div>
+<div class="form-group"><label>apply_url</label><input name="apply_url" type="url"/></div>
+<div class="form-group"><label>link_url</label><input name="link_url" type="url"/></div>
+<div class="form-group"><label>status</label><select name="status"><option value="draft">draft</option><option value="active">active</option><option value="closed">closed</option></select></div>
+<div class="form-group form-full"><label>cover_summary</label><textarea name="cover_summary"></textarea></div>
+<div class="form-group form-full"><label>coverage_th</label><textarea name="coverage_th"></textarea></div>
+<div class="form-group form-full"><label>coverage_en</label><textarea name="coverage_en"></textarea></div>
+<div class="form-group"><label>public_visible</label><div class="check-item"><input name="public_visible" type="checkbox"/><label>Public visible</label></div></div>
+<div class="form-group"><label>pin</label><div class="check-item"><input name="pin" type="checkbox"/><label>Pin</label></div></div>
+</div>
+</div>
+<datalist id="v2CountryOptions"></datalist>
+<div class="modal-footer">
+<button class="modal-btn modal-cancel" onclick="closeV2NativeForm()">Cancel</button>
+<button class="modal-btn modal-save" onclick="saveV2NativeForm()">Save V2 Metadata</button>
+</div>
+</div>
+</div>
 <script>
 function openModal(type){
   switchModalType(type);
@@ -896,6 +956,142 @@ async function refreshRound9EventTypeOptions(selectedValue){
     populateRound9EventTypeSelect(ROUND9_EVENT_TYPE_FALLBACK_OPTIONS, selectedValue);
   }
 }
+function getV2NativeResponseRows(response, key){
+  const data=response && response.data !== undefined ? response.data : response;
+  if(Array.isArray(data)) return data;
+  if(Array.isArray(data?.items)) return data.items;
+  if(Array.isArray(data?.rows)) return data.rows;
+  if(key && Array.isArray(data?.[key])) return data[key];
+  return [];
+}
+function setV2NativeSelectOptions(select, rows, valueKey, labelKeys){
+  if(!select) return;
+  const previous=select.value;
+  select.innerHTML='<option value=""></option>';
+  rows.forEach(row=>{
+    const value=String(row?.[valueKey] || '').trim();
+    if(!value) return;
+    const label=(labelKeys || []).map(key=>String(row?.[key] || '').trim()).find(Boolean) || value;
+    const option=document.createElement('option');
+    option.value=value;
+    option.textContent=label === value ? value : `${label} (${value})`;
+    select.appendChild(option);
+  });
+  if(previous && Array.from(select.options).some(option=>option.value===previous)) select.value=previous;
+}
+function setV2NativeCountryOptions(rows){
+  const list=document.getElementById('v2CountryOptions');
+  if(!list) return;
+  list.innerHTML='';
+  rows.forEach(row=>{
+    const value=String(row?.country_id || '').trim();
+    if(!value) return;
+    const label=String(row?.country_name_th || row?.country_name_en || row?.label || value).trim();
+    const option=document.createElement('option');
+    option.value=value;
+    option.label=label === value ? value : `${label} (${value})`;
+    list.appendChild(option);
+  });
+}
+async function loadV2NativeMasterData(){
+  if(!window.IROUP_V2 || !IROUP_V2.lookup) return;
+  const eventForm=document.getElementById('v2NativeEventForm');
+  const eventTypes=typeof IROUP_V2.lookup.eventTypes === 'function'
+    ? IROUP_V2.lookup.eventTypes()
+    : IROUP_V2.request('v2.lookup.event_types');
+  const units=IROUP_V2.lookup.units();
+  const countries=IROUP_V2.lookup.countries();
+  try{
+    const results=await Promise.allSettled([eventTypes, units, countries]);
+    const eventTypeRows=results[0].status === 'fulfilled' ? getV2NativeResponseRows(results[0].value, 'event_types') : [];
+    const unitRows=results[1].status === 'fulfilled' ? getV2NativeResponseRows(results[1].value, 'units') : [];
+    const countryRows=results[2].status === 'fulfilled' ? getV2NativeResponseRows(results[2].value, 'countries') : [];
+    setV2NativeSelectOptions(eventForm?.querySelector('select[name="event_type_id"]'), eventTypeRows, 'event_type_id', ['name_th','name_en']);
+    setV2NativeSelectOptions(eventForm?.querySelector('select[name="organizer_unit_id"]'), unitRows, 'unit_id', ['unit_name_th','unit_name_en','label']);
+    setV2NativeCountryOptions(countryRows);
+  }catch(err){
+    console.warn('[V2 Native Form] master lookup unavailable; V2 form remains inactive.', err);
+  }
+}
+function switchV2NativeType(type){
+  const isEvent=type !== 'scholarship';
+  const modal=document.getElementById('v2NativeModal');
+  if(modal) modal.dataset.type=isEvent ? 'event' : 'scholarship';
+  document.getElementById('v2NativeEventForm').style.display=isEvent?'block':'none';
+  document.getElementById('v2NativeScholarshipForm').style.display=isEvent?'none':'block';
+  document.getElementById('v2NativeEventTab').classList.toggle('active',isEvent);
+  document.getElementById('v2NativeScholarshipTab').classList.toggle('active',!isEvent);
+}
+function openV2NativeForm(type, id){
+  const modal=document.getElementById('v2NativeModal');
+  if(!modal) return;
+  modal.classList.add('show');
+  modal.dataset.recordId=id || '';
+  switchV2NativeType(type || 'event');
+  loadV2NativeMasterData();
+}
+function closeV2NativeForm(){
+  const modal=document.getElementById('v2NativeModal');
+  if(modal) modal.classList.remove('show');
+}
+function getV2NativeFieldMap(form){
+  const payload={};
+  qsa(form,'input,textarea,select').forEach(el=>{
+    if(!el.name) return;
+    payload[el.name]=el.type === 'checkbox' ? !!el.checked : String(el.value || '').trim();
+  });
+  return payload;
+}
+function pruneV2NativePayload(payload){
+  const result={};
+  Object.keys(payload || {}).forEach(key=>{
+    const value=payload[key];
+    if(value === '' || value === null || typeof value === 'undefined') return;
+    result[key]=key === 'participant_count' ? Number(value) : value;
+  });
+  return result;
+}
+function validateV2NativeRequired(payload, requiredFields){
+  return (requiredFields || []).filter(field=>String(payload?.[field] || '').trim() === '');
+}
+async function saveV2NativeForm(){
+  const modal=document.getElementById('v2NativeModal');
+  const type=modal?.dataset.type || 'event';
+  const isEvent=type === 'event';
+  const form=document.getElementById(isEvent ? 'v2NativeEventForm' : 'v2NativeScholarshipForm');
+  const payload=pruneV2NativePayload(getV2NativeFieldMap(form));
+  const recordId=String(modal?.dataset.recordId || '').trim();
+  const required=isEvent
+    ? ['title_th','event_type_id','organizer_unit_id','start_date']
+    : ['title_th','institution_name','country_id','scholarship_type','open_date','close_date'];
+  const missing=validateV2NativeRequired(payload, required);
+  if(missing.length){
+    console.warn('[V2 Native Form] required fields missing', { type, missing, payload });
+    return null;
+  }
+  if(!V2_EVENT_WRITE_UI_ENABLED){
+    console.log('[V2 Native Form] V2 write route disabled; V1 remains default.', { type, payload });
+    return null;
+  }
+  if(!window.IROUP_V2 || !IROUP_V2.admin){
+    console.warn('[V2 Native Form] IROUP_V2 admin adapter unavailable.');
+    return null;
+  }
+  if(recordId) payload[isEvent ? 'event_id' : 'scholarship_id']=recordId;
+  const createFn=isEvent ? IROUP_V2.admin.eventCreate : IROUP_V2.admin.scholarshipCreate;
+  const updateFn=isEvent ? IROUP_V2.admin.eventUpdate : IROUP_V2.admin.scholarshipUpdate;
+  if(typeof createFn !== 'function' || typeof updateFn !== 'function'){
+    console.warn('[V2 Native Form] V2 admin write wrapper unavailable.', { type });
+    return null;
+  }
+  const response=recordId ? await updateFn(payload) : await createFn(payload);
+  console.info('[V2 Native Form] save result', { type, mode:recordId ? 'update' : 'create', payload, response });
+  return response;
+}
+window.openV2NativeForm=openV2NativeForm;
+window.closeV2NativeForm=closeV2NativeForm;
+window.switchV2NativeType=switchV2NativeType;
+window.saveV2NativeForm=saveV2NativeForm;
 function setAssetField(form, name, value){
   const input=form.querySelector(`input[name="${name}"]`);
   setInputValue(input,value);

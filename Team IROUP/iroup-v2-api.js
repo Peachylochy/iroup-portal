@@ -292,6 +292,14 @@
     });
   }
 
+  function adminScholarshipWrite_(action, payload) {
+    return request(action, { payload: payload || {} }, {
+      auth: true,
+      method: 'POST',
+      timeoutMs: ADMIN_EVENT_WRITE_TIMEOUT_MS
+    });
+  }
+
   var IROUP_V2 = {
     API_VERSION: API_VERSION,
     get SCRIPT_URL() {
@@ -371,6 +379,12 @@
       },
       scholarshipDetail: function (scholarshipId) {
         return request('v2.admin.scholarship.detail', withId_('scholarship_id', scholarshipId), { auth: true });
+      },
+      scholarshipCreate: function (payload) {
+        return adminScholarshipWrite_('v2.admin.scholarship.create', payload);
+      },
+      scholarshipUpdate: function (payload) {
+        return adminScholarshipWrite_('v2.admin.scholarship.update', payload);
       },
       eventList: function (params) {
         return request('v2.admin.event.list', params || {}, { auth: true });

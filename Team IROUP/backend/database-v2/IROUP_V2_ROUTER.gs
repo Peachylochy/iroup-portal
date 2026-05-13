@@ -258,6 +258,18 @@ function getV2RouteDispatch_() {
         return getV2AdminScholarship_(getV2RequestId_(request, 'scholarship_id'));
       }
     },
+    'v2.admin.scholarship.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminScholarship_(request);
+      }
+    },
+    'v2.admin.scholarship.update': {
+      access: 'admin',
+      handler: function (request) {
+        return updateV2AdminScholarship_(request);
+      }
+    },
     'v2.admin.event.list': {
       access: 'admin',
       handler: function (request) {
