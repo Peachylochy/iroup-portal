@@ -715,3 +715,22 @@ Required gates before EVENT render/source activation:
 - Rollback readiness: `V2_EVENT_WRITE_UI_ENABLED` can be restored to `false`, V1
   fallback remains available, and scholarship/upload/delete/FILES/BUDGET flows remain
   outside the activation.
+
+### 12.7 Local V2 Render-Source Validation Completed
+
+Status: completed locally; no production activation.
+
+- `V2_EVENT_RENDER_UI_ENABLED` was temporarily enabled during local browser validation.
+- Adapted V2 EVENT rows rendered successfully through the existing
+  `round9RenderEvents()` path.
+- The selected-source search/render pipeline remained stable.
+- The fallback path to legacy V1 rows was confirmed.
+- `V2_EVENT_RENDER_UI_ENABLED` was reverted to `false` after testing.
+- `V2_EVENT_WRITE_UI_ENABLED` remains `false`.
+- No save/upload/delete/FILES/BUDGET behavior was changed.
+
+Next phase:
+
+- Controlled production-safe activation planning for the V2 EVENT render source.
+- Keep V2 as the EVENT source of truth for the new workflow.
+- Keep V1 as fallback/runtime comparison only.

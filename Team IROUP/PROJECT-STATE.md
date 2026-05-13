@@ -1,10 +1,41 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-13 | Session: V2 EVENT Source-of-Truth Alignment**
+**Last updated: 2026-05-13 | Session: V2 EVENT Render Pilot Validation**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2 EVENT Render Pilot Validation
+
+### Session: 2026-05-13 - Local-Only Adapted V2 EVENT Render Activation
+
+**Phase goal:** Validate that adapted V2 EVENT rows can pass through the existing
+`round9RenderEvents()` card/search pipeline when a page-local render flag is
+temporarily enabled. This was a local-only validation pass, not production activation.
+
+Validation result:
+
+- Temporarily enabled `V2_EVENT_RENDER_UI_ENABLED` locally for browser validation.
+- Adapted V2 EVENT rows rendered successfully through the existing EVENT render path.
+- The search/render pipeline remained stable while using the selected render source.
+- The safe fallback path to legacy V1 rows was confirmed.
+- No production activation was performed.
+
+Rollback and safety confirmation:
+
+- `V2_EVENT_RENDER_UI_ENABLED` was reverted to `false` after testing.
+- `V2_EVENT_WRITE_UI_ENABLED` remains `false`.
+- V2 write activation remains off.
+- Scholarship, upload, delete, FILES, and BUDGET flows remain untouched.
+- `IROUP.SCRIPT_URL` remains unchanged.
+
+Next recommended phase:
+
+- Controlled production-safe V2 EVENT render activation planning, with V2 as the
+  source of truth and V1 retained as fallback/runtime comparison only.
 
 ---
 
