@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mobility — iROUP</title>
-<link rel="stylesheet" href="../iroup-theme.css">
+<link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -26,7 +26,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-
 </head>
 <body>
 <nav>
-  <a class="nav-logo" href="public-landing.html"><img src="iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'"></a>
+  <a class="nav-logo" href="public-landing.html"><img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'"></a>
   <div class="nav-links">
     <a href="public-mou.html" class="nav-link">🤝 MOU</a>
     <a href="public-scholar.html" class="nav-link">🎓 ทุนการศึกษา</a>
@@ -95,9 +95,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-
 </main>
 <footer>© 2569 International Relations Office · University of Phayao</footer>
 <div class="modal-backdrop" id="detailModal"><div class="modal"><div class="modal-head"><div class="modal-title" id="modalTitle">รายละเอียด</div><button class="modal-close" onclick="closeDetail()">✕</button></div><div class="modal-body" id="modalBody"></div></div></div>
-<script src="../iroup-config.js"></script>
-<script src="../iroup-v2-endpoint.js"></script>
-<script src="../iroup-v2-api.js"></script>
+<script src="../js/iroup-config.js"></script>
+<script src="../js/iroup-v2-endpoint.js"></script>
+<script src="../js/iroup-v2-api.js"></script>
 <script>
 const FLAGS={'China':'🇨🇳','Japan':'🇯🇵','South Korea':'🇰🇷','Korea':'🇰🇷','Germany':'🇩🇪','Australia':'🇦🇺','Taiwan':'🇹🇼','USA':'🇺🇸','United States':'🇺🇸','United Kingdom':'🇬🇧','France':'🇫🇷','Vietnam':'🇻🇳','Myanmar':'🇲🇲','Indonesia':'🇮🇩','Malaysia':'🇲🇾','Philippines':'🇵🇭','Singapore':'🇸🇬','India':'🇮🇳','Thailand':'🇹🇭','Laos':'🇱🇦','Cambodia':'🇰🇭','Hong Kong':'🇭🇰'};
 const countryAlias={'china':['china','cn','จีน'],'japan':['japan','jp','ญี่ปุ่น'],'south korea':['south korea','republic of korea','korea','kr','เกาหลี'],'united states of america':['usa','us','united states','america','สหรัฐ'],'australia':['australia','au','ออสเตรเลีย'],'france':['france','fr','ฝรั่งเศส'],'germany':['germany','de','เยอรมนี'],'thailand':['thailand','th','ไทย'],'malaysia':['malaysia','my','มาเลเซีย'],'indonesia':['indonesia','id','อินโดนีเซีย'],'singapore':['singapore','sg','สิงคโปร์'],'india':['india','in','อินเดีย'],'vietnam':['vietnam','vn','เวียดนาม'],'laos':['laos','lao','ลาว'],'cambodia':['cambodia','kh','กัมพูชา'],'myanmar':['myanmar','mm','พม่า']};
