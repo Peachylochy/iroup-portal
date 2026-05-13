@@ -251,7 +251,7 @@ Recommended phase:
 
 - After read-only public MOU migration and after V2 file relation contract is ready.
 
-### `scholarship-events.html`
+### `events.html`
 
 Current API usage:
 

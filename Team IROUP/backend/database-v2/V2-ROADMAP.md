@@ -513,7 +513,7 @@ Admin/dashboard audit:
 - Recommended first admin-side migration is `dashboard.html` as a read-only summary proof, followed by `report.html` as a separate read/report proof.
 - CRUD migration should wait until V2 create/update/delete contracts are designed and tested per module.
 - Upload migration should wait until V2 file upload plus normalized `FILES` relation workflow is locked.
-- `mou.html`, `scholarship-events.html`, `travel.html`, and `mobility.html` should begin with read-list/detail-only coexistence; keep V1 writes/uploads during the transition.
+- `mou.html`, `events.html`, `travel.html`, and `mobility.html` should begin with read-list/detail-only coexistence; keep V1 writes/uploads during the transition.
 
 Dashboard readiness pilot:
 
@@ -794,7 +794,7 @@ Planning conclusions:
 Recommended first future write pilot:
 
 ```text
-scholarship-events.html
+events.html
 event metadata-only create/update
 ```
 
@@ -849,18 +849,18 @@ Blocked in this phase:
 Next gate:
 
 - live smoke the dry-run routes with a valid admin token
-- review normalized preview shape against `scholarship-events.html` event form fields
+- review normalized preview shape against `events.html` event form fields
 - only then consider adapter wrappers and a frontend validation sidecar
 
 ## Event Draft Frontend Validation-Only Pilot
 
 Date: 2026-05-11
 
-Status: implemented for `scholarship-events.html` as a validation-only helper.
+Status: implemented for `events.html` as a validation-only helper.
 
 Design:
 
-- loads the live V2 endpoint config and V2 adapter on `scholarship-events.html`
+- loads the live V2 endpoint config and V2 adapter on `events.html`
 - keeps the existing V1 `round9Save()` path unchanged
 - adds `buildV2EventDraftPayload(formData)` for EVENT metadata mapping
 - adds manual `previewV2EventDraft(payload)` dry-run preview

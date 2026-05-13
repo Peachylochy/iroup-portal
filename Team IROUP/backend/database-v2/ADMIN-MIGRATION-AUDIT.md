@@ -8,7 +8,7 @@ Scope:
 - `Team IROUP/report.html`
 - `Team IROUP/mobility.html`
 - `Team IROUP/mou.html`
-- `Team IROUP/scholarship-events.html`
+- `Team IROUP/events.html`
 - `Team IROUP/travel.html`
 
 This is an audit/planning pass only. No operational page behavior, frontend architecture, backend route, deployment, or push action was changed.
@@ -33,7 +33,7 @@ Recommended sequence:
 | `dashboard.html` | Read-only aggregate dashboard | `IROUP.getReport(year)` | No | No | High response-shape dependency, no external charts | Lowest |
 | `report.html` | Read-only report/export | `IROUP.getReport()`, fallback `IROUP.getAll(...)` for six sheets | No | No | Chart.js, CSV export, cached raw rows | Low-medium |
 | `mou.html` | Mixed read/write operational page | `IROUP.getAll(IROUP.SHEETS.MOU)` | `add/edit/delete` | `IROUP.uploadFile` | Chart.js + D3/topojson map + country aggregation | High |
-| `scholarship-events.html` | Mixed read/write, upload-heavy | `IROUP.getAll(SCHOLAR)`, `IROUP.getAll(EVENT)` | `add/edit/delete` | `IROUP.uploadImage`, `IROUP.uploadFile` | KPI/card rendering, date/status logic | High |
+| `events.html` | Mixed read/write, upload-heavy | `IROUP.getAll(SCHOLAR)`, `IROUP.getAll(EVENT)` | `add/edit/delete` | `IROUP.uploadImage`, `IROUP.uploadFile` | KPI/card rendering, date/status logic | High |
 | `travel.html` | Mixed read/write, staff-coupled | `IROUP.getAll(TRAVEL)`, `IROUP.getAll(STAFF)`, `IROUP.getAll('COUNTRY')` | travel add/edit/delete, quick-add staff | `IROUP.uploadFile` | KPIs, country filters, CSV export | Very high |
 | `mobility.html` | High-risk operational page | repeated `IROUP.getAll(INBOUND/OUTBOUND)`, `IROUP.searchStaff` | add/edit/delete inbound/outbound | No direct upload in current audit | Chart.js, duplicated workflow blocks, staff search/autofill, private fields | Highest |
 
@@ -129,7 +129,7 @@ Recommendation:
 - Good candidate for a read-list-only pilot after dashboard/report decisions.
 - Keep add/edit/delete/upload V1-backed until V2 MOU write and file relation contracts exist.
 
-### `scholarship-events.html`
+### `events.html`
 
 Current flow:
 
@@ -238,7 +238,7 @@ Recommendation:
 1. `dashboard.html` read-only V2 summary proof, if V2 summary can satisfy existing panels.
 2. `report.html` summary-only or per-module list-backed read proof, with raw export explicitly left V1-backed if needed.
 3. `mou.html` read-list-only pilot; keep write/upload V1.
-4. `scholarship-events.html` read-list-only, split scholarship and event internally; keep write/upload V1.
+4. `events.html` read-list-only, split scholarship and event internally; keep write/upload V1.
 5. `travel.html` read-list-only; keep staff/country lookup, quick-add, writes, and uploads V1.
 6. `mobility.html` read-list/detail-only after other reads stabilize; keep staff search and writes V1.
 7. Add V2 write routes one module at a time.

@@ -28,7 +28,7 @@ Internal-only pages behind login. All use `iroup-config.js` and `iroup-sidebar.j
 | `mobility.html` | 188 KB | 16.7 KB | 24.5 KB | Chart.js | mini (64px) |
 | `mou.html` | 192 KB | 17.8 KB | 33.4 KB | Chart.js + D3 + TopoJSON | mini (64px) |
 | `report.html` | 28 KB | 5.1 KB | 14.4 KB | Chart.js | `iroup-sidebar.js` (full) |
-| `scholarship-events.html` | 183 KB | 21.6 KB | 18.4 KB | — | mini (64px) |
+| `events.html` | 183 KB | 21.6 KB | 18.4 KB | — | mini (64px) |
 | `travel.html` | 31 KB | 6.9 KB | 12.2 KB | — | `iroup-sidebar.js` (full) |
 
 ---
@@ -170,7 +170,7 @@ These pages have the smallest inline `<style>` blocks and fewest custom override
 | `mobility.html` | 16.7 KB | Large Chart.js styling — check chart colors |
 | `mou.html` | 17.8 KB | D3 map + Chart — most complex private page |
 | `public-landing.html` | 19.1 KB | 305 KB total — needs separate audit first |
-| `scholarship-events.html` | 21.6 KB | Largest inline CSS block |
+| `events.html` | 21.6 KB | Largest inline CSS block |
 
 ---
 

@@ -715,7 +715,7 @@ Scholarship & Events Stabilization
 
 During migration verification, a render crash was identified in:
 
-scholarship-events.html
+events.html
 Root Cause
 
 The page referenced:
@@ -745,7 +745,7 @@ dashboard.html
 mou.html
 mobility.html
 travel.html
-scholarship-events.html
+events.html
 report.html
 
 Verification included:
@@ -979,7 +979,7 @@ Implementation notes:
 - Updated shared `iroup-theme.css` light text tokens and placeholder coverage
 - Reinforced shared light-mode table body readability and gray/expired badge labels
 - Updated `travel.html`, `dashboard.html`, and `report.html` inline muted tokens and form/table readability rules
-- Updated `mobility.html` and `scholarship-events.html` page-local gray scales and placeholder/helper text contrast
+- Updated `mobility.html` and `events.html` page-local gray scales and placeholder/helper text contrast
 - Preserved existing layouts, spacing, cards, dashboards, and page structure
 
 Constraints maintained:
@@ -1817,14 +1817,14 @@ Scope
 - `Team IROUP/report.html`
 - `Team IROUP/mobility.html`
 - `Team IROUP/mou.html`
-- `Team IROUP/scholarship-events.html`
+- `Team IROUP/events.html`
 - `Team IROUP/travel.html`
 
 Audit notes
 
 - `dashboard.html` is the safest first candidate because it is read-only and currently depends on one V1 aggregate call: `IROUP.getReport(year)`.
 - `report.html` should migrate separately because it combines aggregate loading, V1 multi-sheet fallback reads, client-side row normalization, Chart.js, cache, and CSV export.
-- `mou.html`, `scholarship-events.html`, `travel.html`, and `mobility.html` are mixed read/write operational pages.
+- `mou.html`, `events.html`, `travel.html`, and `mobility.html` are mixed read/write operational pages.
 - Upload workflows remain V1-only through `IROUP.uploadFile()` and `IROUP.uploadImage()`.
 - V2 admin list/detail routes exist, but create/update/delete, upload/file relation, person/staff lookup, quick-add staff, and budget relation routes are not ready.
 - Admin token propagation exists in both V1 and V2 clients, but mixed pages need a readiness check before enabling V2 admin reads.
@@ -2612,7 +2612,7 @@ Created
 Plan coverage
 
 - current V1 write surface map
-- page risk matrix for `mou.html`, `mobility.html`, `travel.html`, and `scholarship-events.html`
+- page risk matrix for `mou.html`, `mobility.html`, `travel.html`, and `events.html`
 - DTO normalization strategy
 - upload isolation plan
 - auth direction for future V2 writes
@@ -2621,7 +2621,7 @@ Plan coverage
 
 Recommended first future write pilot
 
-- `scholarship-events.html`
+- `events.html`
 - event metadata-only create/update
 - no delete in the first pass
 - no upload migration in the first pass
@@ -2643,7 +2643,7 @@ Still not doing
 
 Summary
 
-Prepared the backend contract for the first controlled V2 write pilot target, `scholarship-events.html` event metadata-only create/update. This pass added validation and dry-run routes only; it did not add real writes or frontend wiring.
+Prepared the backend contract for the first controlled V2 write pilot target, `events.html` event metadata-only create/update. This pass added validation and dry-run routes only; it did not add real writes or frontend wiring.
 
 Changed
 
@@ -2685,11 +2685,11 @@ Still not doing
 
 Summary
 
-Added a non-invasive frontend validation helper to `scholarship-events.html` for EVENT metadata dry-run preview. Existing V1 save/delete/upload flows remain unchanged.
+Added a non-invasive frontend validation helper to `events.html` for EVENT metadata dry-run preview. Existing V1 save/delete/upload flows remain unchanged.
 
 Changed
 
-- `Team IROUP/scholarship-events.html`
+- `Team IROUP/events.html`
 - `Team IROUP/PROJECT-STATE.md`
 - `Team IROUP/backend/database-v2/V2-ROADMAP.md`
 - `Team IROUP/development_journal_r_2_r_foundation_iroup.md`
@@ -2852,14 +2852,14 @@ Context:
 The V2 isolated backend write routes (`v2.admin.event.create` / `v2.admin.event.update`)
 were confirmed working in the previous session via direct backend smoke test.
 This session performed the first controlled browser UI activation: temporarily enabling
-the page-local `V2_EVENT_WRITE_UI_ENABLED` flag in `scholarship-events.html` to
+the page-local `V2_EVENT_WRITE_UI_ENABLED` flag in `events.html` to
 exercise the full UI-to-V2-backend path, then rolling it back.
 
 What happened:
 
 - `V2_EVENT_WRITE_UI_ENABLED` was temporarily changed from `false` to `true` in
-  `scholarship-events.html` for a local browser-only test. Not committed, not pushed.
-- Opened `scholarship-events.html` in the browser and used the EVENT create modal.
+  `events.html` for a local browser-only test. Not committed, not pushed.
+- Opened `events.html` in the browser and used the EVENT create modal.
 - First create attempt failed correctly — the V2 backend validator rejected the payload
   because required fields (`title`, `start_date`) were missing from the initial submission.
   This confirmed the backend validation is enforced at the UI path, not just the API level.

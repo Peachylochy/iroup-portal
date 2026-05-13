@@ -95,7 +95,8 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-
       <a class="nav-btn" href="mou.html"><span class="nav-icon">🤝</span>MOU</a>
       <a class="nav-btn" href="mobility.html"><span class="nav-icon">🌏</span>Mobility</a>
       <a class="nav-btn" href="travel.html"><span class="nav-icon">✈️</span>การเดินทาง</a>
-      <a class="nav-btn" href="scholarship-events.html"><span class="nav-icon">🎓</span>ทุน / กิจกรรม</a>
+      <a class="nav-btn" href="scholarship.html"><span class="nav-icon">🎓</span>ทุนการศึกษา</a>
+      <a class="nav-btn" href="events.html"><span class="nav-icon">📅</span>กิจกรรม</a>
       <a class="nav-btn" href="report.html"><span class="nav-icon">📤</span>รายงาน & Export</a>
     </nav>
     <div class="userbox">
@@ -500,11 +501,11 @@ function render(){
 
     <div class="layout-main">
       <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">🎓 ทุนที่เปิดรับ / ใกล้ปิดรับ</div><div class="panel-sub">เรียงตามวันปิดรับ</div></div><a class="btn" href="scholarship-events.html">จัดการทุน</a></div>
+        <div class="panel-head"><div><div class="panel-title">🎓 ทุนที่เปิดรับ / ใกล้ปิดรับ</div><div class="panel-sub">เรียงตามวันปิดรับ</div></div><a class="btn" href="scholarship.html">จัดการทุน</a></div>
         <div class="table-wrap">${scholarTable(data.scholar)}</div>
       </div>
       <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">📅 กิจกรรมใกล้ถึง</div><div class="panel-sub">ใช้ติดตามงานระยะสั้น</div></div><a class="btn" href="scholarship-events.html">จัดการกิจกรรม</a></div>
+        <div class="panel-head"><div><div class="panel-title">📅 กิจกรรมใกล้ถึง</div><div class="panel-sub">ใช้ติดตามงานระยะสั้น</div></div><a class="btn" href="events.html">จัดการกิจกรรม</a></div>
         <div class="table-wrap">${eventTable(data.event)}</div>
       </div>
     </div>

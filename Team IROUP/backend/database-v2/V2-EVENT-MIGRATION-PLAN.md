@@ -19,7 +19,7 @@ Source-of-truth direction:
 
 ## 1. Current V1 EVENT Lifecycle Audit
 
-All current production EVENT operations in `scholarship-events.html`.
+All current production EVENT operations in `events.html`.
 
 ### 1.1 Data Load (READ)
 
@@ -342,7 +342,7 @@ Pre-conditions:
 - [ ] Admin login verified (Google token auth working)
 
 Tasks:
-- [ ] Set `V2_EVENT_WRITE_UI_ENABLED = true` in `scholarship-events.html`
+- [ ] Set `V2_EVENT_WRITE_UI_ENABLED = true` in `events.html`
 - [ ] Activate Phase D simultaneously (see below)
 - [ ] Test EVENT create: fill all required fields, save, verify record appears in V2 list
 - [ ] Test EVENT update: open existing event, modify fields, save, verify V2 list reflects changes
@@ -559,7 +559,7 @@ No runtime files are modified by this planning document.
 
 Status: planning only. No runtime behavior changes.
 
-This audit prepares `scholarship-events.html` for future V1/V2 EVENT
+This audit prepares `events.html` for future V1/V2 EVENT
 co-activation without switching the render source yet.
 
 ### 12.1 Current EVENT Rendering Lifecycle
@@ -875,7 +875,7 @@ Status: readiness audit only. No runtime refactor.
 
 Current frontend state:
 
-- `scholarship-events.html` uses a hardcoded EVENT type dropdown in the EVENT modal.
+- `events.html` uses a hardcoded EVENT type dropdown in the EVENT modal.
 - The current hardcoded values are:
   - `✈️ การเดินทาง`
   - `🌏 Inbound`

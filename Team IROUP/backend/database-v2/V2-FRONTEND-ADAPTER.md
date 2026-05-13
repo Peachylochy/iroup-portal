@@ -177,13 +177,13 @@ Event write wrapper notes:
 - `eventCreate(payload)` and `eventUpdate(payload)` are adapter surface only at this stage. They are not wired to any frontend save button.
 - `eventUpdate(payload)` callers must hydrate the full required event payload before calling the wrapper. The backend update route validates the incoming payload as a complete event shape and does not merge with the existing row first.
 
-`scholarship-events.html` hydration groundwork:
+`events.html` hydration groundwork:
 
 - The page now exposes isolated EVENT metadata helpers for console/manual dry-run preparation only: `buildV2EventDraftPayload()`, `buildHydratedV2EventUpdatePayload()`, and `buildV2EventDryRunPayload()`.
 - Update hydration merges the existing event row with the current form payload, with form values taking precedence, before calling `IROUP_V2.admin.eventUpdateDryRun()`.
 - The production save path remains `round9Save()` through V1 `IROUP.add()` / `IROUP.edit()`. Real V2 `eventCreate()` / `eventUpdate()` wrappers remain unused by the UI.
 
-`scholarship-events.html` disabled EVENT save pilot branch:
+`events.html` disabled EVENT save pilot branch:
 
 - A page-local `V2_EVENT_WRITE_UI_ENABLED` flag exists and is set to `false` by default.
 - When the flag is false, `round9Save()` continues through the existing V1 `IROUP.add()` / `IROUP.edit()` save path.

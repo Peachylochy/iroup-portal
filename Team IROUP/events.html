@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Events — iROUP V2</title>
+<link rel="stylesheet" href="css/iroup-theme.css">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="js/iroup-config.js"></script>
+<script src="js/iroup-v2-endpoint.js"></script>
+<script src="js/iroup-v2-api.js"></script>
+<script src="js/iroup-utils.js"></script>
+<style>
+*{box-sizing:border-box}
+:root{--blue:#1A6DB5;--sky:#4BBDE8;--navy:#0F2D5A;--dark:#071828;--green:#5BAD3E;--gold:#F5A623;--red:#D63B32;--purple:#7C3AED;--teal:#0D9488;--bg:#F5F8FC;--card:#fff;--line:#DCE7F2;--text:#10233f;--muted:#52647a;--soft:#E8F4FD;--shadow:0 9px 30px rgba(15,45,90,.12);--radius:18px}
+body{margin:0;font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select,textarea{font:inherit}
+.app{min-height:100vh}
+.sidebar{width:250px;min-width:250px;height:100vh;background:#fff;border-right:1px solid #E6EDF6;position:fixed;left:0;top:0;z-index:20;display:flex;flex-direction:column}
+.brand{height:76px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid #E6EDF6}
+.brand img{width:68px;height:auto;object-fit:contain}
+.brand-title{font-size:12px;color:#66758a;line-height:1.25}.brand-title b{color:var(--navy);font-weight:900}
+.nav{padding:16px 12px;overflow:auto;flex:1}.nav-section{font-size:11px;font-weight:800;color:#a0adbc;text-transform:uppercase;margin:18px 12px 8px}
+.nav-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;color:#26364e;text-decoration:none;font-weight:800;font-size:14px;margin-bottom:4px}
+.nav-link:hover{background:#F1F7FD;color:var(--blue)}.nav-link.active{background:var(--soft);color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+.nav-icon{font-size:20px;width:24px;text-align:center}.userbox{margin-top:auto;padding:16px;border-top:1px solid #E6EDF6;display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--blue));display:grid;place-items:center;color:#fff;font-weight:900}
+.user-name{font-size:12px;font-weight:900}.user-sub{font-size:11px;color:#66758a}
+.main{margin-left:250px;min-height:100vh;padding:24px}
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:18px}.title{font-size:28px;font-weight:900;color:var(--navy);line-height:1.1}.subtitle{font-size:13px;color:var(--muted);margin-top:4px}.spacer{flex:1}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;min-height:42px}
+.btn:hover{border-color:#BBD7EF;box-shadow:0 6px 16px rgba(15,45,90,.08)}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{background:#fff;color:var(--red);border-color:#F5C4C0}.btn.ghost{background:transparent}
+.lang-toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px}.lang-toggle button{border:0;background:transparent;border-radius:9px;padding:7px 10px;font-weight:900;cursor:pointer;color:var(--muted)}.lang-toggle button.active{background:var(--blue);color:#fff}
+.toolbar{display:grid;grid-template-columns:1.3fr .8fr .8fr .6fr auto;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:16px}
+.input,.select,.textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;color:var(--text);outline:none}.textarea{min-height:98px;resize:vertical;font-family:'Sarabun',sans-serif}.input:focus,.select:focus,.textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,109,181,.12)}
+.notice{display:none;margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid #BBD7EF;background:#F1F8FE;color:#174B7A;font-weight:700}.notice.error{background:#FFF5F4;border-color:#F5C4C0;color:#A62C25}.notice.ok{background:#F4FBF2;border-color:#C7E8BC;color:#356D27}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.event-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(15,45,90,.06);display:flex;flex-direction:column;gap:12px;min-height:230px}
+.card-head{display:flex;gap:12px;align-items:flex-start}.type-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--soft);color:var(--blue);font-size:22px;flex:0 0 42px}.card-title{font-weight:900;line-height:1.35;font-size:16px}.card-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meta-item{font-size:12px;color:var(--muted);background:#F8FBFE;border:1px solid #EDF3F8;border-radius:12px;padding:8px}.meta-item b{display:block;color:var(--text);font-size:13px;margin-top:2px}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.active{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.draft{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.cancelled{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.pin{color:#6D43BA;background:#F6F0FF;border-color:#D8C8FF}
+.card-actions{margin-top:auto;display:flex;justify-content:flex-end;gap:8px}.empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}
+.modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1080px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.checks{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding-top:22px}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}
+.loading{display:grid;place-items:center;padding:36px;color:var(--muted);font-weight:800}.spinner{width:28px;height:28px;border:3px solid #D8E7F4;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:auto auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{justify-content:center}}
+@media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:16px}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.topbar{align-items:flex-start;flex-wrap:wrap}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/iroup-logo.png" alt="iROUP">
+      <div class="brand-title"><b>iROUP</b><br>International<br>Relations Office</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">OVERVIEW</div>
+      <a class="nav-link" href="dashboard.html"><span class="nav-icon">📊</span><span>Executive Dashboard</span></a>
+      <div class="nav-section">MANAGEMENT</div>
+      <a class="nav-link" href="mou.html"><span class="nav-icon">🤝</span><span>MOU</span></a>
+      <a class="nav-link" href="mobility.html"><span class="nav-icon">🌏</span><span>Mobility</span></a>
+      <a class="nav-link" href="travel.html"><span class="nav-icon">✈️</span><span>การเดินทาง</span></a>
+      <a class="nav-link" href="scholarship.html"><span class="nav-icon">🎓</span><span>ทุนการศึกษา</span></a>
+      <a class="nav-link active" href="events.html"><span class="nav-icon">📅</span><span>Events</span></a>
+      <a class="nav-link" href="report.html"><span class="nav-icon">📤</span><span>รายงาน & Export</span></a>
+      <div class="nav-section">PUBLIC</div>
+      <a class="nav-link" href="public/public-landing.html"><span class="nav-icon">🌐</span><span>Public View</span></a>
+    </nav>
+    <div class="userbox">
+      <div class="avatar">IR</div>
+      <div><div class="user-name">งานวิเทศสัมพันธ์</div><div class="user-sub">University of Phayao</div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="title" data-i18n-th="กิจกรรม" data-i18n-en="Events">กิจกรรม</div>
+        <div class="subtitle" data-i18n-th="จัดการข้อมูลกิจกรรมด้วย V2 เป็นแหล่งข้อมูลหลัก" data-i18n-en="Manage event records with V2 as the source of truth">จัดการข้อมูลกิจกรรมด้วย V2 เป็นแหล่งข้อมูลหลัก</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="lang-toggle" aria-label="Language">
+        <button type="button" id="langThBtn" class="active" onclick="setLang('th')">TH</button>
+        <button type="button" id="langEnBtn" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="btn" type="button" onclick="loadEvents(true)">↻ <span data-i18n-th="โหลดใหม่" data-i18n-en="Reload">โหลดใหม่</span></button>
+      <button class="btn primary" type="button" onclick="openCreateModal()">+ <span data-i18n-th="เพิ่มกิจกรรม" data-i18n-en="Add Event">เพิ่มกิจกรรม</span></button>
+    </header>
+
+    <section class="toolbar" aria-label="Event filters">
+      <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อกิจกรรม / สถานที่ / หน่วยงาน" oninput="renderEvents()">
+      <select id="typeFilter" class="select" onchange="renderEvents()"><option value="">ทุกประเภท</option></select>
+      <select id="statusFilter" class="select" onchange="renderEvents()">
+        <option value="">ทุกสถานะ</option>
+        <option value="draft">Draft</option>
+        <option value="active">Active</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <select id="yearFilter" class="select" onchange="renderEvents()"><option value="">ทุกปี</option></select>
+      <button class="btn ghost" type="button" onclick="clearFilters()">ล้างตัวกรอง</button>
+    </section>
+
+    <div id="notice" class="notice"></div>
+    <section id="eventCards" class="cards"><div class="loading"><div><div class="spinner"></div>กำลังโหลดข้อมูล...</div></div></section>
+  </main>
+</div>
+
+<div id="eventModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-panel">
+    <form id="eventForm" onsubmit="saveEvent(event)">
+      <div class="modal-head">
+        <div>
+          <div id="modalTitle" class="modal-title">เพิ่มกิจกรรม</div>
+          <div id="modalSub" class="subtitle">V2-native EVENT metadata</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn" type="button" onclick="closeModal()">ปิด</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="eventId">
+        <div class="form-grid">
+          <div class="field">
+            <label class="label" for="titleTh">ชื่อกิจกรรม (TH) <span class="req">*</span></label>
+            <input id="titleTh" class="input" name="title_th" required>
+          </div>
+          <div class="field">
+            <label class="label" for="titleEn">ชื่อกิจกรรม (EN) <span class="req">*</span></label>
+            <input id="titleEn" class="input" name="title_en" required>
+          </div>
+          <div class="field">
+            <label class="label" for="eventTypeSelect">ประเภทกิจกรรม <span class="req">*</span></label>
+            <select id="eventTypeSelect" class="select" name="event_type_id" required></select>
+          </div>
+          <div class="field">
+            <label class="label" for="unitInput">หน่วยงาน <span class="req">*</span><span class="hint">พิมพ์เพื่อค้นหาได้</span></label>
+            <input id="unitInput" class="input" list="unitOptions" name="organizer_unit_display" required>
+            <datalist id="unitOptions"></datalist>
+          </div>
+          <div class="field">
+            <label class="label" for="countryInput">ประเทศ <span class="hint">optional</span></label>
+            <input id="countryInput" class="input" list="countryOptions" name="country_display">
+            <datalist id="countryOptions"></datalist>
+          </div>
+          <div class="field">
+            <label class="label" for="statusSelect">สถานะ</label>
+            <select id="statusSelect" class="select" name="status">
+              <option value="draft">draft</option>
+              <option value="active">active</option>
+              <option value="cancelled">cancelled</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="startDate">วันที่เริ่ม <span class="req">*</span></label>
+            <input id="startDate" class="input" type="date" name="start_date" required onchange="updateFiscalPreview()">
+          </div>
+          <div class="field">
+            <label class="label" for="endDate">วันที่สิ้นสุด</label>
+            <input id="endDate" class="input" type="date" name="end_date">
+          </div>
+          <div class="field">
+            <label class="label" for="startTime">เวลาเริ่ม</label>
+            <input id="startTime" class="input" type="time" name="start_time">
+          </div>
+          <div class="field">
+            <label class="label" for="endTime">เวลาสิ้นสุด</label>
+            <input id="endTime" class="input" type="time" name="end_time">
+          </div>
+          <div class="field">
+            <label class="label" for="locationInput">สถานที่</label>
+            <input id="locationInput" class="input" name="location">
+          </div>
+          <div class="field">
+            <label class="label" for="meetingUrl">ลิงก์ online</label>
+            <input id="meetingUrl" class="input" type="url" name="meeting_url">
+          </div>
+          <div class="field">
+            <label class="label" for="participantCount">จำนวนผู้เข้าร่วม</label>
+            <input id="participantCount" class="input" type="number" min="0" step="1" name="participant_count">
+          </div>
+          <div class="field">
+            <label class="label">ปีงบประมาณ</label>
+            <input id="fiscalPreview" class="input" readonly>
+          </div>
+          <div class="field full">
+            <label class="label" for="detailTh">รายละเอียด (TH)</label>
+            <textarea id="detailTh" class="textarea" name="detail_th"></textarea>
+          </div>
+          <div class="field full">
+            <label class="label" for="detailEn">รายละเอียด (EN)</label>
+            <textarea id="detailEn" class="textarea" name="detail_en"></textarea>
+          </div>
+          <div class="field">
+            <label class="label" for="applyUrl">ลิงก์สมัคร</label>
+            <input id="applyUrl" class="input" type="url" name="apply_url">
+          </div>
+          <div class="field">
+            <label class="label" for="detailUrl">ลิงก์รายละเอียด</label>
+            <input id="detailUrl" class="input" type="url" name="detail_url">
+          </div>
+          <div class="field">
+            <label class="label" for="linkUrl">ลิงก์ไฟล์แนบ</label>
+            <input id="linkUrl" class="input" type="url" name="link_url">
+          </div>
+          <div class="field checks">
+            <label class="check"><input id="publicVisible" type="checkbox" name="public_visible"> แสดงสาธารณะ</label>
+            <label class="check"><input id="pinInput" type="checkbox" name="pin"> ปักหมุด</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button id="deleteBtn" class="btn danger" type="button" onclick="deleteEvent()">ลบ</button>
+        <div class="spacer"></div>
+        <button class="btn" type="button" onclick="closeModal()">ยกเลิก</button>
+        <button id="saveBtn" class="btn primary" type="submit">บันทึก</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const state = {
+  lang: 'th',
+  events: [],
+  eventTypes: [],
+  units: [],
+  countries: [],
+  editingId: '',
+  loading: false
+};
+
+const $ = selector => document.querySelector(selector);
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadMasters();
+  await loadEvents(false);
+});
+
+async function loadMasters() {
+  const [eventTypesRes, unitsRes, countriesRes] = await Promise.all([
+    IROUP_V2.lookup.eventTypes(),
+    IROUP_V2.lookup.units(),
+    IROUP_V2.lookup.countries()
+  ]);
+
+  state.eventTypes = normalizeList(eventTypesRes);
+  state.units = normalizeList(unitsRes);
+  state.countries = normalizeList(countriesRes);
+
+  populateMasterControls();
+}
+
+async function loadEvents(force) {
+  if (state.loading) return;
+  state.loading = true;
+  showNotice('', '');
+  $('#eventCards').innerHTML = '<div class="loading"><div><div class="spinner"></div>กำลังโหลดข้อมูล...</div></div>';
+  try {
+    const res = await IROUP_V2.admin.eventList({ includeArchived: true, _: force ? Date.now() : '' });
+    if (!res.success) throw new Error(res.error || 'โหลดข้อมูลกิจกรรมไม่สำเร็จ');
+    state.events = normalizeList(res).map(enrichEventForPage);
+    populateYearFilter();
+    renderEvents();
+  } catch (error) {
+    $('#eventCards').innerHTML = `<div class="empty">${esc(error.message || error)}</div>`;
+    showNotice(error.message || String(error), 'error');
+  } finally {
+    state.loading = false;
+  }
+}
+
+function normalizeList(res) {
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res?.data)) return res.data;
+  if (Array.isArray(res?.data?.items)) return res.data.items;
+  return [];
+}
+
+function populateMasterControls() {
+  const typeOptions = state.eventTypes.map(type => {
+    const label = typeLabel(type);
+    return `<option value="${esc(type.event_type_id || '')}">${esc((type.icon ? type.icon + ' ' : '') + label)}</option>`;
+  }).join('');
+  $('#eventTypeSelect').innerHTML = '<option value="">เลือกประเภทกิจกรรม</option>' + typeOptions;
+  $('#typeFilter').innerHTML = '<option value="">ทุกประเภท</option>' + typeOptions;
+
+  $('#unitOptions').innerHTML = state.units.map(unit => {
+    const label = unitLabel(unit);
+    return `<option value="${esc(label)}" data-id="${esc(unit.unit_id || '')}"></option>`;
+  }).join('');
+
+  $('#countryOptions').innerHTML = state.countries.map(country => {
+    const label = countryLabel(country);
+    return `<option value="${esc(label)}" data-id="${esc(country.country_id || '')}"></option>`;
+  }).join('');
+}
+
+function populateYearFilter() {
+  const selected = $('#yearFilter').value;
+  const years = [...new Set(state.events.map(event => String(event.fiscal_year || fiscalYear(event.start_date) || '')).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+  $('#yearFilter').innerHTML = '<option value="">ทุกปี</option>' + years.map(year => `<option value="${esc(year)}">ปีงบ ${esc(year)}</option>`).join('');
+  if (years.includes(selected)) $('#yearFilter').value = selected;
+}
+
+function renderEvents() {
+  const q = $('#searchInput').value.trim().toLowerCase();
+  const typeId = $('#typeFilter').value;
+  const status = $('#statusFilter').value;
+  const year = $('#yearFilter').value;
+  const rows = state.events.filter(event => {
+    const haystack = [
+      event.title_th, event.title_en, event.event_type, event.event_type_id,
+      unitDisplay(event), countryDisplay(event), event.location, event.detail_th, event.detail_en
+    ].join(' ').toLowerCase();
+    if (q && !haystack.includes(q)) return false;
+    if (typeId && event.event_type_id !== typeId) return false;
+    if (status && event.status !== status) return false;
+    if (year && String(event.fiscal_year || fiscalYear(event.start_date)) !== year) return false;
+    return true;
+  });
+
+  $('#eventCards').innerHTML = rows.length ? rows.map(renderCard).join('') : '<div class="empty">ไม่พบข้อมูลกิจกรรม</div>';
+}
+
+function renderCard(event) {
+  const type = findEventType(event.event_type_id, event.event_type);
+  const status = event.status || 'draft';
+  const title = displayTitle(event);
+  const detail = state.lang === 'en' ? event.detail_en || event.detail_th : event.detail_th || event.detail_en;
+  return `
+    <article class="event-card">
+      <div class="card-head">
+        <div class="type-icon" style="${type?.color_token ? `background:${esc(type.color_token)}1A;color:${esc(type.color_token)}` : ''}">${esc(type?.icon || '📅')}</div>
+        <div>
+          <div class="card-title">${esc(title || '-')}</div>
+          <div class="card-sub">${esc(type ? typeLabel(type) : event.event_type || '-')}</div>
+        </div>
+      </div>
+      <div class="badge-row">
+        <span class="badge ${esc(status)}">${esc(status)}</span>
+        ${event.pin ? '<span class="badge pin">ปักหมุด</span>' : ''}
+        ${event.public_visible ? '<span class="badge active">Public</span>' : ''}
+      </div>
+      <div class="meta">
+        <div class="meta-item">วันที่เริ่ม<b>${esc(displayDate(event.start_date))}</b></div>
+        <div class="meta-item">ปีงบประมาณ<b>${esc(event.fiscal_year || fiscalYear(event.start_date) || '-')}</b></div>
+        <div class="meta-item">หน่วยงาน<b>${esc(unitDisplay(event) || '-')}</b></div>
+        <div class="meta-item">ประเทศ<b>${esc(countryDisplay(event) || '-')}</b></div>
+      </div>
+      ${detail ? `<div class="card-sub">${esc(truncate(detail, 150))}</div>` : ''}
+      <div class="card-actions">
+        <button class="btn" type="button" onclick="openEditModal('${escAttr(event.event_id)}')">แก้ไข</button>
+      </div>
+    </article>
+  `;
+}
+
+function openCreateModal() {
+  state.editingId = '';
+  $('#eventForm').reset();
+  $('#eventId').value = '';
+  $('#modalTitle').textContent = state.lang === 'en' ? 'Add Event' : 'เพิ่มกิจกรรม';
+  $('#modalSub').textContent = 'V2-native EVENT metadata';
+  $('#deleteBtn').style.display = 'none';
+  $('#statusSelect').value = 'draft';
+  updateFiscalPreview();
+  $('#eventModal').classList.add('open');
+}
+
+function openEditModal(eventId) {
+  const event = state.events.find(item => item.event_id === eventId);
+  if (!event) return;
+  state.editingId = eventId;
+  $('#eventForm').reset();
+  $('#eventId').value = event.event_id || '';
+  $('#titleTh').value = event.title_th || '';
+  $('#titleEn').value = event.title_en || '';
+  $('#eventTypeSelect').value = event.event_type_id || '';
+  $('#unitInput').value = unitDisplay(event) || '';
+  $('#countryInput').value = countryDisplay(event) || '';
+  $('#statusSelect').value = event.status || 'draft';
+  $('#startDate').value = event.start_date || '';
+  $('#endDate').value = event.end_date || '';
+  $('#startTime').value = event.start_time || '';
+  $('#endTime').value = event.end_time || '';
+  $('#locationInput').value = event.location || '';
+  $('#meetingUrl').value = event.meeting_url || '';
+  $('#participantCount').value = event.participant_count || '';
+  $('#detailTh').value = event.detail_th || '';
+  $('#detailEn').value = event.detail_en || '';
+  $('#applyUrl').value = event.apply_url || '';
+  $('#detailUrl').value = event.detail_url || '';
+  $('#linkUrl').value = event.link_url || '';
+  $('#publicVisible').checked = !!event.public_visible;
+  $('#pinInput').checked = !!event.pin;
+  $('#modalTitle').textContent = state.lang === 'en' ? 'Edit Event' : 'แก้ไขกิจกรรม';
+  $('#modalSub').textContent = event.event_id || '';
+  $('#deleteBtn').style.display = '';
+  updateFiscalPreview();
+  $('#eventModal').classList.add('open');
+}
+
+function closeModal() {
+  $('#eventModal').classList.remove('open');
+}
+
+async function saveEvent(evt) {
+  evt.preventDefault();
+  const saveBtn = $('#saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'กำลังบันทึก...';
+  try {
+    const payload = buildPayloadFromForm();
+    const isUpdate = !!payload.event_id;
+    const res = isUpdate
+      ? await IROUP_V2.admin.eventUpdate(payload)
+      : await IROUP_V2.admin.eventCreate(payload);
+    if (!res || !res.success) throw new Error(res?.error || 'บันทึกไม่สำเร็จ');
+    alert('บันทึกสำเร็จ');
+    closeModal();
+    await loadEvents(true);
+  } catch (error) {
+    alert(error.message || String(error));
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'บันทึก';
+  }
+}
+
+async function deleteEvent() {
+  const eventId = $('#eventId').value;
+  if (!eventId) return;
+  if (!confirm('ยืนยันลบกิจกรรมนี้หรือไม่')) return;
+  if (!IROUP_V2.admin.eventDelete) {
+    alert('ยังไม่มี V2 soft delete route สำหรับ EVENT');
+    return;
+  }
+  const res = await IROUP_V2.admin.eventDelete(eventId);
+  if (!res || !res.success) {
+    alert(res?.error || 'ลบไม่สำเร็จ');
+    return;
+  }
+  closeModal();
+  await loadEvents(true);
+}
+
+function buildPayloadFromForm() {
+  const type = findEventType($('#eventTypeSelect').value, '');
+  const unit = findUnitByLabel($('#unitInput').value);
+  const country = findCountryByLabel($('#countryInput').value);
+  const payload = {
+    event_id: $('#eventId').value.trim(),
+    title_th: $('#titleTh').value.trim(),
+    title_en: $('#titleEn').value.trim(),
+    event_type_id: $('#eventTypeSelect').value.trim(),
+    event_type: typeLabel(type) || $('#eventTypeSelect').value.trim(),
+    organizer_unit_id: unit?.unit_id || '',
+    organizer: $('#unitInput').value.trim(),
+    country_id: country?.country_id || '',
+    country: $('#countryInput').value.trim(),
+    start_date: $('#startDate').value,
+    end_date: $('#endDate').value || $('#startDate').value,
+    start_time: $('#startTime').value,
+    end_time: $('#endTime').value,
+    location: $('#locationInput').value.trim(),
+    meeting_url: $('#meetingUrl').value.trim(),
+    participant_count: Number($('#participantCount').value || 0),
+    detail_th: $('#detailTh').value.trim(),
+    detail_en: $('#detailEn').value.trim(),
+    apply_url: $('#applyUrl').value.trim(),
+    detail_url: $('#detailUrl').value.trim(),
+    link_url: $('#linkUrl').value.trim() || $('#detailUrl').value.trim() || $('#applyUrl').value.trim(),
+    status: $('#statusSelect').value,
+    public_visible: $('#publicVisible').checked,
+    pin: $('#pinInput').checked
+  };
+  validatePayload(payload);
+  return payload;
+}
+
+function validatePayload(payload) {
+  const missing = [];
+  if (!payload.title_th) missing.push('ชื่อกิจกรรม (TH)');
+  if (!payload.title_en) missing.push('ชื่อกิจกรรม (EN)');
+  if (!payload.event_type_id) missing.push('ประเภทกิจกรรม');
+  if (!payload.organizer_unit_id && !payload.organizer) missing.push('หน่วยงาน');
+  if (!payload.start_date) missing.push('วันที่เริ่ม');
+  if (payload.end_date && payload.start_date && payload.end_date < payload.start_date) missing.push('วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม');
+  if (missing.length) throw new Error('กรุณากรอกข้อมูลให้ครบ: ' + missing.join(', '));
+}
+
+function enrichEventForPage(event) {
+  const row = Object.assign({}, event || {});
+  const type = findEventType('', row.event_type);
+  row.event_type_id = row.event_type_id || type?.event_type_id || '';
+  row.fiscal_year = row.fiscal_year || fiscalYear(row.start_date);
+  row.apply_url = row.apply_url || '';
+  row.detail_url = row.detail_url || '';
+  return row;
+}
+
+function findEventType(id, display) {
+  const wantedId = String(id || '').trim();
+  if (wantedId) {
+    const byId = state.eventTypes.find(type => type.event_type_id === wantedId);
+    if (byId) return byId;
+  }
+  const wanted = String(display || '').trim().toLowerCase();
+  if (!wanted) return null;
+  return state.eventTypes.find(type => [type.name_th, type.name_en, type.event_type_id].map(value => String(value || '').trim().toLowerCase()).includes(wanted)) || null;
+}
+
+function findUnitByLabel(value) {
+  const wanted = String(value || '').trim().toLowerCase();
+  return state.units.find(unit => [unit.unit_id, unit.unit_code, unit.unit_name_th, unit.unit_name_en, unitLabel(unit)].map(item => String(item || '').trim().toLowerCase()).includes(wanted)) || null;
+}
+
+function findCountryByLabel(value) {
+  const wanted = String(value || '').trim().toLowerCase();
+  return state.countries.find(country => [country.country_id, country.iso2, country.iso3, country.country_name_th, country.country_name_en, countryLabel(country)].map(item => String(item || '').trim().toLowerCase()).includes(wanted)) || null;
+}
+
+function displayTitle(event) {
+  return state.lang === 'en' ? event.title_en || event.title_th : event.title_th || event.title_en;
+}
+
+function typeLabel(type) {
+  if (!type) return '';
+  return state.lang === 'en' ? type.name_en || type.name_th || type.event_type_id : type.name_th || type.name_en || type.event_type_id;
+}
+
+function unitLabel(unit) {
+  if (!unit) return '';
+  return state.lang === 'en' ? unit.unit_name_en || unit.unit_name_th || unit.unit_code || unit.unit_id : unit.unit_name_th || unit.unit_name_en || unit.unit_code || unit.unit_id;
+}
+
+function countryLabel(country) {
+  if (!country) return '';
+  const name = state.lang === 'en' ? country.country_name_en || country.country_name_th : country.country_name_th || country.country_name_en;
+  return [country.flag_emoji, name || country.iso3 || country.country_id].filter(Boolean).join(' ');
+}
+
+function unitDisplay(event) {
+  if (event.organizer_unit) return unitLabel(event.organizer_unit);
+  return event.organizer || event.organizer_display || '';
+}
+
+function countryDisplay(event) {
+  if (event.country) return countryLabel(event.country);
+  return event.country_display || '';
+}
+
+function fiscalYear(dateText) {
+  if (!dateText) return '';
+  const parts = String(dateText).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parts) return '';
+  const year = Number(parts[1]) + 543;
+  const month = Number(parts[2]);
+  return String(month >= 10 ? year + 1 : year);
+}
+
+function displayDate(dateText) {
+  if (!dateText) return '-';
+  const parts = String(dateText).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parts) return dateText;
+  const date = new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]));
+  if (state.lang === 'en') return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function updateFiscalPreview() {
+  const fy = fiscalYear($('#startDate').value);
+  $('#fiscalPreview').value = fy ? `ปีงบประมาณ ${fy}` : '';
+}
+
+function setLang(lang) {
+  state.lang = lang === 'en' ? 'en' : 'th';
+  $('#langThBtn').classList.toggle('active', state.lang === 'th');
+  $('#langEnBtn').classList.toggle('active', state.lang === 'en');
+  document.querySelectorAll('[data-i18n-th]').forEach(node => {
+    node.textContent = node.getAttribute(state.lang === 'en' ? 'data-i18n-en' : 'data-i18n-th');
+  });
+  populateMasterControls();
+  renderEvents();
+}
+
+function clearFilters() {
+  $('#searchInput').value = '';
+  $('#typeFilter').value = '';
+  $('#statusFilter').value = '';
+  $('#yearFilter').value = '';
+  renderEvents();
+}
+
+function showNotice(message, type) {
+  const box = $('#notice');
+  if (!message) {
+    box.style.display = 'none';
+    box.textContent = '';
+    box.className = 'notice';
+    return;
+  }
+  box.textContent = message;
+  box.className = 'notice ' + (type || '');
+  box.style.display = 'block';
+}
+
+function truncate(text, max) {
+  const value = String(text || '');
+  return value.length > max ? value.slice(0, max - 1) + '…' : value;
+}
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+}
+
+function escAttr(value) {
+  return esc(value).replace(/`/g, '&#96;');
+}
+</script>
+</body>
+</html>

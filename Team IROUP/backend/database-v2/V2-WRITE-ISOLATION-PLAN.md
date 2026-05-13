@@ -37,7 +37,7 @@ The current production write surface lives in `Team IROUP/iroup-config.js`.
 | `mou.html` | V1 `getAll(MOU)`, map/table local aggregation | `IROUP.add/edit/delete(MOU)` | `uploadMouFile()` via `IROUP.uploadFile` | custom country picker, MOU modal, file URL field | MOU parent plus `FILES` and later `BUDGET` relation rows | Medium-high |
 | `mobility.html` | V1 `getAll(INBOUND/OUTBOUND)`, staff search | `IROUP.add/edit/delete(INBOUND/OUTBOUND)` | none found in current scan | duplicated/overlaid save/render paths, inline table actions | V2 requires `MOBILITY_PROJECT` plus `MOBILITY_PARTICIPANT` split | High |
 | `travel.html` | V1 `getAll(TRAVEL/STAFF/COUNTRY)` | `IROUP.add/edit/delete(TRAVEL)`, `quickAddStaff()` | `uploadFileFromInput()` via `IROUP.uploadFile` | staff chips, selected staff snapshots, country lookup | V2 requires `TRAVEL` plus `TRAVEL_PARTICIPANT` split | High |
-| `scholarship-events.html` | V1 `getAll(SCHOLAR/EVENT)` | `IROUP.add/edit/delete(SCHOLAR/EVENT)` | `uploadImage()` and `uploadFile()` for poster/file URLs | dual scholarship/event modal, poster/file URL fields | parent row plus `FILES`; event metadata is comparatively simple | Medium |
+| `events.html` | V1 `getAll(SCHOLAR/EVENT)` | `IROUP.add/edit/delete(SCHOLAR/EVENT)` | `uploadImage()` and `uploadFile()` for poster/file URLs | dual scholarship/event modal, poster/file URL fields | parent row plus `FILES`; event metadata is comparatively simple | Medium |
 
 ## DTO Strategy
 
@@ -186,7 +186,7 @@ Rollback checklist:
 Recommended first write pilot:
 
 ```text
-scholarship-events.html
+events.html
 event metadata-only create/update
 ```
 
@@ -358,7 +358,7 @@ Status: local browser-only test completed. Feature flag remains FALSE.
 
 Test result:
 
-- `V2_EVENT_WRITE_UI_ENABLED` was temporarily set to `true` in `scholarship-events.html`
+- `V2_EVENT_WRITE_UI_ENABLED` was temporarily set to `true` in `events.html`
   for a page-local browser UI smoke test.
 - The EVENT create flow succeeded end-to-end:
   UI form -> hydration helpers -> gated V2 branch -> `IROUP_V2.admin.eventCreate()` ->

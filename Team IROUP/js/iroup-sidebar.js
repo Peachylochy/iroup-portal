@@ -16,7 +16,8 @@
       { icon: '🤝', label: 'MOU', href: 'mou.html', match: ['mou.html'] },
       { icon: '🌏', label: 'Mobility', href: 'mobility.html', match: ['mobility.html'] },
       { icon: '✈️', label: 'การเดินทาง', href: 'travel.html', match: ['travel.html'] },
-      { icon: '🎓', label: 'ทุน / กิจกรรม', href: 'scholarship-events.html', match: ['scholarship-events.html'] },
+      { icon: '🎓', label: 'ทุนการศึกษา', href: 'scholarship.html', match: ['scholarship.html'] },
+      { icon: '📅', label: 'กิจกรรม', href: 'events.html', match: ['events.html'] },
       { icon: '📤', label: 'รายงาน & Export', href: 'report.html', match: ['report.html'] }
     ]},
     { section: 'PUBLIC', items: [

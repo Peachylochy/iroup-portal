@@ -224,7 +224,7 @@ Direction change:
 - V2 is the intended source of truth for the new EVENT workflow.
 - V1 remains a legacy fallback/runtime comparison source only.
 - V1/V2 row parity is informational and is no longer a migration gate.
-- Legacy comparison diagnostics in `scholarship-events.html` classify unmigrated or
+- Legacy comparison diagnostics in `events.html` classify unmigrated or
   malformed V1 rows, but mismatches do not block the V2 path by default.
 
 Current gates for future EVENT activation:
@@ -253,7 +253,7 @@ Still not doing:
 ### Session: 2026-05-12 - Controlled Page-Local V2 EVENT Metadata Save Pilot
 
 **Phase goal:** Temporarily activate the disabled page-local EVENT metadata write branch
-in `scholarship-events.html` for a local browser UI smoke test only, then roll it back.
+in `events.html` for a local browser UI smoke test only, then roll it back.
 No production activation, no commit, no push, no scholarship write migration, no upload
 migration, no delete migration, no FILES/BUDGET relation writes, and no `IROUP.SCRIPT_URL`
 replacement.
@@ -717,14 +717,14 @@ Audited target pages:
 - `report.html`
 - `mobility.html`
 - `mou.html`
-- `scholarship-events.html`
+- `events.html`
 - `travel.html`
 
 Audit result:
 
 - `dashboard.html` is the safest first admin-side candidate because it is read-only and uses one aggregate V1 call: `IROUP.getReport(year)`.
 - `report.html` should migrate separately from dashboard because it depends on row-level report/export behavior and has V1 `getAll(...)` fallback reads.
-- `mou.html`, `scholarship-events.html`, `travel.html`, and `mobility.html` are mixed read/write operational pages and should not start with V2 CRUD.
+- `mou.html`, `events.html`, `travel.html`, and `mobility.html` are mixed read/write operational pages and should not start with V2 CRUD.
 - Upload flows are still V1-only through `IROUP.uploadFile()` / `IROUP.uploadImage()`.
 - V2 admin list/detail routes exist, but V2 create/update/delete/upload/person/staff routes are not ready for frontend migration.
 - Admin token propagation is centralized in both clients, but mixed V1/V2 pages need a page-local readiness check before enabling V2 admin reads.
@@ -906,7 +906,7 @@ Legend: `[✓]` fully migrated · `[~]` partial / stabilized · `[ ]` pending
 | `report.html` | `[✓]` migrated | ✅ | ✅ Full (all IU.*) | ✅ Replaced with comments | Complete. Reference implementation. |
 | `travel.html` | `[~]` partial | ✅ | ✅ Full (all IU.*) | ⏳ Kept — verify visually before removing | Call sites done; stubs pending cleanup commit. |
 | `dashboard.html` | `[~]` partial | ✅ | ✅ Full (46 IU.* calls) | ⏳ Kept — verify visually before removing | Migrated 2026-05-09. Stubs have TODO markers. |
-| `scholarship-events.html` | `[~]` partial | ✅ | ⚠️ Stabilized only — `IU.toDate` at 3 sites; `esc`/`IROUP.formatDate` not yet migrated | ✅ Local `esc` kept + TODO marker | Crash fix: `IROUP.parseDate` → `IU.toDate`. Full IU migration is a future step. |
+| `events.html` | `[~]` partial | ✅ | ⚠️ Stabilized only — `IU.toDate` at 3 sites; `esc`/`IROUP.formatDate` not yet migrated | ✅ Local `esc` kept + TODO marker | Crash fix: `IROUP.parseDate` → `IU.toDate`. Full IU migration is a future step. |
 | `mou.html` | `[ ]` pending | ❌ | ❌ | N/A — `htmlSafe()` local, TODO marked | Uses `IROUP.getMouStatus()` and local `htmlSafe()`. Migration planned. |
 | `mobility.html` | `[ ]` pending | ❌ | ❌ | N/A — `r9e()` + `formatDate()` local, TODO marked | Uses `r9e()` (esc) and local `formatDate()`. Migration planned. |
 | `index.html` | `[ ]` deferred | ❌ | ❌ | ❌ | Auth/login page — v1 layout concept approved. CSS/layout implementation next. JS/auth untouched. |
@@ -926,7 +926,7 @@ Legend: `[✓]` fully migrated · `[~]` partial / stabilized · `[ ]` pending
 | `mobility.html` | ✅ |
 | `mou.html` | ✅ |
 | `report.html` | ✅ |
-| `scholarship-events.html` | ✅ |
+| `events.html` | ✅ |
 | `travel.html` | ✅ |
 | `index.html` | ✅ |
 | `public/public-events.html` | ✅ |
@@ -981,7 +981,7 @@ Lightweight `// TODO: migrate to IU.*` comments added (no code changed) to:
 |------|----------|----------------|
 | `dashboard.html` | Line ~158 | `esc`, `num`, `money`, `toDate`, `fmtDate` local stubs → remove after visual check |
 | `dashboard.html` | Line ~287 | `group`, `sum` local stubs → remove; `uniqueCount` stays (local wrapper) |
-| `scholarship-events.html` | Line ~730 | `esc` → `IU.esc`; `IROUP.formatDate` call sites → `IU.fmtDate` |
+| `events.html` | Line ~730 | `esc` → `IU.esc`; `IROUP.formatDate` call sites → `IU.fmtDate` |
 | `mou.html` | Line ~567 | `htmlSafe` → `IU.esc`; `IROUP.getMouStatus` → `IU.statusMou`; add `iroup-utils.js` |
 | `mobility.html` | Line ~699 | `formatDate` → `IU.fmtDate`; add `iroup-utils.js` |
 | `mobility.html` | Line ~813 | `r9e` → `IU.esc` |
@@ -1006,7 +1006,7 @@ Lightweight `// TODO: migrate to IU.*` comments added (no code changed) to:
 | Sidebar Type | Pages | Status |
 |---|---|---|
 | `iroup-sidebar.js` injected (full 220px) | `dashboard.html`, `report.html`, `travel.html` | Active — do not touch |
-| Mini inline sidebar (64px icon strip) | `mobility.html`, `mou.html`, `scholarship-events.html` | Active — do not touch |
+| Mini inline sidebar (64px icon strip) | `mobility.html`, `mou.html`, `events.html` | Active — do not touch |
 | No sidebar | All `/public/` pages | By design |
 
 `iroup-sidebar.js` uses `!important` overrides — architectural problem, but replacement (`iroup-nav.js`) not built yet. Protected.
@@ -1038,11 +1038,11 @@ Note: `IROUP.parseDate()` does NOT exist — use `IU.toDate()` instead.
 | Problem | Files Affected | Risk | Priority |
 |---------|---------------|------|----------|
 | Local utility stubs pending removal | `dashboard.html`, `travel.html` | Low — stubs are inert, call sites already on IU.* | Next cleanup pass |
-| Partial IU migration | `scholarship-events.html` | Medium — esc/formatDate still local | Next migration session |
+| Partial IU migration | `events.html` | Medium — esc/formatDate still local | Next migration session |
 | No IU loaded at all | `mou.html`, `mobility.html`, 4× public pages | Medium — divergence as IU.* evolves | Upcoming sessions |
 | Two competing sidebar systems | All private pages | High — visual inconsistency | Blocked on `iroup-nav.js` |
 | Inline CSS in every page | All pages | Medium | Low — after IU migration complete |
-| `IROUP.parseDate` called but missing | Fixed in `scholarship-events.html` | ✅ Resolved | — |
+| `IROUP.parseDate` called but missing | Fixed in `events.html` | ✅ Resolved | — |
 | `--ir-text-muted` contrast fail (dark + light) | All pages using theme tokens | ✅ Resolved — token raised in `iroup-theme.css` | — |
 | Duplicate Google Fonts `<link>` tags | All pages | Low — performance only | Low |
 
@@ -1054,13 +1054,13 @@ Note: `IROUP.parseDate()` does NOT exist — use `IU.toDate()` instead.
 1. **Visual verification** — open `index.html` (login page) in browser to confirm UI polish renders correctly.
 2. **Visual verification** — open `dashboard.html` and `travel.html` to confirm IU migration rendering is correct.
 3. **Stub removal** — once verified, remove local stubs from `travel.html` (committed separately from call-site migration per git workflow).
-4. **Consistency check** — scan `dashboard.html`, `report.html`, `travel.html`, `scholarship-events.html` for any inline CSS overriding `--ir-text-muted` that may need a matching manual fix.
+4. **Consistency check** — scan `dashboard.html`, `report.html`, `travel.html`, `events.html` for any inline CSS overriding `--ir-text-muted` that may need a matching manual fix.
 5. **Login redesign implementation** — implement v1 split-layout concept in `index.html` (CSS/layout only; auth flow untouched).
 
 ### Next migration targets (in order of simplicity)
 1. `public/public-scholar.html` — small, no charting, good warm-up
 2. `public/public-events.html` — small, no charting
-3. `scholarship-events.html` full pass — migrate remaining `esc`/`IROUP.formatDate` call sites to IU.*
+3. `events.html` full pass — migrate remaining `esc`/`IROUP.formatDate` call sites to IU.*
 4. `public/public-mou.html` — has D3, check carefully
 5. `public/public-mobility.html` — Chart.js + D3
 6. `mobility.html` — large Chart.js page
@@ -1094,7 +1094,7 @@ Commits made across sessions:
 - `report.html` full migration (call sites + stub comments)
 - `travel.html` migration (call sites switched; local stubs kept pending visual verification)
 - `dashboard.html` migration (call sites switched; local stubs + TODO markers kept)
-- `scholarship-events.html` stabilization (iroup-utils.js added; `IROUP.parseDate` → `IU.toDate`)
+- `events.html` stabilization (iroup-utils.js added; `IROUP.parseDate` → `IU.toDate`)
 - Migration markers added to `mou.html`, `mobility.html`
 - Git + GitHub initial setup
 
@@ -1148,7 +1148,7 @@ Commits made across sessions:
 
 ## 14. Light Theme Contrast Stabilization - Continued (2026-05-09)
 
-- Continued the CSS-first light-mode readability pass across `travel.html`, `dashboard.html`, `report.html`, `mobility.html`, and `scholarship-events.html`.
+- Continued the CSS-first light-mode readability pass across `travel.html`, `dashboard.html`, `report.html`, `mobility.html`, and `events.html`.
 - Strengthened shared light theme secondary/muted text tokens and placeholder coverage in `iroup-theme.css`.
 - Improved global table body readability and expired/gray badge label contrast without changing table structure.
 - Stabilized older page-local gray scales and inline theme variables where those pages bypass shared tokens.
@@ -2007,7 +2007,7 @@ Team IROUP/backend/database-v2/V2-WRITE-ISOLATION-PLAN.md
 ### Scope Covered
 
 - current V1 write surface map
-- page-level migration risk matrix for `mou.html`, `mobility.html`, `travel.html`, and `scholarship-events.html`
+- page-level migration risk matrix for `mou.html`, `mobility.html`, `travel.html`, and `events.html`
 - DTO normalization strategy
 - upload isolation plan
 - admin auth direction for future writes
@@ -2019,7 +2019,7 @@ Team IROUP/backend/database-v2/V2-WRITE-ISOLATION-PLAN.md
 Recommended first future pilot:
 
 ```text
-scholarship-events.html
+events.html
 event metadata-only create/update
 ```
 
@@ -2041,7 +2041,7 @@ Still not doing:
 
 ### Purpose
 
-Prepared the first controlled V2 write pilot backend contract for `scholarship-events.html` event metadata, without enabling real writes.
+Prepared the first controlled V2 write pilot backend contract for `events.html` event metadata, without enabling real writes.
 
 ### Routes Added
 
@@ -2093,7 +2093,7 @@ Still not doing:
 
 ### Purpose
 
-Added a frontend-side validation-only pilot to `scholarship-events.html` for EVENT metadata.
+Added a frontend-side validation-only pilot to `events.html` for EVENT metadata.
 
 ### Scope
 
