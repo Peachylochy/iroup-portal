@@ -810,7 +810,7 @@ let IROUND9_events = [];
 let round9V2Events = []; // V2 sidecar — read-only comparison store, not rendered
 let round9V2EventsForRender = []; // V2 sidecar — adapted V1-shape preview, not rendered
 // Disabled V2 EVENT metadata save pilot. Keep false until a reviewed activation pass.
-const V2_EVENT_WRITE_UI_ENABLED = false;
+let V2_EVENT_WRITE_UI_ENABLED = false;
 // Disabled V2 EVENT render-source pilot. Keep false unless explicitly testing adapted V2 rendering.
 const V2_EVENT_RENDER_UI_ENABLED = false;
 const ROUND9_EVENT_TYPE_FALLBACK_OPTIONS = [
@@ -996,12 +996,12 @@ function setV2NativeCountryOptions(rows){
 async function loadV2NativeMasterData(){
   if(!window.IROUP_V2 || !IROUP_V2.lookup) return;
   const eventForm=document.getElementById('v2NativeEventForm');
-  const eventTypes=typeof IROUP_V2.lookup.eventTypes === 'function'
-    ? IROUP_V2.lookup.eventTypes()
-    : IROUP_V2.request('v2.lookup.event_types');
-  const units=IROUP_V2.lookup.units();
-  const countries=IROUP_V2.lookup.countries();
   try{
+    const eventTypes=typeof IROUP_V2.lookup.eventTypes === 'function'
+      ? IROUP_V2.lookup.eventTypes()
+      : IROUP_V2.request('v2.lookup.event_types');
+    const units=IROUP_V2.lookup.units();
+    const countries=IROUP_V2.lookup.countries();
     const results=await Promise.allSettled([eventTypes, units, countries]);
     const eventTypeRows=results[0].status === 'fulfilled' ? getV2NativeResponseRows(results[0].value, 'event_types') : [];
     const unitRows=results[1].status === 'fulfilled' ? getV2NativeResponseRows(results[1].value, 'units') : [];
@@ -1012,6 +1012,18 @@ async function loadV2NativeMasterData(){
   }catch(err){
     console.warn('[V2 Native Form] master lookup unavailable; V2 form remains inactive.', err);
   }
+}
+function handleV2NativeModalOpen(){
+  const modal=document.getElementById('v2NativeModal');
+  if(modal && modal.classList.contains('show')) loadV2NativeMasterData();
+}
+function bindV2NativeModalMasterLoad(){
+  const modal=document.getElementById('v2NativeModal');
+  if(!modal || modal.dataset.masterLoadObserver === '1') return;
+  modal.dataset.masterLoadObserver='1';
+  const observer=new MutationObserver(handleV2NativeModalOpen);
+  observer.observe(modal,{ attributes:true, attributeFilter:['class'] });
+  handleV2NativeModalOpen();
 }
 function switchV2NativeType(type){
   const isEvent=type !== 'scholarship';
@@ -1025,10 +1037,10 @@ function switchV2NativeType(type){
 function openV2NativeForm(type, id){
   const modal=document.getElementById('v2NativeModal');
   if(!modal) return;
-  modal.classList.add('show');
   modal.dataset.recordId=id || '';
   switchV2NativeType(type || 'event');
-  loadV2NativeMasterData();
+  modal.classList.add('show');
+  handleV2NativeModalOpen();
 }
 function closeV2NativeForm(){
   const modal=document.getElementById('v2NativeModal');
@@ -1092,6 +1104,7 @@ window.openV2NativeForm=openV2NativeForm;
 window.closeV2NativeForm=closeV2NativeForm;
 window.switchV2NativeType=switchV2NativeType;
 window.saveV2NativeForm=saveV2NativeForm;
+bindV2NativeModalMasterLoad();
 function setAssetField(form, name, value){
   const input=form.querySelector(`input[name="${name}"]`);
   setInputValue(input,value);
