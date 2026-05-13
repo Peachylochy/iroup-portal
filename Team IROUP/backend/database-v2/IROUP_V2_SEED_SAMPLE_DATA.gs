@@ -275,6 +275,85 @@ function isV2SampleId_(value) {
   });
 }
 
+function seedMasterEventTypes() {
+  const sheetName = 'MASTER_EVENT_TYPES';
+  const idField = 'event_type_id';
+  const now = Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd');
+  const rows = [
+    { event_type_id: 'EVT-TYPE-001', name_th: 'ประชุม', name_en: 'Meeting', icon: '📋', color_token: '#3B82F6', is_active: true, sort_order: 10, created_at: now, updated_at: now },
+    { event_type_id: 'EVT-TYPE-002', name_th: 'อบรม', name_en: 'Workshop', icon: '📚', color_token: '#8B5CF6', is_active: true, sort_order: 20, created_at: now, updated_at: now },
+    { event_type_id: 'EVT-TYPE-003', name_th: 'Inbound', name_en: 'Inbound', icon: '✈️', color_token: '#10B981', is_active: true, sort_order: 30, created_at: now, updated_at: now },
+    { event_type_id: 'EVT-TYPE-004', name_th: 'Exchange', name_en: 'Exchange', icon: '🔄', color_token: '#F59E0B', is_active: true, sort_order: 40, created_at: now, updated_at: now },
+    { event_type_id: 'EVT-TYPE-005', name_th: 'การเดินทาง', name_en: 'Travel', icon: '🗺️', color_token: '#EF4444', is_active: true, sort_order: 50, created_at: now, updated_at: now }
+  ];
+
+  const sheetResult = getV2Sheet_(sheetName);
+  if (!sheetResult.success) {
+    return { success: false, inserted: 0, skipped: 0, error: sheetResult.error, data: [] };
+  }
+
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  const idIndex = headers.indexOf(idField);
+  const missingHeaders = Object.keys(rows[0]).filter(function (field) {
+    return headers.indexOf(field) < 0;
+  });
+
+  if (idIndex < 0 || missingHeaders.length) {
+    return {
+      success: false,
+      inserted: 0,
+      skipped: 0,
+      error: 'MASTER_EVENT_TYPES seed headers are missing',
+      diagnostics: {
+        missingIdField: idIndex < 0 ? idField : '',
+        missingHeaders: missingHeaders,
+        headers: headers
+      },
+      data: []
+    };
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const existingIds = {};
+  for (let rowIndex = 1; rowIndex < values.length; rowIndex++) {
+    const existingId = String(values[rowIndex][idIndex] || '').trim();
+    if (existingId) existingIds[existingId] = true;
+  }
+
+  const insertedRows = [];
+  const skippedIds = [];
+  rows.forEach(function (row) {
+    const eventTypeId = String(row.event_type_id || '').trim();
+    if (existingIds[eventTypeId]) {
+      skippedIds.push(eventTypeId);
+      return;
+    }
+
+    const targetRow = findFirstEmptyRowByKey_(sheet, idIndex + 1);
+    const rowValues = headers.map(function (header) {
+      return row[header] !== undefined ? row[header] : '';
+    });
+    sheet.getRange(targetRow, 1, 1, headers.length).setValues([rowValues]);
+    existingIds[eventTypeId] = true;
+    insertedRows.push(row);
+  });
+
+  SpreadsheetApp.flush();
+  Logger.log('[V2 SEED][MASTER_EVENT_TYPES] inserted=' + insertedRows.length +
+    ' skipped=' + skippedIds.length +
+    ' skippedIds=' + JSON.stringify(skippedIds));
+
+  return {
+    success: true,
+    inserted: insertedRows.length,
+    skipped: skippedIds.length,
+    skippedIds: skippedIds,
+    data: insertedRows,
+    error: ''
+  };
+}
+
 function getV2SampleDataBatches_() {
   const now = v2SeedDate_(0);
   const yesterday = v2SeedDate_(-1);
