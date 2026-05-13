@@ -17,6 +17,49 @@ Source-of-truth direction:
 
 ---
 
+## 0. 2026-05-14 V2-Native Events Validation Update
+
+Status: local validation successful. `events.html` is now usable as the internal
+admin workflow baseline for V2-native module rewrites.
+
+Validated locally:
+
+- V2 Events render successfully in both Card and List views.
+- Card/List views expose equivalent row actions.
+- Create and edit work through the V2 EVENT metadata flow.
+- Soft delete works through `v2.admin.event.delete` by setting `is_deleted = TRUE`.
+- Delete buttons are available from both Card view and List view.
+- EVENT mode badges and countdown/status badges render correctly.
+- File upload UI is wired for poster/cover image and general attachments.
+- Uploads use `v2.admin.file.upload` and write `FILES` relation rows instead of
+  embedding file fields directly in EVENT rows.
+
+Backend routes added to the validated Events baseline:
+
+- `v2.admin.file.upload`
+- `v2.admin.event.delete`
+
+EVENT file relation standard:
+
+- Drive folder: `IROUP_V2_FILES`
+- Drive sharing: anyone with link can view
+- `module = event`
+- `file_role_id = poster` for poster/cover image
+- `file_role_id = attachment` for other files
+- `visibility_level = public` for poster/banner
+- `visibility_level = internal` for other attachments
+
+Forward rule for future modules:
+
+- Delete must be available for every add/edit data module going forward.
+- Delete must be soft delete by default where the schema supports `is_deleted`.
+- Card and List render modes must expose equivalent actions.
+- File uploads must use the `FILES` relation table, not transaction-row file fields.
+- Scholarship, MOU, Mobility, Travel, News, and Knowledge should follow the validated
+  V2 Events workflow pattern.
+
+---
+
 ## 1. Current V1 EVENT Lifecycle Audit
 
 All current production EVENT operations in `events.html`.
@@ -129,8 +172,8 @@ SCHOLAR migration is explicitly out of scope for all phases below.
 | `v2.admin.event.update.dryrun`   | ✅             | ✅ `eventUpdateDryRun` | yes |
 | `v2.admin.event.create`          | ✅             | ✅ `eventCreate` | ✅ live smoke |
 | `v2.admin.event.update`          | ✅             | ✅ `eventUpdate` | ✅ live smoke |
-| `v2.admin.event.delete`          | ❌ not yet     | ❌ not yet       | —            |
-| `v2.admin.file.upload`           | ❌ not yet     | ❌ not yet       | —            |
+| `v2.admin.event.delete`          | ✅             | ✅ `eventDelete` | ✅ local validation |
+| `v2.admin.file.upload`           | ✅             | ✅ `fileUpload`  | ✅ local validation |
 | `v2.admin.file.attach`           | ❌ not yet     | ❌ not yet       | —            |
 | `v2.admin.file.delete`           | ❌ not yet     | ❌ not yet       | —            |
 
@@ -210,30 +253,35 @@ V2 unit/country lookups.
 - `status` must be user-settable (not hardcoded `draft`)
 - `public_visible` must be user-settable
 
-### 4.3 V1 Delete vs V2 Soft-Delete Mismatch
+### 4.3 V2 Soft-Delete Baseline
 
-`round9Delete('event', id)` calls V1 hard delete. There is no V2 event delete route.
-V2 uses soft-delete (`is_deleted = TRUE`). If V2 reads are active, soft-deleted V2
-rows must be excluded from list results (already done in V2 backend aggregate queries).
+The V2-native `events.html` workflow now uses `v2.admin.event.delete` for EVENT delete.
+The route performs soft delete only by setting `is_deleted = TRUE`; it does not
+physically delete the row. V2 list routes exclude soft-deleted rows.
 
-If EVENT reads are migrated to V2 but delete remains V1, deleted events will vanish
-from V1 but will still appear in V2 list queries unless the V2 row is also soft-deleted.
+Forward rule: every add/edit data module should expose delete actions and should use
+soft delete by default when the transaction sheet has `is_deleted`.
 
-Resolution: add `v2.admin.event.softDelete(eventId)` route before migrating delete.
+Card and List views must expose equivalent delete/edit actions.
 
-### 4.4 Upload Architecture Mismatch
+### 4.4 FILES Relation Upload Baseline
 
-V1 uploads return a flat Drive URL stored directly in `Poster_URL` / `ไฟล์_URL`.
-V2 architecture requires a `FILES` relation row with `module`, `record_id`,
-`file_role_id`, `visibility_level`, `public_file_url`, `drive_file_id`, and audit fields.
+V2-native Events now use `v2.admin.file.upload` for poster/cover image and general
+attachment uploads. Uploads create `FILES` relation rows with `module`, `record_id`,
+`file_role_id`, `visibility_level`, Drive metadata, and upload audit fields.
 
-No V2 upload route exists. Upload migration is the most complex sub-phase and must
-remain deferred until metadata writes and `FILES` relation DTOs are stable.
+File standard:
 
-During the metadata-only write phase, poster and file URLs can continue to be handled
-as V1 uploads with the resulting URL passed through the V2 event payload as flat fields
-(`Poster_URL`, `ไฟล์_URL`). The V2 backend must accept these as optional flat URL
-fields during the transition. This is an explicit temporary bridge — not the end state.
+- Drive folder: `IROUP_V2_FILES`
+- Drive sharing: anyone with link can view
+- `module = event`
+- `file_role_id = poster` for poster/cover image
+- `file_role_id = attachment` for other files
+- `visibility_level = public` for poster/banner
+- `visibility_level = internal` for other attachments
+
+Forward rule: future module uploads should use the `FILES` relation and should not
+embed file fields directly in transaction rows.
 
 ### 4.5 SCHOLAR Contamination Risk
 

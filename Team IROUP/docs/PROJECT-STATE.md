@@ -1,10 +1,66 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-13 | Session: V2-Native EVENT Form Save Wiring**
+**Last updated: 2026-05-14 | Session: V2 Events Internal Admin Baseline Validation**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest V2 Events Internal Admin Baseline
+
+### Session: 2026-05-14 - Local Validation of V2-Native Events Workflow
+
+Current outcome:
+
+- `events.html` is working well in local validation as a V2-native internal admin
+  workflow baseline.
+- V2 Events display successfully in both Card and List views.
+- Create and edit flows work through the V2 EVENT metadata routes.
+- Card/List rendering, EVENT mode badges, and countdown/status badges were validated.
+- Soft delete works through the V2 route and keeps row history by setting
+  `is_deleted = TRUE`.
+- Delete actions are available from both Card view and List view, with equivalent
+  action coverage.
+- File upload UI is wired for poster/cover image and attachment selection.
+- File upload backend route was added and writes through the V2 `FILES` relation
+  instead of embedding file fields directly in the EVENT transaction row.
+
+Backend/admin routes now included in the V2 Events baseline:
+
+- `v2.admin.event.create`
+- `v2.admin.event.update`
+- `v2.admin.event.delete`
+- `v2.admin.file.upload`
+
+File handling standard confirmed:
+
+- Drive folder: `IROUP_V2_FILES`
+- Drive sharing: anyone with link can view
+- EVENT file relation values:
+  - `module = event`
+  - `file_role_id = poster` for poster/cover image
+  - `file_role_id = attachment` for other files
+  - `visibility_level = public` for poster/banner
+  - `visibility_level = internal` for other attachments
+
+Pattern for next modules:
+
+- Every add/edit data module should expose delete actions wherever edit actions are
+  available.
+- Delete should be soft delete by default whenever the schema supports `is_deleted`.
+- Card and List views must expose equivalent row actions.
+- Uploads should write V2 `FILES` relation rows, not flat file URL columns inside
+  transaction sheets.
+- Events is now the internal admin workflow baseline for the next V2-native modules.
+
+Next:
+
+- Apply the same V2-native admin pattern to Scholarship next.
+- Continue using `FILES` relation semantics for module uploads.
+- Keep soft-delete, equivalent Card/List actions, and relation-based files as default
+  design rules for MOU, Mobility, Travel, Scholarship, News, and Knowledge rewrites.
 
 ---
 
