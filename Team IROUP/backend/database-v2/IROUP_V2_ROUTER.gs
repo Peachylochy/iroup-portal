@@ -252,6 +252,42 @@ function getV2RouteDispatch_() {
         return getV2AdminMobilityProject_(getV2RequestId_(request, 'mobility_id'));
       }
     },
+    'v2.admin.mobility.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminMobilityProject_(request);
+      }
+    },
+    'v2.admin.mobility.update': {
+      access: 'admin',
+      handler: function (request) {
+        return updateV2AdminMobilityProject_(request);
+      }
+    },
+    'v2.admin.mobility.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminMobilityProject_(request);
+      }
+    },
+    'v2.admin.mobility.participant.list': {
+      access: 'admin',
+      handler: function (request) {
+        return listV2AdminMobilityParticipants_(request);
+      }
+    },
+    'v2.admin.mobility.participant.add': {
+      access: 'admin',
+      handler: function (request) {
+        return addV2AdminMobilityParticipant_(request);
+      }
+    },
+    'v2.admin.mobility.participant.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminMobilityParticipant_(request);
+      }
+    },
     'v2.admin.travel.list': {
       access: 'admin',
       handler: function (request) {
@@ -370,6 +406,18 @@ function getV2RouteDispatch_() {
       access: 'public',
       handler: function () {
         return listV2LookupUnits_();
+      }
+    },
+    'v2.lookup.students': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupStudents_();
+      }
+    },
+    'v2.lookup.staff': {
+      access: 'public',
+      handler: function () {
+        return listV2LookupStaff_();
       }
     },
     'v2.lookup.event_types': {

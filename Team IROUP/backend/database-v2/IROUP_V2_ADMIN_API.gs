@@ -14,6 +14,188 @@ function adminResponseV2_(success, data, total, error) {
   };
 }
 
+function seedV2PersonSampleData() {
+  const unitIds = getV2PersonSampleUnitIds_();
+  if (!unitIds.length) {
+    return adminResponseV2_(false, null, 0, 'UP_UNIT_MASTER has no available unit_id values.');
+  }
+
+  const now = new Date();
+  const timestamp = Utilities.formatDate(now, 'Asia/Bangkok', 'yyyyMMddHHmmss');
+  const updatedAt = now.toISOString();
+  const rows = buildV2PersonSampleRows_(unitIds, timestamp, updatedAt);
+  const studentResult = writeV2PersonSampleRows_(
+    IROUP_V2_SHEETS.PERSON_STUDENT,
+    'student_id',
+    rows.students
+  );
+  if (!studentResult.success) return studentResult;
+
+  const staffResult = writeV2PersonSampleRows_(
+    IROUP_V2_SHEETS.PERSON_STAFF,
+    'staff_id',
+    rows.staff
+  );
+  if (!staffResult.success) return staffResult;
+
+  SpreadsheetApp.flush();
+  return adminResponseV2_(
+    true,
+    {
+      students_added: studentResult.total,
+      staff_added: staffResult.total,
+      student_ids: studentResult.data.ids,
+      staff_ids: staffResult.data.ids
+    },
+    studentResult.total + staffResult.total,
+    ''
+  );
+}
+
+function getV2PersonSampleUnitIds_() {
+  const unitRows = readV2Sheet_(IROUP_V2_SHEETS.UP_UNIT_MASTER).data || [];
+  return unitRows
+    .filter(function (row) {
+      return String(row.unit_id || '').trim() && !isSoftDeletedV2_(row);
+    })
+    .map(function (row) {
+      return String(row.unit_id || '').trim();
+    });
+}
+
+function buildV2PersonSampleRows_(unitIds, timestamp, updatedAt) {
+  const unitAt = function (index) {
+    return unitIds[index % unitIds.length];
+  };
+
+  const students = [
+    ['นาย', 'กิตติพงศ์', 'ใจดี', 'ชาย', 'วิทยาการคอมพิวเตอร์', 'ป.ตรี'],
+    ['นางสาว', 'พิมพ์ชนก', 'วัฒนกุล', 'หญิง', 'บริหารธุรกิจ', 'ป.ตรี'],
+    ['นาย', 'ธนกฤต', 'ศรีสุข', 'ชาย', 'วิศวกรรมซอฟต์แวร์', 'ป.โท'],
+    ['นางสาว', 'ณัฐธิดา', 'แก้วมณี', 'หญิง', 'สาธารณสุขศาสตร์', 'ป.ตรี'],
+    ['นาย', 'ภาคภูมิ', 'จันทร์หอม', 'ชาย', 'ภาษาอังกฤษ', 'ป.ตรี'],
+    ['นางสาว', 'ศิริลักษณ์', 'บุญเรือง', 'หญิง', 'นิติศาสตร์', 'ป.โท'],
+    ['นาย', 'วรพล', 'ตันติวงศ์', 'ชาย', 'รัฐศาสตร์', 'ป.ตรี'],
+    ['นางสาว', 'อรปรียา', 'คำแสน', 'หญิง', 'พยาบาลศาสตร์', 'ป.ตรี'],
+    ['นาย', 'ชานนท์', 'อินทร์แก้ว', 'ชาย', 'เศรษฐศาสตร์', 'ป.เอก'],
+    ['นางสาว', 'กัญญารัตน์', 'มีทรัพย์', 'หญิง', 'เทคโนโลยีสารสนเทศ', 'ป.ตรี'],
+    ['นาย', 'ปณิธาน', 'สุขเกษม', 'ชาย', 'วิทยาศาสตร์การกีฬา', 'ป.โท'],
+    ['นางสาว', 'ชลธิชา', 'แซ่ตั้ง', 'หญิง', 'การจัดการการท่องเที่ยว', 'ป.ตรี'],
+    ['นาย', 'ณภัทร', 'วงศ์คำ', 'ชาย', 'แพทยศาสตร์', 'ป.ตรี'],
+    ['นางสาว', 'สุพัตรา', 'ยอดแก้ว', 'หญิง', 'การบัญชี', 'ป.ตรี'],
+    ['นาย', 'พิชญะ', 'ธรรมรักษ์', 'ชาย', 'สถาปัตยกรรมศาสตร์', 'ป.โท'],
+    ['นางสาว', 'มนัสนันท์', 'แสงทอง', 'หญิง', 'วิทยาศาสตร์สิ่งแวดล้อม', 'ป.ตรี'],
+    ['นาย', 'อิทธิพล', 'พรมมา', 'ชาย', 'วิศวกรรมโยธา', 'ป.เอก'],
+    ['นางสาว', 'เบญจพร', 'พูลทรัพย์', 'หญิง', 'การสื่อสารดิจิทัล', 'ป.ตรี'],
+    ['นาย', 'ศุภณัฐ', 'นาคเกิด', 'ชาย', 'ชีววิทยา', 'ป.ตรี'],
+    ['นางสาว', 'ปรียาภรณ์', 'รัตนชัย', 'หญิง', 'หลักสูตรและการสอน', 'ป.โท']
+  ].map(function (item, index) {
+    const fullName = item[0] + item[1] + ' ' + item[2];
+    return {
+      student_id: 'STD-' + timestamp + '-' + String(index + 1).padStart(3, '0'),
+      prefix_th: item[0],
+      first_name_th: item[1],
+      last_name_th: item[2],
+      full_name_th: fullName,
+      gender: item[3],
+      unit_id: unitAt(index),
+      program_th: item[4],
+      degree_level: item[5],
+      student_status: 'active',
+      active: true,
+      source_system: 'manual',
+      updated_at: updatedAt
+    };
+  });
+
+  const staff = [
+    ['นาย', 'กิตติศักดิ์', 'สุวรรณศรี', 'Kittisak', 'Suwansri', 'ชาย', 'อาจารย์', 'academic'],
+    ['นางสาว', 'ปาริฉัตร', 'วงศ์ใหญ่', 'Parichat', 'Wongyai', 'หญิง', 'นักวิเทศสัมพันธ์', 'support'],
+    ['นาง', 'รัตนา', 'มณีรัตน์', 'Rattana', 'Maneerat', 'หญิง', 'ผู้ช่วยศาสตราจารย์', 'academic'],
+    ['นาย', 'ธีรภัทร', 'จอมคำ', 'Teerapat', 'Jomkham', 'ชาย', 'นักวิชาการศึกษา', 'support'],
+    ['นางสาว', 'อัญชลี', 'ศรีประเสริฐ', 'Anchalee', 'Sriprasert', 'หญิง', 'อาจารย์', 'academic'],
+    ['นาย', 'วิเชียร', 'บุญมาก', 'Wichian', 'Boonmak', 'ชาย', 'เจ้าหน้าที่บริหารงานทั่วไป', 'support'],
+    ['นางสาว', 'กมลชนก', 'อินทรชัย', 'Kamonchanok', 'Inthachai', 'หญิง', 'นักวิจัย', 'academic'],
+    ['นาย', 'สุเมธ', 'ใจมั่น', 'Sumet', 'Jaiman', 'ชาย', 'นักวิเคราะห์นโยบายและแผน', 'support'],
+    ['นาง', 'พัชรินทร์', 'คำภีร์', 'Patcharin', 'Khamphi', 'หญิง', 'รองศาสตราจารย์', 'academic'],
+    ['นาย', 'จักรพันธ์', 'ทองดี', 'Jakkaphan', 'Thongdee', 'ชาย', 'นักเทคโนโลยีสารสนเทศ', 'support'],
+    ['นางสาว', 'วิลาสินี', 'แสงแก้ว', 'Wilasinee', 'Saengkaew', 'หญิง', 'อาจารย์', 'academic'],
+    ['นาย', 'นพดล', 'ศรีมงคล', 'Nopphadon', 'Srimongkol', 'ชาย', 'นักประชาสัมพันธ์', 'support'],
+    ['นางสาว', 'สุชาดา', 'แก้วคำ', 'Suchada', 'Kaewkham', 'หญิง', 'ผู้ช่วยศาสตราจารย์', 'academic'],
+    ['นาย', 'ประเสริฐ', 'พูนผล', 'Prasert', 'Poonphon', 'ชาย', 'เจ้าหน้าที่การเงินและบัญชี', 'support'],
+    ['นาง', 'มาลินี', 'ธรรมวงศ์', 'Malinee', 'Thammawong', 'หญิง', 'อาจารย์', 'academic'],
+    ['นาย', 'อนุชา', 'ยอดยิ่ง', 'Anucha', 'Yodying', 'ชาย', 'นักทรัพยากรบุคคล', 'support'],
+    ['นางสาว', 'จิราพร', 'เผ่าพันธ์', 'Jiraporn', 'Phaophan', 'หญิง', 'นักวิจัย', 'academic'],
+    ['นาย', 'ไกรสร', 'มั่นคง', 'Kraison', 'Mankhong', 'ชาย', 'นักวิชาการคอมพิวเตอร์', 'support'],
+    ['นางสาว', 'เมธาวี', 'จันทร์ดี', 'Methavee', 'Chandee', 'หญิง', 'อาจารย์', 'academic'],
+    ['นาย', 'ธวัชชัย', 'สุขสำราญ', 'Thawatchai', 'Suksamran', 'ชาย', 'เจ้าหน้าที่ประสานงานโครงการ', 'support']
+  ].map(function (item, index) {
+    const fullNameTh = item[0] + item[1] + ' ' + item[2];
+    const fullNameEn = item[3] + ' ' + item[4];
+    return {
+      staff_id: 'STF-' + timestamp + '-' + String(index + 1).padStart(3, '0'),
+      prefix_th: item[0],
+      first_name_th: item[1],
+      last_name_th: item[2],
+      full_name_th: fullNameTh,
+      first_name_en: item[3],
+      last_name_en: item[4],
+      full_name_en: fullNameEn,
+      gender: item[5],
+      unit_id: unitAt(index + 3),
+      position: item[6],
+      staff_type: item[7],
+      active: true,
+      source_system: 'manual',
+      updated_at: updatedAt
+    };
+  });
+
+  return {
+    students: students,
+    staff: staff
+  };
+}
+
+function writeV2PersonSampleRows_(sheetName, idField, rows) {
+  const sheetResult = getV2Sheet_(sheetName);
+  if (!sheetResult.success) {
+    return adminResponseV2_(false, null, 0, sheetResult.error);
+  }
+
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  const idColumnIndex = headers.indexOf(idField) + 1;
+  if (idColumnIndex < 1) {
+    return adminResponseV2_(false, null, 0, sheetName + ' missing required column: ' + idField);
+  }
+
+  const fieldNames = Object.keys(rows[0] || {});
+  const missingFields = fieldNames.filter(function (field) {
+    return headers.indexOf(field) < 0;
+  });
+  if (missingFields.length) {
+    return adminResponseV2_(
+      false,
+      null,
+      0,
+      sheetName + ' missing required columns: ' + missingFields.join(', ')
+    );
+  }
+
+  const writtenIds = [];
+  rows.forEach(function (row) {
+    const targetRow = findFirstEmptyRowByKey_(sheet, idColumnIndex);
+    const values = headers.map(function (header) {
+      return Object.prototype.hasOwnProperty.call(row, header) ? row[header] : '';
+    });
+    sheet.getRange(targetRow, 1, 1, headers.length).setValues([values]);
+    writtenIds.push(row[idField]);
+  });
+
+  return adminResponseV2_(true, { ids: writtenIds }, writtenIds.length, '');
+}
+
 function getV2AdminMobilityProject_(mobilityId) {
   const valid = validateModuleRecordLinkV2_('mobility', mobilityId);
   if (!valid.success) return adminResponseV2_(false, null, 0, valid.error);
@@ -34,6 +216,7 @@ function listV2AdminMobilityProjects_(includeArchived) {
   const rows = ctx.tables[IROUP_V2_SHEETS.MOBILITY_PROJECT] || [];
   const dtos = rows
     .filter(function (row) {
+      if (!String(row.mobility_id || '').trim()) return false;
       if (isSoftDeletedV2_(row)) return false;
       if (includeArchived === true) return true;
       return ['cancelled', 'archived'].indexOf(String(row.status || '').trim()) < 0;
@@ -163,6 +346,149 @@ function createV2AdminMOU_(request) {
 
 function updateV2AdminMOU_(request) {
   return writeV2AdminMOUMetadata_(request, 'update');
+}
+
+function createV2AdminMobilityProject_(request) {
+  return writeV2AdminMobilityProjectMetadata_(request, 'create');
+}
+
+function updateV2AdminMobilityProject_(request) {
+  return writeV2AdminMobilityProjectMetadata_(request, 'update');
+}
+
+function deleteV2AdminMobilityProject_(request) {
+  const flag = getV2MobilityWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2MobilityWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const mobilityId = extractV2MobilityDeleteId_(request);
+  if (!mobilityId) {
+    return adminResponseV2_(false, null, 0, 'mobility_id is required for mobility delete.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId);
+  if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+
+  const persisted = updateV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId, {
+    is_deleted: true,
+    updated_by: actor.user.email || '',
+    updated_at: new Date().toISOString()
+  });
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      mobility_id: mobilityId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    mobility_id: mobilityId
+  }, 1, '');
+}
+
+function listV2AdminMobilityParticipants_(request) {
+  const mobilityId = extractV2MobilityParticipantMobilityId_(request);
+  if (!mobilityId) {
+    return adminResponseV2_(false, null, 0, 'mobility_id is required for mobility participant list.');
+  }
+
+  const read = readV2Sheet_(IROUP_V2_SHEETS.MOBILITY_PARTICIPANT);
+  if (!read.success) return adminResponseV2_(false, null, 0, read.error);
+
+  const participants = (read.data || [])
+    .filter(function (row) {
+      return String(row.mobility_id || '').trim() === String(mobilityId || '').trim()
+        && !isSoftDeletedV2_(row);
+    })
+    .map(mapV2AdminMobilityParticipantDto_);
+
+  return adminResponseV2_(true, participants, participants.length, '');
+}
+
+function addV2AdminMobilityParticipant_(request) {
+  const actor = authorizeV2MobilityWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const payload = extractV2MobilityParticipantPayload_(request);
+  const normalized = normalizeV2MobilityParticipantPayload_(payload);
+  if (!normalized.success) {
+    return adminResponseV2_(false, normalized.data, 0, normalized.error);
+  }
+
+  const mobilityId = normalized.data.mobility_id;
+  const existing = findV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId);
+  if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+  if (isSoftDeletedV2_(existing.data)) return adminResponseV2_(false, null, 0, 'Cannot add participant to a deleted mobility project.');
+
+  const now = new Date().toISOString();
+  const row = {
+    participant_id: generateV2Id_(IROUP_V2_ID_PREFIXES.MOBILITY_PARTICIPANT),
+    mobility_id: mobilityId,
+    participant_type: normalized.data.participant_type,
+    person_source: normalized.data.person_source,
+    person_id: normalized.data.person_id,
+    unit_id_snapshot: normalized.data.unit_id_snapshot,
+    full_name_snapshot: normalized.data.full_name_snapshot,
+    gender_snapshot: normalized.data.gender_snapshot,
+    program_or_position_snapshot: normalized.data.program_or_position_snapshot,
+    role: normalized.data.role,
+    is_deleted: false,
+    created_by: actor.user.email || '',
+    created_at: now
+  };
+
+  const persisted = appendV2MobilityParticipantRow_(row);
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      participant_id: row.participant_id,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    participant_id: row.participant_id
+  }, 1, '');
+}
+
+function deleteV2AdminMobilityParticipant_(request) {
+  const actor = authorizeV2MobilityWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const participantId = extractV2MobilityParticipantDeleteId_(request);
+  if (!participantId) {
+    return adminResponseV2_(false, null, 0, 'participant_id is required for mobility participant delete.');
+  }
+
+  const persisted = updateV2RowById_(IROUP_V2_SHEETS.MOBILITY_PARTICIPANT, 'participant_id', participantId, {
+    is_deleted: true
+  });
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      participant_id: participantId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    participant_id: participantId
+  }, 1, '');
 }
 
 function deleteV2AdminMOU_(request) {
@@ -505,6 +831,103 @@ function writeV2AdminMOUMetadata_(request, mode) {
   }, 1, '');
 }
 
+function writeV2AdminMobilityProjectMetadata_(request, mode) {
+  const flag = getV2MobilityWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2MobilityWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const context = buildV2AdminContext_();
+  if (!context.success) return context;
+
+  const writeMode = String(mode || '').trim().toLowerCase();
+  const previewMode = writeMode === 'update' ? 'update' : 'create';
+  const preview = buildV2MobilityProjectWritePreview_(request, context.data, previewMode);
+  if (!preview.success) {
+    return adminResponseV2_(false, preview.data, 0, preview.error);
+  }
+
+  const now = new Date().toISOString();
+  const adminEmail = actor.user.email || '';
+  const normalized = preview.data.normalized_mobility || {};
+  let persisted;
+
+  if (writeMode === 'update') {
+    const mobilityId = cleanV2EventText_(normalized.mobility_id);
+    if (!mobilityId) {
+      return adminResponseV2_(false, preview.data, 0, 'mobility_id is required for mobility update.');
+    }
+
+    const existing = findV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId);
+    if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+    if (isSoftDeletedV2_(existing.data)) return adminResponseV2_(false, null, 0, 'Cannot update a deleted mobility project.');
+
+    const patch = buildV2MobilityProjectSheetRow_(normalized);
+    delete patch.mobility_id;
+    delete patch.created_by;
+    delete patch.created_at;
+    patch.updated_by = adminEmail;
+    patch.updated_at = now;
+
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId, patch);
+  } else {
+    const row = buildV2MobilityProjectSheetRow_(normalized);
+    row.mobility_id = generateV2Id_(IROUP_V2_ID_PREFIXES.MOBILITY_PROJECT);
+    row.created_by = adminEmail;
+    row.updated_by = adminEmail;
+    row.created_at = now;
+    row.updated_at = now;
+
+    persisted = appendV2Row_(IROUP_V2_SHEETS.MOBILITY_PROJECT, row, {
+      idField: 'mobility_id',
+      requiredFields: ['mobility_id', 'direction', 'project_name', 'institution_name', 'country_id', 'up_unit_id', 'purpose', 'start_date', 'end_date', 'fiscal_year', 'status']
+    });
+  }
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      write_enabled: true,
+      mode: writeMode,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  const dto = mapV2AdminMobilityProjectDto_(persisted.data, context.data, false);
+  return adminResponseV2_(true, {
+    dry_run: false,
+    write_enabled: true,
+    mode: writeMode,
+    target_sheet: IROUP_V2_SHEETS.MOBILITY_PROJECT,
+    mobility: dto,
+    persisted_mobility: persisted.data,
+    actor: {
+      email: adminEmail,
+      role: actor.user.role || ''
+    },
+    relation_writes: {
+      participants: [],
+      files: [],
+      budgets: []
+    },
+    skipped_operations: [
+      'participant_write',
+      'file_upload',
+      'file_relation_write',
+      'budget_relation_write'
+    ],
+    diagnostics: persisted.diagnostics || {}
+  }, 1, '');
+}
+
 function writeV2AdminEventMetadata_(request, mode) {
   const flag = getV2EventWriteFeatureFlag_();
   if (!flag.enabled) {
@@ -729,6 +1152,16 @@ function getV2MOUWriteFeatureFlag_() {
   };
 }
 
+function getV2MobilityWriteFeatureFlag_() {
+  const property = 'IROUP_V2_MOBILITY_WRITE_ENABLED';
+  const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
+  return {
+    enabled: value === 'TRUE',
+    property: property,
+    error: value === 'TRUE' ? '' : 'V2 mobility metadata writes are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
+  };
+}
+
 function ensureV2MOUContinentColumn_() {
   const sheetResult = getV2Sheet_(IROUP_V2_SHEETS.MOU);
   if (!sheetResult.success) return sheetResult;
@@ -811,6 +1244,21 @@ function authorizeV2MOUWriteActor_(request) {
   return { success: true, user: user, error: '' };
 }
 
+function authorizeV2MobilityWriteActor_(request) {
+  const user = request && request.user ? request.user : null;
+  if (!user || !user.email) {
+    return { success: false, user: null, error: 'V2 admin identity is required for mobility writes.' };
+  }
+
+  const role = String(user.role || '').trim().toLowerCase();
+  const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
+  if (allowed.indexOf(role) < 0) {
+    return { success: false, user: null, error: 'V2 admin role is not allowed for mobility writes.' };
+  }
+
+  return { success: true, user: user, error: '' };
+}
+
 function authorizeV2FileUploadActor_(request) {
   const user = request && request.user ? request.user : null;
   if (!user || !user.email) {
@@ -869,6 +1317,31 @@ function buildV2MOUSheetRow_(normalized) {
     status: cleanV2EventText_(data.status || 'draft'),
     public_visible: isTruthyV2_(data.public_visible),
     public_file_allowed: isTruthyV2_(data.public_file_allowed),
+    is_deleted: false
+  };
+}
+
+function buildV2MobilityProjectSheetRow_(normalized) {
+  const data = normalized || {};
+  return {
+    mobility_id: cleanV2EventText_(data.mobility_id),
+    direction: cleanV2EventText_(data.direction),
+    project_name: cleanV2EventText_(data.project_name),
+    institution_name: cleanV2EventText_(data.institution_name),
+    country_id: cleanV2EventText_(data.country_id),
+    city: cleanV2EventText_(data.city),
+    up_unit_id: cleanV2EventText_(data.up_unit_id),
+    purpose: cleanV2EventText_(data.purpose),
+    level: cleanV2EventText_(data.level),
+    participant_group: cleanV2EventText_(data.participant_group),
+    start_date: cleanV2EventText_(data.start_date),
+    end_date: cleanV2EventText_(data.end_date),
+    fiscal_year: cleanV2EventText_(data.fiscal_year),
+    participant_count_cached: toNumberV2_(data.participant_count),
+    student_count: toNumberV2_(data.student_count),
+    staff_count: toNumberV2_(data.staff_count),
+    status: cleanV2EventText_(data.status || 'draft'),
+    public_visible: isTruthyV2_(data.public_visible),
     is_deleted: false
   };
 }
@@ -949,6 +1422,68 @@ function buildV2MOUWritePreview_(request, ctx, mode) {
         'file_upload',
         'image_upload',
         'file_relation_write',
+        'delete'
+      ]
+    }
+  };
+}
+
+function buildV2MobilityProjectWritePreview_(request, ctx, mode) {
+  const payload = extractV2MobilityWritePayload_(request);
+  const normalized = normalizeV2MobilityWritePayload_(payload, ctx);
+  const errors = [];
+  const warnings = normalized.warnings || [];
+  const data = normalized.data || {};
+  const actionMode = String(mode || 'validate').trim();
+  const normalizedMode = actionMode.toLowerCase();
+
+  if (normalizedMode.indexOf('update') === 0 && !data.mobility_id) {
+    errors.push({ field: 'mobility_id', code: 'MOBILITY_ID_REQUIRED', message: 'mobility_id is required for mobility update.' });
+  }
+
+  ['direction', 'project_name', 'institution_name', 'country_id', 'up_unit_id', 'purpose', 'start_date', 'end_date', 'fiscal_year', 'status'].forEach(function (field) {
+    if (!data[field]) {
+      errors.push({ field: field, code: field.toUpperCase() + '_REQUIRED', message: field + ' is required.' });
+    }
+  });
+
+  if (data.end_date && data.start_date && data.end_date < data.start_date) {
+    errors.push({ field: 'end_date', code: 'END_BEFORE_START', message: 'end_date must be the same as or after start_date.' });
+  }
+
+  if (data.direction) {
+    const directionCheck = validateDirectionV2_(data.direction);
+    if (!directionCheck.success) errors.push({ field: 'direction', code: directionCheck.code, message: directionCheck.error });
+  }
+
+  if (data.status) {
+    const statusCheck = validateEnumV2_(data.status, IROUP_V2_ENUMS.status, 'status');
+    if (!statusCheck.success) errors.push({ field: 'status', code: statusCheck.code, message: statusCheck.error });
+  }
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'Mobility metadata payload validation failed.' : '',
+    data: {
+      dry_run: true,
+      mode: actionMode,
+      target_sheet: IROUP_V2_SHEETS.MOBILITY_PROJECT,
+      write_enabled: false,
+      valid: errors.length === 0,
+      errors: errors,
+      warnings: warnings,
+      normalized_mobility: data,
+      relation_writes: {
+        participants: [],
+        files: [],
+        budgets: []
+      },
+      blocked_operations: [
+        'sheet_write',
+        'participant_write',
+        'file_upload',
+        'file_relation_write',
+        'budget_relation_write',
         'delete'
       ]
     }
@@ -1112,6 +1647,46 @@ function extractV2MOUWritePayload_(request) {
   return params;
 }
 
+function extractV2MobilityWritePayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.mobility || params.payload || params.mobility || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
+function extractV2MobilityParticipantPayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.participant || params.payload || params.participant || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
 function extractV2ScholarshipWritePayload_(request) {
   const params = request && request.params ? request.params : {};
   const body = request && request.body ? request.body : {};
@@ -1186,6 +1761,38 @@ function extractV2MOUDeleteId_(request) {
     }
   }
   return cleanV2EventText_(body.mou_id || params.mou_id || body.id || params.id || body.record_id || params.record_id || '');
+}
+
+function extractV2MobilityDeleteId_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.mobility || params.payload || params.mobility || null;
+  if (candidate && typeof candidate === 'object') {
+    return cleanV2EventText_(candidate.mobility_id || candidate.id || candidate.record_id || '');
+  }
+  if (candidate && typeof candidate === 'string') {
+    try {
+      const parsed = JSON.parse(candidate);
+      return cleanV2EventText_(parsed.mobility_id || parsed.id || parsed.record_id || '');
+    } catch (err) {
+      return cleanV2EventText_(params.mobility_id || params.id || params.record_id || '');
+    }
+  }
+  return cleanV2EventText_(body.mobility_id || params.mobility_id || body.id || params.id || body.record_id || params.record_id || '');
+}
+
+function extractV2MobilityParticipantMobilityId_(request) {
+  const payload = extractV2MobilityParticipantPayload_(request);
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  return cleanV2EventText_(payload.mobility_id || body.mobility_id || params.mobility_id || payload.id || body.id || params.id || '');
+}
+
+function extractV2MobilityParticipantDeleteId_(request) {
+  const payload = extractV2MobilityParticipantPayload_(request);
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  return cleanV2EventText_(payload.participant_id || body.participant_id || params.participant_id || payload.id || body.id || params.id || '');
 }
 
 function normalizeV2FileUploadPayload_(payload) {
@@ -1329,6 +1936,107 @@ function normalizeV2MOUWritePayload_(payload, ctx) {
   };
 
   return { data: normalized, warnings: warnings };
+}
+
+function normalizeV2MobilityWritePayload_(payload, ctx) {
+  const source = payload || {};
+  const warnings = [];
+  if (source.payload_parse_error) {
+    warnings.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  }
+
+  const country = resolveV2EventCountryRef_(source, ctx, warnings);
+  const unit = resolveV2MOUUnitRef_(source, ctx, warnings);
+  const normalized = {
+    mobility_id: cleanV2EventText_(pickV2EventValue_(source, ['mobility_id', 'id'])),
+    direction: cleanV2EventText_(source.direction || ''),
+    project_name: cleanV2EventText_(source.project_name || ''),
+    institution_name: cleanV2EventText_(source.institution_name || ''),
+    country_id: country.country_id,
+    country_display: country.display,
+    city: cleanV2EventText_(source.city || ''),
+    up_unit_id: unit.unit_id,
+    up_unit_display: unit.display,
+    purpose: cleanV2EventText_(source.purpose || ''),
+    level: cleanV2EventText_(source.level || ''),
+    participant_group: cleanV2EventText_(source.participant_group || ''),
+    start_date: normalizeV2EventDate_(source.start_date || ''),
+    end_date: normalizeV2EventDate_(source.end_date || ''),
+    fiscal_year: cleanV2EventText_(source.fiscal_year || ''),
+    participant_count: toNumberV2_(pickV2EventValue_(source, ['participant_count', 'participantCount', 'count'])),
+    student_count: toNumberV2_(pickV2EventValue_(source, ['student_count', 'studentCount'])),
+    staff_count: toNumberV2_(pickV2EventValue_(source, ['staff_count', 'staffCount'])),
+    status: cleanV2EventText_(source.status || 'draft'),
+    public_visible: isTruthyV2_(source.public_visible),
+    is_deleted: false
+  };
+
+  return { data: normalized, warnings: warnings };
+}
+
+function normalizeV2MobilityParticipantPayload_(payload) {
+  const source = payload || {};
+  const errors = [];
+  const participantType = normalizeV2MobilityParticipantType_(source.participant_type);
+  const personSource = normalizeV2MobilityPersonSource_(source.person_source);
+  const normalized = {
+    mobility_id: cleanV2EventText_(source.mobility_id || ''),
+    participant_type: participantType,
+    person_source: personSource,
+    person_id: cleanV2EventText_(source.person_id || ''),
+    full_name_snapshot: cleanV2EventText_(source.full_name_snapshot || ''),
+    gender_snapshot: cleanV2EventText_(source.gender_snapshot || ''),
+    unit_id_snapshot: cleanV2EventText_(source.unit_id_snapshot || ''),
+    program_or_position_snapshot: cleanV2EventText_(source.program_or_position_snapshot || ''),
+    role: cleanV2EventText_(source.role || '')
+  };
+
+  if (source.payload_parse_error) errors.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  if (!normalized.mobility_id) errors.push({ field: 'mobility_id', code: 'MOBILITY_ID_REQUIRED', message: 'mobility_id is required.' });
+  if (!normalized.participant_type) errors.push({ field: 'participant_type', code: 'PARTICIPANT_TYPE_REQUIRED', message: 'participant_type is required.' });
+  if (participantType && ['student', 'staff', 'manual'].indexOf(participantType) < 0) {
+    errors.push({ field: 'participant_type', code: 'PARTICIPANT_TYPE_INVALID', message: 'participant_type must be student, staff, or manual.' });
+  }
+  if (!normalized.person_source) errors.push({ field: 'person_source', code: 'PERSON_SOURCE_REQUIRED', message: 'person_source is required.' });
+  if (personSource && ['PERSON_STUDENT', 'PERSON_STAFF', 'manual'].indexOf(personSource) < 0) {
+    errors.push({ field: 'person_source', code: 'PERSON_SOURCE_INVALID', message: 'person_source must be PERSON_STUDENT, PERSON_STAFF, or manual.' });
+  }
+  if (!normalized.full_name_snapshot) errors.push({ field: 'full_name_snapshot', code: 'FULL_NAME_REQUIRED', message: 'full_name_snapshot is required.' });
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'Mobility participant payload validation failed.' : '',
+    data: {
+      valid: errors.length === 0,
+      errors: errors,
+      mobility_id: normalized.mobility_id,
+      participant_type: normalized.participant_type,
+      person_source: normalized.person_source,
+      person_id: normalized.person_id,
+      full_name_snapshot: normalized.full_name_snapshot,
+      gender_snapshot: normalized.gender_snapshot,
+      unit_id_snapshot: normalized.unit_id_snapshot,
+      program_or_position_snapshot: normalized.program_or_position_snapshot,
+      role: normalized.role
+    }
+  };
+}
+
+function normalizeV2MobilityParticipantType_(value) {
+  const text = cleanV2EventText_(value).toLowerCase();
+  if (text === 'student') return 'student';
+  if (text === 'staff') return 'staff';
+  if (text === 'manual' || text === 'person_manual') return 'manual';
+  return text;
+}
+
+function normalizeV2MobilityPersonSource_(value) {
+  const text = cleanV2EventText_(value);
+  const lower = text.toLowerCase();
+  if (lower === 'person_student' || lower === 'student') return 'PERSON_STUDENT';
+  if (lower === 'person_staff' || lower === 'staff') return 'PERSON_STAFF';
+  if (lower === 'manual' || lower === 'person_manual') return 'manual';
+  return text;
 }
 
 function normalizeV2ScholarshipWritePayload_(payload, ctx) {
@@ -1561,6 +2269,60 @@ function findV2RelationRows_(ctx, sheetName, module, recordId) {
       && String(row.record_id || '').trim() === String(recordId || '').trim()
       && !isSoftDeletedV2_(row);
   });
+}
+
+function appendV2MobilityParticipantRow_(row) {
+  const diagnostics = {
+    sheetName: IROUP_V2_SHEETS.MOBILITY_PARTICIPANT,
+    idField: 'participant_id',
+    idValue: row && row.participant_id ? String(row.participant_id) : '',
+    headers: [],
+    missingHeaders: [],
+    emptyRequiredFields: [],
+    rowNumber: 0
+  };
+  const sheetResult = getV2Sheet_(IROUP_V2_SHEETS.MOBILITY_PARTICIPANT);
+  if (!sheetResult.success) {
+    return { success: false, data: null, error: sheetResult.error, total: 0, diagnostics: diagnostics };
+  }
+
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  diagnostics.headers = headers;
+  if (!headers.length) {
+    diagnostics.missingHeaders = ['<all>'];
+    return { success: false, data: null, error: 'Missing headers in V2 sheet: ' + IROUP_V2_SHEETS.MOBILITY_PARTICIPANT, total: 0, diagnostics: diagnostics };
+  }
+
+  const requiredFields = ['participant_id', 'mobility_id', 'participant_type', 'person_source', 'full_name_snapshot', 'is_deleted', 'created_by', 'created_at'];
+  requiredFields.forEach(function (field) {
+    if (headers.indexOf(field) < 0) {
+      diagnostics.missingHeaders.push(field);
+      return;
+    }
+    const value = row[field];
+    if (value === undefined || value === null || String(value).trim() === '') {
+      diagnostics.emptyRequiredFields.push(field);
+    }
+  });
+
+  if (diagnostics.missingHeaders.length || diagnostics.emptyRequiredFields.length) {
+    return { success: false, data: null, error: 'V2 participant append preflight failed for ' + IROUP_V2_SHEETS.MOBILITY_PARTICIPANT, total: 0, diagnostics: diagnostics };
+  }
+
+  const values = headers.map(function (header) {
+    return row[header] !== undefined ? row[header] : '';
+  });
+
+  try {
+    const keyColumnIndex = getV2AppendKeyColumnIndex_(headers, 'participant_id');
+    diagnostics.rowNumber = findFirstEmptyRowByKey_(sheet, keyColumnIndex);
+    sheet.getRange(diagnostics.rowNumber, 1, 1, headers.length).setValues([values]);
+    SpreadsheetApp.flush();
+    return { success: true, data: rowToObjectV2_(headers, values), error: '', total: 1, diagnostics: diagnostics };
+  } catch (err) {
+    return { success: false, data: null, error: String(err && err.message ? err.message : err), total: 0, diagnostics: diagnostics };
+  }
 }
 
 function getOrCreateV2FileUploadFolder_(folderName) {
