@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทุนการศึกษา - iROUP V2</title>
+<link rel="stylesheet" href="css/iroup-theme.css">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="js/iroup-config.js"></script>
+<script src="js/iroup-v2-endpoint.js"></script>
+<script src="js/iroup-v2-api.js"></script>
+<script src="js/iroup-utils.js"></script>
+<style>
+*{box-sizing:border-box}
+:root{--blue:#1A6DB5;--sky:#4BBDE8;--navy:#0F2D5A;--dark:#071828;--green:#5BAD3E;--gold:#F5A623;--red:#D63B32;--purple:#7C3AED;--teal:#0D9488;--bg:#F5F8FC;--card:#fff;--line:#DCE7F2;--text:#10233f;--muted:#52647a;--soft:#E8F4FD;--shadow:0 9px 30px rgba(15,45,90,.12);--radius:18px}
+body{margin:0;font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select,textarea{font:inherit}
+.app{min-height:100vh}
+.sidebar{width:250px;min-width:250px;height:100vh;background:#fff;border-right:1px solid #E6EDF6;position:fixed;left:0;top:0;z-index:20;display:flex;flex-direction:column}
+.brand{height:76px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid #E6EDF6}
+.brand img{width:68px;height:auto;object-fit:contain}
+.brand-title{font-size:12px;color:#66758a;line-height:1.25}.brand-title b{color:var(--navy);font-weight:900}
+.nav{padding:16px 12px;overflow:auto;flex:1}.nav-section{font-size:11px;font-weight:800;color:#6b7f96;text-transform:uppercase;margin:18px 12px 8px}
+.nav-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;color:#26364e;text-decoration:none;font-weight:800;font-size:14px;margin-bottom:4px}
+.nav-link:hover{background:#F1F7FD;color:var(--blue)}.nav-link.active{background:var(--soft);color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+.nav-icon{font-size:20px;width:24px;text-align:center}.userbox{margin-top:auto;padding:16px;border-top:1px solid #E6EDF6;display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--blue));display:grid;place-items:center;color:#fff;font-weight:900}
+.user-name{font-size:12px;font-weight:900}.user-sub{font-size:11px;color:#66758a}
+.main{margin-left:250px;min-height:100vh;padding:24px}
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:18px}.title{font-size:28px;font-weight:900;color:var(--navy);line-height:1.1}.subtitle{font-size:13px;color:var(--muted);margin-top:4px}.page-header .subtitle,.dark-header .subtitle,.topbar.dark .subtitle{color:rgba(255,255,255,.75)}.topbar .scholar-header-subtitle{color:rgba(255,255,255,.72)!important}.spacer{flex:1}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;min-height:42px}
+.btn:hover{border-color:#BBD7EF;box-shadow:0 6px 16px rgba(15,45,90,.08)}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{background:#fff;color:var(--red);border-color:#F5C4C0}.btn.ghost{background:transparent}.btn:disabled{opacity:.55;cursor:not-allowed}
+.lang-toggle,.view-toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px}.lang-toggle button,.view-toggle button{border:0;background:transparent;border-radius:9px;padding:7px 10px;font-weight:900;cursor:pointer;color:var(--muted)}.lang-toggle button.active,.view-toggle button.active{background:var(--blue);color:#fff}
+.toolbar{display:grid;grid-template-columns:1.4fr .9fr .8fr .6fr auto;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:16px}
+.input,.select,.textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;color:var(--text);outline:none}.textarea{min-height:92px;resize:vertical;font-family:'Sarabun',sans-serif}.input:focus,.select:focus,.textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,109,181,.12)}
+.notice{display:none;margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid #BBD7EF;background:#F1F8FE;color:#174B7A;font-weight:700}.notice.error{background:#FFF5F4;border-color:#F5C4C0;color:#A62C25}.notice.ok{background:#F4FBF2;border-color:#C7E8BC;color:#356D27}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.scholar-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(15,45,90,.06);display:flex;flex-direction:column;min-height:360px}
+.poster{height:138px;background:linear-gradient(135deg,#E8F4FD,#F8FBFE);display:grid;place-items:center;color:var(--blue);font-weight:900}.poster img{width:100%;height:100%;object-fit:cover}.poster span{font-size:34px}
+.card-body{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1}.card-title{font-weight:900;line-height:1.35;font-size:16px}.card-sub{font-size:12px;color:var(--muted);line-height:1.5}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meta-item{font-size:12px;color:var(--muted);background:#F8FBFE;border:1px solid #EDF3F8;border-radius:12px;padding:8px}.meta-item b{display:block;color:var(--text);font-size:13px;margin-top:2px}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.active{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.draft{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.closed{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.pin{color:#6D43BA;background:#F6F0FF;border-color:#D8C8FF}.badge.type{color:#174B7A;background:#F1F8FE;border-color:#BBD7EF}.badge.days-green{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.days-yellow{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.days-red{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.done{color:#56657A;background:#F3F6FA;border-color:#D7E1EA}
+.card-actions{margin-top:auto;display:flex;justify-content:flex-end;gap:8px}.empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}
+.list-wrap{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:auto;box-shadow:0 6px 20px rgba(15,45,90,.06)}.scholar-table{width:100%;border-collapse:collapse;min-width:980px}.scholar-table th,.scholar-table td{padding:12px 14px;border-bottom:1px solid #EDF3F8;text-align:left;vertical-align:middle;font-size:13px}.scholar-table th{background:#F8FBFE;color:#344761;font-weight:900}.scholar-table tr:last-child td{border-bottom:0}.title-cell{font-weight:900;color:var(--navy)}
+.modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1080px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
+.form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.checks{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}
+.file-picker-row{display:flex;gap:10px;flex-wrap:wrap}.file-list{display:grid;gap:8px;margin-top:8px}.file-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);background:#F8FBFE;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:800;color:var(--muted)}.file-chip.uploading{color:var(--blue)}.file-chip.error{color:var(--red);border-color:#F5C4C0;background:#FFF5F4}.file-chip button{min-height:30px;padding:5px 9px}.poster-preview{width:160px;height:96px;border-radius:12px;border:1px dashed #BFD0E0;background:#F8FBFE;display:grid;place-items:center;overflow:hidden;color:var(--muted);font-size:12px}.poster-preview.has-image{position:relative}.poster-preview img{width:100%;height:100%;object-fit:cover}.preview-remove{position:absolute;right:6px;top:6px;z-index:3;width:30px;height:30px;min-height:30px;border:0;border-radius:50%;background:rgba(7,24,40,.86);color:#fff;font-size:20px;line-height:1;font-weight:900;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 12px rgba(7,24,40,.35)}.file-status{min-height:20px;margin-top:8px;color:var(--muted);font-size:12px;font-weight:800}.file-status.active{color:var(--blue)}
+.loading{display:grid;place-items:center;padding:36px;color:var(--muted);font-weight:800}.spinner{width:28px;height:28px;border:3px solid #D8E7F4;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:auto auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{justify-content:center}}
+@media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:16px}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.topbar{align-items:flex-start;flex-wrap:wrap}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/iroup-logo.png" alt="iROUP">
+      <div class="brand-title"><b>iROUP</b><br>International<br>Relations Office</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">OVERVIEW</div>
+      <a class="nav-link" href="dashboard.html"><span class="nav-icon">📊</span><span>Executive Dashboard</span></a>
+      <div class="nav-section">MANAGEMENT</div>
+      <a class="nav-link" href="mou.html"><span class="nav-icon">🤝</span><span>MOU</span></a>
+      <a class="nav-link" href="mobility.html"><span class="nav-icon">🌏</span><span>Mobility</span></a>
+      <a class="nav-link" href="travel.html"><span class="nav-icon">✈️</span><span>การเดินทาง</span></a>
+      <a class="nav-link active" href="scholarship.html"><span class="nav-icon">🎓</span><span>ทุนการศึกษา</span></a>
+      <a class="nav-link" href="events.html"><span class="nav-icon">📅</span><span>กิจกรรม</span></a>
+      <a class="nav-link" href="report.html"><span class="nav-icon">📋</span><span>รายงาน & Export</span></a>
+      <div class="nav-section">PUBLIC</div>
+      <a class="nav-link" href="public/public-landing.html"><span class="nav-icon">🌐</span><span>Public View</span></a>
+    </nav>
+    <div class="userbox">
+      <div class="avatar">IR</div>
+      <div><div class="user-name">งานวิเทศสัมพันธ์</div><div class="user-sub">University of Phayao</div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="title">ทุนการศึกษา</div>
+        <div class="subtitle scholar-header-subtitle">จัดการข้อมูลทุนการศึกษาด้วย V2 เป็นแหล่งข้อมูลหลัก</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="lang-toggle" aria-label="Language">
+        <button type="button" id="langThBtn" class="active" onclick="setLang('th')">TH</button>
+        <button type="button" id="langEnBtn" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="view-toggle" aria-label="View mode">
+        <button type="button" id="cardViewBtn" class="active" onclick="setViewMode('card')">การ์ด</button>
+        <button type="button" id="listViewBtn" onclick="setViewMode('list')">ตาราง</button>
+      </div>
+      <button class="btn" type="button" onclick="loadScholarships(true)">↻ <span>โหลดใหม่</span></button>
+      <button class="btn primary" type="button" onclick="openCreateModal()">+ <span>เพิ่มทุนการศึกษา</span></button>
+    </header>
+
+    <section class="toolbar" aria-label="Scholarship filters">
+      <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อทุน / สถาบัน / ประเทศ / ประเภท" oninput="renderScholarships()">
+      <select id="typeFilter" class="select" onchange="renderScholarships()"><option value="">ทุกประเภท</option></select>
+      <select id="statusFilter" class="select" onchange="renderScholarships()">
+        <option value="">ทุกสถานะ</option>
+        <option value="draft">ร่าง</option>
+        <option value="active">เผยแพร่</option>
+        <option value="closed">ปิดรับ</option>
+      </select>
+      <select id="yearFilter" class="select" onchange="renderScholarships()"><option value="">ทุกปี</option></select>
+      <button class="btn ghost" type="button" onclick="clearFilters()">ล้างตัวกรอง</button>
+    </section>
+
+    <div id="notice" class="notice"></div>
+    <section id="scholarCards" class="cards"><div class="loading"><div><div class="spinner"></div>กำลังโหลดข้อมูล...</div></div></section>
+  </main>
+</div>
+
+<div id="scholarModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-panel">
+    <form id="scholarForm" onsubmit="saveScholarship(event)">
+      <div class="modal-head">
+        <div>
+          <div id="modalTitle" class="modal-title">เพิ่มทุนการศึกษา</div>
+          <div id="modalSub" class="subtitle">V2-native SCHOLARSHIP metadata</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn" type="button" onclick="closeModal()">ปิด</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="scholarshipId">
+
+        <section class="form-section">
+          <div class="section-title">ข้อมูลหลัก</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="titleTh">ชื่อทุน (TH) <span class="req">*</span></label>
+              <input id="titleTh" class="input" name="title_th" required>
+            </div>
+            <div class="field">
+              <label class="label" for="titleEn">ชื่อทุน (EN)</label>
+              <input id="titleEn" class="input" name="title_en">
+            </div>
+            <div class="field">
+              <label class="label" for="institutionName">สถาบัน <span class="req">*</span><span class="hint">พิมพ์หรือเลือกจากรายการ</span></label>
+              <input id="institutionName" class="input" list="institutionOptions" name="institution_name" required>
+              <datalist id="institutionOptions"></datalist>
+            </div>
+            <div class="field">
+              <label class="label" for="countryInput">ประเทศ <span class="req">*</span><span class="hint">พิมพ์เพื่อค้นหา</span></label>
+              <input id="countryInput" class="input" list="countryOptions" name="country_display" required oninput="updateCountryIdFromInput()">
+              <input id="countryId" type="hidden" name="country_id">
+              <datalist id="countryOptions"></datalist>
+            </div>
+            <div class="field">
+              <label class="label" for="scholarshipType">ประเภททุน <span class="req">*</span><span class="hint">พิมพ์หรือเลือกจากรายการ</span></label>
+              <input id="scholarshipType" class="input" list="typeOptions" name="scholarship_type" required>
+              <datalist id="typeOptions"></datalist>
+            </div>
+            <div class="field">
+              <label class="label" for="fundingType">รูปแบบทุน</label>
+              <select id="fundingType" class="select" name="funding_type">
+                <option value="full">ทุนเต็มจำนวน</option>
+                <option value="partial">ทุนบางส่วน</option>
+                <option value="self">ทุนส่วนตัว</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label" for="targetGroup">กลุ่มเป้าหมาย</label>
+              <select id="targetGroup" class="select" name="target_group">
+                <option value="student">นิสิต</option>
+                <option value="staff">บุคลากร</option>
+                <option value="both">นิสิตและบุคลากร</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">รายละเอียด</div>
+          <div class="form-grid">
+            <div class="field full">
+              <label class="label" for="coverSummary">สรุปสั้น</label>
+              <textarea id="coverSummary" class="textarea" name="cover_summary"></textarea>
+            </div>
+            <div class="field">
+              <label class="label" for="coverageTh">สิทธิประโยชน์ (TH)</label>
+              <textarea id="coverageTh" class="textarea" name="coverage_th"></textarea>
+            </div>
+            <div class="field">
+              <label class="label" for="coverageEn">สิทธิประโยชน์ (EN)</label>
+              <textarea id="coverageEn" class="textarea" name="coverage_en"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">วันที่</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="publishDate">วันที่เผยแพร่</label>
+              <input id="publishDate" class="input" type="date" name="publish_date">
+            </div>
+            <div class="field">
+              <label class="label" for="openDate">วันเปิดรับ <span class="req">*</span></label>
+              <input id="openDate" class="input" type="date" name="open_date" required onchange="updateYearPreview()">
+            </div>
+            <div class="field">
+              <label class="label" for="closeDate">วันปิดรับ <span class="req">*</span></label>
+              <input id="closeDate" class="input" type="date" name="close_date" required onchange="updateYearPreview()">
+            </div>
+            <div class="field">
+              <label class="label" for="yearPreview">ปีงบประมาณ</label>
+              <input id="yearPreview" class="input" readonly>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">ลิงก์</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="applyUrl">ลิงก์สมัคร</label>
+              <input id="applyUrl" class="input" name="apply_url">
+            </div>
+            <div class="field">
+              <label class="label" for="detailUrl">ลิงก์รายละเอียด</label>
+              <input id="detailUrl" class="input" name="detail_url">
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">การตั้งค่า</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="statusSelect">สถานะ</label>
+              <select id="statusSelect" class="select" name="status">
+                <option value="draft">ร่าง</option>
+                <option value="active">เผยแพร่</option>
+                <option value="closed">ปิดรับ</option>
+              </select>
+            </div>
+            <div class="field checks">
+              <label class="check"><input id="publicVisible" type="checkbox" name="public_visible"> แสดงสาธารณะ</label>
+              <label class="check"><input id="pinInput" type="checkbox" name="pin"> ปักหมุด</label>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">ไฟล์</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label">รูปปก</label>
+              <div class="file-picker-row">
+                <button id="posterPickerBtn" class="btn" type="button" onclick="chooseScholarFile('poster')">แนบรูปปก</button>
+                <div id="posterPreview" class="poster-preview">ยังไม่มีรูป</div>
+              </div>
+              <input id="posterFileInput" type="file" accept="image/*" hidden>
+            </div>
+            <div class="field">
+              <label class="label">ไฟล์แนบ</label>
+              <div class="file-picker-row">
+                <button id="attachmentPickerBtn" class="btn" type="button" onclick="chooseScholarFile('attachment')">แนบไฟล์</button>
+              </div>
+              <input id="attachmentFileInput" type="file" hidden>
+              <div id="selectedFiles" class="file-list"></div>
+            </div>
+            <div class="field full">
+              <div id="fileStatus" class="file-status"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="modal-foot">
+        <button id="deleteBtn" class="btn danger" type="button" onclick="deleteScholarshipFromModal()">ลบ</button>
+        <button class="btn" type="button" onclick="closeModal()">ยกเลิก</button>
+        <button id="saveBtn" class="btn primary" type="submit">บันทึก</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const V2_SCHOLARSHIP_WRITE_UI_ENABLED = true;
+
+const state = {
+  scholarships: [],
+  countries: [],
+  lang: 'th',
+  viewMode: 'card',
+  editingId: '',
+  pendingFiles: [],
+  isSaving: false
+};
+
+const $ = selector => document.querySelector(selector);
+
+document.addEventListener('DOMContentLoaded', init);
+
+async function init() {
+  $('#posterFileInput').addEventListener('change', event => handleScholarFileSelected(event, 'poster'));
+  $('#attachmentFileInput').addEventListener('change', event => handleScholarFileSelected(event, 'attachment'));
+  await loadMasterData();
+  await loadScholarships();
+}
+
+async function loadMasterData() {
+  try {
+    const countriesRes = await IROUP_V2.lookup.countries();
+    state.countries = normalizeList(countriesRes);
+    populateCountrySelect();
+  } catch (error) {
+    console.warn('[V2 Scholarship] country lookup failed', error);
+    state.countries = [];
+    populateCountrySelect();
+  }
+}
+
+async function loadScholarships(force) {
+  showNotice('', '');
+  $('#scholarCards').className = 'cards';
+  $('#scholarCards').innerHTML = '<div class="loading"><div><div class="spinner"></div>กำลังโหลดข้อมูล...</div></div>';
+  try {
+    const res = await IROUP_V2.admin.scholarshipList({ includeArchived: false, _: force ? Date.now() : '' });
+    if (!res || !res.success) throw new Error(res?.error || 'โหลดข้อมูลทุนการศึกษาไม่สำเร็จ');
+    state.scholarships = normalizeList(res).map(enrichScholarshipForPage);
+    populateFilterOptions();
+    populateComboboxOptions();
+    renderScholarships();
+  } catch (error) {
+    showNotice(error.message || String(error), 'error');
+    $('#scholarCards').innerHTML = '<div class="empty">ไม่สามารถโหลดข้อมูลทุนการศึกษาได้</div>';
+  }
+}
+
+function normalizeList(res) {
+  if (!res) return [];
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res.data)) return res.data;
+  if (res.data && Array.isArray(res.data.items)) return res.data.items;
+  if (res.data && Array.isArray(res.data.rows)) return res.data.rows;
+  return [];
+}
+
+function populateCountrySelect() {
+  $('#countryOptions').innerHTML = state.countries.map(country => {
+    const label = countryLabel(country);
+    return `<option value="${escAttr(label)}" data-id="${escAttr(country.country_id || '')}"></option>`;
+  }).join('');
+}
+
+function populateFilterOptions() {
+  const types = unique(state.scholarships.map(item => item.scholarship_type).filter(Boolean));
+  $('#typeFilter').innerHTML = '<option value="">ทุกประเภท</option>' + types.map(type => `<option value="${escAttr(type)}">${esc(type)}</option>`).join('');
+
+  const years = unique(state.scholarships.map(item => fiscalYear(item.close_date || item.open_date)).filter(Boolean)).sort().reverse();
+  $('#yearFilter').innerHTML = '<option value="">ทุกปี</option>' + years.map(year => `<option value="${escAttr(year)}">${esc(year)}</option>`).join('');
+}
+
+function populateComboboxOptions() {
+  const institutions = unique(state.scholarships.map(item => item.institution_name).filter(Boolean));
+  $('#institutionOptions').innerHTML = institutions.map(value => `<option value="${escAttr(value)}"></option>`).join('');
+
+  const types = unique(state.scholarships.map(item => item.scholarship_type).filter(Boolean));
+  $('#typeOptions').innerHTML = types.map(value => `<option value="${escAttr(value)}"></option>`).join('');
+}
+
+function renderScholarships() {
+  const target = $('#scholarCards');
+  const rows = filteredScholarships();
+
+  if (!rows.length) {
+    target.className = 'cards';
+    target.innerHTML = '<div class="empty">ยังไม่มีข้อมูลทุนการศึกษาที่ตรงกับเงื่อนไข</div>';
+    return;
+  }
+
+  if (state.viewMode === 'list') {
+    target.className = 'list-wrap';
+    target.innerHTML = renderList(rows);
+    return;
+  }
+
+  target.className = 'cards';
+  target.innerHTML = rows.map(renderCard).join('');
+}
+
+function filteredScholarships() {
+  const q = ($('#searchInput').value || '').trim().toLowerCase();
+  const type = $('#typeFilter').value;
+  const status = $('#statusFilter').value;
+  const year = $('#yearFilter').value;
+
+  return state.scholarships.filter(item => {
+    if (type && item.scholarship_type !== type) return false;
+    if (status && item.status !== status) return false;
+    if (year && fiscalYear(item.close_date || item.open_date) !== year) return false;
+    if (!q) return true;
+    const haystack = [
+      item.title_th, item.title_en, item.institution_name, item.scholarship_type,
+      fundingLabel(item.funding_type), targetLabel(item.target_group), countryDisplay(item),
+      item.cover_summary, item.coverage_th, item.coverage_en
+    ].join(' ').toLowerCase();
+    return haystack.indexOf(q) >= 0;
+  });
+}
+
+function renderCard(item) {
+  const status = item.status || 'draft';
+  const countdown = daysUntilCloseBadge(item.close_date);
+  const poster = posterUrl(item);
+  const detail = displayCoverage(item);
+  return `
+    <article class="scholar-card">
+      <div class="poster">${poster ? `<img src="${escAttr(poster)}" alt="">` : '<span>🎓</span>'}</div>
+      <div class="card-body">
+        <div>
+          <div class="card-title">${esc(displayTitle(item) || '-')}</div>
+          <div class="card-sub">${esc(item.institution_name || '-')} | ${esc(countryDisplay(item) || '-')}</div>
+        </div>
+        <div class="badge-row">
+          <span class="badge type">${esc(fundingLabel(item.funding_type))}</span>
+          <span class="badge type">${esc(targetLabel(item.target_group))}</span>
+          <span class="badge ${esc(status)}">${esc(statusLabel(status))}</span>
+          ${item.pin ? '<span class="badge pin">ปักหมุด</span>' : ''}
+          <span class="badge ${esc(countdown.className)}">${esc(countdown.label)}</span>
+        </div>
+        <div class="meta">
+          <div class="meta-item">ประเภท<b>${esc(item.scholarship_type || '-')}</b></div>
+          <div class="meta-item">วันปิดรับ<b>${esc(displayDate(item.close_date))}</b></div>
+        </div>
+        ${item.cover_summary ? `<div class="card-sub">${esc(truncate(item.cover_summary, 150))}</div>` : ''}
+        ${detail ? `<div class="card-sub">${esc(truncate(detail, 150))}</div>` : ''}
+        <div class="card-actions">
+          <button class="btn" type="button" onclick="openEditModal('${escAttr(item.scholarship_id)}')">แก้ไข</button>
+          <button class="btn danger" type="button" onclick="deleteV2Scholarship('${escAttr(item.scholarship_id)}')">ลบ</button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderList(rows) {
+  const body = rows.map(item => {
+    const status = item.status || 'draft';
+    return `
+      <tr>
+        <td class="title-cell">${esc(displayTitle(item) || '-')}</td>
+        <td>${esc(item.institution_name || '-')}</td>
+        <td>${esc(countryDisplay(item) || '-')}</td>
+        <td>${esc(item.scholarship_type || '-')}</td>
+        <td>${esc(targetLabel(item.target_group))}</td>
+        <td>${esc(displayDate(item.close_date))}</td>
+        <td><span class="badge ${esc(status)}">${esc(statusLabel(status))}</span></td>
+        <td>
+          <button class="btn" type="button" onclick="openEditModal('${escAttr(item.scholarship_id)}')">แก้ไข</button>
+          <button class="btn danger" type="button" onclick="deleteV2Scholarship('${escAttr(item.scholarship_id)}')">ลบ</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <table class="scholar-table">
+      <thead>
+        <tr>
+          <th>ชื่อทุน</th>
+          <th>สถาบัน</th>
+          <th>ประเทศ</th>
+          <th>ประเภท</th>
+          <th>กลุ่มเป้าหมาย</th>
+          <th>วันปิดรับ</th>
+          <th>สถานะ</th>
+          <th>จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>${body}</tbody>
+    </table>
+  `;
+}
+
+function openCreateModal() {
+  if (!V2_SCHOLARSHIP_WRITE_UI_ENABLED) {
+    alert('ยังไม่เปิดใช้งานการบันทึก V2 สำหรับทุนการศึกษา');
+    return;
+  }
+  state.editingId = '';
+  $('#scholarForm').reset();
+  state.pendingFiles = [];
+  $('#scholarshipId').value = '';
+  $('#modalTitle').textContent = 'เพิ่มทุนการศึกษา';
+  $('#modalSub').textContent = 'V2-native SCHOLARSHIP metadata';
+  $('#deleteBtn').style.display = 'none';
+  $('#statusSelect').value = 'draft';
+  $('#publicVisible').checked = true;
+  updateYearPreview();
+  renderSelectedFiles();
+  renderPosterPreview('');
+  $('#scholarModal').classList.add('open');
+}
+
+async function openEditModal(scholarshipId) {
+  let item = state.scholarships.find(row => row.scholarship_id === scholarshipId);
+  if (!item) return;
+  try {
+    if (IROUP_V2.admin.scholarshipDetail) {
+      const res = await IROUP_V2.admin.scholarshipDetail(scholarshipId);
+      if (res && res.success && res.data) {
+        item = enrichScholarshipForPage(Object.assign({}, item, res.data));
+      }
+    }
+  } catch (error) {
+    console.warn('[V2 Scholarship] detail hydrate failed', scholarshipId, error);
+  }
+  state.editingId = scholarshipId;
+  $('#scholarForm').reset();
+  state.pendingFiles = [];
+  $('#scholarshipId').value = item.scholarship_id || '';
+  $('#titleTh').value = item.title_th || '';
+  $('#titleEn').value = item.title_en || '';
+  $('#institutionName').value = item.institution_name || '';
+  $('#countryInput').value = countryDisplay(item) || '';
+  $('#countryId').value = item.country_id || item.country?.country_id || '';
+  $('#scholarshipType').value = item.scholarship_type || '';
+  $('#fundingType').value = item.funding_type || 'full';
+  $('#targetGroup').value = item.target_group || 'student';
+  $('#coverSummary').value = item.cover_summary || '';
+  $('#coverageTh').value = item.coverage_th || '';
+  $('#coverageEn').value = item.coverage_en || '';
+  $('#publishDate').value = item.publish_date || '';
+  $('#openDate').value = item.open_date || '';
+  $('#closeDate').value = item.close_date || '';
+  $('#applyUrl').value = item.apply_url || '';
+  $('#detailUrl').value = item.detail_url || '';
+  $('#statusSelect').value = item.status || 'draft';
+  $('#publicVisible').checked = !!item.public_visible;
+  $('#pinInput').checked = !!item.pin;
+  $('#modalTitle').textContent = 'แก้ไขทุนการศึกษา';
+  $('#modalSub').textContent = item.scholarship_id || '';
+  $('#deleteBtn').style.display = '';
+  updateYearPreview();
+  renderSelectedFiles();
+  renderPosterPreview(posterUrl(item));
+  $('#scholarModal').classList.add('open');
+}
+
+function closeModal() {
+  $('#scholarModal').classList.remove('open');
+}
+
+async function saveScholarship(evt) {
+  evt.preventDefault();
+  if (state.isSaving) return;
+  state.isSaving = true;
+
+  const saveBtn = $('#saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'กำลังบันทึก...';
+  setFileControlsDisabled(true);
+  setFileStatus('กำลังบันทึก...', true);
+  try {
+    const payload = buildPayloadFromForm();
+    const isUpdate = !!payload.scholarship_id;
+    const res = isUpdate
+      ? await IROUP_V2.admin.scholarshipUpdate(payload)
+      : await IROUP_V2.admin.scholarshipCreate(payload);
+    if (!res || !res.success) throw new Error(res?.error || 'บันทึกไม่สำเร็จ');
+
+    const savedId = isUpdate ? payload.scholarship_id : extractSavedScholarshipId(res);
+    if (state.pendingFiles.length) {
+      setFileStatus('กำลังอัปโหลดไฟล์...', true);
+      await uploadPendingScholarshipFiles(savedId);
+    }
+    alert('บันทึกสำเร็จ (V2)');
+    closeModal();
+    await loadScholarships(true);
+  } catch (error) {
+    alert(error.message || String(error));
+  } finally {
+    state.isSaving = false;
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'บันทึก';
+    setFileControlsDisabled(false);
+    setFileStatus('', false);
+  }
+}
+
+async function deleteScholarshipFromModal() {
+  await deleteV2Scholarship($('#scholarshipId').value);
+}
+
+async function deleteV2Scholarship(scholarshipId) {
+  if (!V2_SCHOLARSHIP_WRITE_UI_ENABLED) {
+    alert('ยังไม่เปิดใช้งานการลบ V2 สำหรับทุนการศึกษา');
+    return;
+  }
+  if (!scholarshipId) return;
+  if (!confirm('ยืนยันลบทุนการศึกษานี้หรือไม่')) return;
+  const res = await scholarshipDeleteRequest(scholarshipId);
+  if (!res || !res.success) {
+    alert(res?.error || 'ลบไม่สำเร็จ');
+    return;
+  }
+  if ($('#scholarModal').classList.contains('open') && $('#scholarshipId').value === scholarshipId) {
+    closeModal();
+  }
+  await loadScholarships(true);
+}
+
+function scholarshipDeleteRequest(scholarshipId) {
+  if (IROUP_V2.admin.scholarshipDelete) return IROUP_V2.admin.scholarshipDelete(scholarshipId);
+  return IROUP_V2.request('v2.admin.scholarship.delete', { payload: { scholarship_id: scholarshipId } }, {
+    auth: true,
+    method: 'POST',
+    timeoutMs: 120000
+  });
+}
+
+function buildPayloadFromForm() {
+  updateCountryIdFromInput();
+  const payload = {
+    scholarship_id: $('#scholarshipId').value.trim(),
+    title_th: $('#titleTh').value.trim(),
+    title_en: $('#titleEn').value.trim(),
+    institution_name: $('#institutionName').value.trim(),
+    country_id: $('#countryId').value.trim(),
+    scholarship_type: $('#scholarshipType').value.trim(),
+    funding_type: $('#fundingType').value,
+    target_group: $('#targetGroup').value,
+    cover_summary: $('#coverSummary').value.trim(),
+    coverage_th: $('#coverageTh').value.trim(),
+    coverage_en: $('#coverageEn').value.trim(),
+    publish_date: $('#publishDate').value,
+    open_date: $('#openDate').value,
+    close_date: $('#closeDate').value,
+    apply_url: $('#applyUrl').value.trim(),
+    detail_url: $('#detailUrl').value.trim(),
+    link_url: '',
+    status: $('#statusSelect').value,
+    public_visible: $('#publicVisible').checked,
+    pin: $('#pinInput').checked
+  };
+  validatePayload(payload);
+  return payload;
+}
+
+function validatePayload(payload) {
+  const missing = [];
+  if (!payload.title_th) missing.push('ชื่อทุน (TH)');
+  if (!payload.institution_name) missing.push('สถาบัน');
+  if (!payload.country_id) missing.push('ประเทศ');
+  if (!payload.scholarship_type) missing.push('ประเภททุน');
+  if (!payload.open_date) missing.push('วันเปิดรับ');
+  if (!payload.close_date) missing.push('วันปิดรับ');
+  if (payload.close_date && payload.open_date && payload.close_date < payload.open_date) missing.push('วันปิดรับต้องไม่ก่อนวันเปิดรับ');
+  if (missing.length) throw new Error('กรุณากรอกข้อมูลให้ครบ: ' + missing.join(', '));
+}
+
+function chooseScholarFile(role) {
+  if (state.isSaving) return;
+  const input = role === 'poster' ? $('#posterFileInput') : $('#attachmentFileInput');
+  if (input) input.click();
+}
+
+function handleScholarFileSelected(evt, role) {
+  const file = evt && evt.target && evt.target.files ? evt.target.files[0] : null;
+  if (!file) return;
+  const normalizedRole = role === 'poster' ? 'poster' : 'attachment';
+  if (normalizedRole === 'poster') state.pendingFiles = state.pendingFiles.filter(item => item.role !== 'poster');
+  state.pendingFiles.push({ role: normalizedRole, file });
+  evt.target.value = '';
+  renderSelectedFiles();
+  setFileStatus(normalizedRole === 'poster' ? 'เลือกรูปปกแล้ว' : 'เลือกไฟล์แนบแล้ว', false);
+  if (normalizedRole === 'poster') {
+    const reader = new FileReader();
+    reader.onload = () => renderPosterPreview(String(reader.result || ''));
+    reader.readAsDataURL(file);
+  }
+}
+
+function renderSelectedFiles() {
+  const box = $('#selectedFiles');
+  const attachmentRows = state.pendingFiles
+    .map((item, index) => ({ item, index }))
+    .filter(entry => entry.item.role === 'attachment');
+  if (!attachmentRows.length) {
+    box.innerHTML = '';
+    return;
+  }
+  box.innerHTML = attachmentRows.map(entry => `
+    <div class="file-chip">
+      <span>ไฟล์แนบ · ${esc(entry.item.file.name)}</span>
+      <button class="btn" type="button" onclick="removeSelectedFile(${entry.index})" aria-label="ลบไฟล์แนบ">×</button>
+    </div>
+  `).join('');
+}
+
+function renderPosterPreview(url) {
+  const preview = $('#posterPreview');
+  preview.classList.toggle('has-image', !!url);
+  preview.innerHTML = url
+    ? `<img src="${escAttr(url)}" alt=""><button class="preview-remove" type="button" onclick="removeSelectedPoster()" aria-label="ลบรูปปก">×</button>`
+    : 'ยังไม่มีรูป';
+}
+
+function removeSelectedFile(index) {
+  state.pendingFiles.splice(index, 1);
+  renderSelectedFiles();
+}
+
+function removeSelectedPoster() {
+  state.pendingFiles = state.pendingFiles.filter(item => item.role !== 'poster');
+  const input = $('#posterFileInput');
+  if (input) input.value = '';
+  renderPosterPreview('');
+  setFileStatus('ลบรูปปกแล้ว', false);
+}
+
+function setFileStatus(message, active) {
+  const status = $('#fileStatus');
+  if (!status) return;
+  status.textContent = message || '';
+  status.classList.toggle('active', !!active);
+}
+
+function setFileControlsDisabled(disabled) {
+  ['#posterPickerBtn', '#attachmentPickerBtn'].forEach(selector => {
+    const btn = $(selector);
+    if (btn) btn.disabled = !!disabled;
+  });
+}
+
+async function uploadPendingScholarshipFiles(recordId) {
+  if (!recordId) throw new Error('ไม่พบรหัสทุนการศึกษาสำหรับแนบไฟล์');
+  for (const item of state.pendingFiles) {
+    const dataUrl = await readFileAsDataUrl(item.file);
+    const payload = {
+      base64_data: dataUrl,
+      filename: item.file.name,
+      mime_type: item.file.type || 'application/octet-stream',
+      module: 'scholarship',
+      record_id: recordId,
+      file_role_id: item.role === 'poster' ? 'poster' : 'attachment',
+      visibility_level: item.role === 'poster' ? 'public' : 'internal'
+    };
+    const res = await IROUP_V2.admin.fileUpload(payload);
+    if (!res || !res.success) throw new Error(res?.error || 'อัปโหลดไฟล์ไม่สำเร็จ');
+  }
+  state.pendingFiles = [];
+  renderSelectedFiles();
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error || new Error('อ่านไฟล์ไม่สำเร็จ'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function extractSavedScholarshipId(res) {
+  const data = res && res.data ? res.data : {};
+  return data.scholarship?.scholarship_id || data.persisted_scholarship?.scholarship_id || data.scholarship_id || '';
+}
+
+function enrichScholarshipForPage(item) {
+  const row = Object.assign({}, item || {});
+  row.country_id = row.country_id || row.country?.country_id || '';
+  row.status = row.status || 'draft';
+  row.public_visible = !!row.public_visible;
+  row.pin = !!row.pin;
+  return row;
+}
+
+function displayTitle(item) {
+  return state.lang === 'en' ? item.title_en || item.title_th : item.title_th || item.title_en;
+}
+
+function displayCoverage(item) {
+  return state.lang === 'en' ? item.coverage_en || item.coverage_th : item.coverage_th || item.coverage_en;
+}
+
+function countryDisplay(item) {
+  if (item.country) return countryLabel(item.country);
+  const country = state.countries.find(row => row.country_id === item.country_id);
+  return country ? countryLabel(country) : '';
+}
+
+function countryLabel(country) {
+  if (!country) return '';
+  const name = state.lang === 'en' ? country.country_name_en || country.country_name_th : country.country_name_th || country.country_name_en;
+  return [country.flag_emoji, name || country.iso2 || country.country_id].filter(Boolean).join(' ');
+}
+
+function findCountryByLabel(value) {
+  const wanted = String(value || '').trim().toLowerCase();
+  return state.countries.find(country => [
+    country.country_id,
+    country.iso2,
+    country.iso3,
+    country.country_name_th,
+    country.country_name_en,
+    countryLabel(country)
+  ].map(item => String(item || '').trim().toLowerCase()).includes(wanted)) || null;
+}
+
+function updateCountryIdFromInput() {
+  const country = findCountryByLabel($('#countryInput').value);
+  $('#countryId').value = country ? country.country_id || '' : '';
+}
+
+function fundingLabel(value) {
+  const th = { full: 'ทุนเต็มจำนวน', partial: 'ทุนบางส่วน', self: 'ทุนส่วนตัว' };
+  const en = { full: 'Full funding', partial: 'Partial funding', self: 'Self-funded' };
+  const labels = state.lang === 'en' ? en : th;
+  return labels[value] || value || '-';
+}
+
+function targetLabel(value) {
+  const th = { student: 'นิสิต', staff: 'บุคลากร', both: 'นิสิตและบุคลากร' };
+  const en = { student: 'Student', staff: 'Staff', both: 'Student and staff' };
+  const labels = state.lang === 'en' ? en : th;
+  return labels[value] || value || '-';
+}
+
+function statusLabel(value) {
+  const th = { draft: 'ร่าง', active: 'เผยแพร่', closed: 'ปิดรับ' };
+  const en = { draft: 'Draft', active: 'Active', closed: 'Closed' };
+  const labels = state.lang === 'en' ? en : th;
+  return labels[value] || value || '-';
+}
+
+function posterUrl(item) {
+  const files = flattenFiles(item.files);
+  const poster = files.find(file => {
+    const role = file.file_role_id || file.role_id || file.file_role?.file_role_id || file.file_role?.role_id || '';
+    return String(role).toLowerCase() === 'poster';
+  });
+  return poster?.file_url || poster?.url || '';
+}
+
+function flattenFiles(files) {
+  if (!files) return [];
+  if (Array.isArray(files)) return files;
+  if (typeof files !== 'object') return [];
+  return Object.keys(files).reduce((acc, key) => acc.concat(Array.isArray(files[key]) ? files[key] : []), []);
+}
+
+function daysUntilCloseBadge(dateText) {
+  const parts = String(dateText || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parts) return { label: '-', className: 'done' };
+  const today = new Date();
+  const close = new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]));
+  today.setHours(0, 0, 0, 0);
+  close.setHours(0, 0, 0, 0);
+  const days = Math.ceil((close.getTime() - today.getTime()) / 86400000);
+  if (days < 0) return { label: state.lang === 'en' ? 'Closed' : 'ปิดรับแล้ว', className: 'done' };
+  const label = state.lang === 'en'
+    ? `Closes in ${days} ${days === 1 ? 'day' : 'days'}`
+    : `ปิดรับใน ${days} วัน`;
+  if (days > 30) return { label, className: 'days-green' };
+  if (days >= 7) return { label, className: 'days-yellow' };
+  return { label, className: 'days-red' };
+}
+
+function fiscalYear(dateText) {
+  if (!dateText) return '';
+  const parts = String(dateText).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parts) return '';
+  const year = Number(parts[1]) + 543;
+  const month = Number(parts[2]);
+  return String(month >= 10 ? year + 1 : year);
+}
+
+function displayDate(dateText) {
+  if (!dateText) return '-';
+  const parts = String(dateText).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parts) return dateText;
+  const date = new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]));
+  if (state.lang === 'en') return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  return `${date.getDate()} ${months[date.getMonth()]} พ.ศ. ${date.getFullYear() + 543}`;
+}
+
+function updateYearPreview() {
+  const fy = fiscalYear($('#closeDate').value || $('#openDate').value);
+  $('#yearPreview').value = fy ? `ปีงบประมาณ ${fy}` : '';
+}
+
+function setLang(lang) {
+  state.lang = lang === 'en' ? 'en' : 'th';
+  document.documentElement.lang = state.lang;
+  $('#langThBtn').classList.toggle('active', state.lang === 'th');
+  $('#langEnBtn').classList.toggle('active', state.lang === 'en');
+  const selectedCountryId = $('#countryId') ? $('#countryId').value : '';
+  populateCountrySelect();
+  if (selectedCountryId && $('#countryInput')) {
+    const country = state.countries.find(row => row.country_id === selectedCountryId);
+    $('#countryInput').value = country ? countryLabel(country) : $('#countryInput').value;
+  }
+  renderScholarships();
+}
+
+function setViewMode(mode) {
+  state.viewMode = mode === 'list' ? 'list' : 'card';
+  $('#cardViewBtn').classList.toggle('active', state.viewMode === 'card');
+  $('#listViewBtn').classList.toggle('active', state.viewMode === 'list');
+  renderScholarships();
+}
+
+function clearFilters() {
+  $('#searchInput').value = '';
+  $('#typeFilter').value = '';
+  $('#statusFilter').value = '';
+  $('#yearFilter').value = '';
+  renderScholarships();
+}
+
+function showNotice(message, type) {
+  const box = $('#notice');
+  if (!message) {
+    box.style.display = 'none';
+    box.textContent = '';
+    box.className = 'notice';
+    return;
+  }
+  box.textContent = message;
+  box.className = 'notice ' + (type || '');
+  box.style.display = 'block';
+}
+
+function unique(values) {
+  return Array.from(new Set(values.map(value => String(value || '').trim()).filter(Boolean)));
+}
+
+function truncate(text, max) {
+  const value = String(text || '');
+  return value.length > max ? value.slice(0, max - 1) + '…' : value;
+}
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+}
+
+function escAttr(value) {
+  return esc(value).replace(/`/g, '&#96;');
+}
+</script>
+</body>
+</html>

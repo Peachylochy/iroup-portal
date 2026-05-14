@@ -96,6 +96,7 @@ function listV2AdminScholarships_(includeArchived) {
   const rows = ctx.tables[IROUP_V2_SHEETS.SCHOLARSHIP] || [];
   const dtos = rows
     .filter(function (row) {
+      if (!String(row.scholarship_id || '').trim()) return false;
       if (isSoftDeletedV2_(row)) return false;
       if (includeArchived === true) return true;
       return ['archived'].indexOf(String(row.status || '').trim()) < 0;
@@ -222,6 +223,58 @@ function createV2AdminScholarship_(request) {
 
 function updateV2AdminScholarship_(request) {
   return writeV2AdminScholarshipMetadata_(request, 'update');
+}
+
+function deleteV2AdminScholarship_(request) {
+  const flag = getV2ScholarshipWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2ScholarshipWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const payload = body.payload || params.payload || {};
+  const scholarshipId = cleanV2EventText_(
+    payload.scholarship_id ||
+    payload.id ||
+    body.scholarship_id ||
+    params.scholarship_id ||
+    body.id ||
+    params.id ||
+    ''
+  );
+
+  if (!scholarshipId) {
+    return adminResponseV2_(false, null, 0, 'scholarship_id is required for scholarship delete.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.SCHOLARSHIP, 'scholarship_id', scholarshipId);
+  if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+
+  const persisted = updateV2RowById_(IROUP_V2_SHEETS.SCHOLARSHIP, 'scholarship_id', scholarshipId, {
+    is_deleted: true,
+    updated_by: actor.user.email || '',
+    updated_at: new Date().toISOString()
+  });
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      scholarship_id: scholarshipId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    scholarship_id: scholarshipId
+  }, 1, '');
 }
 
 function uploadV2AdminFile_(request) {

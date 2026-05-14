@@ -270,6 +270,12 @@ function getV2RouteDispatch_() {
         return updateV2AdminScholarship_(request);
       }
     },
+    'v2.admin.scholarship.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminScholarship_(request);
+      }
+    },
     'v2.admin.event.list': {
       access: 'admin',
       handler: function (request) {

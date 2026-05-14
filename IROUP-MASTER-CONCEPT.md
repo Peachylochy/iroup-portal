@@ -417,28 +417,6 @@ BUDGET
 FILES
 ```
 
-### FILES Relation Standard
-
-- File uploads use the shared `FILES` relation table instead of embedding file fields
-  directly in transaction rows.
-- Admin upload route baseline: `v2.admin.file.upload`.
-- Drive folder baseline: `IROUP_V2_FILES`.
-- Uploaded Drive files are shared as anyone-with-link view.
-- Standard relation fields: `module`, `record_id`, `file_role_id`, `file_name`,
-  `mime_type`, `drive_file_id`, `file_url`, `thumbnail_url`, `visibility_level`,
-  `is_deleted`, `uploaded_by`, `uploaded_at`, and `note`.
-- For Events: `module = event`, `file_role_id = poster` for poster/cover images,
-  `file_role_id = attachment` for general attachments, `visibility_level = public`
-  for poster/banner, and `visibility_level = internal` for other attachments.
-
-### Admin Action Standard
-
-- Every add/edit data module should expose delete wherever edit is available.
-- Delete should be soft delete by default when the sheet has `is_deleted`.
-- Card and List views should expose equivalent actions for each row.
-- Hard delete should be reserved for explicit maintenance/cleanup workflows, not normal
-  admin UX.
-
 ### Log/Cache
 ```
 AUDIT_LOG
@@ -447,7 +425,7 @@ PUBLIC_CACHE
 
 ---
 
-## Current Status (2026-05-14)
+## Current Status (2026-05-13)
 
 ### เสร็จแล้ว ✅
 - V2 Backend (schema, auth, router, DTOs)
@@ -455,15 +433,10 @@ PUBLIC_CACHE
 - V2 EVENT save ทำงานได้จริง (end-to-end)
 - MASTER_EVENT_TYPES พร้อม
 - Master dropdowns โหลดจาก V2
-- V2-native `events.html` validated locally as the internal admin workflow baseline
-- V2 Events Card/List rendering, create/edit, soft delete, badges/countdown, and
-  relation-based file upload wiring are validated locally
-- V2-native `scholarship.html` validated locally
-- Scholarship Card/List views, create/edit, soft delete, TH/EN toggle, and file
-  upload wiring are complete
 
 ### กำลังทำ ⏳
-- Use the validated Events pattern for next V2-native modules
+- Rewrite scholarship.html (V2-native)
+- Rewrite events.html (V2-native)
 
 ### ยังไม่ได้ทำ 📋
 - mou.html rewrite

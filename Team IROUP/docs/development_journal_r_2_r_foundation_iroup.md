@@ -2896,3 +2896,43 @@ V2 frontend write readiness status:
 - Frontend production activation: NOT activated. `V2_EVENT_WRITE_UI_ENABLED = false`.
 - Apps Script Script Property: `IROUP_V2_EVENT_WRITE_ENABLED = FALSE`.
 - Next step: plan controlled production activation criteria and rollout phase.
+
+---
+
+## Scholarship V2-Native Baseline (May 2026)
+
+Summary:
+
+Built `scholarship.html` as a V2-native admin workflow using the validated
+`events.html` internal admin baseline as the pattern.
+
+Implementation notes:
+
+- `scholarship.html` follows the Events Card/List, create/edit, soft-delete,
+  TH/EN toggle, and relation-based file upload direction.
+- The scholarship form differs from Events by using three date fields:
+  `publish_date`, `open_date`, and `close_date`.
+- Scholarship countdown badges count toward `close_date`, unlike Events where the
+  countdown is based on `start_date`.
+- `institution_name` uses a free-type combobox with suggestions from existing V2
+  scholarship rows.
+- `scholarship_type` also uses a free-type combobox with suggestions from existing
+  V2 scholarship rows, allowing new values without a dedicated master table yet.
+- `country_id` uses a searchable combobox backed by `COUNTRY_MASTER`.
+
+Lesson learned:
+
+- Never call `detail()` once per row on page load. In this session,
+  `hydrateScholarshipDetails()` caused 21+ API calls and roughly a one-minute page
+  load time.
+- Page load should render from list data only.
+- `detail()` should fire only on explicit user action, such as edit/view for one
+  selected record.
+- Future module specs must state this rule explicitly before implementation:
+  list route for page load, detail route for user-selected records only.
+
+Operational direction:
+
+- Scholarship now has a V2-native internal admin baseline alongside Events.
+- The Events/Scholarship pattern becomes the working reference for future V2-native
+  module rewrites.

@@ -1,10 +1,45 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-14 | Session: V2 Events Internal Admin Baseline Validation**
+**Last updated: 2026-05-14 | Session: Scholarship V2-Native Baseline**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest Scholarship V2-Native Baseline
+
+### Session: 2026-05-14 - Scholarship V2-Native Baseline
+
+Outcomes:
+
+- Added `v2.admin.scholarship.delete` backend route using soft delete, following
+  the same pattern as EVENT delete.
+- Created `scholarship.html` as a V2-native admin page following the validated
+  `events.html` baseline pattern.
+- Fixed empty-row filtering in `listV2AdminScholarships_()` using the same
+  primary-key guard pattern as the EVENT empty-row fix.
+- Fixed TH/EN toggle behavior for scholarship cards and list view.
+- Fixed the country field to use a searchable combobox backed by `COUNTRY_MASTER`.
+- Fixed `scholarship_type` to use a free-type combobox with suggestions from
+  existing V2 scholarship rows.
+- Fixed page load performance by removing `hydrateScholarshipDetails()`, which was
+  firing one `scholarshipDetail()` request per row on every page load.
+- Reduced scholarship page load from 21+ calls to 2 calls in the tested dataset:
+  one countries lookup and one scholarship list request.
+- `scholarshipDetail()` now fires only on explicit edit action for a single record.
+
+Standards confirmed for next modules:
+
+- Render from list data only on page load.
+- Never call `detail()` per row on page load.
+- `detail()` should only fire on explicit user action such as edit/view.
+
+Next:
+
+- UI redesign later as a coordinated all-pages pass.
+- Continue with the next V2-native module using the Scholarship/Events baseline.
 
 ---
 
