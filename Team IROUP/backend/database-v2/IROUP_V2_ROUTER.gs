@@ -222,6 +222,24 @@ function getV2RouteDispatch_() {
         return getV2AdminMOU_(getV2RequestId_(request, 'mou_id'));
       }
     },
+    'v2.admin.mou.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminMOU_(request);
+      }
+    },
+    'v2.admin.mou.update': {
+      access: 'admin',
+      handler: function (request) {
+        return updateV2AdminMOU_(request);
+      }
+    },
+    'v2.admin.mou.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminMOU_(request);
+      }
+    },
     'v2.admin.mobility.list': {
       access: 'admin',
       handler: function (request) {

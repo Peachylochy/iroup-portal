@@ -156,6 +156,54 @@ function updateV2AdminEvent_(request) {
   return writeV2AdminEventMetadata_(request, 'update');
 }
 
+function createV2AdminMOU_(request) {
+  return writeV2AdminMOUMetadata_(request, 'create');
+}
+
+function updateV2AdminMOU_(request) {
+  return writeV2AdminMOUMetadata_(request, 'update');
+}
+
+function deleteV2AdminMOU_(request) {
+  const flag = getV2MOUWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2MOUWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const mouId = extractV2MOUDeleteId_(request);
+  if (!mouId) {
+    return adminResponseV2_(false, null, 0, 'mou_id is required for MOU delete.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.MOU, 'mou_id', mouId);
+  if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+
+  const persisted = updateV2RowById_(IROUP_V2_SHEETS.MOU, 'mou_id', mouId, {
+    is_deleted: true,
+    updated_by: actor.user.email || '',
+    updated_at: new Date().toISOString()
+  });
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      mou_id: mouId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    mou_id: mouId
+  }, 1, '');
+}
+
 function deleteV2AdminEvent_(request) {
   const flag = getV2EventWriteFeatureFlag_();
   if (!flag.enabled) {
@@ -352,6 +400,103 @@ function uploadV2AdminFile_(request) {
   } catch (error) {
     return adminResponseV2_(false, sanitizeV2FileUploadDiagnostics_(normalized.data), 0, error && error.message ? error.message : String(error));
   }
+}
+
+function writeV2AdminMOUMetadata_(request, mode) {
+  const flag = getV2MOUWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2MOUWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const context = buildV2AdminContext_();
+  if (!context.success) return context;
+
+  const writeMode = String(mode || '').trim().toLowerCase();
+  const previewMode = writeMode === 'update' ? 'update' : 'create';
+  const preview = buildV2MOUWritePreview_(request, context.data, previewMode);
+  if (!preview.success) {
+    return adminResponseV2_(false, preview.data, 0, preview.error);
+  }
+
+  const now = new Date().toISOString();
+  const adminEmail = actor.user.email || '';
+  const normalized = preview.data.normalized_mou || {};
+  let persisted;
+
+  if (writeMode === 'update') {
+    const mouId = cleanV2EventText_(normalized.mou_id);
+    if (!mouId) {
+      return adminResponseV2_(false, preview.data, 0, 'mou_id is required for MOU update.');
+    }
+
+    const existing = findV2RowById_(IROUP_V2_SHEETS.MOU, 'mou_id', mouId);
+    if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
+    if (isSoftDeletedV2_(existing.data)) return adminResponseV2_(false, null, 0, 'Cannot update a deleted MOU.');
+
+    const patch = buildV2MOUSheetRow_(normalized);
+    delete patch.mou_id;
+    delete patch.created_by;
+    delete patch.created_at;
+    patch.updated_by = adminEmail;
+    patch.updated_at = now;
+
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.MOU, 'mou_id', mouId, patch);
+  } else {
+    const row = buildV2MOUSheetRow_(normalized);
+    row.mou_id = generateV2Id_(IROUP_V2_ID_PREFIXES.MOU);
+    row.created_by = adminEmail;
+    row.updated_by = adminEmail;
+    row.created_at = now;
+    row.updated_at = now;
+
+    persisted = appendV2Row_(IROUP_V2_SHEETS.MOU, row, {
+      idField: 'mou_id',
+      requiredFields: ['mou_id', 'up_unit_id', 'partner_org_name', 'country_id', 'mou_type', 'start_date', 'end_date', 'fiscal_year', 'status']
+    });
+  }
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      write_enabled: true,
+      mode: writeMode,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  const dto = mapV2AdminMOUDto_(persisted.data, context.data, false);
+  return adminResponseV2_(true, {
+    dry_run: false,
+    write_enabled: true,
+    mode: writeMode,
+    target_sheet: IROUP_V2_SHEETS.MOU,
+    mou: dto,
+    persisted_mou: persisted.data,
+    actor: {
+      email: adminEmail,
+      role: actor.user.role || ''
+    },
+    relation_writes: {
+      files: [],
+      budgets: []
+    },
+    skipped_operations: [
+      'file_upload',
+      'image_upload',
+      'file_relation_write',
+      'budget_relation_write',
+      'delete'
+    ],
+    diagnostics: persisted.diagnostics || {}
+  }, 1, '');
 }
 
 function writeV2AdminEventMetadata_(request, mode) {
@@ -568,6 +713,16 @@ function getV2ScholarshipWriteFeatureFlag_() {
   };
 }
 
+function getV2MOUWriteFeatureFlag_() {
+  const property = 'IROUP_V2_MOU_WRITE_ENABLED';
+  const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
+  return {
+    enabled: value === 'TRUE',
+    property: property,
+    error: value === 'TRUE' ? '' : 'V2 MOU metadata writes are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
+  };
+}
+
 function getV2FileUploadFeatureFlag_() {
   const property = 'IROUP_V2_FILE_UPLOAD_ENABLED';
   const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
@@ -603,6 +758,21 @@ function authorizeV2ScholarshipWriteActor_(request) {
   const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
   if (allowed.indexOf(role) < 0) {
     return { success: false, user: null, error: 'V2 admin role is not allowed for scholarship writes.' };
+  }
+
+  return { success: true, user: user, error: '' };
+}
+
+function authorizeV2MOUWriteActor_(request) {
+  const user = request && request.user ? request.user : null;
+  if (!user || !user.email) {
+    return { success: false, user: null, error: 'V2 admin identity is required for MOU writes.' };
+  }
+
+  const role = String(user.role || '').trim().toLowerCase();
+  const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
+  if (allowed.indexOf(role) < 0) {
+    return { success: false, user: null, error: 'V2 admin role is not allowed for MOU writes.' };
   }
 
   return { success: true, user: user, error: '' };
@@ -650,6 +820,25 @@ function buildV2EventSheetRow_(normalized) {
   };
 }
 
+function buildV2MOUSheetRow_(normalized) {
+  const data = normalized || {};
+  return {
+    mou_id: cleanV2EventText_(data.mou_id),
+    up_unit_id: cleanV2EventText_(data.up_unit_id),
+    partner_org_name: cleanV2EventText_(data.partner_org_name),
+    partner_org_name_en: cleanV2EventText_(data.partner_org_name_en),
+    country_id: cleanV2EventText_(data.country_id),
+    mou_type: cleanV2EventText_(data.mou_type),
+    start_date: cleanV2EventText_(data.start_date),
+    end_date: cleanV2EventText_(data.end_date),
+    fiscal_year: cleanV2EventText_(data.fiscal_year),
+    status: cleanV2EventText_(data.status || 'draft'),
+    public_visible: isTruthyV2_(data.public_visible),
+    public_file_allowed: isTruthyV2_(data.public_file_allowed),
+    is_deleted: false
+  };
+}
+
 function buildV2ScholarshipSheetRow_(normalized) {
   const data = normalized || {};
   return {
@@ -674,6 +863,61 @@ function buildV2ScholarshipSheetRow_(normalized) {
     status: cleanV2EventText_(data.status || 'draft'),
     public_visible: isTruthyV2_(data.public_visible),
     is_deleted: false
+  };
+}
+
+function buildV2MOUWritePreview_(request, ctx, mode) {
+  const payload = extractV2MOUWritePayload_(request);
+  const normalized = normalizeV2MOUWritePayload_(payload, ctx);
+  const errors = [];
+  const warnings = normalized.warnings || [];
+  const data = normalized.data || {};
+  const actionMode = String(mode || 'validate').trim();
+  const normalizedMode = actionMode.toLowerCase();
+
+  if (normalizedMode.indexOf('update') === 0 && !data.mou_id) {
+    errors.push({ field: 'mou_id', code: 'MOU_ID_REQUIRED', message: 'mou_id is required for MOU update.' });
+  }
+
+  ['up_unit_id', 'partner_org_name', 'country_id', 'mou_type', 'start_date', 'end_date', 'fiscal_year', 'status'].forEach(function (field) {
+    if (!data[field]) {
+      errors.push({ field: field, code: field.toUpperCase() + '_REQUIRED', message: field + ' is required.' });
+    }
+  });
+
+  if (data.end_date && data.start_date && data.end_date < data.start_date) {
+    errors.push({ field: 'end_date', code: 'END_BEFORE_START', message: 'end_date must be the same as or after start_date.' });
+  }
+
+  if (data.status) {
+    const statusCheck = validateEnumV2_(data.status, IROUP_V2_ENUMS.status, 'status');
+    if (!statusCheck.success) errors.push({ field: 'status', code: statusCheck.code, message: statusCheck.error });
+  }
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'MOU metadata payload validation failed.' : '',
+    data: {
+      dry_run: true,
+      mode: actionMode,
+      target_sheet: IROUP_V2_SHEETS.MOU,
+      write_enabled: false,
+      valid: errors.length === 0,
+      errors: errors,
+      warnings: warnings,
+      normalized_mou: data,
+      relation_writes: {
+        files: [],
+        budgets: []
+      },
+      blocked_operations: [
+        'sheet_write',
+        'file_upload',
+        'image_upload',
+        'file_relation_write',
+        'delete'
+      ]
+    }
   };
 }
 
@@ -814,6 +1058,26 @@ function extractV2EventWritePayload_(request) {
   return params;
 }
 
+function extractV2MOUWritePayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.mou || params.payload || params.mou || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
 function extractV2ScholarshipWritePayload_(request) {
   const params = request && request.params ? request.params : {};
   const body = request && request.body ? request.body : {};
@@ -870,6 +1134,24 @@ function extractV2EventDeleteId_(request) {
     }
   }
   return cleanV2EventText_(body.event_id || params.event_id || body.id || params.id || body.record_id || params.record_id || '');
+}
+
+function extractV2MOUDeleteId_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.mou || params.payload || params.mou || null;
+  if (candidate && typeof candidate === 'object') {
+    return cleanV2EventText_(candidate.mou_id || candidate.id || candidate.record_id || '');
+  }
+  if (candidate && typeof candidate === 'string') {
+    try {
+      const parsed = JSON.parse(candidate);
+      return cleanV2EventText_(parsed.mou_id || parsed.id || parsed.record_id || '');
+    } catch (err) {
+      return cleanV2EventText_(params.mou_id || params.id || params.record_id || '');
+    }
+  }
+  return cleanV2EventText_(body.mou_id || params.mou_id || body.id || params.id || body.record_id || params.record_id || '');
 }
 
 function normalizeV2FileUploadPayload_(payload) {
@@ -984,6 +1266,36 @@ function normalizeV2EventWritePayload_(payload, ctx) {
   return { data: normalized, warnings: warnings };
 }
 
+function normalizeV2MOUWritePayload_(payload, ctx) {
+  const source = payload || {};
+  const warnings = [];
+  if (source.payload_parse_error) {
+    warnings.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  }
+
+  const country = resolveV2EventCountryRef_(source, ctx, warnings);
+  const unit = resolveV2MOUUnitRef_(source, ctx, warnings);
+  const normalized = {
+    mou_id: cleanV2EventText_(pickV2EventValue_(source, ['mou_id', 'id'])),
+    up_unit_id: unit.unit_id,
+    up_unit_display: unit.display,
+    partner_org_name: cleanV2EventText_(source.partner_org_name || ''),
+    partner_org_name_en: cleanV2EventText_(source.partner_org_name_en || ''),
+    country_id: country.country_id,
+    country_display: country.display,
+    mou_type: cleanV2EventText_(source.mou_type || ''),
+    start_date: normalizeV2EventDate_(source.start_date || ''),
+    end_date: normalizeV2EventDate_(source.end_date || ''),
+    fiscal_year: cleanV2EventText_(source.fiscal_year || ''),
+    status: cleanV2EventText_(source.status || 'draft'),
+    public_visible: isTruthyV2_(source.public_visible),
+    public_file_allowed: isTruthyV2_(source.public_file_allowed),
+    is_deleted: false
+  };
+
+  return { data: normalized, warnings: warnings };
+}
+
 function normalizeV2ScholarshipWritePayload_(payload, ctx) {
   const source = payload || {};
   const warnings = [];
@@ -1037,6 +1349,25 @@ function resolveV2EventCountryRef_(source, ctx, warnings) {
 
   warnings.push({ field: 'country', code: 'COUNTRY_DISPLAY_UNRESOLVED', message: 'country display fallback could not be resolved to country_id.' });
   return { country_id: '', display: display };
+}
+
+function resolveV2MOUUnitRef_(source, ctx, warnings) {
+  const unitId = cleanV2EventText_(pickV2EventValue_(source, ['up_unit_id', 'unit_id', 'unitId']));
+  const display = cleanV2EventText_(pickV2EventValue_(source, ['up_unit', 'unit', 'department', 'dept']));
+  if (unitId && ctx.unitsById[unitId]) {
+    return { unit_id: unitId, display: display };
+  }
+  if (unitId) {
+    warnings.push({ field: 'up_unit_id', code: 'UNIT_ID_NOT_FOUND', message: 'up_unit_id was not found in UP_UNIT_MASTER.' });
+    return { unit_id: unitId, display: display };
+  }
+  if (!display) return { unit_id: '', display: '' };
+
+  const found = findV2UnitByDisplay_(ctx, display);
+  if (found) return { unit_id: found.unit_id || '', display: display };
+
+  warnings.push({ field: 'up_unit', code: 'UNIT_DISPLAY_UNRESOLVED', message: 'up_unit display fallback could not be resolved to up_unit_id.' });
+  return { unit_id: '', display: display };
 }
 
 function resolveV2EventUnitRef_(source, ctx, warnings) {
