@@ -32,18 +32,18 @@ html,body{height:100%;overflow:hidden}
 body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--gray-900);display:flex}
 button,input,select,textarea{font:inherit}
 
-.sidebar{width:64px;background:var(--navy-dark);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:4px;flex-shrink:0;z-index:100}
-.logo-box{width:44px;height:44px;border-radius:10px;margin-bottom:14px;display:grid;place-items:center;background:#fff;overflow:hidden}
-.logo-box img{width:38px;height:38px;object-fit:contain}
-.nav-item{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;font-size:18px;text-decoration:none}
-.nav-item:hover{background:rgba(75,189,232,0.15)}
-.nav-item.active{background:rgba(75,189,232,0.2)}
-.nav-item.active::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--blue-light);border-radius:2px 0 0 2px}
-.nav-tooltip{position:absolute;left:54px;background:var(--navy);color:#fff;font-size:11px;padding:4px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;font-family:'Prompt',sans-serif;z-index:999}
-.nav-item:hover .nav-tooltip{opacity:1}
-.sidebar-spacer{flex:1}
+.sidebar{width:250px;min-width:250px;height:100vh;background:#fff;border-right:1px solid #E6EDF6;position:fixed;left:0;top:0;z-index:20;display:flex;flex-direction:column}
+.brand{height:76px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid #E6EDF6}
+.brand img{width:68px;height:auto;object-fit:contain}
+.brand-title{font-size:12px;color:#66758a;line-height:1.25}.brand-title b{color:var(--navy);font-weight:900}
+.nav{padding:16px 12px;overflow:auto;flex:1}.nav-section{font-size:11px;font-weight:800;color:#a0adbc;text-transform:uppercase;margin:18px 12px 8px}
+.nav-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;color:#26364e;text-decoration:none;font-weight:800;font-size:14px;margin-bottom:4px}
+.nav-link:hover{background:#F1F7FD;color:var(--blue)}.nav-link.active{background:var(--soft);color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+.nav-icon{font-size:20px;width:24px;text-align:center}.userbox{margin-top:auto;padding:16px;border-top:1px solid #E6EDF6;display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--blue));display:grid;place-items:center;color:#fff;font-weight:900}
+.user-name{font-size:12px;font-weight:900}.user-sub{font-size:11px;color:#66758a}
 
-.main-layout{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100vh}
+.main-layout{margin-left:250px;flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100vh}
 .topbar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow-sm)}
 .topbar-left{display:flex;align-items:center;gap:12px}
 .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gray-600)}
@@ -197,21 +197,33 @@ tr:hover td{background:var(--blue-pale)}
 .notice.info{display:flex;background:var(--blue-pale);color:var(--blue)}
 
 @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr)}.map-chart-row{grid-template-columns:1fr}.chart-wrap{min-height:220px}}
-@media(max-width:760px){html,body{overflow:auto}.sidebar{display:none}.main-layout{height:auto;min-height:100vh}.topbar{height:auto;min-height:56px;padding:12px;align-items:flex-start;gap:10px;flex-wrap:wrap}.content{padding:14px}.kpi-row{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.form-full{grid-column:auto}.modal{padding:18px}}
+@media(max-width:760px){html,body{overflow:auto}.sidebar{position:relative;width:100%;height:auto}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.main-layout{margin-left:0;height:auto;min-height:100vh}.topbar{height:auto;min-height:56px;padding:12px;align-items:flex-start;gap:10px;flex-wrap:wrap}.content{padding:14px}.kpi-row{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.form-full{grid-column:auto}.modal{padding:18px}}
 </style>
 </head>
 <body>
 <aside class="sidebar">
-  <a class="logo-box" href="index.html" aria-label="iROUP"><img src="assets/iroup-logo.png" alt="iROUP"></a>
-  <a class="nav-item" href="dashboard.html">📊<span class="nav-tooltip">Dashboard</span></a>
-  <a class="nav-item active" href="mou.html">🤝<span class="nav-tooltip">MOU</span></a>
-  <a class="nav-item" href="mobility.html">🌏<span class="nav-tooltip">Mobility</span></a>
-  <a class="nav-item" href="travel.html">✈️<span class="nav-tooltip">Travel</span></a>
-  <a class="nav-item" href="scholarship.html">🎓<span class="nav-tooltip">Scholarship</span></a>
-  <a class="nav-item" href="events.html">📅<span class="nav-tooltip">Events</span></a>
-  <div class="sidebar-spacer"></div>
-  <a class="nav-item" href="public/public-landing.html">🌐<span class="nav-tooltip">Public</span></a>
-</aside>
+    <div class="brand">
+      <img src="assets/iroup-logo.png" alt="iROUP">
+      <div class="brand-title"><b>iROUP</b><br>International<br>Relations Office</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">OVERVIEW</div>
+      <a class="nav-link" href="dashboard.html"><span class="nav-icon">📊</span><span>Executive Dashboard</span></a>
+      <div class="nav-section">MANAGEMENT</div>
+      <a class="nav-link active" href="mou.html"><span class="nav-icon">🤝</span><span>MOU</span></a>
+      <a class="nav-link" href="mobility.html"><span class="nav-icon">🌏</span><span>Mobility</span></a>
+      <a class="nav-link" href="travel.html"><span class="nav-icon">✈️</span><span>การเดินทาง</span></a>
+      <a class="nav-link" href="scholarship.html"><span class="nav-icon">🎓</span><span>ทุนการศึกษา</span></a>
+      <a class="nav-link" href="events.html"><span class="nav-icon">📅</span><span>Events</span></a>
+      <a class="nav-link" href="report.html"><span class="nav-icon">📤</span><span>รายงาน & Export</span></a>
+      <div class="nav-section">PUBLIC</div>
+      <a class="nav-link" href="public/public-landing.html"><span class="nav-icon">🌐</span><span>Public View</span></a>
+    </nav>
+    <div class="userbox">
+      <div class="avatar">IR</div>
+      <div><div class="user-name">งานวิเทศสัมพันธ์</div><div class="user-sub">University of Phayao</div></div>
+    </div>
+  </aside>
 
 <div class="main-layout">
   <div class="topbar">
@@ -370,6 +382,10 @@ tr:hover td{background:var(--blue-pale)}
           <datalist id="countryOptions"></datalist>
         </div>
         <div class="form-group">
+          <label for="continentInput">ทวีป</label>
+          <input type="text" id="continentInput" readonly>
+        </div>
+        <div class="form-group">
           <label for="mouType">ประเภทความร่วมมือ *</label>
           <select id="mouType" required>
             <option value="MOU">MOU</option>
@@ -405,9 +421,9 @@ tr:hover td{background:var(--blue-pale)}
         <div class="form-group">
           <label for="statusSelect">สถานะ</label>
           <select id="statusSelect">
-            <option value="active">active</option>
-            <option value="expired">expired</option>
-            <option value="cancelled">cancelled</option>
+            <option value="active">Active</option>
+            <option value="expired">หมดอายุ</option>
+            <option value="cancelled">ยกเลิก</option>
           </select>
         </div>
         <div class="checks">
@@ -435,7 +451,7 @@ tr:hover td{background:var(--blue-pale)}
 </div>
 
 <script>
-const V2_MOU_WRITE_UI_ENABLED = false;
+const V2_MOU_WRITE_UI_ENABLED = true;
 const EXPIRING_DAYS = 90;
 
 const state = {
@@ -486,6 +502,7 @@ function normalizeMou(row){
     country_name_en: country.country_name_en || '',
     continent_th: country.continent_th || '',
     continent_en: country.continent_en || '',
+    continent: row.continent || '',
     flag_emoji: country.flag_emoji || '',
     mou_type: row.mou_type || '',
     start_date: row.start_date || '',
@@ -525,9 +542,9 @@ function countryDisplay(row){
 }
 
 function countryMapName(row){
-  if (row.country_name_en) return row.country_name_en;
+  if (row.country_name_en) return resolveMapCountryName(row.country_name_en);
   const country = state.countries.find(item => item.country_id === row.country_id);
-  return country ? country.country_name_en || country.country_name_th || row.country_id : row.country_id;
+  return country ? resolveMapCountryName(country.country_name_en || country.country_name_th) || row.country_id : row.country_id;
 }
 
 function continentValue(row){
@@ -795,11 +812,50 @@ function findUnitByInput(value){
 function updateCountryIdFromInput(){
   const country = findCountryByInput($('#countryInput').value);
   $('#countryId').value = country ? country.country_id || '' : '';
+  $('#continentInput').value = country ? country.continent_th || '' : '';
 }
 
 function updateUnitIdFromInput(){
   const unit = findUnitByInput($('#unitInput').value);
   $('#upUnitId').value = unit ? unit.unit_id || '' : '';
+}
+
+function resolveMapCountryName(countryNameEn){
+  const name = String(countryNameEn || '').trim();
+  if (!name) return '';
+  const overrides = {
+    'united states': 'USA',
+    'united states of america': 'USA',
+    'south korea': 'South Korea',
+    'russia': 'Russia',
+    'united kingdom': 'United Kingdom',
+    'czech republic': 'Czechia',
+    'taiwan': 'Taiwan'
+  };
+  const normalized = name.toLowerCase();
+  if (overrides[normalized]) return overrides[normalized];
+
+  const mapNames = Object.values(mapCountryNames || {});
+  return mapNames.find(mapName => {
+    const candidate = String(mapName || '').trim().toLowerCase();
+    return candidate === normalized || candidate.includes(normalized) || normalized.includes(candidate);
+  }) || name;
+}
+
+function enrichMouRowsWithCountryNames(rows){
+  const countriesById = {};
+  state.countries.forEach(country => {
+    const id = String(country.country_id || '').trim();
+    if (id) countriesById[id] = country;
+  });
+  return (rows || []).map(row => {
+    const countryId = String(row.country_id || row.country?.country_id || '').trim();
+    const country = countriesById[countryId];
+    if (!country || row.country_name_en || row.country?.country_name_en) return row;
+    return Object.assign({}, row, {
+      country_name_en: resolveMapCountryName(country.country_name_en)
+    });
+  });
 }
 
 function setLang(lang){
@@ -814,6 +870,7 @@ function setLang(lang){
     const country = state.countries.find(item => item.country_id === countryId);
     if (country) $('#countryInput').value = countryLabel(country);
   }
+  updateCountryIdFromInput();
   if (unitId) {
     const unit = state.units.find(item => item.unit_id === unitId);
     if (unit) $('#unitInput').value = unitLabel(unit);
@@ -831,7 +888,7 @@ async function loadPageData(){
     ]);
     state.countries = unwrapList(countriesRes);
     state.units = unwrapList(unitsRes);
-    state.rows = unwrapList(mouRes);
+    state.rows = enrichMouRowsWithCountryNames(unwrapList(mouRes));
     renderMasterOptions();
     refreshMouDashboard();
     console.log('[V2 MOU] loaded', { countries: state.countries.length, units: state.units.length, mou: state.rows.length });
@@ -894,6 +951,7 @@ function resetForm(){
   $('#partnerOrgNameEn').value = '';
   $('#countryInput').value = '';
   $('#countryId').value = '';
+  $('#continentInput').value = '';
   $('#mouType').value = 'MOU';
   $('#fiscalYear').value = '';
   $('#startDate').value = '';
@@ -918,6 +976,7 @@ function fillForm(item){
   const country = state.countries.find(row => row.country_id === item.country_id);
   $('#countryInput').value = country ? countryLabel(country) : countryDisplay(item);
   $('#countryId').value = item.country_id || '';
+  $('#continentInput').value = country ? country.continent_th || '' : item.continent || item.continent_th || '';
   $('#mouType').value = item.mou_type || 'MOU';
   $('#fiscalYear').value = item.fiscal_year || '';
   $('#startDate').value = item.start_date || '';
@@ -974,6 +1033,7 @@ function buildPayload(){
     partner_org_name_en: $('#partnerOrgNameEn').value.trim(),
     country_id: $('#countryId').value.trim(),
     country: $('#countryInput').value.trim(),
+    continent: $('#continentInput').value.trim(),
     mou_type: $('#mouType').value,
     start_date: $('#startDate').value,
     end_date: $('#endDate').value,

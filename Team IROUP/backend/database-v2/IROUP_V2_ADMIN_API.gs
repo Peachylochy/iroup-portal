@@ -65,6 +65,7 @@ function listV2AdminMOUs_(includeArchived) {
   const rows = ctx.tables[IROUP_V2_SHEETS.MOU] || [];
   const dtos = rows
     .filter(function (row) {
+      if (!String(row.mou_id || '').trim()) return false;
       if (isSoftDeletedV2_(row)) return false;
       if (includeArchived === true) return true;
       return ['archived'].indexOf(String(row.status || '').trim()) < 0;
@@ -417,6 +418,11 @@ function writeV2AdminMOUMetadata_(request, mode) {
     return adminResponseV2_(false, null, 0, actor.error);
   }
 
+  const headerReady = ensureV2MOUContinentColumn_();
+  if (!headerReady.success) {
+    return adminResponseV2_(false, headerReady.data || null, 0, headerReady.error);
+  }
+
   const context = buildV2AdminContext_();
   if (!context.success) return context;
 
@@ -723,6 +729,33 @@ function getV2MOUWriteFeatureFlag_() {
   };
 }
 
+function ensureV2MOUContinentColumn_() {
+  const sheetResult = getV2Sheet_(IROUP_V2_SHEETS.MOU);
+  if (!sheetResult.success) return sheetResult;
+
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  if (!headers.length) {
+    return { success: false, data: null, error: 'Missing headers in V2 sheet: ' + IROUP_V2_SHEETS.MOU };
+  }
+  if (headers.indexOf('continent') >= 0) {
+    return { success: true, data: { added: false, field: 'continent' }, error: '' };
+  }
+
+  let column;
+  if (headers.indexOf('country_id') >= 0) {
+    column = headers.indexOf('country_id') + 2;
+    sheet.insertColumnBefore(column);
+  } else {
+    sheet.insertColumnAfter(headers.length);
+    column = headers.length + 1;
+  }
+  sheet.getRange(1, column).setValue('continent');
+  SpreadsheetApp.flush();
+
+  return { success: true, data: { added: true, field: 'continent', column: column }, error: '' };
+}
+
 function getV2FileUploadFeatureFlag_() {
   const property = 'IROUP_V2_FILE_UPLOAD_ENABLED';
   const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
@@ -828,6 +861,7 @@ function buildV2MOUSheetRow_(normalized) {
     partner_org_name: cleanV2EventText_(data.partner_org_name),
     partner_org_name_en: cleanV2EventText_(data.partner_org_name_en),
     country_id: cleanV2EventText_(data.country_id),
+    continent: cleanV2EventText_(data.continent),
     mou_type: cleanV2EventText_(data.mou_type),
     start_date: cleanV2EventText_(data.start_date),
     end_date: cleanV2EventText_(data.end_date),
@@ -1283,6 +1317,7 @@ function normalizeV2MOUWritePayload_(payload, ctx) {
     partner_org_name_en: cleanV2EventText_(source.partner_org_name_en || ''),
     country_id: country.country_id,
     country_display: country.display,
+    continent: cleanV2EventText_(pickV2EventValue_(source, ['continent', 'continent_th', 'continent_en'])),
     mou_type: cleanV2EventText_(source.mou_type || ''),
     start_date: normalizeV2EventDate_(source.start_date || ''),
     end_date: normalizeV2EventDate_(source.end_date || ''),
@@ -1623,6 +1658,7 @@ function mapV2AdminMOUDto_(row, ctx, includeChildren) {
     partner_org_name: row.partner_org_name || '',
     partner_org_name_en: row.partner_org_name_en || '',
     country: mapV2CountryRef_(ctx, row.country_id),
+    continent: row.continent || '',
     mou_type: row.mou_type || '',
     start_date: row.start_date || '',
     end_date: row.end_date || '',
