@@ -249,7 +249,7 @@ function getV2RouteDispatch_() {
     'v2.admin.mobility.detail': {
       access: 'admin',
       handler: function (request) {
-        return getV2AdminMobilityProject_(getV2RequestId_(request, 'mobility_id'));
+        return getV2AdminMobilityProject_(request);
       }
     },
     'v2.admin.mobility.create': {

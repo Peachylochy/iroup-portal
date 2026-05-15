@@ -196,14 +196,28 @@ function writeV2PersonSampleRows_(sheetName, idField, rows) {
   return adminResponseV2_(true, { ids: writtenIds }, writtenIds.length, '');
 }
 
-function getV2AdminMobilityProject_(mobilityId) {
-  const valid = validateModuleRecordLinkV2_('mobility', mobilityId);
-  if (!valid.success) return adminResponseV2_(false, null, 0, valid.error);
+function getV2AdminMobilityProject_(requestOrMobilityId) {
+  const mobilityId = extractV2MobilityDetailId_(requestOrMobilityId);
+  if (!mobilityId) {
+    return adminResponseV2_(false, null, 0, 'mobility_id is required for mobility detail.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId);
+  if (!existing.success || !existing.data) {
+    return adminResponseV2_(false, {
+      mobility_id: mobilityId
+    }, 0, existing.error || 'Mobility project not found.');
+  }
+  if (isSoftDeletedV2_(existing.data)) {
+    return adminResponseV2_(false, {
+      mobility_id: mobilityId
+    }, 0, 'Mobility project is deleted.');
+  }
 
   const context = buildV2AdminContext_();
   if (!context.success) return context;
 
-  const project = valid.details.row;
+  const project = existing.data;
   const dto = mapV2AdminMobilityProjectDto_(project, context.data, true);
   return adminResponseV2_(true, dto, dto ? 1 : 0, '');
 }
@@ -1665,6 +1679,31 @@ function extractV2MobilityWritePayload_(request) {
   }
 
   return params;
+}
+
+function extractV2MobilityDetailId_(requestOrMobilityId) {
+  if (!requestOrMobilityId || typeof requestOrMobilityId !== 'object') {
+    return cleanV2EventText_(requestOrMobilityId || '');
+  }
+
+  const params = requestOrMobilityId.params || {};
+  const body = requestOrMobilityId.body || {};
+  const candidate = body.payload || body.mobility || params.payload || params.mobility || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return cleanV2EventText_(candidate.mobility_id || candidate.id || candidate.record_id || '');
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      const parsed = JSON.parse(candidate);
+      return cleanV2EventText_(parsed.mobility_id || parsed.id || parsed.record_id || '');
+    } catch (err) {
+      return cleanV2EventText_(params.mobility_id || params.id || params.record_id || '');
+    }
+  }
+
+  return cleanV2EventText_(body.mobility_id || params.mobility_id || body.id || params.id || body.record_id || params.record_id || '');
 }
 
 function extractV2MobilityParticipantPayload_(request) {
