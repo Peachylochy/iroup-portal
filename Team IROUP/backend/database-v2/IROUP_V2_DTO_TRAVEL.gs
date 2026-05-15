@@ -25,13 +25,27 @@ function getV2AdminTravelList_(includeArchived) {
 }
 
 function getV2AdminTravel_(travelId) {
-  const valid = validateModuleRecordLinkV2_('travel', travelId);
-  if (!valid.success) return adminResponseV2_(false, null, 0, valid.error);
+  const id = String(travelId || '').trim();
+  if (!id) {
+    return adminResponseV2_(false, null, 0, 'travel_id is required for travel detail.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.TRAVEL, 'travel_id', id);
+  if (!existing.success || !existing.data) {
+    return adminResponseV2_(false, {
+      travel_id: id
+    }, 0, existing.error || 'Travel project not found.');
+  }
+  if (isSoftDeletedV2_(existing.data)) {
+    return adminResponseV2_(false, {
+      travel_id: id
+    }, 0, 'Travel project is deleted.');
+  }
 
   const context = buildV2TravelDtoContext_(adminResponseV2_);
   if (!context.success) return context;
 
-  const dto = mapV2AdminTravelDetailDto_(valid.details.row, context.data);
+  const dto = mapV2AdminTravelDetailDto_(existing.data, context.data);
   return adminResponseV2_(true, dto, dto ? 1 : 0, '');
 }
 

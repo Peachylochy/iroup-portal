@@ -307,6 +307,41 @@ function unwrapList(response){
   return [];
 }
 
+function unwrapTravelDetail(response, travelId){
+  const hasTravelFields = row => {
+    return row && typeof row === 'object' && (
+      row.travel_id ||
+      row.project_name ||
+      row.purpose ||
+      row.country_id ||
+      row.start_date ||
+      row.end_date
+    );
+  };
+  const candidates = [];
+  const pushCandidate = item => {
+    if (!item || typeof item !== 'object') return;
+    candidates.push(item);
+    ['travel', 'record', 'item', 'persisted_travel', 'data'].forEach(key => {
+      if (item[key] && typeof item[key] === 'object') candidates.push(item[key]);
+    });
+  };
+  pushCandidate(response);
+  pushCandidate(response && response.data);
+  for (const candidate of candidates) {
+    if (hasTravelFields(candidate)) return candidate;
+  }
+  return state.rows.find(row => row && row.travel_id === travelId) || {};
+}
+
+function unwrapTravelBudget(response){
+  const data = response && response.data ? response.data : response;
+  if (data && data.budget) return data.budget;
+  if (data && data.record) return data.record;
+  if (data && data.item) return data.item;
+  return data || null;
+}
+
 function esc(value){
   return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 }
@@ -364,6 +399,7 @@ function unitLabel(unit){
 }
 
 function countryFromRow(row){
+  if (!row || typeof row !== 'object') return null;
   if (row.country && typeof row.country === 'object') return row.country;
   return state.countries.find(country => String(country.country_id || '') === String(row.country_id || '')) || null;
 }
@@ -464,7 +500,7 @@ async function loadPageData(showReloadNotice){
     state.countries = unwrapList(countriesRes);
     state.units = unwrapList(unitsRes);
     state.rows = unwrapList(travelRes)
-      .filter(row => String(row.travel_id || '').trim())
+      .filter(row => row && String(row.travel_id || '').trim())
       .filter(row => !boolValue(row.is_deleted))
       .map(enrichTravelRow);
     renderSuggestions();
@@ -634,17 +670,25 @@ async function openEditModal(travelId){
   $('#participantSection').style.display = '';
   $('#participantList').innerHTML = '<div class="participant-empty">กำลังโหลดผู้เดินทาง...</div>';
   try {
-    const [detailRes, budgetRes, participantsRes] = await Promise.all([
-      IROUP_V2.admin.travelDetail(travelId),
-      requestTravel('v2.admin.travel.budget.get', { travel_id: travelId }),
-      requestTravel('v2.admin.travel.participant.list', { travel_id: travelId })
-    ]);
+    const detailRes = await requestTravel('v2.admin.travel.detail', { travel_id: travelId });
+    console.log('[debug] detail res:', JSON.stringify(detailRes));
     if (detailRes?.success === false) throw new Error(detailRes.error || 'โหลดรายละเอียดไม่สำเร็จ');
+    const detail = unwrapTravelDetail(detailRes, travelId);
+    console.log('[debug] unwrapped detail:', JSON.stringify(detail));
+    if (!detail || !String(detail.travel_id || detail.id || '').trim()) {
+      alert('ไม่พบข้อมูลการเดินทาง');
+      closeModal();
+      return;
+    }
+    console.log('[debug] about to fillForm, travel_id:', detail?.travel_id);
+    fillForm(enrichTravelRow(detail));
+
+    const budgetRes = await requestTravel('v2.admin.travel.budget.get', { travel_id: travelId });
     if (budgetRes?.success === false) throw new Error(budgetRes.error || 'โหลดงบประมาณไม่สำเร็จ');
+    hydrateBudget(unwrapTravelBudget(budgetRes));
+
+    const participantsRes = await requestTravel('v2.admin.travel.participant.list', { travel_id: travelId });
     if (participantsRes?.success === false) throw new Error(participantsRes.error || 'โหลดผู้เดินทางไม่สำเร็จ');
-    const detail = detailRes.data || state.rows.find(row => row.travel_id === travelId) || {};
-    hydrateForm(enrichTravelRow(detail));
-    hydrateBudget(budgetRes.data || null);
     state.participants = unwrapList(participantsRes);
     renderParticipantList();
   } catch (error) {
@@ -655,6 +699,10 @@ async function openEditModal(travelId){
 
 function closeModal(){
   $('#travelModal').classList.remove('open');
+}
+
+function fillForm(row){
+  hydrateForm(row);
 }
 
 function hydrateForm(row){
@@ -805,7 +853,10 @@ async function saveTravel(event){
     if (budgetPayload && savedTravelId) {
       budgetPayload.travel_id = savedTravelId;
       const budgetRes = await requestTravel('v2.admin.travel.budget.save', { payload: budgetPayload });
-      if (!budgetRes || budgetRes.success === false) throw new Error(budgetRes?.error || 'บันทึกงบประมาณไม่สำเร็จ');
+      if (!budgetRes || budgetRes.success === false) {
+        const debug = budgetRes?.debug ? '\n\nDEBUG:\n' + JSON.stringify(budgetRes.debug, null, 2) : '';
+        throw new Error((budgetRes?.error || 'บันทึกงบประมาณไม่สำเร็จ') + debug);
+      }
     }
     if (!isEdit && pendingParticipants.length) {
       for (const participant of pendingParticipants) {

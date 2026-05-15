@@ -685,8 +685,9 @@ function saveV2AdminTravelBudget_(request) {
   const existingBudget = findV2TravelBudgetByTravelId_(travelId);
   Logger.log('[V2 Travel Budget Debug] existing budget: %s', existingBudget ? JSON.stringify(existingBudget) : 'null');
   const now = new Date().toISOString();
-  const adminEmail = actor.user.email || '';
+  const adminEmail = cleanV2EventText_(actor.user.email);
   let budgetId = existingBudget ? cleanV2EventText_(existingBudget.budget_id) : generateV2Id_(IROUP_V2_ID_PREFIXES.BUDGET);
+  if (!budgetId) budgetId = generateV2Id_('BUD');
   const budgetSheetFields = [
     'budget_id',
     'module',
@@ -707,25 +708,44 @@ function saveV2AdminTravelBudget_(request) {
   ];
   const budgetRequiredFields = ['budget_id', 'module', 'record_id', 'currency', 'is_internal', 'is_deleted', 'created_by', 'created_at'];
   const rawRow = {
-    budget_id: budgetId,
+    budget_id: String(budgetId || ''),
     module: 'travel',
-    record_id: travelId,
+    record_id: String(travelId || ''),
     budget_type_id: cleanV2EventText_(payload.budget_type_id || ''),
     budget_source_type: normalized.data.budget_source_type,
     budget_source_unit_id: cleanV2EventText_(payload.budget_source_unit_id || ''),
     budget_source_name: cleanV2EventText_(payload.budget_source_name || normalized.data.budget_source_type),
-    currency: normalized.data.currency,
-    exchange_rate: normalized.data.exchange_rate,
+    currency: 'THB',
+    exchange_rate: 1,
     amount: normalized.data.amount,
     amount_thb: normalized.data.amount_thb,
     budget_note: cleanV2EventText_(payload.budget_note || payload.note || ''),
-    is_internal: normalized.data.is_internal,
+    is_internal: Boolean(normalized.data.is_internal),
     is_deleted: false
   };
   const row = {};
   budgetSheetFields.forEach(function (field) {
     if (rawRow[field] !== undefined) row[field] = rawRow[field];
   });
+  const buildBudgetDebugResponse = function (errorMessage, extraDebug) {
+    const debug = {
+      row_keys: Object.keys(row),
+      row_values: JSON.stringify(row),
+      sheet_name: IROUP_V2_SHEETS.BUDGET
+    };
+    if (extraDebug) {
+      Object.keys(extraDebug).forEach(function (key) {
+        debug[key] = extraDebug[key];
+      });
+    }
+    return {
+      success: false,
+      data: null,
+      total: 0,
+      error: errorMessage || 'Travel budget save failed.',
+      debug: debug
+    };
+  };
 
   let persisted;
   const budgetSheetResult = getV2Sheet_(IROUP_V2_SHEETS.BUDGET);
@@ -751,10 +771,17 @@ function saveV2AdminTravelBudget_(request) {
     });
     Logger.log('[V2 Travel Budget Debug] row: %s', JSON.stringify(row));
     Logger.log('[V2 Travel Budget Debug] missing required fields: %s', JSON.stringify(missingRequiredFields));
-    persisted = appendV2Row_(IROUP_V2_SHEETS.BUDGET, row, {
-      idField: 'budget_id',
-      requiredFields: budgetRequiredFields
-    });
+    try {
+      persisted = appendV2Row_(IROUP_V2_SHEETS.BUDGET, row, {
+        idField: 'budget_id',
+        requiredFields: budgetRequiredFields
+      });
+    } catch (e) {
+      return buildBudgetDebugResponse(e && e.message ? e.message : String(e), {
+        required_fields: budgetRequiredFields,
+        missing_required_fields: missingRequiredFields
+      });
+    }
   }
 
   if (!persisted.success) {
@@ -762,6 +789,16 @@ function saveV2AdminTravelBudget_(request) {
       error: persisted.error || '',
       diagnostics: persisted.diagnostics || {}
     }));
+    if (!existingBudget) {
+      return {
+        success: false,
+        error: 'BUDGET_DEBUG: ' + JSON.stringify({
+          persisted_error: persisted.error,
+          persisted_diagnostics: persisted.diagnostics,
+          row_sent: row
+        })
+      };
+    }
     return adminResponseV2_(false, {
       budget_id: budgetId,
       diagnostics: persisted.diagnostics || {}

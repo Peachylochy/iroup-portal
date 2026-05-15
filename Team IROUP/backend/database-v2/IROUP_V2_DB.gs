@@ -276,11 +276,8 @@ function getV2AppendEnumAllowedValues_(fieldName) {
     status: IROUP_V2_ENUMS.status,
     module: IROUP_V2_MODULES,
     visibility_level: IROUP_V2_ENUMS.visibility_level,
-    budget_source_type: IROUP_V2_ENUMS.budget_source_type,
     direction: IROUP_V2_ENUMS.direction,
     event_mode: IROUP_V2_ENUMS.event_mode,
-    participant_type: IROUP_V2_ENUMS.participant_type,
-    person_source: IROUP_V2_ENUMS.person_source,
     source_system: IROUP_V2_ENUMS.source_system,
     currency: IROUP_V2_ENUMS.currency
   };
