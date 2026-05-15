@@ -300,6 +300,54 @@ function getV2RouteDispatch_() {
         return getV2AdminTravel_(getV2RequestId_(request, 'travel_id'));
       }
     },
+    'v2.admin.travel.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminTravelProject_(request);
+      }
+    },
+    'v2.admin.travel.update': {
+      access: 'admin',
+      handler: function (request) {
+        return updateV2AdminTravelProject_(request);
+      }
+    },
+    'v2.admin.travel.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminTravelProject_(request);
+      }
+    },
+    'v2.admin.travel.participant.list': {
+      access: 'admin',
+      handler: function (request) {
+        return listV2AdminTravelParticipants_(request);
+      }
+    },
+    'v2.admin.travel.participant.add': {
+      access: 'admin',
+      handler: function (request) {
+        return addV2AdminTravelParticipant_(request);
+      }
+    },
+    'v2.admin.travel.participant.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminTravelParticipant_(request);
+      }
+    },
+    'v2.admin.travel.budget.save': {
+      access: 'admin',
+      handler: function (request) {
+        return saveV2AdminTravelBudget_(request);
+      }
+    },
+    'v2.admin.travel.budget.get': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminTravelBudget_(request);
+      }
+    },
     'v2.admin.scholarship.list': {
       access: 'admin',
       handler: function (request) {

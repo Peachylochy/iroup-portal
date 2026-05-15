@@ -3,149 +3,1084 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>การเดินทางบุคลากร — iROUP</title>
+<title>การเดินทาง - iROUP V2</title>
 <link rel="stylesheet" href="css/iroup-theme.css">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/iroup-config.js"></script>
 <script src="js/iroup-v2-endpoint.js"></script>
 <script src="js/iroup-v2-api.js"></script>
 <script src="js/iroup-utils.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#1A6DB5;--sky:#4BBDE8;--navy:#0F2D5A;--dark:#071828;--green:#5BAD3E;--gold:#D4890A;--red:#D63B32;--purple:#7C3AED;--teal:#0D9488;--bg:#F5F8FC;--card:#fff;--line:#E6EDF6;--text:#10233f;--muted:#52647a;--soft:#E8F4FD;--shadow:0 8px 30px rgba(15,45,90,.09);--radius:18px}
-body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px;overflow-x:hidden}.page{max-width:1600px;margin:0 auto;display:flex;flex-direction:column;gap:16px}.head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.title{font-size:22px;font-weight:900;color:var(--navy)}.sub{font-size:12px;color:var(--muted);font-family:'Sarabun',sans-serif;margin-top:4px}.btn{border:0;border-radius:12px;padding:10px 14px;font-family:'Prompt',sans-serif;font-weight:800;cursor:pointer;background:#E8F4FD;color:var(--blue);display:inline-flex;align-items:center;gap:7px;text-decoration:none}.btn.primary{background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff}.btn.green{background:#EBF7E3;color:var(--green)}.btn.red{background:#FDECEA;color:var(--red)}.btn.gray{background:#EEF1F5;color:#5A6A7E}.grid-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}.kpi-ico{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:var(--soft)}.kpi .num{font-size:30px;line-height:1;font-weight:900;color:var(--blue)}.kpi .label{font-size:12px;font-weight:800}.kpi .hint{font-size:11px;color:var(--muted);margin-top:4px}.toolbar{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.input,.select{border:1.5px solid #DCE6F2;background:#fff;border-radius:12px;padding:10px 12px;font-family:'Prompt',sans-serif;font-size:13px;outline:none}.input:focus,.select:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(75,189,232,.12)}.search{flex:1;min-width:240px}.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-title{font-size:15px;font-weight:900}.panel-sub{font-size:12px;color:var(--muted);font-family:'Sarabun',sans-serif;margin-top:2px}.table-wrap{overflow:auto}.data-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1080px}.data-table th{background:#F4F7FB;color:#64738a;font-size:12px;text-align:left;padding:12px;border-bottom:1px solid var(--line);white-space:nowrap}.data-table td{padding:12px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}.data-table tr:hover td{background:#FAFCFF}.status{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800}.active{background:#EBF7E3;color:var(--green)}.upcoming{background:#FFF4DE;color:#B46D00}.done{background:#EEF1F5;color:#778598}.tag{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:4px 8px;background:#EEF6FF;color:var(--blue);font-size:11px;font-weight:800;margin:2px}.file-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:10px;background:#E8F4FD;color:#1A6DB5;font-weight:800;text-decoration:none;font-size:12px;white-space:nowrap}.empty{padding:34px;text-align:center;color:var(--muted)}.actions{display:flex;gap:6px}.iconbtn{border:0;border-radius:10px;padding:8px 10px;cursor:pointer;font-weight:800}.modal-backdrop{position:fixed;inset:0;background:rgba(7,24,40,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}.modal-backdrop.show{display:flex}.modal{width:min(980px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.25)}.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}.modal-title{font-weight:900;font-size:18px}.close{border:0;background:#F2F5F9;border-radius:10px;width:36px;height:36px;cursor:pointer}.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:20px}.field label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin-bottom:6px}.field.full{grid-column:1/-1}.form input,.form textarea,.form select{width:100%;border:1.5px solid #DCE6F2;border-radius:12px;padding:11px 12px;font-family:'Prompt',sans-serif}.form textarea{min-height:80px;resize:vertical}.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--line)}.staff-picker{border:1.5px solid #DCE6F2;border-radius:14px;padding:12px;background:#FAFCFF}.staff-search-row{display:flex;gap:8px;position:relative}.staff-results{position:absolute;left:0;right:0;top:46px;background:#fff;border:1px solid #DCE6F2;border-radius:12px;box-shadow:var(--shadow);max-height:240px;overflow:auto;display:none;z-index:10}.staff-results.show{display:block}.staff-option{padding:10px 12px;cursor:pointer;border-bottom:1px solid #EEF1F5;display:flex;justify-content:space-between;gap:10px}.staff-option:hover{background:#F1F7FD}.staff-name{font-weight:800;font-size:13px}.staff-meta{font-size:11px;color:var(--muted);font-family:'Sarabun',sans-serif;margin-top:2px}.staff-code{font-size:11px;font-weight:900;color:var(--blue);white-space:nowrap}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.chip{display:inline-flex;align-items:center;gap:8px;background:#E8F4FD;color:#0F4F8A;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}.chip button{border:0;background:transparent;color:var(--red);font-weight:900;cursor:pointer}.summary-box{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.summary-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}.summary-label{font-size:10px;color:var(--muted);font-family:'Sarabun',sans-serif}.summary-value{font-weight:900;font-size:13px;margin-top:2px}.hint{font-size:11px;color:var(--muted);font-family:'Sarabun',sans-serif;margin-top:5px}.quick-add{display:none;border:1.5px dashed #B7D7F0;background:#F7FBFF;border-radius:14px;padding:12px;margin-top:10px}.quick-add.show{display:block}.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.loading{padding:30px;text-align:center;color:var(--muted)}@media(max-width:860px){body{padding:12px}.grid-kpi{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr}.summary-box{grid-template-columns:1fr}.quick-grid{grid-template-columns:1fr}.toolbar .btn,.toolbar .input,.toolbar .select{width:100%}}
-.input,.select,.form input,.form textarea,.form select,.quick-grid input,.staff-search-row input{color:var(--text)}
-.select option{color:var(--text);background:#fff}
-.input::placeholder,.form input::placeholder,.form textarea::placeholder,.quick-grid input::placeholder,.staff-search-row input::placeholder{color:#5f7288;opacity:1}
-.data-table td{color:var(--text)}
-.data-table th{color:#52647a}
-.done{color:#52647a}
-/* FINAL LIGHT READABILITY STABILIZATION */
-.done{color:#435a72}
+*{box-sizing:border-box}
+:root{--blue:#1A6DB5;--sky:#4BBDE8;--navy:#0F2D5A;--dark:#071828;--green:#5BAD3E;--gold:#F5A623;--red:#D63B32;--purple:#7C3AED;--teal:#0D9488;--bg:#F5F8FC;--card:#fff;--line:#DCE7F2;--text:#10233f;--muted:#52647a;--soft:#E8F4FD;--shadow:0 9px 30px rgba(15,45,90,.12);--radius:18px}
+body{margin:0;font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select,textarea{font:inherit}
+.app{min-height:100vh}
+.sidebar{width:250px;min-width:250px;height:100vh;background:#fff;border-right:1px solid #E6EDF6;position:fixed;left:0;top:0;z-index:20;display:flex;flex-direction:column}
+.brand{height:76px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid #E6EDF6}
+.brand img{width:68px;height:auto;object-fit:contain}
+.brand-title{font-size:12px;color:#66758a;line-height:1.25}.brand-title b{color:var(--navy);font-weight:900}
+.nav{padding:16px 12px;overflow:auto;flex:1}.nav-section{font-size:11px;font-weight:800;color:#6b7f96;text-transform:uppercase;margin:18px 12px 8px}
+.nav-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;color:#26364e;text-decoration:none;font-weight:800;font-size:14px;margin-bottom:4px}
+.nav-link:hover{background:#F1F7FD;color:var(--blue)}.nav-link.active{background:var(--soft);color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+.nav-icon{font-size:20px;width:24px;text-align:center}.userbox{margin-top:auto;padding:16px;border-top:1px solid #E6EDF6;display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--blue));display:grid;place-items:center;color:#fff;font-weight:900}
+.user-name{font-size:12px;font-weight:900}.user-sub{font-size:11px;color:#66758a}
+.main{margin-left:250px;min-height:100vh;padding:24px}
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:18px}.title{font-size:28px;font-weight:900;color:var(--navy);line-height:1.1}.subtitle{font-size:13px;color:var(--muted);margin-top:4px}.spacer{flex:1}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;min-height:42px}
+.btn:hover{border-color:#BBD7EF;box-shadow:0 6px 16px rgba(15,45,90,.08)}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{background:#fff;color:var(--red);border-color:#F5C4C0}.btn.ghost{background:transparent}.btn:disabled{opacity:.55;cursor:not-allowed}
+.lang-toggle,.view-toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px}.lang-toggle button,.view-toggle button{border:0;background:transparent;border-radius:9px;padding:7px 10px;font-weight:900;cursor:pointer;color:var(--muted)}.lang-toggle button.active,.view-toggle button.active{background:var(--blue);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 6px 20px rgba(15,45,90,.06)}.kpi-num{font-size:28px;font-weight:900;color:var(--navy);line-height:1}.kpi-label{font-size:12px;color:var(--muted);font-weight:800;margin-top:6px}
+.toolbar{display:grid;grid-template-columns:1.6fr .8fr .8fr auto;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:16px}
+.input,.select{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;color:var(--text);outline:none}.input:focus,.select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,109,181,.12)}
+.notice{display:none;margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid #BBD7EF;background:#F1F8FE;color:#174B7A;font-weight:700}.notice.error{background:#FFF5F4;border-color:#F5C4C0;color:#A62C25}
+.loading{display:grid;place-items:center;padding:36px;color:var(--muted);font-weight:800}.spinner{width:28px;height:28px;border:3px solid #D8E7F4;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:auto auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.travel-card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 20px rgba(15,45,90,.06);padding:16px;display:flex;flex-direction:column;gap:12px;min-height:220px}.card-title{font-size:16px;font-weight:900;line-height:1.35}.card-sub{font-size:12px;color:var(--muted);line-height:1.5}.card-actions{margin-top:auto;display:flex;justify-content:flex-end;gap:8px}
+.list-wrap{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:auto;box-shadow:0 6px 20px rgba(15,45,90,.06)}.travel-table{width:100%;border-collapse:collapse;min-width:1080px}.travel-table th,.travel-table td{padding:12px 14px;border-bottom:1px solid #EDF3F8;text-align:left;vertical-align:middle;font-size:13px}.travel-table th{background:#F8FBFE;color:#344761;font-weight:900}.travel-table tr:last-child td{border-bottom:0}.title-cell{font-weight:900;color:var(--navy)}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.active{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.completed{color:#174B7A;background:#F1F8FE;border-color:#BBD7EF}.badge.cancelled{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.draft{color:#56657A;background:#F3F6FA;border-color:#D7E1EA}.badge.count{color:#875D00;background:#FFF8E8;border-color:#F8DB98}
+.empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}.muted{color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;white-space:nowrap}
+.modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1040px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
+.form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}.radio-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.radio-row label{display:flex;gap:8px;align-items:center;font-weight:800}
+.participant-tools{display:grid;gap:12px}.participant-search{position:relative}.suggestions{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(15,45,90,.14);max-height:260px;overflow:auto}.suggestions.open{display:block}.suggestion{width:100%;border:0;background:#fff;text-align:left;padding:10px 12px;cursor:pointer;border-bottom:1px solid #EDF3F8;color:var(--text)}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#F8FBFE}.suggestion-name{font-weight:900}.suggestion-meta{font-size:12px;color:var(--muted);margin-top:2px}.selected-person{display:none;border:1px solid #BBD7EF;background:#F1F8FE;border-radius:14px;padding:10px 12px;align-items:center;gap:10px;justify-content:space-between}.selected-person.show{display:flex}.manual-form{display:none;border:1px dashed #BFD0E0;border-radius:14px;padding:12px;background:#F8FBFE}.manual-form.show{display:block}.participant-list{display:grid;gap:8px}.participant-row{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;align-items:center;border:1px solid #EDF3F8;border-radius:14px;padding:10px 12px;background:#fff}.participant-name{font-weight:900}.participant-unit{color:var(--muted);font-size:12px}.participant-empty{padding:14px;border:1px dashed #BFD0E0;border-radius:14px;color:var(--muted);text-align:center;font-weight:800}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{justify-content:center}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:16px}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.topbar{align-items:flex-start;flex-wrap:wrap}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.participant-row{grid-template-columns:1fr}.participant-row .btn{justify-content:center}}
 </style>
 </head>
 <body>
-<div class="page">
-  <div class="head">
-    <div><div class="title">✈️ การเดินทางบุคลากร</div><div class="sub">จัดการข้อมูลบุคลากรเดินทางไปปฏิบัติงานต่างประเทศ เชื่อมข้อมูลบุคลากร ประเทศ และไฟล์แนบ</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="status done" id="v2TravelReadiness">V2 travel: checking</span><button class="btn gray" onclick="loadAll()">↻ โหลดใหม่</button><button class="btn primary" onclick="openForm()">＋ เพิ่มการเดินทาง</button></div>
-  </div>
-  <div class="grid-kpi">
-    <div class="kpi"><div class="kpi-ico">📄</div><div><div class="num" id="kTotal">0</div><div class="label">รายการทั้งหมด</div><div class="hint">จากชีตการเดินทาง</div></div></div>
-    <div class="kpi"><div class="kpi-ico">🟢</div><div><div class="num" id="kActive">0</div><div class="label">กำลังเดินทาง</div><div class="hint">ตามช่วงวันที่</div></div></div>
-    <div class="kpi"><div class="kpi-ico">👥</div><div><div class="num" id="kPeople">0</div><div class="label">จำนวนคนรวม</div><div class="hint">นับจากผู้เดินทาง</div></div></div>
-    <div class="kpi"><div class="kpi-ico">🌏</div><div><div class="num" id="kCountries">0</div><div class="label">ประเทศ</div><div class="hint">ปลายทางทั้งหมด</div></div></div>
-  </div>
-  <div class="toolbar">
-    <input class="input search" id="searchInput" placeholder="🔍 ค้นหาโครงการ ประเทศ ผู้เดินทาง ต้นสังกัด..." oninput="renderTable()">
-    <select class="select" id="countryFilter" onchange="renderTable()"><option value="">ทุกประเทศ</option></select>
-    <select class="select" id="statusFilter" onchange="renderTable()"><option value="">ทุกสถานะ</option><option value="upcoming">รอเดินทาง</option><option value="active">กำลังเดินทาง</option><option value="done">เสร็จสิ้น</option></select>
-    <button class="btn" onclick="exportCsv()">⬇ Export CSV</button>
-  </div>
-  <div class="panel">
-    <div class="panel-head"><div><div class="panel-title">รายการการเดินทางบุคลากร</div><div class="panel-sub" id="tableSub">กำลังโหลดข้อมูล...</div></div></div>
-    <div class="table-wrap"><table class="data-table"><thead><tr><th>โครงการ</th><th>ปลายทาง</th><th>วันที่</th><th>ผู้เดินทาง</th><th>จำนวน</th><th>งบประมาณ</th><th>ไฟล์</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="travelBody"><tr><td colspan="9"><div class="loading">กำลังโหลดข้อมูล...</div></td></tr></tbody></table></div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/iroup-logo.png" alt="iROUP">
+      <div class="brand-title"><b>iROUP</b><br>International<br>Relations Office</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">OVERVIEW</div>
+      <a class="nav-link" href="dashboard.html"><span class="nav-icon">📊</span><span>Executive Dashboard</span></a>
+      <div class="nav-section">MANAGEMENT</div>
+      <a class="nav-link" href="mou.html"><span class="nav-icon">🤝</span><span>MOU</span></a>
+      <a class="nav-link" href="mobility.html"><span class="nav-icon">🌏</span><span>Mobility</span></a>
+      <a class="nav-link active" href="travel.html"><span class="nav-icon">✈️</span><span>การเดินทาง</span></a>
+      <a class="nav-link" href="scholarship.html"><span class="nav-icon">🎓</span><span>ทุนการศึกษา</span></a>
+      <a class="nav-link" href="events.html"><span class="nav-icon">📅</span><span>กิจกรรม</span></a>
+      <a class="nav-link" href="report.html"><span class="nav-icon">📋</span><span>รายงาน & Export</span></a>
+      <div class="nav-section">PUBLIC</div>
+      <a class="nav-link" href="public/public-landing.html"><span class="nav-icon">🌐</span><span>Public View</span></a>
+    </nav>
+    <div class="userbox">
+      <div class="avatar">IR</div>
+      <div><div class="user-name">งานวิเทศสัมพันธ์</div><div class="user-sub">University of Phayao</div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="title">การเดินทาง</div>
+        <div class="subtitle">จัดการข้อมูลการเดินทางบุคลากรด้วย V2-native API</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="lang-toggle" aria-label="Language">
+        <button type="button" id="langThBtn" class="active" onclick="setLang('th')">TH</button>
+        <button type="button" id="langEnBtn" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="view-toggle" aria-label="View mode">
+        <button type="button" id="cardViewBtn" onclick="setViewMode('card')">การ์ด</button>
+        <button type="button" id="listViewBtn" class="active" onclick="setViewMode('list')">ตาราง</button>
+      </div>
+      <button class="btn" type="button" onclick="loadPageData(true)">↻ <span>โหลดใหม่</span></button>
+      <button class="btn primary" id="createBtn" type="button" onclick="openCreateModal()">+ <span>เพิ่มการเดินทาง</span></button>
+    </header>
+
+    <section class="kpis" aria-label="Travel KPIs">
+      <div class="kpi"><div class="kpi-num" id="kpiTotal">0</div><div class="kpi-label">ภารกิจทั้งหมด</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiActive">0</div><div class="kpi-label">กำลังดำเนินการ</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiParticipants">0</div><div class="kpi-label">จำนวนผู้เดินทางรวม</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiCountries">0</div><div class="kpi-label">ประเทศที่ไป</div></div>
+    </section>
+
+    <section class="toolbar" aria-label="Travel filters">
+      <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อภารกิจ / วัตถุประสงค์ / ประเทศ" oninput="renderTravel()">
+      <select id="statusFilter" class="select" onchange="renderTravel()">
+        <option value="">ทั้งหมด</option>
+        <option value="active">กำลังดำเนินการ</option>
+        <option value="completed">เสร็จสิ้น</option>
+        <option value="cancelled">ยกเลิก</option>
+      </select>
+      <select id="yearFilter" class="select" onchange="renderTravel()"><option value="">ทุกปีงบประมาณ</option></select>
+      <button class="btn ghost" type="button" onclick="clearFilters()">ล้างตัวกรอง</button>
+    </section>
+
+    <div id="notice" class="notice"></div>
+    <section id="travelView" class="list-wrap"><div class="loading"><div><div class="spinner"></div>กำลังโหลดข้อมูล...</div></div></section>
+  </main>
+</div>
+
+<div id="travelModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-panel">
+    <form id="travelForm" onsubmit="saveTravel(event)">
+      <div class="modal-head">
+        <div>
+          <div id="modalTitle" class="modal-title">เพิ่มการเดินทาง</div>
+          <div id="modalSub" class="subtitle">V2-native TRAVEL metadata</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn" type="button" onclick="closeModal()">ปิด</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="travelId">
+
+        <section id="participantSection" class="form-section" style="display:none">
+          <div class="section-title">ผู้เดินทาง</div>
+          <div class="participant-tools">
+            <div class="participant-search">
+              <label class="label" for="participantSearchInput">ค้นหาบุคลากร</label>
+              <input id="participantSearchInput" class="input" type="search" placeholder="ค้นหาจาก PERSON_STAFF" oninput="searchParticipants(this.value)">
+              <div id="participantSuggestions" class="suggestions"></div>
+            </div>
+            <div id="selectedPersonBox" class="selected-person">
+              <div>
+                <div id="selectedPersonName" class="participant-name"></div>
+                <div id="selectedPersonMeta" class="participant-unit"></div>
+              </div>
+              <button class="btn primary" type="button" onclick="addSelectedParticipant()">เพิ่ม</button>
+            </div>
+            <button id="manualAddBtn" class="btn" type="button" style="display:none" onclick="showManualParticipantForm()">+ เพิ่มด้วยตนเอง</button>
+            <div id="manualParticipantForm" class="manual-form">
+              <div class="form-grid">
+                <div class="field">
+                  <label class="label" for="manualFullNameInput">ชื่อ-สกุล <span class="req">*</span></label>
+                  <input id="manualFullNameInput" class="input" type="text">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualUnitInput">หน่วยงาน</label>
+                  <input id="manualUnitInput" class="input" type="text" list="unitOptions" oninput="syncManualUnitIdFromInput()">
+                  <input id="manualUnitIdInput" type="hidden">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualPositionInput">ตำแหน่ง</label>
+                  <input id="manualPositionInput" class="input" type="text">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualRoleInput">บทบาท</label>
+                  <input id="manualRoleInput" class="input" type="text">
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+                <button class="btn ghost" type="button" onclick="hideManualParticipantForm()">ยกเลิก</button>
+                <button class="btn primary" type="button" onclick="addManualParticipant()">เพิ่มผู้เดินทาง</button>
+              </div>
+            </div>
+            <div id="participantList" class="participant-list"></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">ข้อมูลหลัก</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="projectNameInput">ชื่อภารกิจ <span class="req">*</span></label>
+              <input id="projectNameInput" class="input" type="text" list="projectNameOptions" required>
+            </div>
+            <div class="field">
+              <label class="label" for="purposeInput">วัตถุประสงค์</label>
+              <input id="purposeInput" class="input" type="text" list="purposeOptions">
+            </div>
+            <div class="field">
+              <label class="label" for="countryInput">ประเทศ</label>
+              <input id="countryInput" class="input" type="text" list="countryOptions" oninput="syncCountryIdFromInput()">
+              <input id="countryIdInput" type="hidden">
+            </div>
+            <div class="field">
+              <label class="label" for="cityInput">เมือง</label>
+              <input id="cityInput" class="input" type="text" list="cityOptions">
+            </div>
+            <div class="field">
+              <label class="label" for="continentInput">ทวีป</label>
+              <input id="continentInput" class="input" type="text" readonly>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">วันที่</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="startDateInput">วันที่เริ่ม <span class="req">*</span></label>
+              <input id="startDateInput" class="input" type="date" required onchange="updateFiscalYear()">
+            </div>
+            <div class="field">
+              <label class="label" for="endDateInput">วันที่สิ้นสุด <span class="req">*</span></label>
+              <input id="endDateInput" class="input" type="date" required>
+            </div>
+            <div class="field">
+              <label class="label" for="fiscalYearInput">ปีงบประมาณ</label>
+              <input id="fiscalYearInput" class="input" type="text" readonly>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">งบประมาณ</div>
+          <div class="form-grid">
+            <div class="field full">
+              <label class="label">แหล่งงบประมาณ</label>
+              <div class="radio-row">
+                <label><input type="radio" name="budgetMode" value="internal" onchange="syncBudgetFields()"> ภายใน</label>
+                <label><input type="radio" name="budgetMode" value="external" onchange="syncBudgetFields()"> ภายนอก</label>
+              </div>
+            </div>
+            <div class="field budget-internal">
+              <label class="label" for="budgetSourceTypeInput">ประเภทเงิน</label>
+              <input id="budgetSourceTypeInput" class="input" type="text" list="budgetSourceTypeOptions">
+            </div>
+            <div class="field budget-internal">
+              <label class="label" for="budgetAmountInput">จำนวนเงิน (บาท)</label>
+              <input id="budgetAmountInput" class="input" type="number" min="0" step="0.01">
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">การตั้งค่า</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="statusInput">สถานะ</label>
+              <select id="statusInput" class="select">
+                <option value="draft">ร่าง</option>
+                <option value="active">กำลังดำเนินการ</option>
+                <option value="completed">เสร็จสิ้น</option>
+                <option value="cancelled">ยกเลิก</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label">เปิดเผยข้อมูล</label>
+              <label class="check"><input id="publicVisibleInput" type="checkbox" checked> เปิดเผยข้อมูล</label>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="modal-foot">
+        <button class="btn danger" id="deleteModalBtn" type="button" style="display:none" onclick="deleteTravelFromModal()">ลบ</button>
+        <div class="spacer"></div>
+        <button class="btn ghost" type="button" onclick="closeModal()">ยกเลิก</button>
+        <button class="btn primary" id="saveBtn" type="submit">บันทึก</button>
+      </div>
+    </form>
   </div>
 </div>
-<div class="modal-backdrop" id="modalBackdrop"><div class="modal"><div class="modal-head"><div class="modal-title" id="modalTitle">เพิ่มการเดินทางบุคลากร</div><button class="close" onclick="closeModal()">✕</button></div><form id="travelForm" onsubmit="submitTravel(event)"><div class="form">
-  <div class="field full"><label>ชื่อโครงการ / ภารกิจ *</label><input name="ชื่อโครงการ" required placeholder="เช่น AUN Conference Bangkok"></div>
-  <div class="field full"><label>วัตถุประสงค์ *</label><textarea name="วัตถุประสงค์" required placeholder="ใช้สำหรับรายงาน เช่น เข้าร่วมประชุม นำเสนอผลงาน เจรจาความร่วมมือ..."></textarea></div>
-  <div class="field"><label>วันเริ่ม *</label><input type="date" name="วันเริ่ม" required></div><div class="field"><label>วันสิ้นสุด *</label><input type="date" name="วันสิ้นสุด" required></div>
-  <div class="field"><label>ประเทศ *</label><input name="ประเทศ" id="countryInput" list="countryList" required oninput="syncContinent()" onchange="syncContinent()"><datalist id="countryList"></datalist></div><div class="field"><label>ทวีป</label><input name="ทวีป" id="continentInput" placeholder="เลือกประเทศแล้วระบบเติมให้อัตโนมัติ"></div>
-  <div class="field"><label>เมือง / สถานที่</label><input name="เมือง" placeholder="เช่น Tokyo"></div><div class="field"><label>ปีงบประมาณ</label><input name="ปีงบ" list="fyList" placeholder="2569"><datalist id="fyList"><option value="2567"><option value="2568"><option value="2569"><option value="2570"></datalist></div>
-  <div class="field full"><label>ผู้เดินทาง *</label><div class="staff-picker"><div class="staff-search-row"><input id="staffSearch" type="text" placeholder="พิมพ์ชื่อไทย / สกุล / ชื่ออังกฤษ / รหัส / ต้นสังกัด" autocomplete="off" oninput="searchStaffUI(this.value)"><button type="button" class="btn" onclick="toggleQuickAdd(true)">＋ เพิ่มบุคลากรใหม่</button><div id="staffResults" class="staff-results"></div></div><div id="selectedStaffChips" class="chips"><span class="hint">ยังไม่มีผู้เดินทาง — ค้นหาและเลือกทีละคนได้หลายคน</span></div><div class="summary-box"><div class="summary-item"><div class="summary-label">จำนวนอัตโนมัติ</div><div class="summary-value" id="selectedCount">0 คน</div></div><div class="summary-item"><div class="summary-label">รหัสผู้เดินทาง</div><div class="summary-value" id="selectedCodes">-</div></div><div class="summary-item"><div class="summary-label">ต้นสังกัด</div><div class="summary-value" id="selectedAffiliations">-</div></div></div><div class="quick-add" id="quickAddBox"><div class="hint" style="margin-bottom:8px">เพิ่มเข้าชีตบุคลากร แล้วเลือกใช้งานในรายการนี้ทันที</div><div class="quick-grid"><input id="qaPrefix" placeholder="คำนำหน้า"><input id="qaCode" placeholder="รหัส เช่น ST-001"><input id="qaFirst" placeholder="ชื่อไทย"><input id="qaLast" placeholder="สกุลไทย"><input id="qaFirstEn" placeholder="ชื่ออังกฤษ"><input id="qaLastEn" placeholder="สกุลอังกฤษ"><input id="qaAff" placeholder="ต้นสังกัด"><input id="qaPos" placeholder="ตำแหน่ง"><input id="qaType" placeholder="ประเภท เช่น บุคลากร/อาจารย์"></div><div style="margin-top:8px;display:flex;gap:8px"><button type="button" class="btn green" onclick="quickAddStaff()">บันทึกบุคลากรใหม่</button><button type="button" class="btn gray" onclick="toggleQuickAdd(false)">ยกเลิก</button></div></div></div></div>
-  <input type="hidden" name="รหัสผู้เดินทาง" id="travelerCodes"><input type="hidden" name="ชื่อผู้เดินทาง" id="travelerNames"><input type="hidden" name="ต้นสังกัด" id="travelerAff"><input type="hidden" name="จำนวน" id="travelerCount">
-  <div class="field"><label>งบประเภท</label><input name="งบประเภท" list="budgetList" placeholder="เช่น เงินรายได้"><datalist id="budgetList"><option value="งบประมาณแผ่นดิน"><option value="เงินรายได้"><option value="ทุนภายนอก"><option value="ไม่มีงบประมาณ"></datalist></div><div class="field"><label>จำนวนเงิน (บาท)</label><input type="number" name="จำนวนเงิน" placeholder="เช่น 85000"></div>
-  <div class="field full"><label>ไฟล์แนบ</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="url" name="ไฟล์_URL" id="fileUrl" placeholder="File URL / PDF URL" style="flex:1;min-width:240px"><input type="file" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*" onchange="uploadFileFromInput(this)" style="flex:1;min-width:220px"></div><div class="hint">แนบ PDF/เอกสารได้ ระบบจะอัปโหลดแล้วใส่ URL ให้อัตโนมัติ</div></div>
-  <div class="field full"><label>หมายเหตุ</label><textarea name="หมายเหตุ" placeholder="รายละเอียดเพิ่มเติม..."></textarea></div>
-</div><div class="modal-foot"><button type="button" class="btn gray" onclick="closeModal()">ยกเลิก</button><button type="submit" class="btn primary" id="saveBtn">บันทึก</button></div></form></div></div>
+
+<datalist id="countryOptions"></datalist>
+<datalist id="unitOptions"></datalist>
+<datalist id="projectNameOptions"></datalist>
+<datalist id="purposeOptions"></datalist>
+<datalist id="cityOptions"></datalist>
+<datalist id="budgetSourceTypeOptions"></datalist>
+
 <script>
-let travelRows=[], staffRows=[], countryRows=[], selectedStaff=[], editingId=null;
-let v2TravelList=[];
-const $=s=>document.querySelector(s);
-function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
-function uniq(a){return [...new Set(a.map(x=>String(x||'').trim()).filter(Boolean))];}
-function toDate(v){if(!v)return null; if(v instanceof Date)return v; const s=String(v).trim(); let m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/); if(m){let y=+m[3]; if(y>2400)y-=543; if(y<100)y+=2000; return new Date(y,+m[2]-1,+m[1]);} const d=new Date(s); return isNaN(d)?null:d;}
-function fmtDate(v){const d=toDate(v); if(!d)return v||'-'; return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});}
-function statusTravel(r){const now=new Date(); const s=IU.toDate(r['วันเริ่ม']); const e=IU.toDate(r['วันสิ้นสุด']); if(s&&now<s)return 'upcoming'; if(e&&now>e)return 'done'; return 'active';}
-function statusLabel(s){return s==='upcoming'?'รอเดินทาง':s==='done'?'เสร็จสิ้น':'กำลังเดินทาง';}
-function countPeople(r){const n=Number(r['จำนวน']); if(n>0)return n; const codes=String(r['รหัสผู้เดินทาง']||'').split(',').map(x=>x.trim()).filter(Boolean); if(codes.length)return codes.length; const names=String(r['ชื่อผู้เดินทาง']||'').split(',').map(x=>x.trim()).filter(Boolean); return names.length||0;}
-function staffName(s){return `${s['คำนำหน้า']||''}${s['ชื่อ']||''} ${s['สกุล']||''}`.trim() || `${s['ชื่ออังกฤษ']||''} ${s['สกุลอังกฤษ']||''}`.trim() || s['รหัส'] || '-';}
-function staffAff(s){return s['ต้นสังกัด'] || s['คณะ'] || s['หน่วยงาน'] || '';}
-function normalizeStaff(s){return {code:String(s['รหัส']||'').trim(), name:staffName(s), first:s['ชื่อ']||'', last:s['สกุล']||'', en:`${s['ชื่ออังกฤษ']||''} ${s['สกุลอังกฤษ']||''}`.trim(), aff:staffAff(s), pos:s['ตำแหน่ง']||'', type:s['ประเภท']||'', raw:s};}
-function getV2TravelBridgeSession(){
-  const result={email:'',name:'',hasAdminToken:false};
-  try{
-    const direct=sessionStorage.getItem('iroup_admin_token');
-    result.hasAdminToken=!!direct;
-    const rawUser=sessionStorage.getItem('iroup_user');
-    if(rawUser){
-      const user=JSON.parse(rawUser);
-      result.email=String(user.email||'').trim();
-      result.name=String(user.name||'').trim();
-      result.hasAdminToken=result.hasAdminToken || !!user.adminToken;
-    }
-  }catch(err){
-    console.warn('IROUP V2 travel bridge could not read V1 session metadata.', err);
+const V2_TRAVEL_WRITE_UI_ENABLED = true;
+
+const state = {
+  lang: 'th',
+  viewMode: 'list',
+  rows: [],
+  countries: [],
+  units: [],
+  staff: [],
+  participants: [],
+  selectedPerson: null,
+  staffLoaded: false,
+  saving: false
+};
+
+const $ = selector => document.querySelector(selector);
+
+function createPendingParticipantId(){
+  return 'pending-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+}
+
+function unwrapList(response){
+  if (!response) return [];
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response.data)) return response.data;
+  if (response.data && Array.isArray(response.data.items)) return response.data.items;
+  return [];
+}
+
+function esc(value){
+  return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+
+function escAttr(value){
+  return esc(value).replace(/`/g, '&#96;');
+}
+
+function toNumber(value){
+  const number = Number(String(value ?? '').replace(/,/g, ''));
+  return Number.isFinite(number) ? number : 0;
+}
+
+function boolValue(value){
+  if (value === true) return true;
+  const text = String(value ?? '').trim().toLowerCase();
+  return ['true','1','yes','y','checked'].includes(text);
+}
+
+function normalizeDate(value){
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) return String(value);
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 10);
+}
+
+function formatDate(value){
+  if (!value) return '-';
+  const date = new Date(`${normalizeDate(value)}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(state.lang === 'th' ? 'th-TH' : 'en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+function dateRange(row){
+  return `${formatDate(row.start_date)} - ${formatDate(row.end_date)}`;
+}
+
+function countryLabel(country){
+  if (!country) return '';
+  if (state.lang === 'en') return country.country_name_en || country.country_name_th || country.country_id || '';
+  return country.country_name_th || country.country_name_en || country.country_id || '';
+}
+
+function unitLabel(unit){
+  if (!unit) return '';
+  const name = state.lang === 'en'
+    ? unit.unit_name_en || unit.unit_name_th
+    : unit.unit_name_th || unit.unit_name_en;
+  return [unit.unit_code, name].filter(Boolean).join(' - ');
+}
+
+function countryFromRow(row){
+  if (row.country && typeof row.country === 'object') return row.country;
+  return state.countries.find(country => String(country.country_id || '') === String(row.country_id || '')) || null;
+}
+
+function countryName(row){
+  const country = countryFromRow(row);
+  return countryLabel(country) || row.country_name_th || row.country_name_en || row.country_id || '-';
+}
+
+function continentName(row){
+  const country = countryFromRow(row);
+  if (!country) return '';
+  return state.lang === 'en'
+    ? country.continent_en || country.continent_th || ''
+    : country.continent_th || country.continent_en || '';
+}
+
+function enrichTravelRow(row){
+  const source = row || {};
+  const country = countryFromRow(source);
+  return Object.assign({}, source, {
+    travel_id: source.travel_id || source.id || '',
+    country_id: source.country_id || (source.country && source.country.country_id) || '',
+    country_name_th: country ? country.country_name_th || '' : '',
+    country_name_en: country ? country.country_name_en || '' : '',
+    continent_th: country ? country.continent_th || '' : '',
+    continent_en: country ? country.continent_en || '' : '',
+    participant_count: toNumber(source.participant_count ?? source.participant_count_cached ?? source.participant_summary?.total ?? 0),
+    public_visible: boolValue(source.public_visible),
+    is_deleted: boolValue(source.is_deleted)
+  });
+}
+
+function statusLabel(status){
+  const labels = {
+    draft: { th: 'ร่าง', en: 'Draft' },
+    active: { th: 'กำลังดำเนินการ', en: 'Active' },
+    completed: { th: 'เสร็จสิ้น', en: 'Completed' },
+    cancelled: { th: 'ยกเลิก', en: 'Cancelled' }
+  };
+  const item = labels[String(status || '').toLowerCase()] || labels.draft;
+  return item[state.lang] || item.th;
+}
+
+function statusBadge(status){
+  const key = String(status || 'draft').toLowerCase();
+  const cls = ['active','completed','cancelled'].includes(key) ? key : 'draft';
+  return `<span class="badge ${cls}">${esc(statusLabel(cls))}</span>`;
+}
+
+function uniqueValues(rows, field){
+  return [...new Set((rows || []).map(row => String(row[field] || '').trim()).filter(Boolean))].sort();
+}
+
+function renderSuggestions(){
+  $('#projectNameOptions').innerHTML = uniqueValues(state.rows, 'project_name').map(value => `<option value="${escAttr(value)}"></option>`).join('');
+  $('#purposeOptions').innerHTML = uniqueValues(state.rows, 'purpose').map(value => `<option value="${escAttr(value)}"></option>`).join('');
+  $('#cityOptions').innerHTML = uniqueValues(state.rows, 'city').map(value => `<option value="${escAttr(value)}"></option>`).join('');
+  $('#budgetSourceTypeOptions').innerHTML = uniqueValues(state.rows, 'budget_source_type').map(value => `<option value="${escAttr(value)}"></option>`).join('');
+  $('#countryOptions').innerHTML = state.countries.map(country => {
+    const label = countryLabel(country);
+    return `<option value="${escAttr(label)}" data-id="${escAttr(country.country_id || '')}"></option>`;
+  }).join('');
+  $('#unitOptions').innerHTML = state.units.map(unit => `<option value="${escAttr(unitLabel(unit))}" data-id="${escAttr(unit.unit_id || '')}"></option>`).join('');
+}
+
+function renderYearFilter(){
+  const current = $('#yearFilter').value;
+  const years = uniqueValues(state.rows, 'fiscal_year');
+  $('#yearFilter').innerHTML = '<option value="">ทุกปีงบประมาณ</option>' + years.map(year => `<option value="${escAttr(year)}">${esc(year)}</option>`).join('');
+  if (years.includes(current)) $('#yearFilter').value = current;
+}
+
+function showLoading(){
+  $('#travelView').className = 'list-wrap';
+  $('#travelView').innerHTML = '<div class="loading"><div><div class="spinner"></div>กำลังโหลดข้อมูล...</div></div>';
+}
+
+function showNotice(message, isError){
+  const notice = $('#notice');
+  notice.textContent = message || '';
+  notice.className = isError ? 'notice error' : 'notice';
+  notice.style.display = message ? 'block' : 'none';
+}
+
+async function loadPageData(showReloadNotice){
+  showNotice('', false);
+  showLoading();
+  try {
+    const [countriesRes, unitsRes, travelRes] = await Promise.all([
+      IROUP_V2.lookup.countries(),
+      IROUP_V2.lookup.units(),
+      IROUP_V2.admin.travelList()
+    ]);
+    if (countriesRes?.success === false) throw new Error(countriesRes.error || 'โหลดประเทศไม่สำเร็จ');
+    if (unitsRes?.success === false) throw new Error(unitsRes.error || 'โหลดหน่วยงานไม่สำเร็จ');
+    if (travelRes?.success === false) throw new Error(travelRes.error || 'โหลดรายการเดินทางไม่สำเร็จ');
+    state.countries = unwrapList(countriesRes);
+    state.units = unwrapList(unitsRes);
+    state.rows = unwrapList(travelRes)
+      .filter(row => String(row.travel_id || '').trim())
+      .filter(row => !boolValue(row.is_deleted))
+      .map(enrichTravelRow);
+    renderSuggestions();
+    renderYearFilter();
+    renderTravel();
+    if (showReloadNotice) showNotice('โหลดข้อมูลล่าสุดแล้ว', false);
+  } catch (error) {
+    $('#travelView').innerHTML = `<div class="empty">โหลดข้อมูลไม่สำเร็จ: ${esc(error.message || String(error))}</div>`;
+    showNotice(error.message || String(error), true);
   }
-  return result;
 }
-async function fetchV2TravelListSidecar(){
-  const badge=$('#v2TravelReadiness');
-  try{
-    if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.travelList){
-      throw new Error('IROUP_V2 travel adapter is not available');
+
+function filteredRows(){
+  const q = ($('#searchInput').value || '').trim().toLowerCase();
+  const status = $('#statusFilter').value;
+  const fiscalYear = $('#yearFilter').value;
+  return state.rows.filter(row => {
+    if (status && String(row.status || '') !== status) return false;
+    if (fiscalYear && String(row.fiscal_year || '') !== fiscalYear) return false;
+    if (q) {
+      const haystack = [row.project_name, row.purpose, countryName(row), row.city]
+        .join(' ')
+        .toLowerCase();
+      if (!haystack.includes(q)) return false;
     }
-    const bridgeSession=getV2TravelBridgeSession();
-    const adapterToken=typeof IROUP_V2.getAdminToken==='function' ? IROUP_V2.getAdminToken() : '';
-    if(!bridgeSession.email && !bridgeSession.hasAdminToken && !adapterToken){
-      throw new Error('No V1 admin session metadata available for V2 travel handoff');
-    }
-    const response=await IROUP_V2.admin.travelList();
-    if(!response.success) throw new Error(response.error || 'V2 travel list API error');
-    v2TravelList=Array.isArray(response.data) ? response.data : [];
-    if(badge) badge.textContent='V2 travel: ready';
-    console.info('IROUP V2 travel list readiness OK', {total:v2TravelList.length, action:response.meta&&response.meta.action?response.meta.action:''});
-    return v2TravelList;
-  }catch(err){
-    v2TravelList=[];
-    if(badge) badge.textContent='V2 travel: unavailable';
-    console.warn('IROUP V2 travel list readiness failed; V1 travel render continues.', err);
-    return [];
+    return true;
+  }).sort((a, b) => String(b.start_date || '').localeCompare(String(a.start_date || '')));
+}
+
+function updateKpis(rows){
+  const source = rows || state.rows;
+  $('#kpiTotal').textContent = source.length.toLocaleString('th-TH');
+  $('#kpiActive').textContent = source.filter(row => String(row.status || '') === 'active').length.toLocaleString('th-TH');
+  $('#kpiParticipants').textContent = source.reduce((sum, row) => sum + toNumber(row.participant_count), 0).toLocaleString('th-TH');
+  $('#kpiCountries').textContent = new Set(source.map(row => row.country_id || countryName(row)).filter(Boolean)).size.toLocaleString('th-TH');
+}
+
+function renderTravel(){
+  const rows = filteredRows();
+  updateKpis(rows);
+  if (state.viewMode === 'card') renderCards(rows);
+  else renderList(rows);
+}
+
+function renderList(rows){
+  $('#travelView').className = 'list-wrap';
+  if (!rows.length) {
+    $('#travelView').innerHTML = '<div class="empty">ไม่พบข้อมูลการเดินทาง</div>';
+    return;
+  }
+  $('#travelView').innerHTML = `
+    <table class="travel-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ชื่อภารกิจ</th>
+          <th>ประเทศ</th>
+          <th>วัตถุประสงค์</th>
+          <th>จำนวนผู้เดินทาง</th>
+          <th>ช่วงเวลา</th>
+          <th>ปีงบประมาณ</th>
+          <th>สถานะ</th>
+          <th>จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((row, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td><div class="title-cell">${esc(row.project_name || '-')}</div><div class="muted">${esc(row.city || '')}</div></td>
+            <td>${esc(countryName(row))}</td>
+            <td>${esc(row.purpose || '-')}</td>
+            <td><span class="badge count">${toNumber(row.participant_count).toLocaleString('th-TH')} คน</span></td>
+            <td>${esc(dateRange(row))}</td>
+            <td>${esc(row.fiscal_year || '-')}</td>
+            <td>${statusBadge(row.status)}</td>
+            <td>
+              <div class="actions">
+                <button class="btn" type="button" onclick="openEditModal('${escAttr(row.travel_id)}')">แก้ไข</button>
+                <button class="btn danger" type="button" onclick="deleteV2Travel('${escAttr(row.travel_id)}')">ลบ</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderCards(rows){
+  $('#travelView').className = 'cards';
+  if (!rows.length) {
+    $('#travelView').innerHTML = '<div class="empty">ไม่พบข้อมูลการเดินทาง</div>';
+    return;
+  }
+  $('#travelView').innerHTML = rows.map(row => `
+    <article class="travel-card">
+      <div>
+        <div class="card-title">${esc(row.project_name || '-')}</div>
+        <div class="card-sub">${esc([countryName(row), row.city].filter(Boolean).join(' | '))}</div>
+      </div>
+      <div class="card-sub">${esc(row.purpose || '-')}</div>
+      <div class="badge-row">
+        <span class="badge count">${toNumber(row.participant_count).toLocaleString('th-TH')} คน</span>
+        ${statusBadge(row.status)}
+      </div>
+      <div class="card-sub">ช่วงเวลา: ${esc(dateRange(row))}</div>
+      <div class="card-actions">
+        <button class="btn" type="button" onclick="openEditModal('${escAttr(row.travel_id)}')">แก้ไข</button>
+        <button class="btn danger" type="button" onclick="deleteV2Travel('${escAttr(row.travel_id)}')">ลบ</button>
+      </div>
+    </article>
+  `).join('');
+}
+
+function setViewMode(mode){
+  state.viewMode = mode === 'card' ? 'card' : 'list';
+  $('#cardViewBtn').classList.toggle('active', state.viewMode === 'card');
+  $('#listViewBtn').classList.toggle('active', state.viewMode === 'list');
+  renderTravel();
+}
+
+function setLang(lang){
+  state.lang = lang === 'en' ? 'en' : 'th';
+  $('#langThBtn').classList.toggle('active', state.lang === 'th');
+  $('#langEnBtn').classList.toggle('active', state.lang === 'en');
+  renderSuggestions();
+  renderTravel();
+  if ($('#countryIdInput').value) setCountryInputFromId($('#countryIdInput').value);
+}
+
+function clearFilters(){
+  $('#searchInput').value = '';
+  $('#statusFilter').value = '';
+  $('#yearFilter').value = '';
+  renderTravel();
+}
+
+function resetForm(){
+  $('#travelForm').reset();
+  $('#travelId').value = '';
+  $('#countryIdInput').value = '';
+  $('#continentInput').value = '';
+  state.participants = [];
+  state.selectedPerson = null;
+  syncBudgetFields();
+  resetParticipantUi();
+}
+
+function openCreateModal(){
+  resetForm();
+  $('#modalTitle').textContent = 'เพิ่มการเดินทาง';
+  $('#modalSub').textContent = 'สร้างข้อมูล TRAVEL ผ่าน V2';
+  $('#deleteModalBtn').style.display = 'none';
+  $('#participantSection').style.display = '';
+  $('#travelModal').classList.add('open');
+  $('#projectNameInput').focus();
+}
+
+async function openEditModal(travelId){
+  if (!travelId) return alert('ไม่พบ travel_id');
+  resetForm();
+  $('#modalTitle').textContent = 'แก้ไขการเดินทาง';
+  $('#modalSub').textContent = travelId;
+  $('#deleteModalBtn').style.display = '';
+  $('#travelModal').classList.add('open');
+  $('#participantSection').style.display = '';
+  $('#participantList').innerHTML = '<div class="participant-empty">กำลังโหลดผู้เดินทาง...</div>';
+  try {
+    const [detailRes, budgetRes, participantsRes] = await Promise.all([
+      IROUP_V2.admin.travelDetail(travelId),
+      requestTravel('v2.admin.travel.budget.get', { travel_id: travelId }),
+      requestTravel('v2.admin.travel.participant.list', { travel_id: travelId })
+    ]);
+    if (detailRes?.success === false) throw new Error(detailRes.error || 'โหลดรายละเอียดไม่สำเร็จ');
+    if (budgetRes?.success === false) throw new Error(budgetRes.error || 'โหลดงบประมาณไม่สำเร็จ');
+    if (participantsRes?.success === false) throw new Error(participantsRes.error || 'โหลดผู้เดินทางไม่สำเร็จ');
+    const detail = detailRes.data || state.rows.find(row => row.travel_id === travelId) || {};
+    hydrateForm(enrichTravelRow(detail));
+    hydrateBudget(budgetRes.data || null);
+    state.participants = unwrapList(participantsRes);
+    renderParticipantList();
+  } catch (error) {
+    alert(error.message || String(error));
+    closeModal();
   }
 }
-async function loadAll(){
-  $('#travelBody').innerHTML='<tr><td colspan="9"><div class="loading">กำลังโหลดข้อมูล...</div></td></tr>';
-  try{
-    const [t,s,c]=await Promise.all([IROUP.getAll(IROUP.SHEETS.TRAVEL), IROUP.getAll(IROUP.SHEETS.STAFF), IROUP.getAll('COUNTRY')]);
-    travelRows=t||[]; staffRows=(s||[]).map(normalizeStaff); countryRows=c||[];
-    fillCountryOptions(); updateKpis(); renderTable();
-    setTimeout(()=>fetchV2TravelListSidecar(),0);
-  }catch(e){console.error(e); $('#travelBody').innerHTML='<tr><td colspan="9"><div class="empty">โหลดข้อมูลไม่สำเร็จ</div></td></tr>';}
+
+function closeModal(){
+  $('#travelModal').classList.remove('open');
 }
-function fillCountryOptions(){const countries=uniq([...countryRows.flatMap(c=>[c.en_name,c.th_name,c.code]),...travelRows.map(r=>r['ประเทศ'])]); $('#countryList').innerHTML=countries.map(c=>`<option value="${IU.esc(c)}"></option>`).join(''); $('#countryFilter').innerHTML='<option value="">ทุกประเทศ</option>'+uniq(travelRows.map(r=>r['ประเทศ'])).map(c=>`<option value="${IU.esc(c)}">${IU.esc(c)}</option>`).join('');}
-function findCountry(v){const x=String(v||'').trim().toLowerCase(); return countryRows.find(c=>[c.code,c.th_name,c.en_name].some(a=>String(a||'').trim().toLowerCase()===x));}
-function syncContinent(){const c=findCountry($('#countryInput').value); if(c&&c.continent) $('#continentInput').value=c.continent;}
-function updateKpis(){const active=travelRows.filter(r=>statusTravel(r)==='active').length; const people=travelRows.reduce((a,r)=>a+countPeople(r),0); const countries=uniq(travelRows.map(r=>r['ประเทศ'])).length; $('#kTotal').textContent=travelRows.length; $('#kActive').textContent=active; $('#kPeople').textContent=people; $('#kCountries').textContent=countries;}
-function filteredRows(){const q=$('#searchInput').value.toLowerCase().trim(); const country=$('#countryFilter').value; const status=$('#statusFilter').value; return travelRows.filter(r=>{if(country&&r['ประเทศ']!==country)return false; if(status&&statusTravel(r)!==status)return false; if(q&&!Object.values(r).join(' ').toLowerCase().includes(q))return false; return true;}).sort((a,b)=>(IU.toDate(b['วันเริ่ม'])||0)-(IU.toDate(a['วันเริ่ม'])||0));}
-function renderTable(){const rows=filteredRows(); $('#tableSub').textContent=`แสดง ${rows.length} รายการ จาก ${travelRows.length} รายการ`; $('#travelBody').innerHTML=rows.length?rows.map(r=>{const st=statusTravel(r); const file=r['ไฟล์_URL']; const names=String(r['ชื่อผู้เดินทาง']||'').split(',').map(x=>x.trim()).filter(Boolean); const affs=uniq(String(r['ต้นสังกัด']||r['คณะ/ต้นสังกัด']||'').split(',').map(x=>x.trim())); return `<tr><td><b>${IU.esc(r['ชื่อโครงการ']||'-')}</b><div class="sub">${IU.esc(r['วัตถุประสงค์']||'')}</div></td><td>🌍 ${IU.esc(r['ประเทศ']||'-')}<div class="sub">${IU.esc([r['ทวีป'],r['เมือง']].filter(Boolean).join(' · '))}</div></td><td>${IU.fmtDate(r['วันเริ่ม'])} – ${IU.fmtDate(r['วันสิ้นสุด'])}</td><td>${names.slice(0,3).map(n=>`<span class="tag">${IU.esc(n)}</span>`).join('')}${names.length>3?`<span class="tag">+${names.length-3}</span>`:''}<div class="sub">${IU.esc(affs.join(', ')||'-')}</div></td><td><b>${countPeople(r)}</b> คน</td><td>${IU.esc(r['งบประเภท']||'-')}<div class="sub">${r['จำนวนเงิน']?Number(r['จำนวนเงิน']).toLocaleString('th-TH')+' บาท':''}</div></td><td>${file?`<a class="file-btn" href="${IU.esc(file)}" target="_blank">📎 เปิดไฟล์</a>`:'-'}</td><td><span class="status ${st}">${statusLabel(st)}</span></td><td><div class="actions"><button class="iconbtn" onclick="openForm('${IU.esc(r.ID)}')">✏️</button><button class="iconbtn" onclick="deleteTravel('${IU.esc(r.ID)}')">🗑️</button></div></td></tr>`}).join(''):`<tr><td colspan="9"><div class="empty">ไม่พบข้อมูล</div></td></tr>`;}
-function openForm(id=null){editingId=id; const r=id?travelRows.find(x=>String(x.ID)===String(id)):null; $('#modalTitle').textContent=(id?'แก้ไข':'เพิ่ม')+'การเดินทางบุคลากร'; $('#travelForm').reset(); selectedStaff=[]; toggleQuickAdd(false); if(r){Object.keys(r).forEach(k=>{const el=$(`#travelForm [name="${CSS.escape(k)}"]`); if(el){let val=r[k]||''; if(/วัน/.test(k)){const d=IU.toDate(val); if(d) val=d.toISOString().slice(0,10);} el.value=val;}}); const codes=String(r['รหัสผู้เดินทาง']||'').split(',').map(x=>x.trim()).filter(Boolean); const names=String(r['ชื่อผู้เดินทาง']||'').split(',').map(x=>x.trim()).filter(Boolean); const affs=String(r['ต้นสังกัด']||r['คณะ/ต้นสังกัด']||'').split(',').map(x=>x.trim()).filter(Boolean); selectedStaff=codes.map((code,i)=>({code,name:names[i]||code,aff:affs[i]||''}));}
- renderSelectedStaff(); $('#modalBackdrop').classList.add('show'); setTimeout(()=>$('#staffSearch').focus(),100);}
-function closeModal(){ $('#modalBackdrop').classList.remove('show'); editingId=null; }
-function searchStaffUI(q){const box=$('#staffResults'); q=String(q||'').toLowerCase().trim(); if(q.length<1){box.classList.remove('show');return;} const selectedCodes=new Set(selectedStaff.map(s=>s.code)); const rows=staffRows.filter(s=>!selectedCodes.has(s.code)&&[s.code,s.name,s.en,s.aff,s.pos,s.type].join(' ').toLowerCase().includes(q)).slice(0,12); if(!rows.length){box.innerHTML=`<div class="staff-option" onclick="toggleQuickAdd(true)"><div><div class="staff-name">ไม่พบรายชื่อ</div><div class="staff-meta">กดเพื่อเพิ่มบุคลากรใหม่</div></div><div class="staff-code">＋ เพิ่ม</div></div>`; box.classList.add('show'); return;} box.innerHTML=rows.map(s=>`<div class="staff-option" onclick="selectStaff('${IU.esc(s.code)}')"><div><div class="staff-name">${IU.esc(s.name)}</div><div class="staff-meta">${IU.esc([s.aff,s.pos,s.type].filter(Boolean).join(' · '))}</div></div><div class="staff-code">${IU.esc(s.code)}</div></div>`).join(''); box.classList.add('show');}
-function selectStaff(code){const s=staffRows.find(x=>String(x.code)===String(code)); if(!s)return; if(!selectedStaff.some(x=>x.code===s.code))selectedStaff.push({code:s.code,name:s.name,aff:s.aff}); $('#staffSearch').value=''; $('#staffResults').classList.remove('show'); renderSelectedStaff();}
-function removeStaff(code){selectedStaff=selectedStaff.filter(s=>s.code!==code); renderSelectedStaff();}
-function renderSelectedStaff(){const chips=$('#selectedStaffChips'); if(!selectedStaff.length){chips.innerHTML='<span class="hint">ยังไม่มีผู้เดินทาง — ค้นหาและเลือกทีละคนได้หลายคน</span>';} else {chips.innerHTML=selectedStaff.map(s=>`<span class="chip">${IU.esc(s.name)} <small>${IU.esc(s.code)}</small><button type="button" onclick="removeStaff('${IU.esc(s.code)}')">×</button></span>`).join('');} const codes=selectedStaff.map(s=>s.code).join(','); const names=selectedStaff.map(s=>s.name).join(', '); const aff=uniq(selectedStaff.map(s=>s.aff)).join(', '); $('#selectedCount').textContent=selectedStaff.length+' คน'; $('#selectedCodes').textContent=codes||'-'; $('#selectedAffiliations').textContent=aff||'-'; $('#travelerCodes').value=codes; $('#travelerNames').value=names; $('#travelerAff').value=aff; $('#travelerCount').value=selectedStaff.length;}
-function toggleQuickAdd(show){$('#quickAddBox').classList.toggle('show',!!show); if(show){$('#qaFirst').focus(); const next='ST-'+String(staffRows.length+1).padStart(3,'0'); if(!$('#qaCode').value)$('#qaCode').value=next;}}
-async function quickAddStaff(){const data={'รหัส':$('#qaCode').value.trim(),'คำนำหน้า':$('#qaPrefix').value.trim(),'ชื่อ':$('#qaFirst').value.trim(),'สกุล':$('#qaLast').value.trim(),'ชื่ออังกฤษ':$('#qaFirstEn').value.trim(),'สกุลอังกฤษ':$('#qaLastEn').value.trim(),'ต้นสังกัด':$('#qaAff').value.trim(),'ตำแหน่ง':$('#qaPos').value.trim(),'ประเภท':$('#qaType').value.trim()}; if(!data['รหัส']||!data['ชื่อ'])return alert('กรุณากรอกรหัสและชื่อ'); try{const res=await IROUP.add(IROUP.SHEETS.STAFF,data); if(res.error)throw new Error(res.error); const norm=normalizeStaff(data); staffRows.push(norm); selectedStaff.push({code:norm.code,name:norm.name,aff:norm.aff}); ['qaCode','qaPrefix','qaFirst','qaLast','qaFirstEn','qaLastEn','qaAff','qaPos','qaType'].forEach(id=>$('#'+id).value=''); toggleQuickAdd(false); renderSelectedStaff(); alert('เพิ่มบุคลากรใหม่สำเร็จ');}catch(e){alert('เพิ่มบุคลากรไม่สำเร็จ: '+e.message);}}
-function fileToBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=()=>reject(new Error('อ่านไฟล์ไม่สำเร็จ')); r.readAsDataURL(file);});}
-async function uploadFileFromInput(input){const file=input.files&&input.files[0]; if(!file)return; input.disabled=true; try{const base64=await fileToBase64(file); const data=await IROUP.uploadFile(base64,file.name,'Travel Files'); if(data.error)throw new Error(data.error); $('#fileUrl').value=data.url||data.fileUrl; alert('อัปโหลดไฟล์สำเร็จ');}catch(e){alert('อัปโหลดไม่สำเร็จ: '+e.message);}finally{input.disabled=false;}}
-async function submitTravel(e){e.preventDefault(); if(!selectedStaff.length)return alert('กรุณาเลือกผู้เดินทางอย่างน้อย 1 คน'); renderSelectedStaff(); const data={}; new FormData(e.target).forEach((v,k)=>data[k]=v); if(data['ประเทศ']){const c=findCountry(data['ประเทศ']); if(c){data['ประเทศ']=c.en_name||c.th_name||data['ประเทศ']; if(c.continent)data['ทวีป']=c.continent;}} $('#saveBtn').disabled=true; $('#saveBtn').textContent='กำลังบันทึก...'; try{const res=editingId?await IROUP.edit(IROUP.SHEETS.TRAVEL,editingId,data):await IROUP.add(IROUP.SHEETS.TRAVEL,data); if(res.error)throw new Error(res.error); closeModal(); await loadAll(); alert('บันทึกสำเร็จ');}catch(e){alert('บันทึกไม่สำเร็จ: '+e.message);}finally{$('#saveBtn').disabled=false; $('#saveBtn').textContent='บันทึก';}}
-async function deleteTravel(id){if(!confirm('ยืนยันลบรายการนี้?'))return; try{const res=await IROUP.delete(IROUP.SHEETS.TRAVEL,id); if(res.error)throw new Error(res.error); await loadAll();}catch(e){alert('ลบไม่สำเร็จ: '+e.message);}}
-function exportCsv(){const rows=filteredRows(); if(!rows.length)return alert('ไม่มีข้อมูล'); const headers=Object.keys(rows[0]); const csv=[headers.join(','),...rows.map(r=>headers.map(h=>`"${String(r[h]??'').replace(/"/g,'""')}"`).join(','))].join('\n'); const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='iroup-travel-staff.csv'; a.click(); URL.revokeObjectURL(a.href);}
-document.addEventListener('click',e=>{if(!e.target.closest('.staff-search-row'))$('#staffResults').classList.remove('show'); if(e.target===$('#modalBackdrop'))closeModal();});
-loadAll();
+
+function hydrateForm(row){
+  $('#travelId').value = row.travel_id || '';
+  $('#projectNameInput').value = row.project_name || '';
+  $('#purposeInput').value = row.purpose || '';
+  $('#countryIdInput').value = row.country_id || '';
+  setCountryInputFromId(row.country_id || '');
+  $('#cityInput').value = row.city || '';
+  $('#startDateInput').value = normalizeDate(row.start_date);
+  $('#endDateInput').value = normalizeDate(row.end_date);
+  $('#fiscalYearInput').value = row.fiscal_year || '';
+  $('#statusInput').value = row.status || 'active';
+  $('#publicVisibleInput').checked = row.public_visible !== false;
+}
+
+function hydrateBudget(budget){
+  const internal = budget && boolValue(budget.is_internal);
+  const external = budget && !boolValue(budget.is_internal);
+  const radios = document.querySelectorAll('input[name="budgetMode"]');
+  radios.forEach(radio => {
+    radio.checked = (internal && radio.value === 'internal') || (external && radio.value === 'external');
+  });
+  $('#budgetSourceTypeInput').value = internal ? (budget.budget_source_type || '') : '';
+  $('#budgetAmountInput').value = internal ? toNumber(budget.amount || budget.amount_thb || 0) || '' : '';
+  syncBudgetFields();
+}
+
+function syncCountryIdFromInput(){
+  const value = ($('#countryInput').value || '').trim().toLowerCase();
+  const found = state.countries.find(country => {
+    return [country.country_id, country.country_name_th, country.country_name_en, countryLabel(country)]
+      .map(item => String(item || '').trim().toLowerCase())
+      .includes(value);
+  });
+  $('#countryIdInput').value = found ? found.country_id || '' : '';
+  $('#continentInput').value = found ? (state.lang === 'en' ? found.continent_en || found.continent_th || '' : found.continent_th || found.continent_en || '') : '';
+}
+
+function setCountryInputFromId(countryId){
+  const found = state.countries.find(country => String(country.country_id || '') === String(countryId || ''));
+  $('#countryInput').value = found ? countryLabel(found) : '';
+  $('#continentInput').value = found ? (state.lang === 'en' ? found.continent_en || found.continent_th || '' : found.continent_th || found.continent_en || '') : '';
+}
+
+function syncManualUnitIdFromInput(){
+  const value = ($('#manualUnitInput').value || '').trim().toLowerCase();
+  const found = state.units.find(unit => {
+    return [unit.unit_id, unit.unit_code, unit.unit_name_th, unit.unit_name_en, unitLabel(unit)]
+      .map(item => String(item || '').trim().toLowerCase())
+      .includes(value);
+  });
+  $('#manualUnitIdInput').value = found ? found.unit_id || '' : '';
+}
+
+function syncBudgetFields(){
+  const mode = getBudgetMode();
+  document.querySelectorAll('.budget-internal').forEach(el => {
+    el.style.display = mode === 'internal' ? '' : 'none';
+  });
+}
+
+function getBudgetMode(){
+  const checked = document.querySelector('input[name="budgetMode"]:checked');
+  return checked ? checked.value : '';
+}
+
+function updateFiscalYear(){
+  const start = $('#startDateInput').value;
+  if (!start) return;
+  const date = new Date(`${start}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return;
+  let year = date.getFullYear() + 543;
+  if (date.getMonth() >= 9) year += 1;
+  $('#fiscalYearInput').value = String(year);
+}
+
+function buildPayload(){
+  syncCountryIdFromInput();
+  return {
+    travel_id: $('#travelId').value.trim(),
+    project_name: $('#projectNameInput').value.trim(),
+    purpose: $('#purposeInput').value.trim(),
+    country_id: $('#countryIdInput').value.trim(),
+    city: $('#cityInput').value.trim(),
+    start_date: $('#startDateInput').value,
+    end_date: $('#endDateInput').value,
+    fiscal_year: $('#fiscalYearInput').value.trim(),
+    status: $('#statusInput').value,
+    participant_count: state.participants.length,
+    public_visible: $('#publicVisibleInput').checked
+  };
+}
+
+function validatePayload(payload){
+  const missing = [];
+  if (!payload.project_name) missing.push('ชื่อภารกิจ');
+  if (!payload.start_date) missing.push('วันที่เริ่ม');
+  if (!payload.end_date) missing.push('วันที่สิ้นสุด');
+  if (payload.end_date && payload.start_date && payload.end_date < payload.start_date) missing.push('ช่วงวันที่ไม่ถูกต้อง');
+  return missing;
+}
+
+function buildBudgetPayload(travelId){
+  const mode = getBudgetMode();
+  if (!mode) return null;
+  return {
+    travel_id: travelId,
+    is_internal: mode === 'internal',
+    budget_source_type: mode === 'internal' ? $('#budgetSourceTypeInput').value : '',
+    amount: mode === 'internal' ? toNumber($('#budgetAmountInput').value) : 0,
+    currency: 'THB'
+  };
+}
+
+function validateBudgetPayload(payload){
+  if (!payload) return [];
+  const missing = [];
+  if (payload.is_internal && !payload.budget_source_type) missing.push('ประเภทเงิน');
+  if (payload.is_internal && payload.amount <= 0) missing.push('จำนวนเงิน');
+  return missing;
+}
+
+async function saveTravel(event){
+  event.preventDefault();
+  if (!V2_TRAVEL_WRITE_UI_ENABLED) {
+    alert('V2 Travel write UI ยังปิดอยู่');
+    return;
+  }
+  const payload = buildPayload();
+  const missing = validatePayload(payload);
+  const budgetPayload = buildBudgetPayload(payload.travel_id || 'pending');
+  const budgetMissing = validateBudgetPayload(budgetPayload);
+  if (missing.length || budgetMissing.length) {
+    alert('กรุณาตรวจสอบ: ' + missing.concat(budgetMissing).join(', '));
+    return;
+  }
+  const isEdit = !!payload.travel_id;
+  const pendingParticipants = isEdit ? [] : state.participants.slice();
+  if (!isEdit) delete payload.travel_id;
+  setSaving(true);
+  try {
+    const action = isEdit ? 'v2.admin.travel.update' : 'v2.admin.travel.create';
+    const res = await requestTravel(action, { payload });
+    if (!res || res.success === false) throw new Error(res?.error || 'บันทึกไม่สำเร็จ');
+    const savedTravelId = isEdit ? $('#travelId').value : (res.data?.travel?.travel_id || res.data?.persisted_travel?.travel_id || '');
+    if (!savedTravelId) throw new Error('ไม่พบ travel_id หลังบันทึก TRAVEL');
+    if (budgetPayload && savedTravelId) {
+      budgetPayload.travel_id = savedTravelId;
+      const budgetRes = await requestTravel('v2.admin.travel.budget.save', { payload: budgetPayload });
+      if (!budgetRes || budgetRes.success === false) throw new Error(budgetRes?.error || 'บันทึกงบประมาณไม่สำเร็จ');
+    }
+    if (!isEdit && pendingParticipants.length) {
+      for (const participant of pendingParticipants) {
+        const participantPayload = {
+          travel_id: savedTravelId,
+          person_source: participant.person_source,
+          person_id: participant.person_id,
+          full_name_snapshot: participant.full_name_snapshot,
+          unit_id_snapshot: participant.unit_id_snapshot,
+          position_snapshot: participant.position_snapshot,
+          role: participant.role || ''
+        };
+        const participantRes = await requestTravel('v2.admin.travel.participant.add', participantPayload);
+        if (!participantRes || participantRes.success === false) {
+          throw new Error(participantRes?.error || 'บันทึกผู้เดินทางไม่สำเร็จ');
+        }
+      }
+    }
+    alert('บันทึกสำเร็จ (V2)');
+    closeModal();
+    await loadPageData(true);
+  } catch (error) {
+    alert(error.message || String(error));
+  } finally {
+    setSaving(false);
+  }
+}
+
+function requestTravel(action, payload){
+  return IROUP_V2.request(action, payload || {}, {
+    auth: true,
+    method: String(action || '').includes('.list') || String(action || '').includes('.get') ? 'GET' : 'POST',
+    timeoutMs: 30000
+  });
+}
+
+function setSaving(active){
+  state.saving = !!active;
+  $('#saveBtn').disabled = state.saving;
+  $('#saveBtn').textContent = state.saving ? 'กำลังบันทึก...' : 'บันทึก';
+}
+
+function resetParticipantUi(){
+  state.participants = [];
+  state.selectedPerson = null;
+  if ($('#participantSearchInput')) $('#participantSearchInput').value = '';
+  if ($('#participantSuggestions')) {
+    $('#participantSuggestions').className = 'suggestions';
+    $('#participantSuggestions').innerHTML = '';
+  }
+  if ($('#selectedPersonBox')) $('#selectedPersonBox').className = 'selected-person';
+  if ($('#manualAddBtn')) $('#manualAddBtn').style.display = 'none';
+  hideManualParticipantForm();
+  renderParticipantList();
+}
+
+async function loadStaffLookupOnce(){
+  if (state.staffLoaded) return;
+  const res = await IROUP_V2.request('v2.lookup.staff');
+  if (!res || res.success === false) throw new Error(res?.error || 'โหลดรายชื่อบุคลากรไม่สำเร็จ');
+  state.staff = unwrapList(res).map(row => ({
+    source: 'PERSON_STAFF',
+    person_id: row.staff_id || '',
+    full_name_snapshot: row.full_name_th || row.full_name_en || '',
+    unit_id_snapshot: row.unit_id || '',
+    position_snapshot: row.position || row.staff_type || ''
+  }));
+  state.staffLoaded = true;
+}
+
+async function searchParticipants(value){
+  await loadStaffLookupOnce();
+  const q = String(value || '').trim().toLowerCase();
+  state.selectedPerson = null;
+  $('#selectedPersonBox').className = 'selected-person';
+  if (!q) {
+    $('#participantSuggestions').className = 'suggestions';
+    $('#participantSuggestions').innerHTML = '';
+    $('#manualAddBtn').style.display = 'none';
+    return;
+  }
+  const people = state.staff.filter(person => {
+    return [person.full_name_snapshot, unitNameById(person.unit_id_snapshot), person.position_snapshot]
+      .join(' ')
+      .toLowerCase()
+      .includes(q);
+  }).slice(0, 10);
+  if (!people.length) {
+    $('#participantSuggestions').className = 'suggestions open';
+    $('#participantSuggestions').innerHTML = '<div class="suggestion"><div class="suggestion-name">ไม่พบรายชื่อ</div><div class="suggestion-meta">กดปุ่ม + เพิ่มด้วยตนเอง เพื่อกรอกข้อมูลใหม่</div></div>';
+    $('#manualAddBtn').style.display = '';
+    return;
+  }
+  $('#manualAddBtn').style.display = 'none';
+  $('#participantSuggestions').className = 'suggestions open';
+  $('#participantSuggestions').innerHTML = people.map((person, index) => `
+    <button class="suggestion" type="button" onclick="selectPersonSuggestion(${index})">
+      <div class="suggestion-name">${esc(person.full_name_snapshot)}</div>
+      <div class="suggestion-meta">${esc(unitNameById(person.unit_id_snapshot))} | ${esc(person.position_snapshot)}</div>
+    </button>
+  `).join('');
+  $('#participantSuggestions')._results = people;
+}
+
+function selectPersonSuggestion(index){
+  const results = $('#participantSuggestions')._results || [];
+  const person = results[index];
+  if (!person) return;
+  state.selectedPerson = person;
+  $('#participantSearchInput').value = person.full_name_snapshot;
+  $('#participantSuggestions').className = 'suggestions';
+  $('#participantSuggestions').innerHTML = '';
+  $('#selectedPersonName').textContent = person.full_name_snapshot;
+  $('#selectedPersonMeta').textContent = `${unitNameById(person.unit_id_snapshot)} | ${person.position_snapshot || '-'}`;
+  $('#selectedPersonBox').className = 'selected-person show';
+  $('#manualAddBtn').style.display = 'none';
+  hideManualParticipantForm();
+}
+
+async function addSelectedParticipant(){
+  if (!state.selectedPerson) return alert('กรุณาเลือกผู้เดินทาง');
+  const travelId = $('#travelId').value;
+  const person = state.selectedPerson;
+  await addParticipantPayload({
+    travel_id: travelId,
+    person_source: person.source,
+    person_id: person.person_id,
+    full_name_snapshot: person.full_name_snapshot,
+    unit_id_snapshot: person.unit_id_snapshot,
+    position_snapshot: person.position_snapshot,
+    role: ''
+  });
+  state.selectedPerson = null;
+  $('#participantSearchInput').value = '';
+  $('#selectedPersonBox').className = 'selected-person';
+}
+
+function showManualParticipantForm(){
+  state.selectedPerson = null;
+  $('#selectedPersonBox').className = 'selected-person';
+  $('#manualParticipantForm').className = 'manual-form show';
+  $('#manualFullNameInput').focus();
+}
+
+function hideManualParticipantForm(){
+  if (!$('#manualParticipantForm')) return;
+  $('#manualParticipantForm').className = 'manual-form';
+  $('#manualFullNameInput').value = '';
+  $('#manualUnitInput').value = '';
+  $('#manualUnitIdInput').value = '';
+  $('#manualPositionInput').value = '';
+  $('#manualRoleInput').value = '';
+}
+
+async function addManualParticipant(){
+  syncManualUnitIdFromInput();
+  const fullName = $('#manualFullNameInput').value.trim();
+  if (!fullName) return alert('กรุณากรอกชื่อ-สกุล');
+  await addParticipantPayload({
+    travel_id: $('#travelId').value,
+    person_source: 'manual',
+    person_id: '',
+    full_name_snapshot: fullName,
+    unit_id_snapshot: $('#manualUnitIdInput').value,
+    position_snapshot: $('#manualPositionInput').value.trim(),
+    role: $('#manualRoleInput').value.trim()
+  });
+  hideManualParticipantForm();
+}
+
+async function addParticipantPayload(payload){
+  if (!V2_TRAVEL_WRITE_UI_ENABLED) return alert('V2 Travel write UI ยังปิดอยู่');
+  if (!payload.travel_id) {
+    state.participants.push({
+      travel_participant_id: createPendingParticipantId(),
+      travel_id: '',
+      person_source: payload.person_source,
+      person_id: payload.person_id || '',
+      full_name_snapshot: payload.full_name_snapshot,
+      unit_id_snapshot: payload.unit_id_snapshot || '',
+      position_snapshot: payload.position_snapshot || '',
+      role: payload.role || '',
+      pending: true
+    });
+    renderParticipantList();
+    return;
+  }
+  try {
+    const res = await requestTravel('v2.admin.travel.participant.add', payload);
+    if (!res || res.success === false) throw new Error(res?.error || 'เพิ่มผู้เดินทางไม่สำเร็จ');
+    await loadParticipants(payload.travel_id);
+  } catch (error) {
+    alert(error.message || String(error));
+  }
+}
+
+async function loadParticipants(travelId){
+  const res = await requestTravel('v2.admin.travel.participant.list', { travel_id: travelId });
+  if (!res || res.success === false) throw new Error(res?.error || 'โหลดผู้เดินทางไม่สำเร็จ');
+  state.participants = unwrapList(res);
+  renderParticipantList();
+}
+
+function renderParticipantList(){
+  const list = $('#participantList');
+  if (!list) return;
+  if (!state.participants.length) {
+    list.innerHTML = '<div class="participant-empty">ยังไม่มีผู้เดินทาง</div>';
+    return;
+  }
+  list.innerHTML = state.participants.map(row => `
+    <div class="participant-row">
+      <div>
+        <div class="participant-name">${esc(row.full_name_snapshot || '-')}</div>
+        <div class="participant-unit">${esc(row.position_snapshot || '')}</div>
+      </div>
+      <div class="participant-unit">${esc(unitNameById(row.unit_id_snapshot))}</div>
+      <div class="participant-unit">${esc(row.role || '-')}</div>
+      <button class="btn danger" type="button" onclick="deleteParticipant('${escAttr(row.travel_participant_id)}')">ลบ</button>
+    </div>
+  `).join('');
+}
+
+function unitNameById(unitId){
+  const unit = state.units.find(item => String(item.unit_id || '') === String(unitId || ''));
+  return unit ? unitLabel(unit) : '-';
+}
+
+async function deleteParticipant(participantId){
+  if (!V2_TRAVEL_WRITE_UI_ENABLED) return alert('V2 Travel write UI ยังปิดอยู่');
+  if (!participantId) return alert('ไม่พบ travel_participant_id');
+  if (!$('#travelId').value) {
+    state.participants = state.participants.filter(row => String(row.travel_participant_id || '') !== String(participantId));
+    renderParticipantList();
+    return;
+  }
+  if (!confirm('ต้องการลบผู้เดินทางคนนี้ใช่ไหม?')) return;
+  try {
+    const res = await requestTravel('v2.admin.travel.participant.delete', { travel_participant_id: participantId });
+    if (!res || res.success === false) throw new Error(res?.error || 'ลบผู้เดินทางไม่สำเร็จ');
+    await loadParticipants($('#travelId').value);
+  } catch (error) {
+    alert(error.message || String(error));
+  }
+}
+
+async function deleteTravelFromModal(){
+  await deleteV2Travel($('#travelId').value);
+}
+
+async function deleteV2Travel(travelId){
+  if (!V2_TRAVEL_WRITE_UI_ENABLED) {
+    alert('V2 Travel write UI ยังปิดอยู่');
+    return;
+  }
+  if (!travelId) return alert('ไม่พบ travel_id');
+  if (!confirm('ต้องการลบการเดินทางรายการนี้ใช่ไหม?')) return;
+  try {
+    const res = await requestTravel('v2.admin.travel.delete', { travel_id: travelId });
+    if (!res || res.success === false) throw new Error(res?.error || 'ลบไม่สำเร็จ');
+    alert('ลบสำเร็จ');
+    closeModal();
+    await loadPageData(true);
+  } catch (error) {
+    alert(error.message || String(error));
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  $('#travelModal').addEventListener('click', event => {
+    if (event.target === $('#travelModal')) closeModal();
+  });
+  syncBudgetFields();
+  loadPageData();
+});
 </script>
-<script src="js/iroup-sidebar.js"></script>
 </body>
 </html>
