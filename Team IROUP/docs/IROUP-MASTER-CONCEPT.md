@@ -496,6 +496,10 @@ Status addendum — Travel V2-native baseline:
 - `mobility.html` remains ⏳ in progress: participant create flow has been added
   and the participant section now appears in create mode.
 
+Status addendum — Travel V2-native baseline complete:
+
+- `travel.html` is ✅ done as a V2-native admin baseline.
+
 ---
 
 *Document created: 2026-05-13*

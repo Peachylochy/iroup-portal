@@ -3003,6 +3003,19 @@ Lesson learned:
 
 ---
 
+## Travel V2-Native Baseline (May 2026)
+
+Lessons learned:
+
+- `IROUP_V2_DB.gs` has enum validation that can block free-text fields; remove
+  enum validation for user-defined fields such as `budget_source_type`.
+- `validateModuleRecordLinkV2_` does not safely return the row for detail handlers;
+  use `findV2RowById_` instead before DTO mapping.
+- The same safe detail pattern is needed for every module detail handler: Mobility,
+  Travel, and future modules.
+
+---
+
 ## MOU and Mobility V2-Native Baseline (May 2026)
 
 Cover:

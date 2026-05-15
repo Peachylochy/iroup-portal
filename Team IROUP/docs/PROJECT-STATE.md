@@ -8,6 +8,28 @@
 
 ---
 
+## Latest Travel V2-Native Baseline Complete
+
+### Session: 2026-05-15 - Travel V2-Native Baseline Complete
+
+Travel outcomes:
+
+- Added `v2.admin.travel.create`, `v2.admin.travel.update`, and
+  `v2.admin.travel.delete` routes.
+- Added `v2.admin.travel.participant.list`,
+  `v2.admin.travel.participant.add`, and
+  `v2.admin.travel.participant.delete`.
+- Added `v2.admin.travel.budget.save` and `v2.admin.travel.budget.get` routes.
+- Rewrote `travel.html` V2-native.
+- Fixed `getV2AdminTravel_()` in `IROUP_V2_DTO_TRAVEL.gs`.
+- Fixed `budget_source_type` enum validation in `IROUP_V2_DB.gs`.
+- Fixed `TRAVEL_PARTICIPANT` `person_source` enum validation.
+- Budget supports ภายใน/ภายนอก with a free-text source field.
+- Participant section appears in both create and edit.
+- Edit modal hydration is working.
+
+---
+
 ## Latest Travel V2-Native Baseline
 
 ### Session: 2026-05-15 - Travel V2-Native Baseline
