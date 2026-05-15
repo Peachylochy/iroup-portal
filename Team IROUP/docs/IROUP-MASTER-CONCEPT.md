@@ -489,6 +489,13 @@ Status addendum — MOU and Mobility V2-native baseline:
 - `mobility.html` is ⏳ in progress: the V2-native rewrite is done, but edit
   modal hydration remains under active debugging.
 
+Status addendum — Travel V2-native baseline:
+
+- `travel.html` remains ⏳ in progress: the V2-native baseline is in place, but
+  the budget save preflight bug is still under investigation.
+- `mobility.html` remains ⏳ in progress: participant create flow has been added
+  and the participant section now appears in create mode.
+
 ---
 
 *Document created: 2026-05-13*

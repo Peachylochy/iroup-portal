@@ -8,6 +8,43 @@
 
 ---
 
+## Latest Travel V2-Native Baseline
+
+### Session: 2026-05-15 - Travel V2-Native Baseline
+
+Travel outcomes:
+
+- Added `v2.admin.travel.create`, `v2.admin.travel.update`, and
+  `v2.admin.travel.delete` routes.
+- Added `v2.admin.travel.participant.list`,
+  `v2.admin.travel.participant.add`, and
+  `v2.admin.travel.participant.delete`.
+- Added `v2.admin.travel.budget.save` and `v2.admin.travel.budget.get` routes.
+- Rewrote `travel.html` V2-native.
+- Participant section shows in both create and edit.
+- Pending participant flow works in create mode.
+- Budget section supports ภายใน/ภายนอก with a free-text source field.
+- `budget_source_type` validation was loosened to accept any string.
+- Budget save preflight error remains under investigation.
+
+Mobility outcomes:
+
+- Participant section now shows in the create modal too.
+- Pending participant flow was added for create mode.
+- Form section reordered with ผู้เข้าร่วม first.
+
+Bug in progress:
+
+- Travel budget save still reports: `V2 append preflight failed for BUDGET`.
+- Debug response was added to the backend for the next session.
+
+Next:
+
+- Fix the travel budget save bug.
+- Continue with remaining modules.
+
+---
+
 ## Latest MOU and Mobility V2-Native Baseline Addendum
 
 ### Session: 2026-05-14 - MOU and Mobility V2-Native Baseline

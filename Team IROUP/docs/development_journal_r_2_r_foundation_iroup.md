@@ -2980,6 +2980,29 @@ Operational direction:
 
 ---
 
+## Travel V2-Native Baseline (May 2026)
+
+Cover:
+
+- `travel.html` was rewritten with the V2-native travel workflow and budget
+  relation.
+- Budget is one record per travel project, not itemized line-by-line budgeting.
+- The ภายใน/ภายนอก pattern is the working travel budget model; ภายนอก needs no
+  detail.
+- `budget_source_type` must be free text rather than a fixed dropdown.
+- The participant section works in create mode with a pending local flow before a
+  real `travel_id` exists.
+- The same pending participant pattern was applied to Mobility.
+
+Lesson learned:
+
+- The BUDGET sheet preflight checks all required headers before append.
+- Backend `requiredFields` must match the actual sheet headers exactly.
+- `Logger.log` is unreliable in the Web App context; use error-response
+  diagnostics for debug instead.
+
+---
+
 ## MOU and Mobility V2-Native Baseline (May 2026)
 
 Cover:
