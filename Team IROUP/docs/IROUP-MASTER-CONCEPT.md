@@ -482,6 +482,13 @@ Status addendum:
 - `mou.html rewrite` is now completed and should be treated as ✅ done.
 - `mobility.html rewrite` remains ⏳ in progress.
 
+Status addendum — MOU and Mobility V2-native baseline:
+
+- `mou.html` is ✅ validated locally as a V2-native admin page.
+- MOU world map, KPI cards, table, create/edit, and soft delete are working.
+- `mobility.html` is ⏳ in progress: the V2-native rewrite is done, but edit
+  modal hydration remains under active debugging.
+
 ---
 
 *Document created: 2026-05-13*

@@ -2977,3 +2977,32 @@ Operational direction:
 - MOU joins Events and Scholarship as a V2-native admin baseline.
 - Mobility remains in active hardening until the edit modal hydration issue is fixed.
 - The next full module rewrite target is `travel.html`.
+
+---
+
+## MOU and Mobility V2-Native Baseline (May 2026)
+
+Cover:
+
+- `mou.html` was rewritten by keeping the existing admin layout and migrating the API
+  layer to V2.
+- The MOU page preserved the D3 world map, Chart.js chart, KPI cards, warning banner,
+  filters, and table workflow.
+- World map country name matching required a normalization lesson: topojson uses
+  short names such as `USA`, while `COUNTRY_MASTER` may use full names such as
+  `United States`; an override table is needed.
+- Continent should be derived from `COUNTRY_MASTER` and also stored in the sheet so
+  dashboards and filters can stay fast and consistent.
+- Mobility phase 1 remains project-level first; participant detail is managed as a
+  separate workflow rather than embedded into the first page-load payload.
+- Participant management was added as a separate section in the Mobility edit modal
+  only.
+
+Lesson learned:
+
+- Empty-row filtering is now a standard pattern for every new module list handler.
+- World map pages need a country name normalization layer before comparing V2 master
+  data with topojson/world-atlas country names.
+- Edit modals must call `detail()` to hydrate the selected record's form, rather than
+  relying on list data directly.
+- List pages must still avoid `detail()` per row on page load.
