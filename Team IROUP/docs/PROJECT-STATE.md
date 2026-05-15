@@ -8,6 +8,48 @@
 
 ---
 
+## Latest MOU and Mobility V2-Native Baseline
+
+### Session: 2026-05-14 - MOU and Mobility V2-Native Baseline
+
+MOU outcomes:
+
+- Added `v2.admin.mou.create`, `v2.admin.mou.update`, and
+  `v2.admin.mou.delete` backend routes.
+- Rewrote `mou.html` as a V2-native admin page while keeping the existing layout.
+- Preserved the D3 world map, Chart.js chart, KPI cards, and table structure.
+- Fixed empty-row filtering in `listV2AdminMOUs_()`.
+- Fixed world map country name matching with a `resolveMapCountryName()` override
+  layer.
+- Added continent auto-fill from `COUNTRY_MASTER`.
+- Added continent field support to the MOU schema and backend.
+
+Mobility outcomes:
+
+- Added `v2.admin.mobility.create`, `v2.admin.mobility.update`, and
+  `v2.admin.mobility.delete` routes.
+- Added `v2.admin.mobility.participant.list`, `v2.admin.mobility.participant.add`,
+  and `v2.admin.mobility.participant.delete`.
+- Added `v2.lookup.students` and `v2.lookup.staff` routes.
+- Rewrote `mobility.html` as a V2-native admin page.
+- Fixed empty-row filtering in `listV2AdminMobilityProjects_()`.
+- Added participant management UI in the edit modal.
+- Edit modal hydration bug remains in progress.
+
+Standards confirmed:
+
+- Empty-row filtering by primary key is now the standard pattern for every new
+  module list handler.
+- World maps need a `resolveMapCountryName()` normalization layer.
+- Never call `detail()` once per row on page load.
+
+Next:
+
+- Fix the Mobility edit modal hydration bug.
+- Rewrite `travel.html` as V2-native.
+
+---
+
 ## Latest Scholarship V2-Native Baseline
 
 ### Session: 2026-05-14 - Scholarship V2-Native Baseline

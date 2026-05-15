@@ -2936,3 +2936,44 @@ Operational direction:
 - Scholarship now has a V2-native internal admin baseline alongside Events.
 - The Events/Scholarship pattern becomes the working reference for future V2-native
   module rewrites.
+
+---
+
+## MOU and Mobility V2-Native Baseline (May 2026)
+
+Summary:
+
+The V2-native admin migration moved beyond Events and Scholarship into the MOU and
+Mobility modules. `mou.html` was rebuilt as a V2-native admin baseline while preserving
+the existing operational layout: KPI cards, warning banner, D3 world map, Chart.js
+unit chart, filters, and the MOU table. Mobility also moved into a V2-native baseline
+phase with backend create/update/delete routes, participant routes, lookup routes for
+students and staff, and an edit-modal participant management direction.
+
+Implementation notes:
+
+- MOU now has V2 admin create/update/delete routes and a V2-native page path.
+- The MOU page keeps the established map/chart/dashboard workflow but sources data
+  from V2.
+- Mobility now has V2 admin metadata routes plus participant list/add/delete routes.
+- `mobility.html` is in progress as a V2-native page, with edit modal hydration still
+  requiring follow-up.
+- `v2.lookup.students` and `v2.lookup.staff` establish the lookup pattern for Mobility
+  participant selection.
+
+Lessons learned:
+
+- Empty-row filtering by primary key is a standard pattern for all module list
+  handlers. Blank sheet rows must be filtered before soft-delete/status filtering.
+- World map pages need a country name normalization layer such as
+  `resolveMapCountryName()` so V2 country master names match topojson/world-atlas
+  country names reliably.
+- Edit modals should call `detail()` to hydrate the form for the selected record.
+- Page load must still render from list data only; never call `detail()` once per row
+  on page load.
+
+Operational direction:
+
+- MOU joins Events and Scholarship as a V2-native admin baseline.
+- Mobility remains in active hardening until the edit modal hydration issue is fixed.
+- The next full module rewrite target is `travel.html`.

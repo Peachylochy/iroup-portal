@@ -461,9 +461,13 @@ PUBLIC_CACHE
 - V2-native `scholarship.html` validated locally
 - Scholarship Card/List views, create/edit, soft delete, TH/EN toggle, and file
   upload wiring are complete
+- V2-native `mou.html` baseline completed with existing map/chart/KPI/table layout
+  preserved
 
 ### กำลังทำ ⏳
 - Use the validated Events pattern for next V2-native modules
+- `mobility.html` V2-native baseline is in progress; edit modal hydration remains
+  the next fix
 
 ### ยังไม่ได้ทำ 📋
 - mou.html rewrite
@@ -472,6 +476,11 @@ PUBLIC_CACHE
 - news.html (ใหม่)
 - knowledge.html (ใหม่)
 - UI/UX redesign (Claude Design)
+
+Status addendum:
+
+- `mou.html rewrite` is now completed and should be treated as ✅ done.
+- `mobility.html rewrite` remains ⏳ in progress.
 
 ---
 
