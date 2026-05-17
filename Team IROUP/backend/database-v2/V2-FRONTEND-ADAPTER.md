@@ -340,3 +340,43 @@ Still not migrated:
 - `uploadFileFromInput()`
 - admin CRUD/write/upload
 - staff/country lookup behavior
+## Public News V2 Endpoint Activation
+
+Date: 2026-05-17
+
+`public/public-news.html` is the public NEWS endpoint activation page.
+
+Implementation pattern:
+
+```html
+<script src="../js/iroup-config.js"></script>
+<script src="../js/iroup-v2-endpoint.js"></script>
+<script src="../js/iroup-v2-api.js"></script>
+```
+
+Primary data flow:
+
+- `public-news.html` calls `IROUP_V2.public.newsList()`.
+- The wrapper calls existing route `v2.public.news.list`.
+- The page does not use V1 `IROUP.getAll()`, `IROUP.SCRIPT_URL`, or mock runtime data.
+
+Rendered behavior:
+
+- Card grid with public NEWS records.
+- TH/EN title and content toggle.
+- Category and SDG filters.
+- SDG badge display.
+- Detail modal.
+- Public cover image from FILES relation when available.
+- Public content image strip from FILES relation when available.
+- Loading, empty, and error states.
+
+Safety expectations:
+
+- Backend public route must only return `public_visible = TRUE`, non-deleted NEWS
+  rows.
+- Files must pass existing public file filtering before the frontend receives them.
+- Audit fields, creator/updater, internal notes, private files, and admin metadata are
+  not rendered.
+
+---

@@ -1042,3 +1042,37 @@ Next gate:
 
 - Frontend event write submit wiring requires: rollback checklist confirmation, V1 event
   flow smoke test, and update payload hydration pattern documented in the frontend adapter.
+## Public News V2 Page
+
+Date: 2026-05-17
+
+Status: implementation pass complete, pending browser validation with live NEWS data.
+
+Scope:
+
+- Added `Team IROUP/public/public-news.html`.
+- Page uses `IROUP_V2.public.newsList()` as the primary data-loading flow.
+- No V1 production route, `Code.gs`, dashboard redesign, or Travel public page was
+  touched.
+- Existing route `v2.public.news.list` is used; no new public route was required.
+- Public NEWS DTO now prefers `file_role_id = cover` for `cover_url` and falls back
+  to `file_role_id = image`.
+
+Public safety:
+
+- `v2.public.news.list` returns only public-visible and non-deleted NEWS rows.
+- Public files are exposed only through the existing public file filter:
+  public parent row, `visibility_level = public`, non-deleted file, and public-safe
+  file role when `FILE_ROLE_MASTER` contains that role.
+- DTO exposes public-facing NEWS fields only: title/content TH/EN, publish date,
+  category, SDG tags, link URL, cover URL, and public file DTOs.
+
+Next gate:
+
+- Seed live NEWS sample rows and public FILES records.
+- Browser-check `public/public-news.html`: loading, empty, category filter, SDG
+  filter, TH/EN toggle, detail modal, cover image, and public image strip.
+- Add `public-news.html` to public landing navigation only in a separate reviewed
+  UI/navigation pass.
+
+---

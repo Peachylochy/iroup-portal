@@ -504,3 +504,76 @@ Status addendum — Travel V2-native baseline complete:
 
 *Document created: 2026-05-13*
 *Next update: หลัง rewrite แต่ละ module เสร็จ*
+
+---
+
+## Status Addendum - News V2-Native Baseline (2026-05-16)
+
+- `news.html` is in progress as a new V2-native admin page.
+- NEWS backend routes and sheet schema have been added.
+- `news.html` has Card/List views, TH/EN toggle, SDG filters, create/edit, soft
+  delete, and FILES-based cover/content image upload wiring.
+- NEWS is now linked from the dashboard/shared sidebar between Events and Report.
+- Live spreadsheet setup remains: run `ensureV2NewsSheet_()` and seed sample rows
+  before final browser validation.
+
+
+## Status Addendum - Knowledge V2-Native Baseline (2026-05-17)
+
+- `knowledge.html` is ✅ validated as a V2-native admin page.
+- Routes: v2.admin.knowledge.list/detail/create/update/delete
+- FILES relation: module=knowledge, file_role_id=image (≤10), file_role_id=pdf
+- Features: Card/List, TH/EN toggle, category combobox, file-type filter,
+  video_url, link_url, pdf_url, public_visible, soft delete
+- Sidebar: uses iroup-sidebar.js (KN entry added)
+- Browser-validated: save, upload, and card render confirmed
+
+## Status Addendum - Sidebar Unified (2026-05-17)
+
+- iroup-sidebar.js now includes all 7 admin modules in order:
+  MOU → Mobility → การเดินทาง → ทุนการศึกษา → กิจกรรม → ข่าว → คลังความรู้ → รายงาน
+- news.html and knowledge.html migrated from inline sidebar to iroup-sidebar.js
+- Modal z-index standardized to 100000 across news.html and knowledge.html
+  to prevent sidebar overlay conflicts
+
+## Status Addendum - Public NEWS & Knowledge V2 Activation + UX Alignment (2026-05-17)
+
+- `public-news.html` and `public-knowledge.html` are active against the V2 public
+  runtime.
+- Verified public routes:
+  - `v2.public.news.list`
+  - `v2.public.knowledge.list`
+- Public NEWS and Knowledge now use real V2 runtime records for validation, with no
+  mock runtime data and no V1 fallback usage.
+- Public NEWS has gallery/lightbox behavior for thumbnails, modal viewing,
+  previous/next navigation, keyboard support, and image counters.
+- Public Knowledge now opens a detail modal before external navigation; external
+  links and media are explicit actions, and image gallery behavior is aligned with
+  NEWS.
+- `dashboard.html`, `news.html`, and `knowledge.html` received an admin visual
+  alignment pass while preserving backend/runtime/API logic.
+- Dashboard visual direction is now the primary reference for later stabilization
+  and refinement passes.
+- Knowledge save slowness is suspected to come from sequential V2 file uploads;
+  lightweight diagnostics were added before optimization.
+
+## Status Addendum - Knowledge Cover Image Support (2026-05-17)
+
+- Added dedicated Knowledge cover-image support without backend contract changes.
+- `knowledge.html` received a dedicated รูปปก upload/preview section. Cover uploads
+  use `file_role_id = cover`; gallery images continue to use `file_role_id = image`.
+  Upload progress, retry handling, diagnostics, and sequential upload behavior are
+  all preserved.
+- `public-knowledge.html` public cards now prioritize the dedicated cover image, with
+  fallback order: cover image → first gallery image → placeholder.
+- `public-knowledge-detail.html` hero section prioritizes the dedicated cover image;
+  the gallery section remains separate from the cover.
+- Preserved: V2 endpoint strategy, public privacy filtering, existing upload
+  architecture, and existing DTO compatibility.
+- No backend/App Script changes were required. No mock data was added.
+- Verification: inline script parse checks passed; `git diff --check` passed with
+  CRLF warnings only; browser smoke tests passed (admin cover picker visible,
+  public list cover rendering works, detail hero rendering works, no console errors).
+- Strategic direction: Knowledge articles are evolving from generic repository records
+  into publication-style content entries with distinct hero/cover presentation
+  separate from gallery media.

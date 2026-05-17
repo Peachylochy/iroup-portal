@@ -1,10 +1,158 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-14 | Session: Scholarship V2-Native Baseline**
+**Last updated: 2026-05-17 | Session: Public NEWS & Knowledge V2 Activation + UX Alignment**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest Public NEWS & Knowledge V2 Activation + UX Alignment
+
+### Session: 2026-05-17 - Public NEWS & Knowledge V2 Activation + UX Alignment
+
+Completed:
+
+- Activated `public-news.html` against the V2 public runtime.
+- Activated `public-knowledge.html` against the V2 public runtime.
+- Verified public routes:
+  - `v2.public.news.list`
+  - `v2.public.knowledge.list`
+- Added real runtime validation using actual NEWS and KNOWLEDGE records.
+- Added public NEWS gallery/lightbox:
+  - thumbnail click
+  - modal image gallery
+  - previous/next navigation
+  - keyboard support
+  - image counter
+- Fixed public KNOWLEDGE behavior:
+  - card click opens detail modal first
+  - external link no longer hijacks the entire card
+  - explicit buttons for external links/media
+  - image gallery behavior aligned with NEWS
+- Added lightweight save-performance diagnostics to `knowledge.html`.
+- Confirmed:
+  - no mock runtime data
+  - V2 public adapters remain the primary source
+  - no V1 fallback usage on public NEWS/Knowledge pages
+- Performed admin visual alignment pass:
+  - `dashboard.html`
+  - `news.html`
+  - `knowledge.html`
+- Standardized:
+  - dark admin shell direction
+  - KPI spacing
+  - filter bar rhythm
+  - modal shell styling
+  - sidebar consistency
+- Preserved all backend/runtime/API logic.
+
+Notes:
+
+- Current UI phase is stabilization/unification, not full redesign.
+- Dashboard visual direction is becoming the primary design reference for later
+  refinement passes.
+- Knowledge save slowness is likely caused by sequential file uploads via the V2
+  file upload pipeline; diagnostics were added before optimization.
+
+---
+
+## Latest Public News V2 Page
+
+### Session: 2026-05-17 - Public News V2 Page
+
+Public NEWS outcomes:
+
+- Confirmed `v2.public.news.list` already exists in the V2 public router.
+- Confirmed `IROUP_V2.public.newsList()` already exists in `iroup-v2-api.js`.
+- Updated public NEWS DTO behavior to prefer `file_role_id = cover` for
+  `cover_url`, with `file_role_id = image` as fallback.
+- Created `Team IROUP/public/public-news.html`.
+- `public-news.html` uses the isolated V2 public route as its primary runtime data
+  source: `IROUP_V2.public.newsList()`.
+- Public page features:
+  - card grid
+  - TH/EN toggle
+  - category filter
+  - SDG filter and badges
+  - detail modal
+  - cover image from public FILES relation
+  - content image strip from public FILES relation
+  - loading, empty, and error states
+
+Safety notes:
+
+- Public NEWS route returns only public-visible, non-deleted NEWS rows.
+- Public NEWS files are filtered through existing public file safety rules:
+  parent must be public, file `visibility_level` must be `public`, file must not be
+  soft-deleted, and unsafe file roles are blocked when `FILE_ROLE_MASTER` marks
+  them as not public-safe.
+- No V1 production lane or `Code.gs` changes were made.
+- Travel public page was not touched.
+- Dashboard redesign was not touched.
+
+Next:
+
+- Browser-test `public/public-news.html` against live V2 data after NEWS sample rows
+  and public cover/image files exist.
+- Consider adding `public-news.html` to `public-landing.html` navigation in a later
+  reviewed pass.
+
+---
+
+## Latest News V2-Native Baseline
+
+### Session: 2026-05-16 - News V2-Native Baseline
+
+News outcomes:
+
+- Added NEWS backend baseline in V2:
+  - `IROUP_V2_SHEETS.NEWS`
+  - NEWS sheet schema in `IROUP_DATABASE_V2_BUILDER.gs`
+  - `v2.admin.news.list`
+  - `v2.admin.news.detail`
+  - `v2.admin.news.create`
+  - `v2.admin.news.update`
+  - `v2.admin.news.delete`
+- Added `news` to `IROUP_V2_MODULES` so `v2.admin.file.upload` accepts
+  `module = news`.
+- Created `news.html` as a V2-native admin page.
+- `news.html` includes:
+  - Card/List views
+  - TH/EN toggle
+  - KPI cards
+  - text/category/SDG filters
+  - create/edit modal
+  - SDG 1-17 checkbox workflow
+  - soft delete via `v2.admin.news.delete`
+  - cover image and content image upload UI via `FILES` relation
+- Added NEWS navigation to:
+  - `dashboard.html` static sidebar block
+  - shared `js/iroup-sidebar.js` final sidebar generator
+
+Current caveats:
+
+- NEWS sheet must be created in the live `IROUP_DATABASE_V2` spreadsheet by
+  running `ensureV2NewsSheet_()` manually in Apps Script, or by running the
+  builder that creates V2 sheets.
+- Sample NEWS rows still need to be seeded in the live spreadsheet.
+- `news.html` should be opened through the normal login/session path:
+  `index.html` login -> `dashboard.html` -> sidebar `ข่าว`, so Google token
+  session storage is available for V2 admin requests.
+
+Validation completed locally:
+
+- `git diff --check -- "Team IROUP/news.html"`
+- inline script parse check for `news.html`
+- V1 API scan found no V1 calls in `news.html`
+- `git diff --check -- "Team IROUP/js/iroup-sidebar.js" "Team IROUP/dashboard.html"`
+
+Next:
+
+- Run `ensureV2NewsSheet_()` in Apps Script and seed 5 sample NEWS rows.
+- Browser-validate `news.html` through the dashboard sidebar after token login.
+- Verify cover/image upload succeeds with `module = news`.
 
 ---
 
@@ -2433,3 +2581,84 @@ Still not doing:
 - V1 `SCRIPT_URL` replacement
 - V1 runtime changes
 - production cutover
+
+---
+
+## Session: 2026-05-17 — knowledge.html + Sidebar Fixes Complete
+
+knowledge.html outcomes:
+- Created Team IROUP/knowledge.html as V2-native admin page
+- Routes: v2.admin.knowledge.list/detail/create/update/delete
+- v2.admin.file.upload with module=knowledge
+- Features: Card/List views, TH/EN toggle, KPI cards (3),
+  text/category/file-type filters, create/edit modal,
+  image upload (≤10), PDF upload, video_url, link_url,
+  public_visible toggle, soft delete, V2_KNOWLEDGE_WRITE_UI_ENABLED flag
+- Browser-validated: card renders, save succeeds (V2), images upload OK
+
+Sidebar fixes:
+- iroup-sidebar.js: added KN คลังความรู้ entry between NW and RP
+- news.html: removed inline sidebar, added iroup-sidebar.js script tag,
+  fixed modal z-index (80 → 100000)
+- knowledge.html: same sidebar migration applied, modal z-index fixed,
+  input field dark color bug fixed (!important on background/color)
+
+Admin pages — ALL COMPLETE ✅:
+events.html ✅, scholarship.html ✅, mou.html ✅,
+mobility.html ✅, travel.html ✅, news.html ✅, knowledge.html ✅
+
+Public pages status:
+- public-landing.html ✅, public-mou.html ✅, public-mobility.html ✅
+- public-scholar.html ✅, public-events.html ✅ (all V2-native)
+- public-news.html ❌ not yet created
+- public-knowledge.html ❌ not yet created
+
+Next tasks:
+1. Add v2.public.news.list + v2.public.knowledge.list to backend
+2. Create public-news.html
+3. Create public-knowledge.html
+4. UI Redesign (later — all pages together)
+5. Facebook Auto-Post (phase 2)
+
+---
+
+## Session: 2026-05-17 — Knowledge Cover Image Support
+
+### Completed
+
+- Added dedicated Knowledge cover-image support without backend contract changes.
+- `knowledge.html`:
+  - Added dedicated รูปปก upload/preview section.
+  - Cover uploads use `file_role_id = cover`.
+  - Gallery images continue using `file_role_id = image`.
+  - Preserved upload progress, retry handling, diagnostics, and sequential upload behavior.
+- `public-knowledge.html`:
+  - Public cards prioritize dedicated cover image.
+  - Fallback order:
+    1. cover image
+    2. first gallery image
+    3. placeholder
+- `public-knowledge-detail.html`:
+  - Hero section prioritizes dedicated cover image.
+  - Gallery remains separate from cover.
+- Preserved:
+  - V2 endpoint strategy
+  - public privacy filtering
+  - existing upload architecture
+  - existing DTO compatibility
+- No backend/App Script changes required.
+- No mock data added.
+
+### Verification
+
+- Inline script parse checks passed.
+- `git diff --check` passed with CRLF warnings only.
+- Browser smoke tests passed:
+  - Admin cover picker visible.
+  - Public list cover rendering works.
+  - Detail hero rendering works.
+  - No console errors observed.
+
+### Strategic Direction
+
+Knowledge articles are evolving from generic repository records into publication-style content entries with distinct hero/cover presentation separate from gallery media.
