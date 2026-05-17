@@ -338,6 +338,47 @@ function listV2AdminEvents_(includeArchived) {
   return adminResponseV2_(true, dtos, dtos.length, '');
 }
 
+function getV2AdminNews_(requestOrNewsId) {
+  const ready = ensureV2NewsSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const newsId = extractV2NewsId_(requestOrNewsId);
+  if (!newsId) {
+    return adminResponseV2_(false, null, 0, 'news_id is required for news detail.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.NEWS, 'news_id', newsId);
+  if (!existing.success || !existing.data) {
+    return adminResponseV2_(false, {
+      news_id: newsId
+    }, 0, existing.error || 'News item not found.');
+  }
+  if (isSoftDeletedV2_(existing.data)) {
+    return adminResponseV2_(false, {
+      news_id: newsId
+    }, 0, 'News item is deleted.');
+  }
+
+  return adminResponseV2_(true, mapV2AdminNewsDto_(existing.data), 1, '');
+}
+
+function listV2AdminNews_() {
+  const ready = ensureV2NewsSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const read = readV2Sheet_(IROUP_V2_SHEETS.NEWS);
+  if (!read.success) return adminResponseV2_(false, null, 0, read.error);
+
+  const rows = (read.data || [])
+    .filter(function (row) {
+      if (!String(row.news_id || '').trim()) return false;
+      return !isSoftDeletedV2_(row);
+    })
+    .map(mapV2AdminNewsDto_);
+
+  return adminResponseV2_(true, rows, rows.length, '');
+}
+
 function validateV2AdminEventWrite_(request, mode) {
   const context = buildV2AdminContext_();
   if (!context.success) return context;
@@ -352,6 +393,14 @@ function createV2AdminEvent_(request) {
 
 function updateV2AdminEvent_(request) {
   return writeV2AdminEventMetadata_(request, 'update');
+}
+
+function createV2AdminNews_(request) {
+  return writeV2AdminNewsMetadata_(request, 'create');
+}
+
+function updateV2AdminNews_(request) {
+  return writeV2AdminNewsMetadata_(request, 'update');
 }
 
 function createV2AdminMOU_(request) {
@@ -935,6 +984,54 @@ function deleteV2AdminEvent_(request) {
   }, 1, '');
 }
 
+function deleteV2AdminNews_(request) {
+  const ready = ensureV2NewsSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const flag = getV2NewsWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2NewsWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const newsId = extractV2NewsId_(request);
+  if (!newsId) {
+    return adminResponseV2_(false, null, 0, 'news_id is required for news delete.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.NEWS, 'news_id', newsId);
+  if (!existing.success || !existing.data) {
+    return adminResponseV2_(false, {
+      news_id: newsId
+    }, 0, existing.error || 'News item not found.');
+  }
+
+  const persisted = updateV2RowById_(IROUP_V2_SHEETS.NEWS, 'news_id', newsId, {
+    is_deleted: true,
+    updated_by: actor.user.email || '',
+    updated_at: new Date().toISOString()
+  });
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      news_id: newsId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    news_id: newsId
+  }, 1, '');
+}
+
 function createV2AdminScholarship_(request) {
   return writeV2AdminScholarshipMetadata_(request, 'create');
 }
@@ -1465,6 +1562,104 @@ function writeV2AdminEventMetadata_(request, mode) {
   }, 1, '');
 }
 
+function writeV2AdminNewsMetadata_(request, mode) {
+  const ready = ensureV2NewsSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const flag = getV2NewsWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2NewsWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const writeMode = String(mode || '').trim().toLowerCase();
+  const payload = extractV2NewsWritePayload_(request);
+  const normalized = normalizeV2NewsWritePayload_(payload);
+  const errors = [];
+  if (writeMode === 'update' && !normalized.news_id) {
+    errors.push({ field: 'news_id', code: 'NEWS_ID_REQUIRED', message: 'news_id is required for news update.' });
+  }
+  if (!normalized.title_th) {
+    errors.push({ field: 'title_th', code: 'TITLE_TH_REQUIRED', message: 'title_th is required.' });
+  }
+  if (errors.length) {
+    return adminResponseV2_(false, {
+      valid: false,
+      errors: errors,
+      normalized_news: normalized
+    }, 0, 'News payload validation failed.');
+  }
+
+  const now = new Date().toISOString();
+  const adminEmail = actor.user.email || '';
+  let persisted;
+
+  if (writeMode === 'update') {
+    const newsId = cleanV2EventText_(normalized.news_id);
+    const existing = findV2RowById_(IROUP_V2_SHEETS.NEWS, 'news_id', newsId);
+    if (!existing.success || !existing.data) {
+      return adminResponseV2_(false, {
+        news_id: newsId
+      }, 0, existing.error || 'News item not found.');
+    }
+    if (isSoftDeletedV2_(existing.data)) {
+      return adminResponseV2_(false, {
+        news_id: newsId
+      }, 0, 'Cannot update a deleted news item.');
+    }
+
+    const patch = buildV2NewsSheetRow_(normalized);
+    delete patch.news_id;
+    delete patch.created_by;
+    delete patch.created_at;
+    patch.updated_by = adminEmail;
+    patch.updated_at = now;
+
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.NEWS, 'news_id', newsId, patch);
+  } else {
+    const row = buildV2NewsSheetRow_(normalized);
+    row.news_id = generateV2Id_('NEWS');
+    row.created_by = adminEmail;
+    row.updated_by = adminEmail;
+    row.created_at = now;
+    row.updated_at = now;
+
+    persisted = appendV2Row_(IROUP_V2_SHEETS.NEWS, row, {
+      idField: 'news_id',
+      requiredFields: ['news_id', 'title_th', 'public_visible', 'is_deleted', 'created_by', 'updated_by', 'created_at', 'updated_at']
+    });
+  }
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      write_enabled: true,
+      mode: writeMode,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    write_enabled: true,
+    mode: writeMode,
+    target_sheet: IROUP_V2_SHEETS.NEWS,
+    news: mapV2AdminNewsDto_(persisted.data),
+    persisted_news: persisted.data,
+    actor: {
+      email: adminEmail,
+      role: actor.user.role || ''
+    }
+  }, 1, '');
+}
+
 function writeV2AdminScholarshipMetadata_(request, mode) {
   const flag = getV2ScholarshipWriteFeatureFlag_();
   if (!flag.enabled) {
@@ -1572,6 +1767,16 @@ function getV2EventWriteFeatureFlag_() {
   };
 }
 
+function getV2NewsWriteFeatureFlag_() {
+  const property = 'IROUP_V2_NEWS_WRITE_ENABLED';
+  const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
+  return {
+    enabled: value === 'TRUE',
+    property: property,
+    error: value === 'TRUE' ? '' : 'V2 news metadata writes are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
+  };
+}
+
 function getV2ScholarshipWriteFeatureFlag_() {
   const property = 'IROUP_V2_SCHOLARSHIP_WRITE_ENABLED';
   const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
@@ -1639,6 +1844,32 @@ function ensureV2MOUContinentColumn_() {
   return { success: true, data: { added: true, field: 'continent', column: column }, error: '' };
 }
 
+function ensureV2NewsSheet_() {
+  const headers = getV2NewsSheetHeaders_();
+  const ss = getV2SS_();
+  let sheet = ss.getSheetByName(IROUP_V2_SHEETS.NEWS);
+  if (!sheet) {
+    sheet = ss.insertSheet(IROUP_V2_SHEETS.NEWS);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    return { success: true, data: { created: true, missing_headers_added: headers }, error: '' };
+  }
+
+  const existingHeaders = getV2Headers_(sheet);
+  if (!existingHeaders.length) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    return { success: true, data: { created: false, missing_headers_added: headers }, error: '' };
+  }
+
+  const missingHeaders = headers.filter(function (header) {
+    return existingHeaders.indexOf(header) < 0;
+  });
+  if (missingHeaders.length) {
+    sheet.getRange(1, existingHeaders.length + 1, 1, missingHeaders.length).setValues([missingHeaders]);
+  }
+
+  return { success: true, data: { created: false, missing_headers_added: missingHeaders }, error: '' };
+}
+
 function getV2FileUploadFeatureFlag_() {
   const property = 'IROUP_V2_FILE_UPLOAD_ENABLED';
   const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
@@ -1659,6 +1890,21 @@ function authorizeV2EventWriteActor_(request) {
   const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
   if (allowed.indexOf(role) < 0) {
     return { success: false, user: null, error: 'V2 admin role is not allowed for event writes.' };
+  }
+
+  return { success: true, user: user, error: '' };
+}
+
+function authorizeV2NewsWriteActor_(request) {
+  const user = request && request.user ? request.user : null;
+  if (!user || !user.email) {
+    return { success: false, user: null, error: 'V2 admin identity is required for news writes.' };
+  }
+
+  const role = String(user.role || '').trim().toLowerCase();
+  const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
+  if (allowed.indexOf(role) < 0) {
+    return { success: false, user: null, error: 'V2 admin role is not allowed for news writes.' };
   }
 
   return { success: true, user: user, error: '' };
@@ -1761,6 +2007,24 @@ function buildV2EventSheetRow_(normalized) {
     link_url: cleanV2EventText_(data.link_url),
     pin: isTruthyV2_(data.pin),
     status: cleanV2EventText_(data.status || 'draft'),
+    public_visible: isTruthyV2_(data.public_visible),
+    is_deleted: false
+  };
+}
+
+function buildV2NewsSheetRow_(normalized) {
+  const data = normalized || {};
+  return {
+    news_id: cleanV2EventText_(data.news_id),
+    title_th: cleanV2EventText_(data.title_th),
+    title_en: cleanV2EventText_(data.title_en),
+    content_th: cleanV2EventText_(data.content_th),
+    content_en: cleanV2EventText_(data.content_en),
+    publish_date: cleanV2EventText_(data.publish_date),
+    category: cleanV2EventText_(data.category),
+    sdg_tags: cleanV2EventText_(data.sdg_tags),
+    credit: cleanV2EventText_(data.credit),
+    link_url: cleanV2EventText_(data.link_url),
     public_visible: isTruthyV2_(data.public_visible),
     is_deleted: false
   };
@@ -2167,6 +2431,26 @@ function extractV2EventWritePayload_(request) {
   return params;
 }
 
+function extractV2NewsWritePayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.news || params.payload || params.news || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
 function extractV2MOUWritePayload_(request) {
   const params = request && request.params ? request.params : {};
   const body = request && request.body ? request.body : {};
@@ -2348,6 +2632,28 @@ function extractV2EventDeleteId_(request) {
     }
   }
   return cleanV2EventText_(body.event_id || params.event_id || body.id || params.id || body.record_id || params.record_id || '');
+}
+
+function extractV2NewsId_(requestOrNewsId) {
+  if (!requestOrNewsId || typeof requestOrNewsId !== 'object') {
+    return cleanV2EventText_(requestOrNewsId || '');
+  }
+
+  const params = requestOrNewsId.params || {};
+  const body = requestOrNewsId.body || {};
+  const candidate = body.payload || body.news || params.payload || params.news || null;
+  if (candidate && typeof candidate === 'object') {
+    return cleanV2EventText_(candidate.news_id || candidate.id || candidate.record_id || '');
+  }
+  if (candidate && typeof candidate === 'string') {
+    try {
+      const parsed = JSON.parse(candidate);
+      return cleanV2EventText_(parsed.news_id || parsed.id || parsed.record_id || '');
+    } catch (err) {
+      return cleanV2EventText_(params.news_id || params.id || params.record_id || '');
+    }
+  }
+  return cleanV2EventText_(body.news_id || params.news_id || body.id || params.id || body.record_id || params.record_id || '');
 }
 
 function extractV2MOUDeleteId_(request) {
@@ -2569,6 +2875,35 @@ function normalizeV2EventWritePayload_(payload, ctx) {
   };
 
   return { data: normalized, warnings: warnings };
+}
+
+function normalizeV2NewsWritePayload_(payload) {
+  const source = payload || {};
+  return {
+    news_id: cleanV2EventText_(pickV2EventValue_(source, ['news_id', 'id'])),
+    title_th: cleanV2EventText_(source.title_th || ''),
+    title_en: cleanV2EventText_(source.title_en || ''),
+    content_th: cleanV2EventText_(source.content_th || ''),
+    content_en: cleanV2EventText_(source.content_en || ''),
+    publish_date: normalizeV2EventDate_(source.publish_date || ''),
+    category: cleanV2EventText_(source.category || ''),
+    sdg_tags: normalizeV2NewsSdgTags_(source.sdg_tags),
+    credit: cleanV2EventText_(source.credit || ''),
+    link_url: cleanV2EventText_(pickV2EventValue_(source, ['link_url', 'linkUrl', 'link'])),
+    public_visible: isTruthyV2_(source.public_visible),
+    is_deleted: false
+  };
+}
+
+function normalizeV2NewsSdgTags_(value) {
+  if (Array.isArray(value)) {
+    return value.map(function (item) {
+      return cleanV2EventText_(item);
+    }).filter(function (item) {
+      return !!item;
+    }).join(', ');
+  }
+  return cleanV2EventText_(value || '');
 }
 
 function normalizeV2MOUWritePayload_(payload, ctx) {
@@ -3045,6 +3380,38 @@ function indexV2RowsById_(rows, idField) {
   return index;
 }
 
+function getV2NewsSheetHeaders_() {
+  return [
+    'news_id',
+    'title_th',
+    'title_en',
+    'content_th',
+    'content_en',
+    'publish_date',
+    'category',
+    'sdg_tags',
+    'credit',
+    'link_url',
+    'public_visible',
+    'is_deleted',
+    'created_by',
+    'updated_by',
+    'created_at',
+    'updated_at'
+  ];
+}
+
+function mapV2AdminNewsDto_(row) {
+  const source = row || {};
+  const dto = {};
+  getV2NewsSheetHeaders_().forEach(function (field) {
+    dto[field] = source[field] !== undefined && source[field] !== null ? source[field] : '';
+  });
+  dto.public_visible = isTruthyV2_(source.public_visible);
+  dto.is_deleted = isSoftDeletedV2_(source);
+  return dto;
+}
+
 function findV2RelationRows_(ctx, sheetName, module, recordId) {
   const rows = ctx.tables[sheetName] || [];
   return rows.filter(function (row) {
@@ -3515,4 +3882,358 @@ function mapV2AuditDto_(row) {
     created_at: row.created_at || '',
     updated_at: row.updated_at || ''
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// KNOWLEDGE MODULE
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ensureV2KnowledgeSheet_() {
+  const headers = getV2KnowledgeSheetHeaders_();
+  const ss = getV2SS_();
+  let sheet = ss.getSheetByName(IROUP_V2_SHEETS.KNOWLEDGE);
+  if (!sheet) {
+    sheet = ss.insertSheet(IROUP_V2_SHEETS.KNOWLEDGE);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    return { success: true, data: { created: true, missing_headers_added: headers }, error: '' };
+  }
+
+  const existingHeaders = getV2Headers_(sheet);
+  if (!existingHeaders.length) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    return { success: true, data: { created: false, missing_headers_added: headers }, error: '' };
+  }
+
+  const missingHeaders = headers.filter(function (header) {
+    return existingHeaders.indexOf(header) < 0;
+  });
+  if (missingHeaders.length) {
+    sheet.getRange(1, existingHeaders.length + 1, 1, missingHeaders.length).setValues([missingHeaders]);
+  }
+
+  return { success: true, data: { created: false, missing_headers_added: missingHeaders }, error: '' };
+}
+
+function getV2KnowledgeSheetHeaders_() {
+  return [
+    'knowledge_id',
+    'title_th',
+    'title_en',
+    'content_th',
+    'content_en',
+    'category',
+    'video_url',
+    'link_url',
+    'public_visible',
+    'is_deleted',
+    'created_by',
+    'updated_by',
+    'created_at',
+    'updated_at'
+  ];
+}
+
+function mapV2AdminKnowledgeDto_(row) {
+  const source = row || {};
+  const dto = {};
+  getV2KnowledgeSheetHeaders_().forEach(function (field) {
+    dto[field] = source[field] !== undefined && source[field] !== null ? source[field] : '';
+  });
+  dto.public_visible = isTruthyV2_(source.public_visible);
+  dto.is_deleted = isSoftDeletedV2_(source);
+  return dto;
+}
+
+function listV2AdminKnowledge_() {
+  const ready = ensureV2KnowledgeSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const read = readV2Sheet_(IROUP_V2_SHEETS.KNOWLEDGE);
+  if (!read.success) return adminResponseV2_(false, null, 0, read.error);
+
+  const rows = (read.data || [])
+    .filter(function (row) {
+      if (!String(row.knowledge_id || '').trim()) return false;
+      return !isSoftDeletedV2_(row);
+    })
+    .map(mapV2AdminKnowledgeDto_);
+
+  return adminResponseV2_(true, rows, rows.length, '');
+}
+
+function getV2AdminKnowledge_(requestOrKnowledgeId) {
+  const ready = ensureV2KnowledgeSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const knowledgeId = extractV2KnowledgeId_(requestOrKnowledgeId);
+  if (!knowledgeId) {
+    return adminResponseV2_(false, null, 0, 'knowledge_id is required for knowledge detail.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.KNOWLEDGE, 'knowledge_id', knowledgeId);
+  if (!existing.success || !existing.data) {
+    return adminResponseV2_(false, {
+      knowledge_id: knowledgeId
+    }, 0, existing.error || 'Knowledge item not found.');
+  }
+  if (isSoftDeletedV2_(existing.data)) {
+    return adminResponseV2_(false, {
+      knowledge_id: knowledgeId
+    }, 0, 'Knowledge item is deleted.');
+  }
+
+  return adminResponseV2_(true, mapV2AdminKnowledgeDto_(existing.data), 1, '');
+}
+
+function createV2AdminKnowledge_(request) {
+  return writeV2AdminKnowledgeMetadata_(request, 'create');
+}
+
+function updateV2AdminKnowledge_(request) {
+  return writeV2AdminKnowledgeMetadata_(request, 'update');
+}
+
+function deleteV2AdminKnowledge_(request) {
+  const ready = ensureV2KnowledgeSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const flag = getV2KnowledgeWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2KnowledgeWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const knowledgeId = extractV2KnowledgeId_(request);
+  if (!knowledgeId) {
+    return adminResponseV2_(false, null, 0, 'knowledge_id is required for knowledge delete.');
+  }
+
+  const existing = findV2RowById_(IROUP_V2_SHEETS.KNOWLEDGE, 'knowledge_id', knowledgeId);
+  if (!existing.success || !existing.data) {
+    return adminResponseV2_(false, {
+      knowledge_id: knowledgeId
+    }, 0, existing.error || 'Knowledge item not found.');
+  }
+
+  const persisted = updateV2RowById_(IROUP_V2_SHEETS.KNOWLEDGE, 'knowledge_id', knowledgeId, {
+    is_deleted: true,
+    updated_by: actor.user.email || '',
+    updated_at: new Date().toISOString()
+  });
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      knowledge_id: knowledgeId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    knowledge_id: knowledgeId
+  }, 1, '');
+}
+
+function writeV2AdminKnowledgeMetadata_(request, mode) {
+  const ready = ensureV2KnowledgeSheet_();
+  if (!ready.success) return adminResponseV2_(false, ready.data || null, 0, ready.error);
+
+  const flag = getV2KnowledgeWriteFeatureFlag_();
+  if (!flag.enabled) {
+    return adminResponseV2_(false, {
+      write_enabled: false,
+      feature_flag: flag.property,
+      required_value: 'TRUE'
+    }, 0, flag.error);
+  }
+
+  const actor = authorizeV2KnowledgeWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const writeMode = String(mode || '').trim().toLowerCase();
+  const payload = extractV2KnowledgeWritePayload_(request);
+  const normalized = normalizeV2KnowledgeWritePayload_(payload);
+  const errors = [];
+  if (writeMode === 'update' && !normalized.knowledge_id) {
+    errors.push({ field: 'knowledge_id', code: 'KNOWLEDGE_ID_REQUIRED', message: 'knowledge_id is required for knowledge update.' });
+  }
+  if (!normalized.title_th) {
+    errors.push({ field: 'title_th', code: 'TITLE_TH_REQUIRED', message: 'title_th is required.' });
+  }
+  if (errors.length) {
+    return adminResponseV2_(false, {
+      valid: false,
+      errors: errors,
+      normalized_knowledge: normalized
+    }, 0, 'Knowledge payload validation failed.');
+  }
+
+  const now = new Date().toISOString();
+  const adminEmail = actor.user.email || '';
+  let persisted;
+
+  if (writeMode === 'update') {
+    const knowledgeId = cleanV2EventText_(normalized.knowledge_id);
+    const existing = findV2RowById_(IROUP_V2_SHEETS.KNOWLEDGE, 'knowledge_id', knowledgeId);
+    if (!existing.success || !existing.data) {
+      return adminResponseV2_(false, {
+        knowledge_id: knowledgeId
+      }, 0, existing.error || 'Knowledge item not found.');
+    }
+    if (isSoftDeletedV2_(existing.data)) {
+      return adminResponseV2_(false, {
+        knowledge_id: knowledgeId
+      }, 0, 'Cannot update a deleted knowledge item.');
+    }
+
+    const patch = buildV2KnowledgeSheetRow_(normalized);
+    delete patch.knowledge_id;
+    delete patch.created_by;
+    delete patch.created_at;
+    patch.updated_by = adminEmail;
+    patch.updated_at = now;
+
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.KNOWLEDGE, 'knowledge_id', knowledgeId, patch);
+  } else {
+    const row = buildV2KnowledgeSheetRow_(normalized);
+    row.knowledge_id = generateV2Id_('KNOW');
+    row.created_by = adminEmail;
+    row.updated_by = adminEmail;
+    row.created_at = now;
+    row.updated_at = now;
+
+    persisted = appendV2Row_(IROUP_V2_SHEETS.KNOWLEDGE, row, {
+      idField: 'knowledge_id',
+      requiredFields: ['knowledge_id', 'title_th', 'public_visible', 'is_deleted', 'created_by', 'updated_by', 'created_at', 'updated_at']
+    });
+  }
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      write_enabled: true,
+      mode: writeMode,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    write_enabled: true,
+    mode: writeMode,
+    target_sheet: IROUP_V2_SHEETS.KNOWLEDGE,
+    knowledge: mapV2AdminKnowledgeDto_(persisted.data),
+    persisted_knowledge: persisted.data,
+    actor: {
+      email: adminEmail,
+      role: actor.user.role || ''
+    }
+  }, 1, '');
+}
+
+function getV2KnowledgeWriteFeatureFlag_() {
+  const property = 'IROUP_V2_KNOWLEDGE_WRITE_ENABLED';
+  const value = String(PropertiesService.getScriptProperties().getProperty(property) || '').trim().toUpperCase();
+  return {
+    enabled: value === 'TRUE',
+    property: property,
+    error: value === 'TRUE' ? '' : 'V2 knowledge metadata writes are disabled. Set ' + property + '=TRUE in the isolated V2 Apps Script project to enable this pilot.'
+  };
+}
+
+function authorizeV2KnowledgeWriteActor_(request) {
+  const user = request && request.user ? request.user : null;
+  if (!user || !user.email) {
+    return { success: false, user: null, error: 'V2 admin identity is required for knowledge writes.' };
+  }
+
+  const role = String(user.role || '').trim().toLowerCase();
+  const allowed = ['superadmin', 'super_admin', 'owner', 'admin'];
+  if (allowed.indexOf(role) < 0) {
+    return { success: false, user: null, error: 'V2 admin role is not allowed for knowledge writes.' };
+  }
+
+  return { success: true, user: user, error: '' };
+}
+
+function buildV2KnowledgeSheetRow_(normalized) {
+  const data = normalized || {};
+  return {
+    knowledge_id: cleanV2EventText_(data.knowledge_id),
+    title_th: cleanV2EventText_(data.title_th),
+    title_en: cleanV2EventText_(data.title_en),
+    content_th: cleanV2EventText_(data.content_th),
+    content_en: cleanV2EventText_(data.content_en),
+    category: cleanV2EventText_(data.category),
+    video_url: cleanV2EventText_(data.video_url),
+    link_url: cleanV2EventText_(data.link_url),
+    public_visible: isTruthyV2_(data.public_visible),
+    is_deleted: false
+  };
+}
+
+function normalizeV2KnowledgeWritePayload_(payload) {
+  const source = payload || {};
+  return {
+    knowledge_id: cleanV2EventText_(pickV2EventValue_(source, ['knowledge_id', 'id'])),
+    title_th: cleanV2EventText_(source.title_th || ''),
+    title_en: cleanV2EventText_(source.title_en || ''),
+    content_th: cleanV2EventText_(source.content_th || ''),
+    content_en: cleanV2EventText_(source.content_en || ''),
+    category: cleanV2EventText_(source.category || ''),
+    video_url: cleanV2EventText_(pickV2EventValue_(source, ['video_url', 'videoUrl', 'video'])),
+    link_url: cleanV2EventText_(pickV2EventValue_(source, ['link_url', 'linkUrl', 'link'])),
+    public_visible: isTruthyV2_(source.public_visible),
+    is_deleted: false
+  };
+}
+
+function extractV2KnowledgeWritePayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.knowledge || params.payload || params.knowledge || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
+function extractV2KnowledgeId_(requestOrKnowledgeId) {
+  if (!requestOrKnowledgeId || typeof requestOrKnowledgeId !== 'object') {
+    return cleanV2EventText_(requestOrKnowledgeId || '');
+  }
+
+  const params = requestOrKnowledgeId.params || {};
+  const body = requestOrKnowledgeId.body || {};
+  const candidate = body.payload || body.knowledge || params.payload || params.knowledge || null;
+  if (candidate && typeof candidate === 'object') {
+    return cleanV2EventText_(candidate.knowledge_id || candidate.id || candidate.record_id || '');
+  }
+  if (candidate && typeof candidate === 'string') {
+    try {
+      const parsed = JSON.parse(candidate);
+      return cleanV2EventText_(parsed.knowledge_id || parsed.id || parsed.record_id || '');
+    } catch (err) {
+      return cleanV2EventText_(params.knowledge_id || params.id || params.record_id || '');
+    }
+  }
+  return cleanV2EventText_(body.knowledge_id || params.knowledge_id || body.id || params.id || body.record_id || params.record_id || '');
 }

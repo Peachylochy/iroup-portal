@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คลังความรู้ - IROUP V2</title>
+  <link rel="stylesheet" href="css/iroup-theme.css">
+  <script src="js/iroup-config.js"></script>
+  <script src="js/iroup-v2-endpoint.js"></script>
+  <script src="js/iroup-v2-api.js"></script>
+  <script src="js/iroup-utils.js"></script>
+  <style>
+    :root{--blue:#0B74B8;--navy:#10294f;--ink:#15243b;--muted:#6b7f96;--line:#e6edf6;--soft:#eef7ff;--bg:#f5f8fc;--ok:#15803d;--warn:#b7791f;--danger:#c2410c}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Noto Sans Thai","Inter",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    button,input,select,textarea{font:inherit}
+    .layout{display:flex;min-height:100vh}
+    .main{margin-left:250px;padding:28px;width:calc(100% - 250px)}
+    .topbar{background:#09244a;color:#fff;border-radius:22px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:18px;box-shadow:0 16px 42px rgba(12,35,66,.16)}
+    .topbar h1{margin:0;font-size:30px;line-height:1.15}.subtitle{margin-top:6px;color:rgba(255,255,255,.75);font-weight:600}
+    .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;min-height:42px}
+    .btn:hover{box-shadow:0 8px 20px rgba(15,39,69,.1)}
+    .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+    .btn.danger{border-color:#f2c5bd;color:#b42318;background:#fff}
+    .btn.ghost{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff}
+    .btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+    .segmented{display:flex;gap:6px;background:#fff;border-radius:14px;padding:5px}
+    .segmented .btn{border:0;border-radius:10px;min-height:34px;padding:8px 12px}
+    .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:22px 0}
+    .kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 28px rgba(21,36,59,.08)}
+    .kpi-value{font-size:34px;font-weight:900;color:var(--navy);line-height:1}.kpi-label{margin-top:8px;color:var(--muted);font-weight:800}
+    .toolbar{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;box-shadow:0 10px 24px rgba(21,36,59,.08);margin-bottom:18px}
+    .input,.select,.textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff !important;color:#15243b !important;min-height:46px}
+    .modal-body .input,.modal-body .select,.modal-body .textarea{background:#fff !important;color:#15243b !important}
+    .textarea{min-height:120px;resize:vertical}
+    .textarea.large{min-height:190px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+    .knowledge-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 12px 28px rgba(21,36,59,.08);display:flex;flex-direction:column;min-height:400px}
+    .cover{height:190px;background:linear-gradient(135deg,#e7f3fb,#f9fcff);display:grid;place-items:center;color:var(--blue);font-weight:900;font-size:42px;overflow:hidden}
+    .cover img{width:100%;height:100%;object-fit:cover;display:block}
+    .cover .pdf-icon{font-size:52px;opacity:.7}
+    .card-body{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1}
+    .card-title{font-size:18px;font-weight:900;color:var(--navy);line-height:1.35}
+    .badge-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;background:#edf5ff;color:#075985;border:1px solid #cce7ff}
+    .badge.public{background:#eaf8ee;color:var(--ok);border-color:#ccebd4}
+    .badge.private{background:#f7f7f8;color:#596579;border-color:#e3e7ee}
+    .badge.pdf{background:#fff3e0;color:#b45309;border-color:#fbd38d}
+    .badge.image{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+    .badge.youtube{background:#fff1f0;color:#c2410c;border-color:#fca5a5}
+    .card-actions{display:flex;gap:8px;margin-top:auto}
+    .list-wrap{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;box-shadow:0 12px 28px rgba(21,36,59,.08)}
+    table{width:100%;border-collapse:collapse;min-width:800px}
+    th,td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{font-size:13px;color:var(--navy);background:#f8fbff;font-weight:900}
+    td{font-size:14px}.title-cell{font-weight:900;color:var(--navy)}
+    .empty,.loading{background:#fff;border:1px dashed #cbd8e7;border-radius:18px;padding:32px;text-align:center;color:var(--muted);font-weight:900}
+    .spinner{width:24px;height:24px;border-radius:999px;border:3px solid #d9e8f4;border-top-color:var(--blue);display:inline-block;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .notice{margin:16px 0;padding:12px 14px;border-radius:14px;display:none;font-weight:800}.notice.error{display:block;background:#fff1f0;color:#b42318;border:1px solid #ffc9c4}.notice.ok{display:block;background:#ecfdf3;color:#027a48;border:1px solid #abefc6}
+    .modal{position:fixed;inset:0;background:rgba(9,24,45,.56);z-index:100000;display:none;align-items:flex-start;justify-content:center;padding:26px;overflow:auto}
+    .modal.open{display:flex}.modal-panel{width:min(1120px,100%);background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}
+    .modal-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .modal-head h2{margin:0;color:var(--navy);font-size:24px}.modal-head p{margin:6px 0 0;color:var(--muted);font-weight:700}
+    .modal-body{padding:22px;max-height:calc(100vh - 210px);overflow:auto}
+    .form-section{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
+    .form-section h3{margin:0 0 14px;color:var(--navy);font-size:18px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .field.full{grid-column:1/-1}.label{display:block;font-size:13px;font-weight:900;color:var(--navy);margin-bottom:7px}.required{color:#c1121f}
+    .toggle-line{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--navy)}
+    .toggle-line input{width:18px;height:18px}
+    .file-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .file-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .cover-preview{width:min(360px,100%);min-height:150px;border:1px dashed #cbd8e7;border-radius:16px;background:linear-gradient(135deg,#e7f3fb,#f9fcff);display:grid;place-items:center;overflow:hidden;color:var(--muted);font-weight:900}
+    .cover-preview img{width:100%;height:190px;object-fit:cover;display:block}
+    .cover-preview-wrap{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-top:10px}
+    .file-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid #d7e4f0;border-radius:999px;background:#f7fbff;padding:6px 8px 6px 12px;font-weight:800;color:#21324b;max-width:100%}
+    .file-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}
+    .file-chip button{border:0;background:#e9f1fa;border-radius:999px;width:24px;height:24px;cursor:pointer;font-weight:900;color:#334155}
+    .file-status{min-height:20px;color:var(--muted);font-weight:800}
+    .file-status.active{color:var(--blue)}
+    .file-status.active::before{content:"";width:16px;height:16px;border-radius:999px;border:2px solid #d9e8f4;border-top-color:var(--blue);display:inline-block;vertical-align:-3px;margin-right:8px;animation:spin .8s linear infinite}
+    .file-status.warning{color:var(--warn)}
+    .file-status.error{color:#b42318}
+    .file-status.done{color:var(--ok)}
+    .modal-foot{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;gap:10px}
+    .modal-foot .right{display:flex;gap:10px}
+    .main{padding:30px 36px 48px;background:linear-gradient(180deg,#f4f8fd 0%,#eef4fb 100%)}
+    .topbar{background:#071828;border-radius:24px;padding:18px 22px;min-height:76px;box-shadow:0 18px 44px rgba(15,45,90,.14)}
+    .topbar h1{font-size:30px;letter-spacing:-.02em}
+    .subtitle{font-size:14px;line-height:1.45}
+    .top-actions{gap:10px}
+    .segmented{border-radius:14px;padding:5px;box-shadow:0 8px 18px rgba(15,45,90,.12)}
+    .segmented .btn{min-height:36px;padding:8px 14px}
+    .btn{border-radius:12px;box-shadow:none;transition:transform .15s,box-shadow .15s,background .15s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(15,39,69,.10)}
+    .btn.primary{background:linear-gradient(135deg,#0B74B8,#0f86d1)}
+    .btn.ghost{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22)}
+    .kpis{gap:18px;margin:24px 0}
+    .kpi{border-radius:20px;padding:24px 26px;min-height:112px;display:flex;align-items:center;gap:18px;box-shadow:0 14px 34px rgba(15,45,90,.08)}
+    .kpi-value{font-size:38px;color:#0F2D5A}
+    .kpi-label{margin-top:0}
+    .toolbar{border-radius:20px;padding:18px;gap:14px;margin-bottom:22px;box-shadow:0 14px 34px rgba(15,45,90,.08)}
+    .input,.select,.textarea{border-color:#dbe6f1;border-radius:13px}
+    .cards{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+    .knowledge-card{border-radius:20px;box-shadow:0 16px 38px rgba(15,45,90,.09)}
+    .cover{height:200px}
+    .modal{z-index:100000}
+    .modal-panel{border-radius:22px}
+    .modal-head{background:#fff}
+    @media(max-width:960px){.layout{display:block}.main{margin-left:0;width:100%;padding:16px}.topbar{align-items:flex-start;flex-direction:column}.toolbar{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.modal{padding:10px}.modal-body{max-height:calc(100vh - 180px)}}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1>คลังความรู้</h1>
+          <div class="subtitle">จัดการบทความและเอกสารความรู้ด้วย V2 เป็นแหล่งข้อมูลหลัก</div>
+        </div>
+        <div class="top-actions">
+          <div class="segmented">
+            <button id="langThBtn" class="btn active" type="button" onclick="setLanguage('th')">TH</button>
+            <button id="langEnBtn" class="btn" type="button" onclick="setLanguage('en')">EN</button>
+          </div>
+          <div class="segmented">
+            <button id="cardViewBtn" class="btn active" type="button" onclick="setViewMode('card')">การ์ด</button>
+            <button id="listViewBtn" class="btn" type="button" onclick="setViewMode('list')">ตาราง</button>
+          </div>
+          <button class="btn ghost" type="button" onclick="loadKnowledge(true)">โหลดใหม่</button>
+          <button id="addKnowledgeBtn" class="btn primary" type="button" onclick="openCreateModal()">+ เพิ่มบทความ</button>
+        </div>
+      </header>
+
+      <section class="kpis">
+        <div class="kpi"><div id="totalKpi" class="kpi-value">0</div><div class="kpi-label">บทความทั้งหมด</div></div>
+        <div class="kpi"><div id="publicKpi" class="kpi-value">0</div><div class="kpi-label">เผยแพร่แล้ว</div></div>
+        <div class="kpi"><div id="categoryKpi" class="kpi-value">0</div><div class="kpi-label">หมวดหมู่</div></div>
+      </section>
+
+      <section class="toolbar">
+        <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อบทความ หรือหมวดหมู่" oninput="renderKnowledge()">
+        <select id="categoryFilter" class="select" onchange="renderKnowledge()"><option value="">ทุกหมวดหมู่</option></select>
+        <select id="fileTypeFilter" class="select" onchange="renderKnowledge()">
+          <option value="">ทุกประเภทไฟล์</option>
+          <option value="pdf">PDF</option>
+          <option value="image">รูป</option>
+          <option value="youtube">YouTube</option>
+        </select>
+        <button class="btn" type="button" onclick="clearFilters()">ล้างตัวกรอง</button>
+      </section>
+
+      <div id="notice" class="notice"></div>
+      <section id="knowledgeContent" class="cards"></section>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="knowledgeModal" class="modal" aria-hidden="true">
+    <form id="knowledgeForm" class="modal-panel" onsubmit="saveKnowledge(event)">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalTitle">เพิ่มบทความ</h2>
+          <p id="modalSub">สร้างข้อมูล KNOWLEDGE ผ่าน V2</p>
+        </div>
+        <button class="btn" type="button" onclick="closeModal()">ปิด</button>
+      </div>
+      <div class="modal-body">
+        <input id="knowledgeId" type="hidden">
+
+        <!-- Group 1: ข้อมูลหลัก -->
+        <section class="form-section">
+          <h3>ข้อมูลหลัก</h3>
+          <div class="form-grid">
+            <label class="field">
+              <span class="label">ชื่อบทความ (TH) <span class="required">*</span></span>
+              <input id="titleTh" class="input" type="text" required>
+            </label>
+            <label class="field">
+              <span class="label">ชื่อบทความ (EN)</span>
+              <input id="titleEn" class="input" type="text">
+            </label>
+            <label class="field full">
+              <span class="label">หมวดหมู่</span>
+              <input id="categoryInput" class="input" type="text" list="categoryOptions" placeholder="เลือกหรือพิมพ์หมวดหมู่">
+              <datalist id="categoryOptions">
+                <option value="คู่มือปฏิบัติงาน"></option>
+                <option value="บทความวิชาการ"></option>
+                <option value="ขั้นตอนการทำงาน"></option>
+                <option value="เอกสารอ้างอิง"></option>
+                <option value="ประกาศ/ระเบียบ"></option>
+                <option value="Presentation"></option>
+              </datalist>
+            </label>
+          </div>
+        </section>
+
+        <!-- Group 2: เนื้อหา -->
+        <section class="form-section">
+          <h3>เนื้อหา</h3>
+          <div class="form-grid">
+            <label class="field full">
+              <span class="label">เนื้อหา (TH)</span>
+              <textarea id="contentTh" class="textarea large"></textarea>
+            </label>
+            <label class="field full">
+              <span class="label">เนื้อหา (EN)</span>
+              <textarea id="contentEn" class="textarea large"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- Group 3: ไฟล์และลิงก์ -->
+        <section class="form-section">
+          <h3>ไฟล์และลิงก์</h3>
+          <div class="form-grid">
+            <div class="field full">
+              <span class="label">รูป / Infographic (เพิ่มได้สูงสุด 10 รูป)</span>
+              <div class="file-tools">
+                <button id="imagePickBtn" class="btn" type="button" onclick="chooseImageFiles()">+ เพิ่มรูป</button>
+                <span id="imageCountText" class="file-status">0/10 รูป</span>
+              </div>
+              <div class="file-tools" style="margin-top:12px">
+                <span class="label" style="margin-bottom:0">รูปปก</span>
+                <button id="coverPickBtn" class="btn" type="button" onclick="chooseCoverFile()">เลือกรูปปก</button>
+              </div>
+              <input id="coverFileInput" type="file" accept="image/*" hidden>
+              <div class="cover-preview-wrap">
+                <div id="coverPreview" class="cover-preview">ยังไม่มีรูปปก</div>
+                <div id="coverFileList" class="file-list"></div>
+              </div>
+              <input id="imageFileInput" type="file" accept="image/*" multiple hidden>
+              <div id="imageFileList" class="file-list"></div>
+            </div>
+            <div class="field full">
+              <span class="label">PDF File</span>
+              <div class="file-tools">
+                <button id="pdfPickBtn" class="btn" type="button" onclick="choosePdfFile()">เลือกไฟล์ PDF</button>
+              </div>
+              <input id="pdfFileInput" type="file" accept="application/pdf" hidden>
+              <div id="pdfFileList" class="file-list"></div>
+            </div>
+            <label class="field">
+              <span class="label">ลิงก์ YouTube</span>
+              <input id="videoUrl" class="input" type="text" placeholder="https://youtube.com/...">
+            </label>
+            <label class="field">
+              <span class="label">ลิงก์เพิ่มเติม</span>
+              <input id="linkUrl" class="input" type="text" placeholder="https://...">
+            </label>
+            <div class="field full">
+              <div id="fileStatus" class="file-status"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Group 4: การตั้งค่า -->
+        <section class="form-section">
+          <h3>การตั้งค่า</h3>
+          <div class="form-grid">
+            <label class="field full toggle-line">
+              <input id="publicVisible" type="checkbox" checked>
+              <span>เผยแพร่</span>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-foot">
+        <button id="deleteBtn" class="btn danger" type="button" onclick="deleteKnowledgeFromModal()">ลบ</button>
+        <div class="right">
+          <button class="btn" type="button" onclick="closeModal()">ยกเลิก</button>
+          <button id="saveBtn" class="btn primary" type="submit">บันทึก</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const V2_KNOWLEDGE_WRITE_UI_ENABLED = true;
+    const MAX_KNOWLEDGE_IMAGES = 10;
+    const UPLOAD_SIZE_WARNING_BYTES = 20 * 1024 * 1024;
+
+    const DEFAULT_CATEGORIES = [
+      'คู่มือปฏิบัติงาน',
+      'บทความวิชาการ',
+      'ขั้นตอนการทำงาน',
+      'เอกสารอ้างอิง',
+      'ประกาศ/ระเบียบ',
+      'Presentation'
+    ];
+
+    const state = {
+      rows: [],
+      lang: 'th',
+      viewMode: 'card',
+      editingId: '',
+      pendingCover: null,
+      existingCoverUrl: '',
+      pendingImages: [],
+      pendingPdf: null,
+      isSaving: false
+    };
+
+    const $ = selector => document.querySelector(selector);
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      $('#coverFileInput').addEventListener('change', handleCoverSelected);
+      $('#imageFileInput').addEventListener('change', handleImagesSelected);
+      $('#pdfFileInput').addEventListener('change', handlePdfSelected);
+      if (!V2_KNOWLEDGE_WRITE_UI_ENABLED) $('#addKnowledgeBtn').style.display = 'none';
+      await loadKnowledge();
+    }
+
+    async function requestKnowledge(action, payload, method) {
+      return IROUP_V2.request(action, payload || {}, {
+        auth: true,
+        method: method || (String(action).indexOf('.list') >= 0 || String(action).indexOf('.detail') >= 0 ? 'GET' : 'POST'),
+        timeoutMs: 120000
+      });
+    }
+
+    async function loadKnowledge(force) {
+      showNotice('', '');
+      $('#knowledgeContent').className = 'cards';
+      $('#knowledgeContent').innerHTML = '<div class="loading"><span class="spinner"></span>กำลังโหลดข้อมูล...</div>';
+      try {
+        const res = await requestKnowledge('v2.admin.knowledge.list', force ? { _: Date.now() } : {});
+        if (!res || !res.success) throw new Error(res && res.error ? res.error : 'โหลดข้อมูลคลังความรู้ไม่สำเร็จ');
+        state.rows = normalizeList(res).map(enrichRow);
+        populateCategoryControls();
+        renderKpis();
+        renderKnowledge();
+      } catch (error) {
+        showNotice(error.message || String(error), 'error');
+        $('#knowledgeContent').innerHTML = '<div class="empty">ไม่สามารถโหลดข้อมูลได้</div>';
+      }
+    }
+
+    function normalizeList(res) {
+      if (!res) return [];
+      if (Array.isArray(res)) return res;
+      if (Array.isArray(res.data)) return res.data;
+      if (res.data && Array.isArray(res.data.items)) return res.data.items;
+      if (res.data && Array.isArray(res.data.rows)) return res.data.rows;
+      return [];
+    }
+
+    function unwrapDetail(res) {
+      if (!res) return null;
+      var data = res.data || res;
+      return data.knowledge || data.record || data.row || data;
+    }
+
+    function enrichRow(row) {
+      var item = Object.assign({}, row || {});
+      item.knowledge_id = item.knowledge_id || '';
+      item.public_visible = isTruthy(item.public_visible);
+      item.video_url = item.video_url || '';
+      item.link_url = item.link_url || '';
+      var files = collectFiles(item);
+      var coverFiles = files.filter(function(f) { return fileRoleId(f) === 'cover'; });
+      var coverFile = coverFiles.length ? coverFiles[coverFiles.length - 1] : null;
+      var imageFiles = files.filter(function(f) { return fileRoleId(f) === 'image'; });
+      item.cover_image_url = item.cover_image_url || item.cover_url || (coverFile ? fileUrl(coverFile) : '');
+      item._coverUrl = item.cover_image_url;
+      item._galleryImages = imageFiles.map(fileUrl).filter(Boolean);
+      item._hasImage = !!item._coverUrl || item._galleryImages.length > 0;
+      item._hasPdf = files.some(function(f) { return fileRoleId(f) === 'pdf'; });
+      item._hasYouTube = !!item.video_url;
+      item._imageUrl = item._coverUrl || item._galleryImages[0] || '';
+      return item;
+    }
+
+    function renderKnowledge() {
+      var rows = filteredRows();
+      renderKpis();
+      if (!rows.length) {
+        $('#knowledgeContent').className = 'cards';
+        $('#knowledgeContent').innerHTML = '<div class="empty">ยังไม่มีบทความที่ตรงกับเงื่อนไข</div>';
+        return;
+      }
+      if (state.viewMode === 'list') {
+        $('#knowledgeContent').className = 'list-wrap';
+        $('#knowledgeContent').innerHTML = renderList(rows);
+        return;
+      }
+      $('#knowledgeContent').className = 'cards';
+      $('#knowledgeContent').innerHTML = rows.map(renderCard).join('');
+    }
+
+    function filteredRows() {
+      var q = ($('#searchInput').value || '').trim().toLowerCase();
+      var category = $('#categoryFilter').value;
+      var fileType = $('#fileTypeFilter').value;
+      return state.rows.filter(function(row) {
+        if (category && row.category !== category) return false;
+        if (fileType === 'pdf' && !row._hasPdf) return false;
+        if (fileType === 'image' && !row._hasImage) return false;
+        if (fileType === 'youtube' && !row._hasYouTube) return false;
+        if (!q) return true;
+        var haystack = [row.title_th, row.title_en, row.category, row.content_th, row.content_en].join(' ').toLowerCase();
+        return haystack.indexOf(q) >= 0;
+      });
+    }
+
+    function renderCard(row) {
+      var coverContent;
+      if (row._imageUrl) {
+        coverContent = '<img src="' + escAttr(row._imageUrl) + '" alt="">';
+      } else if (row._hasPdf) {
+        coverContent = '<span class="pdf-icon">&#128196;</span>';
+      } else {
+        coverContent = '<span>KN</span>';
+      }
+      var title = displayTitle(row);
+      var fileBadges = '';
+      if (row._hasImage) fileBadges += '<span class="badge image">รูป</span>';
+      if (row._hasPdf) fileBadges += '<span class="badge pdf">PDF</span>';
+      if (row._hasYouTube) fileBadges += '<span class="badge youtube">YouTube</span>';
+      return '<article class="knowledge-card">' +
+        '<div class="cover">' + coverContent + '</div>' +
+        '<div class="card-body">' +
+          '<div class="card-title">' + esc(title || '-') + '</div>' +
+          '<div class="badge-row">' +
+            (row.category ? '<span class="badge">' + esc(row.category) + '</span>' : '') +
+            fileBadges +
+            '<span class="badge ' + (row.public_visible ? 'public' : 'private') + '">' + (row.public_visible ? 'เผยแพร่' : 'ไม่เผยแพร่') + '</span>' +
+          '</div>' +
+          '<div class="card-actions">' +
+            '<button class="btn" type="button" onclick="openEditModal(\'' + escAttr(row.knowledge_id) + '\')">แก้ไข</button>' +
+            '<button class="btn danger" type="button" onclick="deleteV2Knowledge(\'' + escAttr(row.knowledge_id) + '\')">ลบ</button>' +
+          '</div>' +
+        '</div>' +
+      '</article>';
+    }
+
+    function renderList(rows) {
+      var body = rows.map(function(row, index) {
+        var fileBadges = '';
+        if (row._hasImage) fileBadges += '<span class="badge image">รูป</span>';
+        if (row._hasPdf) fileBadges += '<span class="badge pdf">PDF</span>';
+        if (row._hasYouTube) fileBadges += '<span class="badge youtube">YouTube</span>';
+        if (!fileBadges) fileBadges = '<span style="color:var(--muted)">-</span>';
+        return '<tr>' +
+          '<td>' + (index + 1) + '</td>' +
+          '<td class="title-cell">' + esc(displayTitle(row) || '-') + '</td>' +
+          '<td>' + esc(row.category || '-') + '</td>' +
+          '<td><div class="badge-row">' + fileBadges + '</div></td>' +
+          '<td><span class="badge ' + (row.public_visible ? 'public' : 'private') + '">' + (row.public_visible ? 'เผยแพร่' : 'ไม่เผยแพร่') + '</span></td>' +
+          '<td>' +
+            '<button class="btn" type="button" onclick="openEditModal(\'' + escAttr(row.knowledge_id) + '\')">แก้ไข</button> ' +
+            '<button class="btn danger" type="button" onclick="deleteV2Knowledge(\'' + escAttr(row.knowledge_id) + '\')">ลบ</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+      return '<table><thead><tr>' +
+        '<th>#</th><th>ชื่อ</th><th>หมวดหมู่</th><th>ประเภทไฟล์</th><th>เผยแพร่</th><th>จัดการ</th>' +
+        '</tr></thead><tbody>' + body + '</tbody></table>';
+    }
+
+    function renderKpis() {
+      $('#totalKpi').textContent = state.rows.length;
+      $('#publicKpi').textContent = state.rows.filter(function(r) { return r.public_visible; }).length;
+      $('#categoryKpi').textContent = unique(state.rows.map(function(r) { return r.category; }).filter(Boolean)).length;
+    }
+
+    function populateCategoryControls() {
+      var fromRows = unique(state.rows.map(function(r) { return r.category; }).filter(Boolean));
+      var allCategories = unique(fromRows.concat(DEFAULT_CATEGORIES)).sort();
+      $('#categoryFilter').innerHTML = '<option value="">ทุกหมวดหมู่</option>' +
+        allCategories.map(function(v) { return '<option value="' + escAttr(v) + '">' + esc(v) + '</option>'; }).join('');
+      $('#categoryOptions').innerHTML = allCategories.map(function(v) { return '<option value="' + escAttr(v) + '"></option>'; }).join('');
+    }
+
+    function openCreateModal() {
+      if (!V2_KNOWLEDGE_WRITE_UI_ENABLED) {
+        alert('ยังไม่เปิดใช้งานการบันทึก V2 สำหรับคลังความรู้');
+        return;
+      }
+      state.editingId = '';
+      state.pendingCover = null;
+      state.existingCoverUrl = '';
+      state.pendingImages = [];
+      state.pendingPdf = null;
+      $('#knowledgeForm').reset();
+      $('#knowledgeId').value = '';
+      $('#modalTitle').textContent = 'เพิ่มบทความ';
+      $('#modalSub').textContent = 'สร้างข้อมูล KNOWLEDGE ผ่าน V2';
+      $('#deleteBtn').style.display = 'none';
+      $('#publicVisible').checked = true;
+      renderCoverFile('');
+      renderImageFiles();
+      renderPdfFile();
+      setFileStatus('', false);
+      $('#knowledgeModal').classList.add('open');
+    }
+
+    async function openEditModal(knowledgeId) {
+      if (!knowledgeId) return;
+      state.editingId = knowledgeId;
+      state.pendingCover = null;
+      state.existingCoverUrl = '';
+      state.pendingImages = [];
+      state.pendingPdf = null;
+      $('#knowledgeForm').reset();
+      $('#modalTitle').textContent = 'แก้ไขบทความ';
+      $('#modalSub').textContent = knowledgeId;
+      $('#deleteBtn').style.display = '';
+      renderCoverFile('');
+      renderImageFiles();
+      renderPdfFile();
+      setFileStatus('', false);
+      $('#knowledgeModal').classList.add('open');
+      try {
+        var res = await requestKnowledge('v2.admin.knowledge.detail', { knowledge_id: knowledgeId });
+        if (!res || !res.success) throw new Error(res && res.error ? res.error : 'โหลดข้อมูลไม่สำเร็จ');
+        var detail = enrichRow(unwrapDetail(res));
+        if (!detail || !detail.knowledge_id) {
+          alert('ไม่พบข้อมูลบทความ');
+          closeModal();
+          return;
+        }
+        fillForm(detail);
+      } catch (error) {
+        alert(error.message || String(error));
+      }
+    }
+
+    function closeModal() {
+      $('#knowledgeModal').classList.remove('open');
+    }
+
+    function fillForm(row) {
+      $('#knowledgeId').value = row.knowledge_id || '';
+      $('#titleTh').value = row.title_th || '';
+      $('#titleEn').value = row.title_en || '';
+      $('#categoryInput').value = row.category || '';
+      $('#contentTh').value = row.content_th || '';
+      $('#contentEn').value = row.content_en || '';
+      $('#videoUrl').value = row.video_url || '';
+      $('#linkUrl').value = row.link_url || '';
+      $('#publicVisible').checked = !!row.public_visible;
+      state.existingCoverUrl = row._coverUrl || row.cover_image_url || '';
+      renderCoverFile(state.existingCoverUrl);
+    }
+
+    async function saveKnowledge(event) {
+      event.preventDefault();
+      if (state.isSaving) return;
+      state.isSaving = true;
+      var saveBtn = $('#saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'กำลังบันทึก...';
+      setFileControlsDisabled(true);
+      var saveStartedAt = Date.now();
+      console.info('[knowledge-save] start', {
+        pending_cover: !!state.pendingCover,
+        pending_images: state.pendingImages.length,
+        pending_pdf: !!state.pendingPdf
+      });
+      setFileStatus('กำลังบันทึก...', true);
+      try {
+        if (!confirmLargeImageUpload()) {
+          setFileStatus('ยกเลิกการอัปโหลด', false);
+          return;
+        }
+        var payload = buildPayloadFromForm();
+        var isUpdate = !!payload.knowledge_id;
+        var action = isUpdate ? 'v2.admin.knowledge.update' : 'v2.admin.knowledge.create';
+        console.time('[knowledge-save] metadata');
+        var res = await requestKnowledge(action, { payload: payload }, 'POST');
+        console.timeEnd('[knowledge-save] metadata');
+        if (!res || !res.success) throw new Error(res && res.error ? res.error : 'บันทึกไม่สำเร็จ');
+        var savedId = isUpdate ? payload.knowledge_id : extractSavedId(res);
+        if (!savedId) throw new Error('ไม่พบรหัสบทความหลังบันทึก');
+        console.time('[knowledge-save] uploadPendingFiles');
+        await uploadPendingFiles(savedId);
+        console.timeEnd('[knowledge-save] uploadPendingFiles');
+        console.info('[knowledge-save] complete', { elapsed_ms: Date.now() - saveStartedAt });
+        alert('บันทึกสำเร็จ (V2)');
+        closeModal();
+        await loadKnowledge(true);
+      } catch (error) {
+        console.warn('[knowledge-save] failed', {
+          elapsed_ms: Date.now() - saveStartedAt,
+          error: error && error.message ? error.message : String(error)
+        });
+        setFileStatus(error.message || String(error), false, 'error');
+        alert(error.message || String(error));
+      } finally {
+        state.isSaving = false;
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'บันทึก';
+        setFileControlsDisabled(false);
+        if (!$('#knowledgeModal').classList.contains('open')) setFileStatus('', false);
+      }
+    }
+
+    function buildPayloadFromForm() {
+      var payload = {
+        knowledge_id: $('#knowledgeId').value.trim(),
+        title_th: $('#titleTh').value.trim(),
+        title_en: $('#titleEn').value.trim(),
+        content_th: $('#contentTh').value.trim(),
+        content_en: $('#contentEn').value.trim(),
+        category: $('#categoryInput').value.trim(),
+        video_url: $('#videoUrl').value.trim(),
+        link_url: $('#linkUrl').value.trim(),
+        public_visible: $('#publicVisible').checked
+      };
+      if (!payload.title_th) throw new Error('กรุณากรอกชื่อบทความ (TH)');
+      return payload;
+    }
+
+    async function deleteKnowledgeFromModal() {
+      await deleteV2Knowledge($('#knowledgeId').value);
+    }
+
+    async function deleteV2Knowledge(knowledgeId) {
+      if (!V2_KNOWLEDGE_WRITE_UI_ENABLED) {
+        alert('ยังไม่เปิดใช้งานการลบ V2 สำหรับคลังความรู้');
+        return;
+      }
+      if (!knowledgeId) return;
+      if (!confirm('ยืนยันลบบทความนี้หรือไม่')) return;
+      var res = await requestKnowledge('v2.admin.knowledge.delete', { payload: { knowledge_id: knowledgeId } }, 'POST');
+      if (!res || !res.success) {
+        alert((res && res.error) || 'ลบไม่สำเร็จ');
+        return;
+      }
+      if ($('#knowledgeModal').classList.contains('open') && $('#knowledgeId').value === knowledgeId) closeModal();
+      await loadKnowledge(true);
+    }
+
+    function chooseCoverFile() {
+      if (state.isSaving) return;
+      $('#coverFileInput').click();
+    }
+
+    function chooseImageFiles() {
+      if (state.isSaving) return;
+      $('#imageFileInput').click();
+    }
+
+    function choosePdfFile() {
+      if (state.isSaving) return;
+      $('#pdfFileInput').click();
+    }
+
+    function handleCoverSelected(event) {
+      var file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+      if (!file) return;
+      state.pendingCover = file;
+      event.target.value = '';
+      renderCoverFile('');
+      setSelectedFileStatus('เลือกรูปปกแล้ว');
+    }
+
+    function handleImagesSelected(event) {
+      var files = Array.from(event.target.files || []);
+      var available = MAX_KNOWLEDGE_IMAGES - state.pendingImages.length;
+      state.pendingImages = state.pendingImages.concat(files.slice(0, available));
+      event.target.value = '';
+      renderImageFiles();
+      setSelectedFileStatus('เลือกรูปแล้ว');
+    }
+
+    function handlePdfSelected(event) {
+      var file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+      if (!file) return;
+      state.pendingPdf = file;
+      event.target.value = '';
+      renderPdfFile();
+      setSelectedFileStatus('เลือกไฟล์ PDF แล้ว');
+    }
+
+    function renderCoverFile(existingUrl) {
+      var preview = $('#coverPreview');
+      var fileList = $('#coverFileList');
+      var url = existingUrl || state.existingCoverUrl || '';
+      if (state.pendingCover) {
+        preview.textContent = state.pendingCover.name;
+        fileList.innerHTML = '<div class="file-chip"><span>' + esc(state.pendingCover.name) + '</span>' +
+          '<button type="button" onclick="removeCoverFile()" aria-label="ลบรูปปก">x</button></div>';
+        return;
+      }
+      fileList.innerHTML = '';
+      preview.innerHTML = url ? '<img src="' + escAttr(toImageUrl(url)) + '" alt="">' : 'ยังไม่มีรูปปก';
+    }
+
+    function renderImageFiles() {
+      $('#imageCountText').textContent = state.pendingImages.length + '/' + MAX_KNOWLEDGE_IMAGES + ' รูป';
+      $('#imageFileList').innerHTML = state.pendingImages.map(function(file, index) {
+        return '<div class="file-chip"><span>' + esc(file.name) + '</span>' +
+          '<button type="button" onclick="removeImageFile(' + index + ')" aria-label="ลบรูป">x</button></div>';
+      }).join('');
+    }
+
+    function renderPdfFile() {
+      $('#pdfFileList').innerHTML = state.pendingPdf
+        ? '<div class="file-chip"><span>' + esc(state.pendingPdf.name) + '</span>' +
+          '<button type="button" onclick="removePdfFile()" aria-label="ลบ PDF">x</button></div>'
+        : '';
+    }
+
+    function removeCoverFile() {
+      state.pendingCover = null;
+      $('#coverFileInput').value = '';
+      renderCoverFile(state.existingCoverUrl);
+      setSelectedFileStatus('');
+    }
+
+    function removeImageFile(index) {
+      state.pendingImages.splice(index, 1);
+      renderImageFiles();
+      setSelectedFileStatus('');
+    }
+
+    function removePdfFile() {
+      state.pendingPdf = null;
+      $('#pdfFileInput').value = '';
+      renderPdfFile();
+      setSelectedFileStatus('');
+    }
+
+    async function uploadPendingFiles(recordId) {
+      var uploads = [];
+      if (state.pendingCover) uploads.push({ role: 'cover', file: state.pendingCover });
+      state.pendingImages.forEach(function(file) { uploads.push({ role: 'image', file: file }); });
+      if (state.pendingPdf) uploads.push({ role: 'pdf', file: state.pendingPdf });
+      if (!uploads.length) return;
+      setFileStatus('กำลังอัปโหลดไฟล์...', true);
+      console.info('[knowledge-save] upload queue', uploads.map(function(item) {
+        return { role: item.role, name: item.file.name, size: item.file.size };
+      }));
+      for (var i = 0; i < uploads.length; i++) {
+        var item = uploads[i];
+        setFileStatus('กำลังอัปโหลด ' + (i + 1) + '/' + uploads.length + ' ไฟล์... ' + item.file.name, true);
+        var label = '[knowledge-save] upload ' + (i + 1) + '/' + uploads.length + ' ' + item.role + ' ' + item.file.name;
+        console.time(label + ' read');
+        var dataUrl = await readFileAsDataUrl(item.file);
+        console.timeEnd(label + ' read');
+        var payload = {
+          base64_data: dataUrl,
+          filename: item.file.name,
+          mime_type: item.file.type || 'application/octet-stream',
+          module: 'knowledge',
+          record_id: recordId,
+          file_role_id: item.role,
+          visibility_level: 'public'
+        };
+        console.time(label + ' api');
+        var res;
+        try {
+          res = await uploadKnowledgeFileWithRetry(payload, item, i, uploads.length);
+        } finally {
+          console.timeEnd(label + ' api');
+        }
+        if (!res || !res.success) {
+          throw new Error('อัปโหลดไฟล์ไม่สำเร็จ (' + (i + 1) + '/' + uploads.length + '): ' + item.file.name + ' - ' + ((res && res.error) || 'unknown error'));
+        }
+      }
+      state.pendingCover = null;
+      state.existingCoverUrl = '';
+      state.pendingImages = [];
+      state.pendingPdf = null;
+      setFileStatus('อัปโหลดครบ ' + uploads.length + '/' + uploads.length + ' ไฟล์แล้ว', false, 'done');
+    }
+
+    async function uploadKnowledgeFileWithRetry(payload, item, index, total) {
+      var lastError = null;
+      for (var attempt = 1; attempt <= 2; attempt++) {
+        if (attempt > 1) {
+          setFileStatus('กำลังลองอัปโหลดอีกครั้ง ' + (index + 1) + '/' + total + '... ' + item.file.name, true);
+          await delay(1500);
+        }
+        var startedAt = performance.now();
+        try {
+          console.info('[knowledge-save] upload attempt', {
+            index: index + 1,
+            total: total,
+            attempt: attempt,
+            role: item.role,
+            filename: item.file.name
+          });
+          var res = await IROUP_V2.admin.fileUpload(payload);
+          var elapsedMs = Math.round(performance.now() - startedAt);
+          if (!res || !res.success) {
+            lastError = new Error((res && res.error) || 'upload response was not successful');
+            console.warn('[knowledge-save] upload attempt failed', {
+              index: index + 1,
+              total: total,
+              attempt: attempt,
+              role: item.role,
+              filename: item.file.name,
+              elapsed_ms: elapsedMs,
+              error: lastError.message,
+              response: res || null
+            });
+            continue;
+          }
+          console.info('[knowledge-save] upload attempt complete', {
+            index: index + 1,
+            total: total,
+            attempt: attempt,
+            role: item.role,
+            filename: item.file.name,
+            elapsed_ms: elapsedMs
+          });
+          return res;
+        } catch (error) {
+          var failedElapsedMs = Math.round(performance.now() - startedAt);
+          lastError = error;
+          console.warn('[knowledge-save] upload attempt failed', {
+            index: index + 1,
+            total: total,
+            attempt: attempt,
+            role: item.role,
+            filename: item.file.name,
+            elapsed_ms: failedElapsedMs,
+            error: error && error.message ? error.message : String(error)
+          });
+        }
+      }
+      throw new Error('อัปโหลดไฟล์ไม่สำเร็จ (' + (index + 1) + '/' + total + '): ' + item.file.name + ' - ' + (lastError && lastError.message ? lastError.message : 'unknown error'));
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() { resolve(String(reader.result || '')); };
+        reader.onerror = function() { reject(reader.error || new Error('อ่านไฟล์ไม่สำเร็จ')); };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function delay(ms) {
+      return new Promise(function(resolve) { setTimeout(resolve, ms); });
+    }
+
+    function extractSavedId(res) {
+      var data = res && res.data ? res.data : {};
+      return (data.knowledge && data.knowledge.knowledge_id) ||
+             (data.persisted_knowledge && data.persisted_knowledge.knowledge_id) ||
+             data.knowledge_id || '';
+    }
+
+    function collectFiles(row) {
+      var source = row || {};
+      var candidates = [];
+      if (Array.isArray(source.files)) candidates = candidates.concat(source.files);
+      if (source.files && Array.isArray(source.files.public)) candidates = candidates.concat(source.files.public);
+      if (source.files && Array.isArray(source.files.internal)) candidates = candidates.concat(source.files.internal);
+      if (source.file_summary && Array.isArray(source.file_summary.files)) candidates = candidates.concat(source.file_summary.files);
+      return candidates;
+    }
+
+    function fileRoleId(file) {
+      return String(file.file_role_id || (file.file_role && (file.file_role.file_role_id || file.file_role.file_role_name)) || '').trim();
+    }
+
+    function fileUrl(file) {
+      return file.file_url || file.thumbnail_url || file.url || '';
+    }
+
+    function toImageUrl(url) {
+      var value = String(url || '').trim();
+      var match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/);
+      if (match && match[1]) return 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1200';
+      return value;
+    }
+
+    function displayTitle(row) {
+      return state.lang === 'en' ? (row.title_en || row.title_th) : (row.title_th || row.title_en);
+    }
+
+    function setLanguage(lang) {
+      state.lang = lang === 'en' ? 'en' : 'th';
+      $('#langThBtn').classList.toggle('active', state.lang === 'th');
+      $('#langEnBtn').classList.toggle('active', state.lang === 'en');
+      renderKnowledge();
+    }
+
+    function setViewMode(mode) {
+      state.viewMode = mode === 'list' ? 'list' : 'card';
+      $('#cardViewBtn').classList.toggle('active', state.viewMode === 'card');
+      $('#listViewBtn').classList.toggle('active', state.viewMode === 'list');
+      renderKnowledge();
+    }
+
+    function clearFilters() {
+      $('#searchInput').value = '';
+      $('#categoryFilter').value = '';
+      $('#fileTypeFilter').value = '';
+      renderKnowledge();
+    }
+
+    function pendingKnowledgeImageFiles() {
+      var files = [];
+      if (state.pendingCover) files.push(state.pendingCover);
+      return files.concat(state.pendingImages.slice());
+    }
+
+    function pendingImageTotalSize() {
+      return pendingKnowledgeImageFiles().reduce(function(sum, file) {
+        return sum + (file.size || 0);
+      }, 0);
+    }
+
+    function pendingAllUploadFiles() {
+      var files = pendingKnowledgeImageFiles();
+      if (state.pendingPdf) files.push(state.pendingPdf);
+      return files;
+    }
+
+    function formatFileSize(bytes) {
+      var size = Number(bytes || 0);
+      if (size >= 1024 * 1024) return (size / 1024 / 1024).toFixed(1) + ' MB';
+      if (size >= 1024) return (size / 1024).toFixed(1) + ' KB';
+      return size + ' B';
+    }
+
+    function confirmLargeImageUpload() {
+      var totalSize = pendingImageTotalSize();
+      if (totalSize <= UPLOAD_SIZE_WARNING_BYTES) return true;
+      return confirm('ไฟล์รูปที่เลือกมีขนาดรวมประมาณ ' + formatFileSize(totalSize) + ' อาจใช้เวลาอัปโหลดหลายนาที ต้องการดำเนินการต่อหรือไม่');
+    }
+
+    function setSelectedFileStatus(prefix) {
+      var allFiles = pendingAllUploadFiles();
+      if (!allFiles.length) {
+        setFileStatus('', false);
+        return;
+      }
+      var imageSize = pendingImageTotalSize();
+      var totalSize = allFiles.reduce(function(sum, file) {
+        return sum + (file.size || 0);
+      }, 0);
+      var message = (prefix ? prefix + ' · ' : '') + allFiles.length + ' ไฟล์ · รวม ' + formatFileSize(totalSize);
+      setFileStatus(message, false, imageSize > UPLOAD_SIZE_WARNING_BYTES ? 'warning' : '');
+    }
+
+    function setFileStatus(message, active, tone) {
+      $('#fileStatus').textContent = message || '';
+      $('#fileStatus').classList.toggle('active', !!active);
+      $('#fileStatus').classList.toggle('warning', tone === 'warning');
+      $('#fileStatus').classList.toggle('error', tone === 'error');
+      $('#fileStatus').classList.toggle('done', tone === 'done');
+    }
+
+    function setFileControlsDisabled(disabled) {
+      ['#coverPickBtn', '#imagePickBtn', '#pdfPickBtn'].forEach(function(selector) {
+        var button = $(selector);
+        if (button) button.disabled = !!disabled;
+      });
+    }
+
+    function showNotice(message, type) {
+      var box = $('#notice');
+      box.textContent = message || '';
+      box.className = 'notice' + (type ? ' ' + type : '');
+    }
+
+    function unique(values) {
+      return Array.from(new Set(values.map(function(v) { return String(v || '').trim(); }).filter(Boolean)));
+    }
+
+    function isTruthy(value) {
+      if (value === true) return true;
+      var text = String(value || '').trim().toLowerCase();
+      return ['true', 'yes', 'y', '1', 'เปิด', 'เผยแพร่'].indexOf(text) >= 0;
+    }
+
+    function esc(value) {
+      return String(value === null || value === undefined ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escAttr(value) {
+      return esc(value);
+    }
+  </script>
+<script src="js/iroup-sidebar.js"></script>
+</body>
+</html>

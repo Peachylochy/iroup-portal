@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ข่าว - IROUP V2</title>
+  <link rel="stylesheet" href="css/iroup-theme.css">
+  <script src="js/iroup-config.js"></script>
+  <script src="js/iroup-v2-endpoint.js"></script>
+  <script src="js/iroup-v2-api.js"></script>
+  <script src="js/iroup-utils.js"></script>
+  <style>
+    :root{--blue:#0B74B8;--navy:#10294f;--ink:#15243b;--muted:#6b7f96;--line:#e6edf6;--soft:#eef7ff;--bg:#f5f8fc;--ok:#15803d;--warn:#b7791f;--danger:#c2410c}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Noto Sans Thai","Inter",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    button,input,select,textarea{font:inherit}
+    .layout{display:flex;min-height:100vh}
+    .main{margin-left:250px;padding:28px;width:calc(100% - 250px)}
+    .topbar{background:#09244a;color:#fff;border-radius:22px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:18px;box-shadow:0 16px 42px rgba(12,35,66,.16)}
+    .topbar h1{margin:0;font-size:30px;line-height:1.15}.subtitle{margin-top:6px;color:rgba(255,255,255,.75);font-weight:600}
+    .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;min-height:42px}
+    .btn:hover{box-shadow:0 8px 20px rgba(15,39,69,.1)}
+    .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+    .btn.danger{border-color:#f2c5bd;color:#b42318;background:#fff}
+    .btn.ghost{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff}
+    .btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+    .segmented{display:flex;gap:6px;background:#fff;border-radius:14px;padding:5px}
+    .segmented .btn{border:0;border-radius:10px;min-height:34px;padding:8px 12px}
+    .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:22px 0}
+    .kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 28px rgba(21,36,59,.08)}
+    .kpi-value{font-size:34px;font-weight:900;color:var(--navy);line-height:1}.kpi-label{margin-top:8px;color:var(--muted);font-weight:800}
+    .toolbar{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;box-shadow:0 10px 24px rgba(21,36,59,.08);margin-bottom:18px}
+    .input,.select,.textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink);min-height:46px}
+    .textarea{min-height:120px;resize:vertical}
+    .textarea.large{min-height:190px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+    .news-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 12px 28px rgba(21,36,59,.08);display:flex;flex-direction:column;min-height:430px}
+    .cover{height:190px;background:linear-gradient(135deg,#e7f3fb,#f9fcff);display:grid;place-items:center;color:var(--blue);font-weight:900;font-size:42px;overflow:hidden}
+    .cover img{width:100%;height:100%;object-fit:cover;display:block}
+    .card-body{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1}
+    .card-title{font-size:18px;font-weight:900;color:var(--navy);line-height:1.35}
+    .card-sub{color:var(--muted);font-size:13px;line-height:1.6}
+    .badge-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;background:#edf5ff;color:#075985;border:1px solid #cce7ff}
+    .badge.public{background:#eaf8ee;color:var(--ok);border-color:#ccebd4}
+    .badge.private{background:#f7f7f8;color:#596579;border-color:#e3e7ee}
+    .badge.sdg{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+    .card-actions{display:flex;gap:8px;margin-top:auto}
+    .list-wrap{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;box-shadow:0 12px 28px rgba(21,36,59,.08)}
+    table{width:100%;border-collapse:collapse;min-width:920px}
+    th,td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{font-size:13px;color:var(--navy);background:#f8fbff;font-weight:900}
+    td{font-size:14px}.title-cell{font-weight:900;color:var(--navy)}
+    .empty,.loading{background:#fff;border:1px dashed #cbd8e7;border-radius:18px;padding:32px;text-align:center;color:var(--muted);font-weight:900}
+    .spinner{width:24px;height:24px;border-radius:999px;border:3px solid #d9e8f4;border-top-color:var(--blue);display:inline-block;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .notice{margin:16px 0;padding:12px 14px;border-radius:14px;display:none;font-weight:800}.notice.error{display:block;background:#fff1f0;color:#b42318;border:1px solid #ffc9c4}.notice.ok{display:block;background:#ecfdf3;color:#027a48;border:1px solid #abefc6}
+    .modal{position:fixed;inset:0;background:rgba(9,24,45,.56);z-index:100000;display:none;align-items:flex-start;justify-content:center;padding:26px;overflow:auto}
+    .modal.open{display:flex}.modal-panel{width:min(1120px,100%);background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}
+    .modal-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .modal-head h2{margin:0;color:var(--navy);font-size:24px}.modal-head p{margin:6px 0 0;color:var(--muted);font-weight:700}
+    .modal-body{padding:22px;max-height:calc(100vh - 210px);overflow:auto}
+    .form-section{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
+    .form-section h3{margin:0 0 14px;color:var(--navy);font-size:18px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .field.full{grid-column:1/-1}.label{display:block;font-size:13px;font-weight:900;color:var(--navy);margin-bottom:7px}.required{color:#c1121f}
+    .toggle-line{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--navy)}
+    .toggle-line input{width:18px;height:18px}
+    .sdg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .sdg-item{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;font-weight:800;color:#20324d;background:#fbfdff}
+    .sdg-item input{margin-top:3px}
+    .file-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .preview{width:220px;height:130px;border:1px dashed #bed2e6;border-radius:14px;background:#f8fbff;display:grid;place-items:center;color:var(--muted);font-weight:900;overflow:hidden;position:relative}
+    .preview img{width:100%;height:100%;object-fit:cover;display:block}
+    .preview-remove{position:absolute;right:8px;top:8px;width:30px;height:30px;border:0;border-radius:999px;background:rgba(15,23,42,.78);color:#fff;font-weight:900;cursor:pointer}
+    .file-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .file-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid #d7e4f0;border-radius:999px;background:#f7fbff;padding:6px 8px 6px 12px;font-weight:800;color:#21324b;max-width:100%}
+    .file-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}
+    .file-chip button{border:0;background:#e9f1fa;border-radius:999px;width:24px;height:24px;cursor:pointer;font-weight:900;color:#334155}
+    .file-status{min-height:20px;color:var(--muted);font-weight:800}
+    .file-status.active{color:var(--blue)}
+    .file-status.active::before{content:"";width:16px;height:16px;border-radius:999px;border:2px solid #d9e8f4;border-top-color:var(--blue);display:inline-block;vertical-align:-3px;margin-right:8px;animation:spin .8s linear infinite}
+    .file-status.warning{color:var(--warn)}
+    .file-status.error{color:#b42318}
+    .file-status.done{color:var(--ok)}
+    .modal-foot{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;gap:10px}
+    .modal-foot .right{display:flex;gap:10px}
+    .main{padding:30px 36px 48px;background:linear-gradient(180deg,#f4f8fd 0%,#eef4fb 100%)}
+    .topbar{background:#071828;border-radius:24px;padding:18px 22px;min-height:76px;box-shadow:0 18px 44px rgba(15,45,90,.14)}
+    .topbar h1{font-size:30px;letter-spacing:-.02em}
+    .subtitle{font-size:14px;line-height:1.45}
+    .top-actions{gap:10px}
+    .segmented{border-radius:14px;padding:5px;box-shadow:0 8px 18px rgba(15,45,90,.12)}
+    .segmented .btn{min-height:36px;padding:8px 14px}
+    .btn{border-radius:12px;box-shadow:none;transition:transform .15s,box-shadow .15s,background .15s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(15,39,69,.10)}
+    .btn.primary{background:linear-gradient(135deg,#0B74B8,#0f86d1)}
+    .btn.ghost{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22)}
+    .kpis{gap:18px;margin:24px 0}
+    .kpi{border-radius:20px;padding:24px 26px;min-height:112px;display:flex;align-items:center;gap:18px;box-shadow:0 14px 34px rgba(15,45,90,.08)}
+    .kpi-value{font-size:38px;color:#0F2D5A}
+    .kpi-label{margin-top:0}
+    .toolbar{border-radius:20px;padding:18px;gap:14px;margin-bottom:22px;box-shadow:0 14px 34px rgba(15,45,90,.08)}
+    .input,.select,.textarea{border-color:#dbe6f1;border-radius:13px;color:#15243b;background:#fff}
+    .cards{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+    .news-card{border-radius:20px;box-shadow:0 16px 38px rgba(15,45,90,.09)}
+    .cover{height:200px}
+    .modal{z-index:100000}
+    .modal-panel{border-radius:22px}
+    .modal-head{background:#fff}
+    @media(max-width:960px){.layout{display:block}.main{margin-left:0;width:100%;padding:16px}.topbar{align-items:flex-start;flex-direction:column}.toolbar{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.form-grid,.sdg-grid{grid-template-columns:1fr}.modal{padding:10px}.modal-body{max-height:calc(100vh - 180px)}}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1>ข่าว</h1>
+          <div class="subtitle">จัดการข่าวประชาสัมพันธ์ด้วย V2 เป็นแหล่งข้อมูลหลัก</div>
+        </div>
+        <div class="top-actions">
+          <div class="segmented">
+            <button id="langThBtn" class="btn active" type="button" onclick="setLanguage('th')">TH</button>
+            <button id="langEnBtn" class="btn" type="button" onclick="setLanguage('en')">EN</button>
+          </div>
+          <div class="segmented">
+            <button id="cardViewBtn" class="btn active" type="button" onclick="setViewMode('card')">การ์ด</button>
+            <button id="listViewBtn" class="btn" type="button" onclick="setViewMode('list')">ตาราง</button>
+          </div>
+          <button class="btn ghost" type="button" onclick="loadNews(true)">โหลดใหม่</button>
+          <button id="addNewsBtn" class="btn primary" type="button" onclick="openCreateModal()">+ เพิ่มข่าว</button>
+        </div>
+      </header>
+
+      <section class="kpis">
+        <div class="kpi"><div id="totalNewsKpi" class="kpi-value">0</div><div class="kpi-label">ข่าวทั้งหมด</div></div>
+        <div class="kpi"><div id="publicNewsKpi" class="kpi-value">0</div><div class="kpi-label">เผยแพร่แล้ว</div></div>
+        <div class="kpi"><div id="monthNewsKpi" class="kpi-value">0</div><div class="kpi-label">เดือนนี้</div></div>
+      </section>
+
+      <section class="toolbar">
+        <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อข่าว หรือหมวดหมู่" oninput="renderNews()">
+        <select id="categoryFilter" class="select" onchange="renderNews()"><option value="">ทุกหมวดหมู่</option></select>
+        <select id="sdgFilter" class="select" onchange="renderNews()"><option value="">ทุก SDG</option></select>
+        <button class="btn" type="button" onclick="clearFilters()">ล้างตัวกรอง</button>
+      </section>
+
+      <div id="notice" class="notice"></div>
+      <section id="newsContent" class="cards"></section>
+    </main>
+  </div>
+
+  <div id="newsModal" class="modal" aria-hidden="true">
+    <form id="newsForm" class="modal-panel" onsubmit="saveNews(event)">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalTitle">เพิ่มข่าว</h2>
+          <p id="modalSub">สร้างข้อมูล NEWS ผ่าน V2</p>
+        </div>
+        <button class="btn" type="button" onclick="closeModal()">ปิด</button>
+      </div>
+      <div class="modal-body">
+        <input id="newsId" type="hidden">
+
+        <section class="form-section">
+          <h3>ข้อมูลหลัก</h3>
+          <div class="form-grid">
+            <label class="field">
+              <span class="label">ชื่อข่าว (TH) <span class="required">*</span></span>
+              <input id="titleTh" class="input" type="text" required>
+            </label>
+            <label class="field">
+              <span class="label">ชื่อข่าว (EN)</span>
+              <input id="titleEn" class="input" type="text">
+            </label>
+            <label class="field">
+              <span class="label">หมวดหมู่</span>
+              <input id="categoryInput" class="input" type="text" list="categoryOptions">
+              <datalist id="categoryOptions"></datalist>
+            </label>
+            <label class="field">
+              <span class="label">วันที่ลงข่าว</span>
+              <input id="publishDate" class="input" type="date">
+            </label>
+            <label class="field">
+              <span class="label">เครดิต</span>
+              <input id="credit" class="input" type="text">
+            </label>
+            <label class="field">
+              <span class="label">ลิงก์เพิ่มเติม</span>
+              <input id="linkUrl" class="input" type="text">
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3>เนื้อหา</h3>
+          <div class="form-grid">
+            <label class="field full">
+              <span class="label">เนื้อหา (TH)</span>
+              <textarea id="contentTh" class="textarea large"></textarea>
+            </label>
+            <label class="field full">
+              <span class="label">เนื้อหา (EN)</span>
+              <textarea id="contentEn" class="textarea large"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3>SDG Tags</h3>
+          <div id="sdgCheckboxes" class="sdg-grid"></div>
+        </section>
+
+        <section class="form-section">
+          <h3>การตั้งค่า & ไฟล์</h3>
+          <div class="form-grid">
+            <label class="field full toggle-line">
+              <input id="publicVisible" type="checkbox" checked>
+              <span>เผยแพร่</span>
+            </label>
+            <div class="field">
+              <span class="label">รูปปก</span>
+              <div class="file-tools">
+                <div id="coverPreview" class="preview">ยังไม่มีรูปปก</div>
+                <button id="coverPickBtn" class="btn" type="button" onclick="chooseCoverFile()">เลือกรูปปก</button>
+              </div>
+              <input id="coverFileInput" type="file" accept="image/*" hidden>
+            </div>
+            <div class="field">
+              <span class="label">รูปเนื้อหา</span>
+              <div class="file-tools">
+                <button id="imagePickBtn" class="btn" type="button" onclick="chooseImageFiles()">เพิ่มรูปเนื้อหา</button>
+                <span id="imageCountText" class="card-sub">เพิ่มได้สูงสุด 30 รูป</span>
+              </div>
+              <input id="imageFileInput" type="file" accept="image/*" multiple hidden>
+              <div id="imageFileList" class="file-list"></div>
+            </div>
+            <div class="field full">
+              <div id="fileStatus" class="file-status"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="modal-foot">
+        <button id="deleteBtn" class="btn danger" type="button" onclick="deleteNewsFromModal()">ลบ</button>
+        <div class="right">
+          <button class="btn" type="button" onclick="closeModal()">ยกเลิก</button>
+          <button id="saveBtn" class="btn primary" type="submit">บันทึก</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const V2_NEWS_WRITE_UI_ENABLED = true;
+    const MAX_NEWS_IMAGES = 30;
+    const UPLOAD_SIZE_WARNING_BYTES = 20 * 1024 * 1024;
+    const SDG_NAMES = {
+      1: 'ไม่มีความยากจน',
+      2: 'ไม่มีความหิวโหย',
+      3: 'สุขภาพและความเป็นอยู่ที่ดี',
+      4: 'การศึกษาที่มีคุณภาพ',
+      5: 'ความเท่าเทียมทางเพศ',
+      6: 'น้ำสะอาดและสุขาภิบาล',
+      7: 'พลังงานสะอาด',
+      8: 'งานที่มีคุณค่าและเศรษฐกิจ',
+      9: 'อุตสาหกรรมและโครงสร้างพื้นฐาน',
+      10: 'ลดความไม่เท่าเทียม',
+      11: 'เมืองและชุมชนที่ยั่งยืน',
+      12: 'การผลิตและบริโภคที่ยั่งยืน',
+      13: 'การรับมือการเปลี่ยนแปลงสภาพภูมิอากาศ',
+      14: 'ทรัพยากรทางทะเล',
+      15: 'ระบบนิเวศทางบก',
+      16: 'สังคมสงบสุข',
+      17: 'ความร่วมมือเพื่อการพัฒนา'
+    };
+
+    const state = {
+      rows: [],
+      lang: 'th',
+      viewMode: 'card',
+      editingId: '',
+      pendingCover: null,
+      pendingImages: [],
+      isSaving: false
+    };
+
+    const $ = selector => document.querySelector(selector);
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      $('#coverFileInput').addEventListener('change', handleCoverSelected);
+      $('#imageFileInput').addEventListener('change', handleImagesSelected);
+      renderSdgCheckboxes();
+      populateSdgFilter();
+      if (!V2_NEWS_WRITE_UI_ENABLED) $('#addNewsBtn').style.display = 'none';
+      await loadNews();
+    }
+
+    async function requestNews(action, payload, method) {
+      return IROUP_V2.request(action, payload || {}, {
+        auth: true,
+        method: method || (String(action).indexOf('.list') >= 0 || String(action).indexOf('.detail') >= 0 ? 'GET' : 'POST'),
+        timeoutMs: 120000
+      });
+    }
+
+    async function loadNews(force) {
+      showNotice('', '');
+      $('#newsContent').className = 'cards';
+      $('#newsContent').innerHTML = '<div class="loading"><span class="spinner"></span>กำลังโหลดข้อมูล...</div>';
+      try {
+        const res = await requestNews('v2.admin.news.list', force ? { _: Date.now() } : {});
+        if (!res || !res.success) throw new Error(res?.error || 'โหลดข้อมูลข่าวไม่สำเร็จ');
+        state.rows = normalizeList(res).map(enrichNewsRow);
+        populateCategoryControls();
+        renderKpis();
+        renderNews();
+      } catch (error) {
+        showNotice(error.message || String(error), 'error');
+        $('#newsContent').innerHTML = '<div class="empty">ไม่สามารถโหลดข้อมูลข่าวได้</div>';
+      }
+    }
+
+    function normalizeList(res) {
+      if (!res) return [];
+      if (Array.isArray(res)) return res;
+      if (Array.isArray(res.data)) return res.data;
+      if (res.data && Array.isArray(res.data.items)) return res.data.items;
+      if (res.data && Array.isArray(res.data.rows)) return res.data.rows;
+      return [];
+    }
+
+    function unwrapNewsDetail(res) {
+      if (!res) return null;
+      const data = res.data || res;
+      return data.news || data.record || data.row || data;
+    }
+
+    function renderNews() {
+      const rows = filteredRows();
+      renderKpis();
+      if (!rows.length) {
+        $('#newsContent').className = 'cards';
+        $('#newsContent').innerHTML = '<div class="empty">ยังไม่มีข่าวที่ตรงกับเงื่อนไข</div>';
+        return;
+      }
+      if (state.viewMode === 'list') {
+        $('#newsContent').className = 'list-wrap';
+        $('#newsContent').innerHTML = renderList(rows);
+        return;
+      }
+      $('#newsContent').className = 'cards';
+      $('#newsContent').innerHTML = rows.map(renderCard).join('');
+    }
+
+    function filteredRows() {
+      const q = ($('#searchInput').value || '').trim().toLowerCase();
+      const category = $('#categoryFilter').value;
+      const sdg = $('#sdgFilter').value;
+      return state.rows.filter(row => {
+        if (category && row.category !== category) return false;
+        if (sdg && parseSdgTags(row.sdg_tags).indexOf(sdg) < 0) return false;
+        if (!q) return true;
+        const haystack = [row.title_th, row.title_en, row.category, row.content_th, row.content_en].join(' ').toLowerCase();
+        return haystack.indexOf(q) >= 0;
+      });
+    }
+
+    function renderCard(row) {
+      const cover = getCoverUrl(row);
+      const content = displayContent(row);
+      return `
+        <article class="news-card">
+          <div class="cover">${cover ? `<img src="${escAttr(cover)}" alt="">` : '<span>NEWS</span>'}</div>
+          <div class="card-body">
+            <div>
+              <div class="card-title">${esc(displayTitle(row) || '-')}</div>
+              <div class="card-sub">${esc(displayDate(row.publish_date))}</div>
+            </div>
+            <div class="badge-row">
+              ${row.category ? `<span class="badge">${esc(row.category)}</span>` : ''}
+              <span class="badge ${row.public_visible ? 'public' : 'private'}">${row.public_visible ? 'เผยแพร่' : 'ไม่เผยแพร่'}</span>
+              ${renderSdgBadges(row.sdg_tags)}
+            </div>
+            ${content ? `<div class="card-sub">${esc(truncate(content, 160))}</div>` : ''}
+            <div class="card-actions">
+              <button class="btn" type="button" onclick="openEditModal('${escAttr(row.news_id)}')">แก้ไข</button>
+              <button class="btn danger" type="button" onclick="deleteV2News('${escAttr(row.news_id)}')">ลบ</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderList(rows) {
+      const body = rows.map((row, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td class="title-cell">${esc(displayTitle(row) || '-')}</td>
+          <td>${esc(row.category || '-')}</td>
+          <td><div class="badge-row">${renderSdgBadges(row.sdg_tags) || '-'}</div></td>
+          <td>${esc(displayDate(row.publish_date))}</td>
+          <td><span class="badge ${row.public_visible ? 'public' : 'private'}">${row.public_visible ? 'เผยแพร่' : 'ไม่เผยแพร่'}</span></td>
+          <td>
+            <button class="btn" type="button" onclick="openEditModal('${escAttr(row.news_id)}')">แก้ไข</button>
+            <button class="btn danger" type="button" onclick="deleteV2News('${escAttr(row.news_id)}')">ลบ</button>
+          </td>
+        </tr>
+      `).join('');
+      return `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ชื่อข่าว</th>
+              <th>หมวดหมู่</th>
+              <th>SDG tags</th>
+              <th>วันที่ลงข่าว</th>
+              <th>เผยแพร่</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>${body}</tbody>
+        </table>
+      `;
+    }
+
+    function renderKpis() {
+      const now = new Date();
+      const monthKey = String(now.getFullYear()) + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      $('#totalNewsKpi').textContent = state.rows.length;
+      $('#publicNewsKpi').textContent = state.rows.filter(row => row.public_visible).length;
+      $('#monthNewsKpi').textContent = state.rows.filter(row => String(row.publish_date || '').slice(0, 7) === monthKey).length;
+    }
+
+    function populateCategoryControls() {
+      const categories = unique(state.rows.map(row => row.category).filter(Boolean)).sort();
+      $('#categoryFilter').innerHTML = '<option value="">ทุกหมวดหมู่</option>' + categories.map(value => `<option value="${escAttr(value)}">${esc(value)}</option>`).join('');
+      $('#categoryOptions').innerHTML = categories.map(value => `<option value="${escAttr(value)}"></option>`).join('');
+    }
+
+    function populateSdgFilter() {
+      const options = Array.from({ length: 17 }, (_, index) => {
+        const id = String(index + 1);
+        return `<option value="${id}">SDG-${id} ${esc(SDG_NAMES[id])}</option>`;
+      }).join('');
+      $('#sdgFilter').innerHTML = '<option value="">ทุก SDG</option>' + options;
+    }
+
+    function renderSdgCheckboxes() {
+      $('#sdgCheckboxes').innerHTML = Array.from({ length: 17 }, (_, index) => {
+        const id = String(index + 1);
+        return `
+          <label class="sdg-item">
+            <input type="checkbox" name="sdgTag" value="${id}">
+            <span>SDG-${id} ${esc(SDG_NAMES[id])}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function openCreateModal() {
+      if (!V2_NEWS_WRITE_UI_ENABLED) {
+        alert('ยังไม่เปิดใช้งานการบันทึก V2 สำหรับข่าว');
+        return;
+      }
+      state.editingId = '';
+      state.pendingCover = null;
+      state.pendingImages = [];
+      $('#newsForm').reset();
+      $('#newsId').value = '';
+      $('#modalTitle').textContent = 'เพิ่มข่าว';
+      $('#modalSub').textContent = 'สร้างข้อมูล NEWS ผ่าน V2';
+      $('#deleteBtn').style.display = 'none';
+      $('#publicVisible').checked = true;
+      renderCoverPreview('');
+      renderImageFiles();
+      setFileStatus('', false);
+      $('#newsModal').classList.add('open');
+    }
+
+    async function openEditModal(newsId) {
+      if (!newsId) return;
+      state.editingId = newsId;
+      state.pendingCover = null;
+      state.pendingImages = [];
+      $('#newsForm').reset();
+      $('#modalTitle').textContent = 'แก้ไขข่าว';
+      $('#modalSub').textContent = newsId;
+      $('#deleteBtn').style.display = '';
+      renderCoverPreview('');
+      renderImageFiles();
+      $('#newsModal').classList.add('open');
+      try {
+        const res = await requestNews('v2.admin.news.detail', { news_id: newsId });
+        if (!res || !res.success) throw new Error(res?.error || 'โหลดข้อมูลข่าวไม่สำเร็จ');
+        const detail = enrichNewsRow(unwrapNewsDetail(res));
+        if (!detail || !detail.news_id) {
+          alert('ไม่พบข้อมูลข่าว');
+          closeModal();
+          return;
+        }
+        fillForm(detail);
+      } catch (error) {
+        alert(error.message || String(error));
+      }
+    }
+
+    function closeModal() {
+      $('#newsModal').classList.remove('open');
+    }
+
+    function fillForm(row) {
+      $('#newsId').value = row.news_id || '';
+      $('#titleTh').value = row.title_th || '';
+      $('#titleEn').value = row.title_en || '';
+      $('#categoryInput').value = row.category || '';
+      $('#publishDate').value = row.publish_date || '';
+      $('#credit').value = row.credit || '';
+      $('#linkUrl').value = row.link_url || '';
+      $('#contentTh').value = row.content_th || '';
+      $('#contentEn').value = row.content_en || '';
+      $('#publicVisible').checked = !!row.public_visible;
+      setSelectedSdgs(parseSdgTags(row.sdg_tags));
+      renderCoverPreview(getCoverUrl(row));
+    }
+
+    async function saveNews(event) {
+      event.preventDefault();
+      if (state.isSaving) return;
+      state.isSaving = true;
+      const saveBtn = $('#saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'กำลังบันทึก...';
+      setFileControlsDisabled(true);
+      const saveStartedAt = Date.now();
+      console.info('[news-save] start', {
+        pending_cover: !!state.pendingCover,
+        pending_images: state.pendingImages.length
+      });
+      setFileStatus('กำลังบันทึก...', true);
+      try {
+        if (!confirmLargeImageUpload()) {
+          setFileStatus('ยกเลิกการอัปโหลด', false);
+          return;
+        }
+        const payload = buildPayloadFromForm();
+        const isUpdate = !!payload.news_id;
+        console.time('[news-save] metadata');
+        const res = await requestNews(isUpdate ? 'v2.admin.news.update' : 'v2.admin.news.create', { payload: payload }, 'POST');
+        console.timeEnd('[news-save] metadata');
+        if (!res || !res.success) throw new Error(res?.error || 'บันทึกไม่สำเร็จ');
+        const savedId = isUpdate ? payload.news_id : extractSavedNewsId(res);
+        if (!savedId) throw new Error('ไม่พบรหัสข่าวหลังบันทึก');
+        console.time('[news-save] uploadPendingFiles');
+        await uploadPendingNewsFiles(savedId);
+        console.timeEnd('[news-save] uploadPendingFiles');
+        console.info('[news-save] complete', { elapsed_ms: Date.now() - saveStartedAt });
+        alert('บันทึกสำเร็จ (V2)');
+        closeModal();
+        await loadNews(true);
+      } catch (error) {
+        console.warn('[news-save] failed', {
+          elapsed_ms: Date.now() - saveStartedAt,
+          error: error && error.message ? error.message : String(error)
+        });
+        setFileStatus(error.message || String(error), false, 'error');
+        alert(error.message || String(error));
+      } finally {
+        state.isSaving = false;
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'บันทึก';
+        setFileControlsDisabled(false);
+        if (!$('#newsModal').classList.contains('open')) setFileStatus('', false);
+      }
+    }
+
+    function buildPayloadFromForm() {
+      const payload = {
+        news_id: $('#newsId').value.trim(),
+        title_th: $('#titleTh').value.trim(),
+        title_en: $('#titleEn').value.trim(),
+        content_th: $('#contentTh').value.trim(),
+        content_en: $('#contentEn').value.trim(),
+        publish_date: $('#publishDate').value,
+        category: $('#categoryInput').value.trim(),
+        sdg_tags: getSelectedSdgs().join(','),
+        credit: $('#credit').value.trim(),
+        link_url: $('#linkUrl').value.trim(),
+        public_visible: $('#publicVisible').checked
+      };
+      if (!payload.title_th) throw new Error('กรุณากรอกชื่อข่าว (TH)');
+      return payload;
+    }
+
+    async function deleteNewsFromModal() {
+      await deleteV2News($('#newsId').value);
+    }
+
+    async function deleteV2News(newsId) {
+      if (!V2_NEWS_WRITE_UI_ENABLED) {
+        alert('ยังไม่เปิดใช้งานการลบ V2 สำหรับข่าว');
+        return;
+      }
+      if (!newsId) return;
+      if (!confirm('ยืนยันลบข่าวนี้หรือไม่')) return;
+      const res = await requestNews('v2.admin.news.delete', { payload: { news_id: newsId } }, 'POST');
+      if (!res || !res.success) {
+        alert(res?.error || 'ลบไม่สำเร็จ');
+        return;
+      }
+      if ($('#newsModal').classList.contains('open') && $('#newsId').value === newsId) closeModal();
+      await loadNews(true);
+    }
+
+    function chooseCoverFile() {
+      if (state.isSaving) return;
+      $('#coverFileInput').click();
+    }
+
+    function chooseImageFiles() {
+      if (state.isSaving) return;
+      $('#imageFileInput').click();
+    }
+
+    function handleCoverSelected(event) {
+      const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+      if (!file) return;
+      state.pendingCover = file;
+      event.target.value = '';
+      const reader = new FileReader();
+      reader.onload = () => renderCoverPreview(String(reader.result || ''));
+      reader.readAsDataURL(file);
+      setSelectedFileStatus('เลือกรูปปกแล้ว');
+    }
+
+    function handleImagesSelected(event) {
+      const files = Array.from(event.target.files || []);
+      const available = MAX_NEWS_IMAGES - state.pendingImages.length;
+      state.pendingImages = state.pendingImages.concat(files.slice(0, available));
+      event.target.value = '';
+      renderImageFiles();
+      setSelectedFileStatus('เลือกรูปเนื้อหาแล้ว');
+    }
+
+    function renderCoverPreview(url) {
+      $('#coverPreview').innerHTML = url
+        ? `<img src="${escAttr(url)}" alt=""><button class="preview-remove" type="button" onclick="removeCoverFile()" aria-label="ลบรูปปก">x</button>`
+        : 'ยังไม่มีรูปปก';
+    }
+
+    function removeCoverFile() {
+      state.pendingCover = null;
+      $('#coverFileInput').value = '';
+      renderCoverPreview('');
+      setSelectedFileStatus('');
+    }
+
+    function renderImageFiles() {
+      $('#imageCountText').textContent = `${state.pendingImages.length}/${MAX_NEWS_IMAGES} รูป`;
+      $('#imageFileList').innerHTML = state.pendingImages.map((file, index) => `
+        <div class="file-chip">
+          <span>${esc(file.name)}</span>
+          <button type="button" onclick="removeImageFile(${index})" aria-label="ลบรูปเนื้อหา">x</button>
+        </div>
+      `).join('');
+    }
+
+    function removeImageFile(index) {
+      state.pendingImages.splice(index, 1);
+      renderImageFiles();
+      setSelectedFileStatus('');
+    }
+
+    async function uploadPendingNewsFiles(recordId) {
+      const files = [];
+      if (state.pendingCover) files.push({ role: 'cover', file: state.pendingCover });
+      state.pendingImages.forEach(file => files.push({ role: 'image', file }));
+      if (!files.length) return;
+      setFileStatus('กำลังอัปโหลดไฟล์...', true);
+      console.info('[news-save] upload queue', files.map(item => ({
+        role: item.role,
+        name: item.file.name,
+        size: item.file.size
+      })));
+      for (let i = 0; i < files.length; i++) {
+        const item = files[i];
+        setFileStatus(`กำลังอัปโหลด ${i + 1}/${files.length} รูป... ${item.file.name}`, true);
+        const label = '[news-save] upload ' + (i + 1) + '/' + files.length + ' ' + item.role + ' ' + item.file.name;
+        console.time(label + ' read');
+        const dataUrl = await readFileAsDataUrl(item.file);
+        console.timeEnd(label + ' read');
+        const payload = {
+          base64_data: dataUrl,
+          filename: item.file.name,
+          mime_type: item.file.type || 'application/octet-stream',
+          module: 'news',
+          record_id: recordId,
+          file_role_id: item.role,
+          visibility_level: 'public'
+        };
+        console.time(label + ' api');
+        let res;
+        try {
+          res = await uploadNewsFileWithRetry(payload, item, i, files.length);
+        } finally {
+          console.timeEnd(label + ' api');
+        }
+        if (!res || !res.success) {
+          throw new Error(`อัปโหลดไฟล์ไม่สำเร็จ (${i + 1}/${files.length}): ${item.file.name} - ${res?.error || 'unknown error'}`);
+        }
+      }
+      state.pendingCover = null;
+      state.pendingImages = [];
+      setFileStatus(`อัปโหลดครบ ${files.length}/${files.length} ไฟล์แล้ว`, false, 'done');
+    }
+
+    async function uploadNewsFileWithRetry(payload, item, index, total) {
+      let lastError = null;
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        if (attempt > 1) {
+          setFileStatus(`กำลังลองอัปโหลดอีกครั้ง ${index + 1}/${total}... ${item.file.name}`, true);
+          await delay(1500);
+        }
+        const startedAt = performance.now();
+        try {
+          console.info('[news-save] upload attempt', {
+            index: index + 1,
+            total: total,
+            attempt: attempt,
+            role: item.role,
+            filename: item.file.name
+          });
+          const res = await IROUP_V2.admin.fileUpload(payload);
+          const elapsedMs = Math.round(performance.now() - startedAt);
+          if (!res || !res.success) {
+            lastError = new Error(res?.error || 'upload response was not successful');
+            console.warn('[news-save] upload attempt failed', {
+              index: index + 1,
+              total: total,
+              attempt: attempt,
+              role: item.role,
+              filename: item.file.name,
+              elapsed_ms: elapsedMs,
+              error: lastError.message,
+              response: res || null
+            });
+            continue;
+          }
+          console.info('[news-save] upload attempt complete', {
+            index: index + 1,
+            total: total,
+            attempt: attempt,
+            role: item.role,
+            filename: item.file.name,
+            elapsed_ms: elapsedMs
+          });
+          return res;
+        } catch (error) {
+          const elapsedMs = Math.round(performance.now() - startedAt);
+          lastError = error;
+          console.warn('[news-save] upload attempt failed', {
+            index: index + 1,
+            total: total,
+            attempt: attempt,
+            role: item.role,
+            filename: item.file.name,
+            elapsed_ms: elapsedMs,
+            error: error && error.message ? error.message : String(error)
+          });
+        }
+      }
+      throw new Error(`อัปโหลดไฟล์ไม่สำเร็จ (${index + 1}/${total}): ${item.file.name} - ${lastError && lastError.message ? lastError.message : 'unknown error'}`);
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(reader.error || new Error('อ่านไฟล์ไม่สำเร็จ'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function getSelectedSdgs() {
+      return Array.from(document.querySelectorAll('input[name="sdgTag"]:checked')).map(input => input.value);
+    }
+
+    function setSelectedSdgs(values) {
+      const selected = new Set((values || []).map(String));
+      document.querySelectorAll('input[name="sdgTag"]').forEach(input => {
+        input.checked = selected.has(input.value);
+      });
+    }
+
+    function setLanguage(lang) {
+      state.lang = lang === 'en' ? 'en' : 'th';
+      $('#langThBtn').classList.toggle('active', state.lang === 'th');
+      $('#langEnBtn').classList.toggle('active', state.lang === 'en');
+      renderNews();
+    }
+
+    function setViewMode(mode) {
+      state.viewMode = mode === 'list' ? 'list' : 'card';
+      $('#cardViewBtn').classList.toggle('active', state.viewMode === 'card');
+      $('#listViewBtn').classList.toggle('active', state.viewMode === 'list');
+      renderNews();
+    }
+
+    function clearFilters() {
+      $('#searchInput').value = '';
+      $('#categoryFilter').value = '';
+      $('#sdgFilter').value = '';
+      renderNews();
+    }
+
+    function parseSdgTags(value) {
+      return String(value || '').split(',').map(item => item.trim()).filter(Boolean);
+    }
+
+    function renderSdgBadges(value) {
+      return parseSdgTags(value).map(tag => `<span class="badge sdg">SDG-${esc(tag)}</span>`).join('');
+    }
+
+    function displayTitle(row) {
+      return state.lang === 'en' ? row.title_en || row.title_th : row.title_th || row.title_en;
+    }
+
+    function displayContent(row) {
+      return state.lang === 'en' ? row.content_en || row.content_th : row.content_th || row.content_en;
+    }
+
+    function enrichNewsRow(row) {
+      const item = Object.assign({}, row || {});
+      item.news_id = item.news_id || '';
+      item.public_visible = isTruthy(item.public_visible);
+      item.publish_date = normalizeDateInput(item.publish_date);
+      return item;
+    }
+
+    function getCoverUrl(row) {
+      const files = collectFileCandidates(row);
+      const cover = files.find(file => fileRoleId(file) === 'cover');
+      return cover ? fileUrl(cover) : '';
+    }
+
+    function collectFileCandidates(row) {
+      const source = row || {};
+      const candidates = [];
+      if (Array.isArray(source.files)) candidates.push.apply(candidates, source.files);
+      if (source.files && Array.isArray(source.files.public)) candidates.push.apply(candidates, source.files.public);
+      if (source.files && Array.isArray(source.files.internal)) candidates.push.apply(candidates, source.files.internal);
+      if (source.file_summary && Array.isArray(source.file_summary.files)) candidates.push.apply(candidates, source.file_summary.files);
+      return candidates;
+    }
+
+    function fileRoleId(file) {
+      return String(file.file_role_id || file.file_role?.file_role_id || file.file_role?.file_role_name || '').trim();
+    }
+
+    function fileUrl(file) {
+      return file.file_url || file.thumbnail_url || file.url || '';
+    }
+
+    function extractSavedNewsId(res) {
+      const data = res && res.data ? res.data : {};
+      return data.news?.news_id || data.persisted_news?.news_id || data.news_id || '';
+    }
+
+    function displayDate(value) {
+      const text = String(value || '').trim();
+      if (!text) return '-';
+      const parsed = new Date(text);
+      if (isNaN(parsed.getTime())) return text;
+      if (state.lang === 'en') {
+        return parsed.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      }
+      return parsed.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function normalizeDateInput(value) {
+      const text = String(value || '').trim();
+      if (!text) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+      const parsed = new Date(text);
+      if (isNaN(parsed.getTime())) return text;
+      return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
+    }
+
+    function truncate(value, max) {
+      const text = String(value || '').trim();
+      if (text.length <= max) return text;
+      return text.slice(0, max - 1) + '…';
+    }
+
+    function unique(values) {
+      return Array.from(new Set(values.map(value => String(value || '').trim()).filter(Boolean)));
+    }
+
+    function isTruthy(value) {
+      if (value === true) return true;
+      const text = String(value || '').trim().toLowerCase();
+      return ['true', 'yes', 'y', '1', 'เปิด', 'เผยแพร่'].indexOf(text) >= 0;
+    }
+
+    function pendingNewsImageFiles() {
+      const files = [];
+      if (state.pendingCover) files.push(state.pendingCover);
+      state.pendingImages.forEach(file => files.push(file));
+      return files;
+    }
+
+    function pendingImageTotalSize() {
+      return pendingNewsImageFiles().reduce((sum, file) => sum + (file.size || 0), 0);
+    }
+
+    function formatFileSize(bytes) {
+      const size = Number(bytes || 0);
+      if (size >= 1024 * 1024) return (size / 1024 / 1024).toFixed(1) + ' MB';
+      if (size >= 1024) return (size / 1024).toFixed(1) + ' KB';
+      return size + ' B';
+    }
+
+    function confirmLargeImageUpload() {
+      const totalSize = pendingImageTotalSize();
+      if (totalSize <= UPLOAD_SIZE_WARNING_BYTES) return true;
+      return confirm('ไฟล์รูปที่เลือกมีขนาดรวมประมาณ ' + formatFileSize(totalSize) + ' อาจใช้เวลาอัปโหลดหลายนาที ต้องการดำเนินการต่อหรือไม่');
+    }
+
+    function setSelectedFileStatus(prefix) {
+      const files = pendingNewsImageFiles();
+      if (!files.length) {
+        setFileStatus('', false);
+        return;
+      }
+      const totalSize = pendingImageTotalSize();
+      const message = (prefix ? prefix + ' · ' : '') + files.length + ' ไฟล์ · รวม ' + formatFileSize(totalSize);
+      setFileStatus(message, false, totalSize > UPLOAD_SIZE_WARNING_BYTES ? 'warning' : '');
+    }
+
+    function setFileStatus(message, active, tone) {
+      $('#fileStatus').textContent = message || '';
+      $('#fileStatus').classList.toggle('active', !!active);
+      $('#fileStatus').classList.toggle('warning', tone === 'warning');
+      $('#fileStatus').classList.toggle('error', tone === 'error');
+      $('#fileStatus').classList.toggle('done', tone === 'done');
+    }
+
+    function setFileControlsDisabled(disabled) {
+      ['#coverPickBtn', '#imagePickBtn'].forEach(selector => {
+        const button = $(selector);
+        if (button) button.disabled = !!disabled;
+      });
+    }
+
+    function showNotice(message, type) {
+      const box = $('#notice');
+      box.textContent = message || '';
+      box.className = 'notice' + (type ? ' ' + type : '');
+    }
+
+    function esc(value) {
+      return String(value === null || value === undefined ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escAttr(value) {
+      return esc(value);
+    }
+  </script>
+<script src="js/iroup-sidebar.js"></script>
+</body>
+</html>

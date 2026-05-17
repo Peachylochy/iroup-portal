@@ -18,6 +18,8 @@
       { icon: '✈️', label: 'การเดินทาง', href: 'travel.html', match: ['travel.html'] },
       { icon: '🎓', label: 'ทุนการศึกษา', href: 'scholarship.html', match: ['scholarship.html'] },
       { icon: '📅', label: 'กิจกรรม', href: 'events.html', match: ['events.html'] },
+      { icon: 'NW', label: 'ข่าว', href: 'news.html', match: ['news.html'] },
+      { icon: 'KN', label: 'คลังความรู้', href: 'knowledge.html', match: ['knowledge.html'] },
       { icon: '📤', label: 'รายงาน & Export', href: 'report.html', match: ['report.html'] }
     ]},
     { section: 'PUBLIC', items: [
@@ -34,7 +36,7 @@
   function html(){
     return `
       <div class="ir-final-brand">
-        <img src="iroup-logo.png" alt="iROUP" onerror="this.style.display='none'">
+        <img src="assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none'">
         <div class="ir-final-brand-title"><b>iROUP</b><br>International<br>Relations Office</div>
       </div>
       <nav class="ir-final-nav">
