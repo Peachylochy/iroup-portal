@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Personal IR Workspace · iROUP — University of Phayao</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="Team IROUP/css/iroup-design.css" />
+
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    /* aurora */
+    background:
+      radial-gradient(60% 60% at 12% 18%, rgba(193,205,255,0.55) 0%, transparent 60%),
+      radial-gradient(50% 60% at 88% 12%, rgba(202,182,255,0.50) 0%, transparent 65%),
+      radial-gradient(70% 50% at 80% 90%, rgba(173,212,255,0.45) 0%, transparent 60%),
+      var(--ir-bg-gradient);
+    background-attachment: fixed;
+  }
+  .launcher {
+    max-width: 1180px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (max-width: 980px) {
+    .launcher { grid-template-columns: 1fr; gap: 32px; }
+  }
+
+  /* ===== Left column: brand + hero ===== */
+  .brand-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .brand-mark-lg {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--ir-primary), var(--ir-accent));
+    box-shadow: 0 12px 28px rgba(26,109,181,0.36);
+    position: relative;
+    overflow: hidden;
+  }
+  .brand-mark-lg::before {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 2px solid rgba(255,255,255,0.92);
+    border-radius: 50%;
+  }
+  .brand-mark-lg::after {
+    content: '';
+    position: absolute;
+    top: 11px; right: 10px;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+  }
+  .brand-row .brand-name {
+    font-size: 28px;
+    font-weight: var(--ir-weight-black);
+    color: var(--ir-text-heading);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .brand-row .brand-sub {
+    font-size: 13px;
+    color: var(--ir-text-muted);
+    margin-top: 4px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ir-glass-bg);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--ir-glass-border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: var(--ir-weight-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ir-primary);
+    margin-bottom: 18px;
+  }
+  .eyebrow .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ir-success);
+    box-shadow: 0 0 0 4px rgba(21,128,61,0.18);
+  }
+  h1.hero {
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: var(--ir-weight-black);
+    color: var(--ir-text-heading);
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 0 18px;
+  }
+  h1.hero .grad {
+    background: linear-gradient(135deg, var(--ir-primary), var(--ir-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  p.lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ir-text-muted);
+    max-width: 480px;
+    margin: 0 0 28px;
+  }
+  .feature-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 560px;
+  }
+  @media (max-width: 540px) { .feature-row { grid-template-columns: 1fr; } }
+  .feature {
+    background: var(--ir-glass-bg);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--ir-glass-border);
+    border-radius: var(--ir-radius-md);
+    padding: 14px 14px;
+  }
+  .feature .ico {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, rgba(26,109,181,0.18), rgba(123,90,232,0.18));
+    color: var(--ir-primary);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .feature .ftitle { font-weight: var(--ir-weight-bold); color: var(--ir-text-heading); font-size: 13.5px; }
+  .feature .fsub   { font-size: 11.5px; color: var(--ir-text-muted); margin-top: 2px; line-height: 1.4; }
+
+  /* ===== Right column: sign-in card ===== */
+  .signin-card {
+    background: var(--ir-glass-bg);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--ir-glass-border);
+    border-radius: 28px;
+    box-shadow: 0 30px 80px rgba(15,45,90,0.16);
+    padding: 36px 36px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .signin-card::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,90,232,0.22), transparent 70%);
+    pointer-events: none;
+  }
+  .signin-card::after {
+    content: '';
+    position: absolute;
+    bottom: -160px; left: -100px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26,109,181,0.22), transparent 70%);
+    pointer-events: none;
+  }
+  .signin-card > * { position: relative; z-index: 1; }
+
+  .signin-title {
+    font-size: 24px;
+    font-weight: var(--ir-weight-black);
+    color: var(--ir-text-heading);
+    letter-spacing: -0.01em;
+  }
+  .signin-sub {
+    color: var(--ir-text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 8px;
+    margin-bottom: 24px;
+  }
+
+  .goog-btn {
+    width: 100%;
+    background: var(--ir-bg-card);
+    border: 1px solid var(--ir-border);
+    border-radius: var(--ir-radius-md);
+    padding: 14px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: var(--ir-weight-semi);
+    color: var(--ir-text-heading);
+    cursor: pointer;
+    transition: all .15s;
+    box-shadow: var(--ir-shadow-sm);
+  }
+  .goog-btn:hover { transform: translateY(-1px); box-shadow: var(--ir-shadow-md); border-color: var(--ir-primary-soft); }
+  .goog-btn .gicon {
+    width: 22px; height: 22px;
+    flex-shrink: 0;
+  }
+
+  .divider {
+    display: flex; align-items: center;
+    gap: 12px;
+    margin: 22px 0 18px;
+    color: var(--ir-text-subtle);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--ir-border-soft);
+  }
+
+  .demo-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--ir-primary), var(--ir-primary-deep));
+    color: white;
+    border: none;
+    border-radius: var(--ir-radius-md);
+    padding: 14px 18px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: var(--ir-weight-semi);
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(26,109,181,0.32);
+    transition: all .15s;
+  }
+  .demo-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 32px rgba(26,109,181,0.42); }
+
+  .guard-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(26,109,181,0.08);
+    border: 1px solid rgba(26,109,181,0.16);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 18px;
+    font-size: 12.5px;
+    color: var(--ir-text-body);
+    line-height: 1.5;
+  }
+  .guard-note .lock {
+    width: 28px; height: 28px;
+    background: var(--ir-info-bg);
+    color: var(--ir-info);
+    border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .signin-foot {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--ir-border-soft);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ir-text-muted);
+  }
+  .signin-foot a { color: var(--ir-primary); text-decoration: none; font-weight: var(--ir-weight-semi); }
+</style>
+</head>
+<body>
+
+<div class="launcher">
+
+  <!-- LEFT: Brand / hero -->
+  <div>
+    <div class="brand-row">
+      <div class="brand-mark-lg"></div>
+      <div>
+        <div class="brand-name">iROUP</div>
+        <div class="brand-sub">International Relations · University of Phayao</div>
+      </div>
+    </div>
+
+    <div class="eyebrow"><span class="dot"></span> iROUP Workspace · v2.0</div>
+
+    <h1 class="hero">Personal <span class="grad">IR Workspace</span></h1>
+    <p class="lede">
+      A focused entry point for international relations operations, planning, reporting, and workload visibility — everything งานวิเทศสัมพันธ์ ม.พะเยา in one place.
+    </p>
+
+    <div class="feature-row">
+      <div class="feature">
+        <div class="ico">🤝</div>
+        <div class="ftitle">MOU · Mobility</div>
+        <div class="fsub">Track agreements and inbound / outbound exchange</div>
+      </div>
+      <div class="feature">
+        <div class="ico">🎓</div>
+        <div class="ftitle">Scholarship · Events</div>
+        <div class="fsub">Publish opportunities and run programmes</div>
+      </div>
+      <div class="feature">
+        <div class="ico">📊</div>
+        <div class="ftitle">Report · Export</div>
+        <div class="fsub">One-click CSV export across every module</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Sign-in card -->
+  <div class="signin-card">
+    <div class="signin-title">Sign in to continue</div>
+    <p class="signin-sub">Use an authorized Google account to open the Personal IR Workspace launcher.</p>
+
+    <button class="goog-btn" onclick="window.location.href='Team IROUP/dashboard.html'">
+      <svg class="gicon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21.6 12.227c0-.81-.073-1.59-.21-2.34H12v4.43h5.387a4.605 4.605 0 0 1-2.001 3.018v2.51h3.233c1.892-1.745 2.981-4.31 2.981-7.618z" fill="#4285F4"/>
+        <path d="M12 22c2.7 0 4.965-.894 6.62-2.42l-3.234-2.51c-.895.6-2.04.957-3.386.957-2.605 0-4.81-1.76-5.598-4.124H3.062v2.59A9.997 9.997 0 0 0 12 22z" fill="#34A853"/>
+        <path d="M6.402 13.903a5.998 5.998 0 0 1 0-3.806V7.507H3.062a9.997 9.997 0 0 0 0 8.986l3.34-2.59z" fill="#FBBC04"/>
+        <path d="M12 5.973c1.47 0 2.79.506 3.828 1.498l2.868-2.868C16.96 2.99 14.696 2 12 2 8.044 2 4.64 4.28 3.062 7.507l3.34 2.59C7.19 7.733 9.395 5.973 12 5.973z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="divider">or try it</div>
+
+    <button class="demo-btn" onclick="window.location.href='Team IROUP/dashboard.html'">
+      🚀  เข้าระบบเดโม (Demo Workspace)
+    </button>
+
+    <div class="guard-note">
+      <span class="lock">🔒</span>
+      <span>Module-specific guards remain active as a second layer. Each module can require additional permissions before granting access.</span>
+    </div>
+
+    <div class="signin-foot">
+      <span>© 2569 University of Phayao</span>
+      <a href="#">Help · ติดต่อทีม</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

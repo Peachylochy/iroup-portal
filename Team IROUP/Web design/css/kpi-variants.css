@@ -1,0 +1,185 @@
+/* ============================================================
+   KPI Style Variants
+   Toggle via body[data-kpi="<variant>"]
+   ============================================================ */
+
+/* ===== 1) GLASS — frosted translucent ===== */
+body[data-kpi="glass"] .ir-kpi {
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 8px 28px rgba(15,45,90,0.10), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+body[data-kpi="glass"] .ir-kpi::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.20), rgba(255,255,255,0) 40%);
+  pointer-events: none;
+}
+[data-theme="dark"] body[data-kpi="glass"] .ir-kpi,
+[data-theme="dark"][data-kpi="glass"] .ir-kpi {
+  background: rgba(30,42,80,0.45);
+  border-color: rgba(255,255,255,0.10);
+}
+
+/* ===== 2) TINTED — soft pastel bg per icon tint ===== */
+body[data-kpi="tinted"] .ir-kpi { border: none; box-shadow: var(--ir-shadow-sm); }
+body[data-kpi="tinted"] .ir-kpi:has(.tint-blue)   { background: linear-gradient(135deg, #E8F2FD, #FFFFFF 70%); }
+body[data-kpi="tinted"] .ir-kpi:has(.tint-violet) { background: linear-gradient(135deg, #EFE9FD, #FFFFFF 70%); }
+body[data-kpi="tinted"] .ir-kpi:has(.tint-green)  { background: linear-gradient(135deg, #E5F6EC, #FFFFFF 70%); }
+body[data-kpi="tinted"] .ir-kpi:has(.tint-teal)   { background: linear-gradient(135deg, #E0F5F2, #FFFFFF 70%); }
+body[data-kpi="tinted"] .ir-kpi:has(.tint-orange) { background: linear-gradient(135deg, #FBEEDF, #FFFFFF 70%); }
+body[data-kpi="tinted"] .ir-kpi:has(.tint-pink)   { background: linear-gradient(135deg, #FCEAF3, #FFFFFF 70%); }
+body[data-kpi="tinted"] .ir-kpi .ir-kpi-icon { background: rgba(255,255,255,0.7); }
+[data-theme="dark"] body[data-kpi="tinted"] .ir-kpi {
+  background: rgba(30,42,80,0.6) !important;
+  border: 1px solid var(--ir-border);
+}
+
+/* ===== 3) GRADIENT-STROKE — transparent bg + glowing color border ===== */
+body[data-kpi="stroke"] .ir-kpi {
+  background: var(--ir-bg-card);
+  border: 1.5px solid transparent;
+  background-image:
+    linear-gradient(var(--ir-bg-card), var(--ir-bg-card)),
+    linear-gradient(135deg, var(--ir-primary), var(--ir-accent));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 4px 20px rgba(26,109,181,0.10);
+}
+body[data-kpi="stroke"] .ir-kpi:hover {
+  box-shadow: 0 10px 32px rgba(26,109,181,0.22);
+}
+
+/* ===== 4) MONO-DARK — premium dark card ===== */
+body[data-kpi="dark"] .ir-kpi {
+  background: linear-gradient(160deg, #1B2244 0%, #11183A 100%);
+  border-color: rgba(255,255,255,0.06);
+  color: #E8EEFB;
+  box-shadow: 0 12px 32px rgba(15,25,60,0.25);
+}
+body[data-kpi="dark"] .ir-kpi-value { color: #FFFFFF; }
+body[data-kpi="dark"] .ir-kpi-label { color: rgba(232,238,251,0.65); }
+body[data-kpi="dark"] .ir-kpi-sub   { color: rgba(232,238,251,0.45); }
+body[data-kpi="dark"] .ir-kpi-foot  { border-top-color: rgba(255,255,255,0.10); }
+body[data-kpi="dark"] .ir-kpi-icon  { background: rgba(255,255,255,0.10); color: #B8D4F5 !important; }
+
+/* ===== 5) SPARKLINE — number + mini chart ===== */
+body[data-kpi="spark"] .ir-kpi { position: relative; overflow: hidden; }
+body[data-kpi="spark"] .ir-kpi::after {
+  content: '';
+  position: absolute;
+  right: -10%; bottom: 36px;
+  width: 70%; height: 56px;
+  background:
+    linear-gradient(180deg, rgba(26,109,181,0.18), rgba(26,109,181,0) 80%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40'><path d='M0,30 L12,28 L24,22 L36,25 L48,15 L60,18 L72,8 L84,12 L100,4' fill='none' stroke='%231A6DB5' stroke-width='1.5' stroke-linecap='round'/></svg>") no-repeat center/contain;
+  pointer-events: none;
+  opacity: 0.85;
+}
+body[data-kpi="spark"] .ir-kpi-value { position: relative; z-index: 2; }
+body[data-kpi="spark"] .ir-kpi-icon  { background: transparent; padding: 0; width: auto; height: auto; }
+
+/* ===== 6) BENTO — asymmetric 1 hero + 5 small ===== */
+body[data-kpi="bento"] .ir-kpi-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: 1fr 1fr;
+}
+body[data-kpi="bento"] .ir-kpi-grid > :nth-child(1) {
+  grid-column: span 2; grid-row: span 2;
+  background: linear-gradient(135deg, var(--ir-primary), var(--ir-primary-deep));
+  color: white;
+  border: none;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+body[data-kpi="bento"] .ir-kpi-grid > :nth-child(1) .ir-kpi-value { color: white; font-size: var(--ir-font-3xl); }
+body[data-kpi="bento"] .ir-kpi-grid > :nth-child(1) .ir-kpi-label { color: rgba(255,255,255,0.85); font-size: var(--ir-font-md); }
+body[data-kpi="bento"] .ir-kpi-grid > :nth-child(1) .ir-kpi-icon  { background: rgba(255,255,255,0.18); color: white; }
+body[data-kpi="bento"] .ir-kpi-grid > :nth-child(1) .ir-kpi-foot  { border-top-color: rgba(255,255,255,0.18); }
+body[data-kpi="bento"] .ir-kpi-grid > :nth-child(1) .ir-kpi-sub   { color: rgba(255,255,255,0.7); }
+@media (max-width: 1100px) {
+  body[data-kpi="bento"] .ir-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  body[data-kpi="bento"] .ir-kpi-grid > :nth-child(1) { grid-column: span 2; grid-row: span 1; }
+}
+
+/* ===== 7) RING — circular progress with value inside ===== */
+body[data-kpi="ring"] .ir-kpi {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 18px;
+  row-gap: 6px;
+  align-items: center;
+  padding: 22px 22px;
+}
+body[data-kpi="ring"] .ir-kpi-icon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  background: conic-gradient(currentColor calc(var(--pct, 50) * 1%), rgba(15,45,90,0.08) 0);
+  position: relative;
+  font-size: 0;        /* hide emoji */
+  margin: 0;
+  flex-shrink: 0;
+  transition: background 1s ease;
+}
+body[data-kpi="ring"] .ir-kpi-icon::before {
+  content: '';
+  position: absolute; inset: 9px;
+  border-radius: 50%;
+  background: var(--ir-bg-card);
+  box-shadow: inset 0 1px 2px rgba(15,45,90,0.06);
+}
+body[data-kpi="ring"] .ir-kpi-value {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  font-size: var(--ir-font-xl);
+  margin: 0;
+}
+body[data-kpi="ring"] .ir-kpi > .ir-kpi-value {
+  /* fallback if not inside icon - position over the ring */
+  position: relative;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center; justify-self: center;
+  background: transparent;
+  font-size: var(--ir-font-xl);
+  z-index: 2;
+  width: 92px;
+  text-align: center;
+  pointer-events: none;
+}
+body[data-kpi="ring"] .ir-kpi-label {
+  grid-column: 2; grid-row: 1;
+  align-self: end;
+  font-size: var(--ir-font-md);
+  font-weight: var(--ir-weight-semi);
+  color: var(--ir-text-heading);
+}
+body[data-kpi="ring"] .ir-kpi-foot  {
+  grid-column: 2; grid-row: 2;
+  align-self: start;
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  display: flex;
+}
+
+/* Per-card progress (showcase — replace with real pct in production) */
+body[data-kpi="ring"] .ir-kpi-grid > :nth-child(1) { --pct: 40; }
+body[data-kpi="ring"] .ir-kpi-grid > :nth-child(2) { --pct: 40; }
+body[data-kpi="ring"] .ir-kpi-grid > :nth-child(3) { --pct: 80; }
+body[data-kpi="ring"] .ir-kpi-grid > :nth-child(4) { --pct: 50; }
+body[data-kpi="ring"] .ir-kpi-grid > :nth-child(5) { --pct: 65; }
+body[data-kpi="ring"] .ir-kpi-grid > :nth-child(6) { --pct: 75; }
+
+[data-theme="dark"] body[data-kpi="ring"] .ir-kpi-icon {
+  background: conic-gradient(currentColor calc(var(--pct, 50) * 1%), rgba(255,255,255,0.08) 0);
+}
