@@ -67,6 +67,90 @@ function listV2PublicEvents_() {
   return publicResponseV2_(true, dtos, dtos.length, '');
 }
 
+// ── NEWS ──────────────────────────────────────────────────────────────────────
+
+function listV2PublicNews_() {
+  const fileRolesResult = readV2Sheet_(IROUP_V2_SHEETS.FILE_ROLE_MASTER);
+  const filesResult     = readV2Sheet_(IROUP_V2_SHEETS.FILES);
+  const newsResult      = readV2Sheet_(IROUP_V2_SHEETS.NEWS);
+  if (!newsResult.success) return publicResponseV2_(false, null, 0, newsResult.error || 'Unable to read NEWS', 'V2_PUBLIC_READ_FAILED');
+
+  const fileRoles    = fileRolesResult.success ? fileRolesResult.data || [] : [];
+  const allFiles     = filesResult.success     ? filesResult.data     || [] : [];
+  const fileRolesById = indexV2PublicRowsById_(fileRoles, 'file_role_id');
+  const ctx = { tables: {}, fileRolesById: fileRolesById };
+  ctx.tables[IROUP_V2_SHEETS.FILES] = allFiles;
+
+  const rows = newsResult.data || [];
+  const dtos = rows
+    .filter(function (row) { return isV2PublicParentRow_(row, false); })
+    .map(function (row)    { return mapV2PublicNewsDto_(row, ctx); });
+
+  return publicResponseV2_(true, dtos, dtos.length, '');
+}
+
+function mapV2PublicNewsDto_(row, ctx) {
+  const files   = findV2PublicFiles_(ctx, 'news', row.news_id, row);
+  const coverFile = files.find(function (f) { return f.file_role_id === 'cover'; })
+    || files.find(function (f) { return f.file_role_id === 'image'; });
+  return {
+    news_id:      row.news_id      || '',
+    title_th:     row.title_th     || '',
+    title_en:     row.title_en     || '',
+    content_th:   row.content_th   || '',
+    content_en:   row.content_en   || '',
+    publish_date: row.publish_date || '',
+    category:     row.category     || '',
+    sdg_tags:     row.sdg_tags     || '',
+    link_url:     row.link_url     || '',
+    cover_url:    coverFile ? (coverFile.file_url || '') : '',
+    files:        files
+  };
+}
+
+// ── KNOWLEDGE ─────────────────────────────────────────────────────────────────
+
+function listV2PublicKnowledge_() {
+  const fileRolesResult  = readV2Sheet_(IROUP_V2_SHEETS.FILE_ROLE_MASTER);
+  const filesResult      = readV2Sheet_(IROUP_V2_SHEETS.FILES);
+  const knowledgeResult  = readV2Sheet_(IROUP_V2_SHEETS.KNOWLEDGE);
+  if (!knowledgeResult.success) return publicResponseV2_(false, null, 0, knowledgeResult.error || 'Unable to read KNOWLEDGE', 'V2_PUBLIC_READ_FAILED');
+
+  const fileRoles    = fileRolesResult.success ? fileRolesResult.data || [] : [];
+  const allFiles     = filesResult.success     ? filesResult.data     || [] : [];
+  const fileRolesById = indexV2PublicRowsById_(fileRoles, 'file_role_id');
+  const ctx = { tables: {}, fileRolesById: fileRolesById };
+  ctx.tables[IROUP_V2_SHEETS.FILES] = allFiles;
+
+  const rows = knowledgeResult.data || [];
+  const dtos = rows
+    .filter(function (row) { return isV2PublicParentRow_(row, false); })
+    .map(function (row)    { return mapV2PublicKnowledgeDto_(row, ctx); });
+
+  return publicResponseV2_(true, dtos, dtos.length, '');
+}
+
+function mapV2PublicKnowledgeDto_(row, ctx) {
+  const files   = findV2PublicFiles_(ctx, 'knowledge', row.knowledge_id, row);
+  const imgFile = files.find(function (f) { return f.file_role_id === 'image'; });
+  const pdfFile = files.find(function (f) { return f.file_role_id === 'pdf'; });
+  return {
+    knowledge_id: row.knowledge_id || '',
+    title_th:     row.title_th     || '',
+    title_en:     row.title_en     || '',
+    content_th:   row.content_th   || '',
+    content_en:   row.content_en   || '',
+    category:     row.category     || '',
+    video_url:    row.video_url    || '',
+    link_url:     row.link_url     || '',
+    cover_url:    imgFile ? (imgFile.file_url || '') : '',
+    pdf_url:      pdfFile ? (pdfFile.file_url || '') : '',
+    files:        files
+  };
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+
 function getV2PublicStats_() {
   const mou = listV2PublicMOUs_();
   if (!mou.success) return mou;

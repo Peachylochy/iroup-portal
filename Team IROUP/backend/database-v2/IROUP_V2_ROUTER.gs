@@ -426,6 +426,66 @@ function getV2RouteDispatch_() {
         return deleteV2AdminEvent_(request);
       }
     },
+    'v2.admin.news.list': {
+      access: 'admin',
+      handler: function (request) {
+        return listV2AdminNews_(request);
+      }
+    },
+    'v2.admin.news.detail': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminNews_(request);
+      }
+    },
+    'v2.admin.news.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminNews_(request);
+      }
+    },
+    'v2.admin.news.update': {
+      access: 'admin',
+      handler: function (request) {
+        return updateV2AdminNews_(request);
+      }
+    },
+    'v2.admin.news.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminNews_(request);
+      }
+    },
+    'v2.admin.knowledge.list': {
+      access: 'admin',
+      handler: function (request) {
+        return listV2AdminKnowledge_(request);
+      }
+    },
+    'v2.admin.knowledge.detail': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminKnowledge_(request);
+      }
+    },
+    'v2.admin.knowledge.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminKnowledge_(request);
+      }
+    },
+    'v2.admin.knowledge.update': {
+      access: 'admin',
+      handler: function (request) {
+        return updateV2AdminKnowledge_(request);
+      }
+    },
+    'v2.admin.knowledge.delete': {
+      access: 'admin',
+      handler: function (request) {
+        return deleteV2AdminKnowledge_(request);
+      }
+    },
     'v2.admin.file.upload': {
       access: 'admin',
       handler: function (request) {
@@ -556,6 +616,18 @@ function getV2RouteDispatch_() {
       access: 'public',
       handler: function () {
         return listV2PublicEvents_();
+      }
+    },
+    'v2.public.news.list': {
+      access: 'public',
+      handler: function () {
+        return listV2PublicNews_();
+      }
+    },
+    'v2.public.knowledge.list': {
+      access: 'public',
+      handler: function () {
+        return listV2PublicKnowledge_();
       }
     }
   };

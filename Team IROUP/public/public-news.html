@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข่าวประชาสัมพันธ์ - iROUP</title>
+<link rel="stylesheet" href="../css/iroup-theme.css">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#1A6DB5;--blue-light:#4BBDE8;--blue-pale:#E8F4FD;
+  --navy:#0F2D5A;--navy-dark:#071828;
+  --green:#5BAD3E;--green-pale:#EBF7E3;
+  --gold:#D4890A;--gold-pale:#FEF3DC;
+  --red:#D63B32;--red-pale:#FDECEA;
+  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#DDE2EA;
+  --gray-400:#B8C2D0;--gray-600:#6B7A8D;--gray-800:#2D3748;
+  --white:#FFFFFF;
+  --shadow-sm:0 1px 4px rgba(15,45,90,0.08);
+  --shadow-md:0 4px 16px rgba(15,45,90,0.12);
+  --shadow-lg:0 8px 32px rgba(15,45,90,0.16);
+}
+body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--navy)}
+button,input,select{font:inherit}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:20px}
+.nav-link{font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent}
+.nav-link:hover{color:var(--blue)}
+.nav-link.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
+.nav-lang{display:flex;background:var(--gray-200);border-radius:8px;padding:3px;gap:2px}
+.nav-lang-btn{padding:4px 12px;border:0;border-radius:6px;background:transparent;font-size:11px;font-weight:700;cursor:pointer;color:var(--gray-600)}
+.nav-lang-btn.active{background:var(--blue);color:#fff}
+.nav-admin-btn{padding:7px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:20px;font-size:12px;font-weight:700;color:#fff;text-decoration:none}
+.page-hero{background:linear-gradient(135deg,#E8F4FD 0%,#F8FBFF 52%,#EBF7E3 100%);padding:48px 5%}
+.hero-inner{max-width:1400px;margin:0 auto}
+.page-hero h1{font-size:34px;font-weight:900;margin-bottom:8px;color:var(--navy-dark)}
+.page-hero p{font-size:15px;color:var(--gray-600);font-family:'Sarabun',sans-serif;line-height:1.7;max-width:760px}
+.hero-kpi{display:flex;gap:32px;margin-top:24px;flex-wrap:wrap}
+.hkpi-num{font-size:36px;font-weight:900;color:var(--blue);letter-spacing:-1px}
+.hkpi-label{font-size:12px;color:var(--gray-600);font-family:'Sarabun',sans-serif;margin-top:2px}
+.content{padding:32px 5%;max-width:1400px;margin:0 auto;width:100%}
+.filter-bar{background:var(--white);border-radius:14px;padding:14px 18px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);display:grid;grid-template-columns:minmax(240px,1fr) 220px 220px auto;gap:10px;margin-bottom:24px}
+.search-wrap{position:relative}
+.search-wrap input{width:100%;padding:10px 12px 10px 36px;border:1.5px solid var(--gray-300);border-radius:10px;font-size:13px;outline:none}
+.search-wrap input:focus,.filter-select:focus{border-color:var(--blue-light)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px}
+.filter-select{padding:10px 12px;border:1.5px solid var(--gray-300);border-radius:10px;font-size:13px;background:#fff;outline:none}
+.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--blue-pale);color:var(--blue);font-weight:800;cursor:pointer}
+.btn:hover{box-shadow:var(--shadow-sm)}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.news-card{background:#fff;border:1px solid var(--gray-200);border-radius:18px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;min-height:420px;cursor:pointer;transition:.2s}
+.news-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.card-cover{height:170px;background:linear-gradient(135deg,var(--blue-pale),#fff);display:grid;place-items:center;color:var(--blue);font-size:30px;font-weight:900;overflow:hidden}
+.card-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.card-body{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1}
+.card-title{font-size:17px;font-weight:800;line-height:1.45;color:var(--navy)}
+.card-text{font-size:13px;line-height:1.7;color:var(--gray-600);font-family:'Sarabun',sans-serif}
+.badge-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:800;background:var(--blue-pale);color:var(--blue);font-family:'Sarabun',sans-serif}
+.badge.category{background:var(--green-pale);color:var(--green)}
+.badge.sdg{background:var(--gold-pale);color:#9b6200}
+.card-footer{margin-top:auto;padding-top:6px;display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--gray-600);font-size:12px;font-family:'Sarabun',sans-serif}
+.loading,.empty,.error-state{text-align:center;padding:42px 18px;color:var(--gray-600);font-family:'Sarabun',sans-serif;background:#fff;border:1px dashed var(--gray-300);border-radius:18px}
+.spinner{width:30px;height:30px;border-radius:50%;border:4px solid #E4EEF8;border-top-color:var(--blue);animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal{position:fixed;inset:0;background:rgba(7,24,40,.58);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+.modal.open{display:flex}
+.modal-panel{width:min(900px,100%);background:#fff;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}
+.modal-cover{height:260px;background:linear-gradient(135deg,var(--blue-pale),#fff);display:grid;place-items:center;color:var(--blue);font-weight:900;font-size:34px;overflow:hidden}
+.modal-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.modal-body{padding:24px}
+.modal-title{font-size:24px;font-weight:900;line-height:1.35;color:var(--navy-dark);margin:10px 0}
+.modal-content{font-family:'Sarabun',sans-serif;font-size:15px;line-height:1.9;color:var(--gray-800);white-space:pre-wrap}
+.modal-actions{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid var(--gray-200)}
+.image-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.image-strip button{display:block;width:92px;height:70px;border-radius:10px;overflow:hidden;background:var(--gray-100);border:1px solid var(--gray-200);padding:0;cursor:pointer}
+.image-strip button:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.image-strip img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-modal{position:fixed;inset:0;background:rgba(3,12,24,.86);z-index:300;display:none;align-items:center;justify-content:center;padding:24px}
+.gallery-modal.open{display:flex}
+.gallery-panel{width:min(1100px,100%);display:grid;grid-template-columns:56px 1fr 56px;gap:14px;align-items:center}
+.gallery-stage{background:#071828;border-radius:18px;min-height:320px;max-height:78vh;display:grid;place-items:center;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.38)}
+.gallery-stage img{max-width:100%;max-height:78vh;object-fit:contain;display:block}
+.gallery-nav,.gallery-close{border:0;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;font-weight:900}
+.gallery-nav{width:56px;height:56px;font-size:30px}
+.gallery-nav:hover,.gallery-close:hover{background:rgba(255,255,255,.24)}
+.gallery-close{position:absolute;top:18px;right:18px;width:44px;height:44px;font-size:24px}
+.gallery-caption{position:absolute;left:24px;right:24px;bottom:16px;text-align:center;color:rgba(255,255,255,.78);font-family:'Sarabun',sans-serif;font-size:13px}
+footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(255,255,255,0.5);font-size:11px;font-family:'Sarabun',sans-serif;margin-top:40px}
+@media(max-width:900px){
+  nav{height:auto;padding:12px 5%;align-items:flex-start;gap:12px}
+  .nav-links{gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .filter-bar{grid-template-columns:1fr}
+  .page-hero{padding:36px 5%}
+  .page-hero h1{font-size:28px}
+  .gallery-panel{grid-template-columns:42px 1fr 42px;gap:8px}
+  .gallery-nav{width:42px;height:42px;font-size:24px}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="public-landing.html">
+    <img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'">
+  </a>
+  <div class="nav-links">
+    <a href="public-mou.html" class="nav-link">MOU</a>
+    <a href="public-scholar.html" class="nav-link">ทุนการศึกษา</a>
+    <a href="public-events.html" class="nav-link">กิจกรรม</a>
+    <a href="public-news.html" class="nav-link active">ข่าว</a>
+    <a href="public-mobility.html" class="nav-link">Mobility</a>
+    <div class="nav-lang">
+      <button id="langThBtn" class="nav-lang-btn active" type="button" onclick="setLang('TH')">TH</button>
+      <button id="langEnBtn" class="nav-lang-btn" type="button" onclick="setLang('EN')">EN</button>
+    </div>
+    <a href="../index.html" class="nav-admin-btn">Admin</a>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="hero-inner">
+    <h1>ข่าวประชาสัมพันธ์</h1>
+    <p>ข่าวสาร ความเคลื่อนไหว และกิจกรรมจากงานวิเทศสัมพันธ์ มหาวิทยาลัยพะเยา</p>
+    <div class="hero-kpi">
+      <div><div class="hkpi-num" id="kpi-total">-</div><div class="hkpi-label">ข่าวทั้งหมด</div></div>
+      <div><div class="hkpi-num" style="color:#5BAD3E" id="kpi-category">-</div><div class="hkpi-label">หมวดหมู่</div></div>
+      <div><div class="hkpi-num" style="color:#D4890A" id="kpi-month">-</div><div class="hkpi-label">เดือนนี้</div></div>
+    </div>
+  </div>
+</section>
+
+<main class="content">
+  <section class="filter-bar">
+    <div class="search-wrap">
+      <span class="search-icon">ค้น</span>
+      <input id="searchInput" type="search" placeholder="ค้นหาข่าว หรือหมวดหมู่..." oninput="renderNews()">
+    </div>
+    <select id="categoryFilter" class="filter-select" onchange="renderNews()">
+      <option value="">ทุกหมวดหมู่</option>
+    </select>
+    <select id="sdgFilter" class="filter-select" onchange="renderNews()">
+      <option value="">ทุก SDG</option>
+    </select>
+    <button class="btn" type="button" onclick="clearFilters()">ล้างตัวกรอง</button>
+  </section>
+
+  <section id="newsGrid" class="cards-grid">
+    <div class="loading"><div class="spinner"></div>กำลังโหลดข่าว...</div>
+  </section>
+</main>
+
+<div id="detailModal" class="modal" aria-hidden="true">
+  <article class="modal-panel">
+    <div id="modalCover" class="modal-cover">NEWS</div>
+    <div class="modal-body">
+      <div id="modalBadges" class="badge-row"></div>
+      <h2 id="modalTitle" class="modal-title"></h2>
+      <div id="modalDate" class="card-text"></div>
+      <div id="modalContent" class="modal-content"></div>
+      <div id="modalImages" class="image-strip"></div>
+    </div>
+    <div class="modal-actions">
+      <a id="modalLink" class="btn" href="#" target="_blank" rel="noopener" style="display:none">อ่านเพิ่มเติม</a>
+      <button class="btn" type="button" onclick="closeDetail()">ปิด</button>
+    </div>
+  </article>
+</div>
+
+<footer>© 2569 International Relations Office · University of Phayao</footer>
+
+<div id="galleryModal" class="gallery-modal" aria-hidden="true">
+  <button class="gallery-close" type="button" onclick="closeGallery()" aria-label="Close">&times;</button>
+  <div class="gallery-panel">
+    <button class="gallery-nav" type="button" onclick="moveGallery(-1)" aria-label="Previous">&lsaquo;</button>
+    <div class="gallery-stage"><img id="galleryImage" src="" alt=""></div>
+    <button class="gallery-nav" type="button" onclick="moveGallery(1)" aria-label="Next">&rsaquo;</button>
+  </div>
+  <div id="galleryCaption" class="gallery-caption"></div>
+</div>
+
+<script src="../js/iroup-config.js"></script>
+<script src="../js/iroup-v2-endpoint.js"></script>
+<script src="../js/iroup-v2-api.js"></script>
+<script>
+let allNews = [];
+let lang = 'TH';
+let galleryImages = [];
+let galleryIndex = 0;
+
+const SDG_NAMES = {
+  1:'ไม่มีความยากจน',2:'ไม่มีความหิวโหย',3:'สุขภาพและความเป็นอยู่ที่ดี',
+  4:'การศึกษาที่มีคุณภาพ',5:'ความเท่าเทียมทางเพศ',6:'น้ำสะอาดและสุขาภิบาล',
+  7:'พลังงานสะอาด',8:'งานที่มีคุณค่าและเศรษฐกิจ',9:'อุตสาหกรรมและโครงสร้างพื้นฐาน',
+  10:'ลดความไม่เท่าเทียม',11:'เมืองและชุมชนที่ยั่งยืน',12:'การผลิตและบริโภคที่ยั่งยืน',
+  13:'การรับมือการเปลี่ยนแปลงสภาพภูมิอากาศ',14:'ทรัพยากรทางทะเล',15:'ระบบนิเวศทางบก',
+  16:'สังคมสงบสุข',17:'ความร่วมมือเพื่อการพัฒนา'
+};
+
+document.addEventListener('DOMContentLoaded', loadNews);
+
+async function loadNews(){
+  const grid = document.getElementById('newsGrid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div>กำลังโหลดข่าว...</div>';
+  try{
+    const response = await IROUP_V2.public.newsList();
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public news API error');
+    allNews = (response.data || []).map(normalizeNews).sort((a,b) => String(b.publish_date || '').localeCompare(String(a.publish_date || '')));
+    populateFilters();
+    updateKpis();
+    renderNews();
+  }catch(error){
+    grid.innerHTML = `<div class="error-state">ไม่สามารถโหลดข่าวได้<br>${esc(error.message || String(error))}</div>`;
+  }
+}
+
+function normalizeNews(row){
+  const files = Array.isArray(row.files) ? row.files.filter(isPublicFile) : [];
+  return {
+    news_id: row.news_id || '',
+    title_th: row.title_th || '',
+    title_en: row.title_en || '',
+    content_th: row.content_th || '',
+    content_en: row.content_en || '',
+    publish_date: normalizeDate(row.publish_date),
+    category: row.category || '',
+    sdg_tags: row.sdg_tags || '',
+    link_url: safeUrl(row.link_url),
+    cover_url: safeUrl(row.cover_url) || firstFileUrl(files, 'cover') || firstFileUrl(files, 'image'),
+    files: files
+  };
+}
+
+function isPublicFile(file){
+  return file && String(file.visibility_level || '').trim() === 'public';
+}
+
+function firstFileUrl(files, role){
+  const file = (files || []).find(item => String(item.file_role_id || '').trim() === role);
+  return file ? safeUrl(file.file_url || file.thumbnail_url) : '';
+}
+
+function populateFilters(){
+  const categories = unique(allNews.map(item => item.category).filter(Boolean)).sort();
+  document.getElementById('categoryFilter').innerHTML =
+    '<option value="">ทุกหมวดหมู่</option>' +
+    categories.map(item => `<option value="${escAttr(item)}">${esc(item)}</option>`).join('');
+
+  document.getElementById('sdgFilter').innerHTML =
+    '<option value="">ทุก SDG</option>' +
+    Array.from({length:17}, (_, i) => {
+      const id = String(i + 1);
+      return `<option value="${id}">SDG-${id} ${esc(SDG_NAMES[id])}</option>`;
+    }).join('');
+}
+
+function updateKpis(){
+  const monthKey = new Date().toISOString().slice(0,7);
+  document.getElementById('kpi-total').textContent = allNews.length;
+  document.getElementById('kpi-category').textContent = unique(allNews.map(item => item.category).filter(Boolean)).length;
+  document.getElementById('kpi-month').textContent = allNews.filter(item => String(item.publish_date || '').slice(0,7) === monthKey).length;
+}
+
+function renderNews(){
+  const grid = document.getElementById('newsGrid');
+  const items = filteredNews();
+  if(!items.length){
+    grid.innerHTML = '<div class="empty">ยังไม่มีข่าวที่ตรงกับเงื่อนไข</div>';
+    return;
+  }
+  grid.innerHTML = items.map(item => `
+    <article class="news-card" onclick="openDetail('${escAttr(item.news_id)}')">
+      <div class="card-cover">${item.cover_url ? `<img src="${escAttr(toImageUrl(item.cover_url))}" alt="">` : '<span>NEWS</span>'}</div>
+      <div class="card-body">
+        <div class="badge-row">
+          ${item.category ? `<span class="badge category">${esc(item.category)}</span>` : ''}
+          ${renderSdgBadges(item.sdg_tags)}
+        </div>
+        <h2 class="card-title">${esc(displayTitle(item) || '-')}</h2>
+        <p class="card-text">${esc(truncate(displayContent(item), 150))}</p>
+        <div class="card-footer">
+          <span>${esc(displayDate(item.publish_date))}</span>
+          <span>อ่านต่อ</span>
+        </div>
+        ${item.link_url ? `<a class="btn" href="${escAttr(item.link_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="align-self:flex-start;margin-top:4px">เปิดลิงก์เพิ่มเติม</a>` : ''}
+      </div>
+    </article>
+  `).join('');
+}
+
+function filteredNews(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const category = document.getElementById('categoryFilter').value;
+  const sdg = document.getElementById('sdgFilter').value;
+  return allNews.filter(item => {
+    if(category && item.category !== category) return false;
+    if(sdg && parseSdgTags(item.sdg_tags).indexOf(sdg) < 0) return false;
+    if(!q) return true;
+    const haystack = [item.title_th,item.title_en,item.content_th,item.content_en,item.category].join(' ').toLowerCase();
+    return haystack.indexOf(q) >= 0;
+  });
+}
+
+function openDetail(newsId){
+  if(!newsId) return;
+  window.location.href = 'public-news-detail.html?id=' + encodeURIComponent(newsId);
+}
+
+function closeDetail(){
+  document.getElementById('detailModal').classList.remove('open');
+  closeGallery();
+}
+
+function renderContentImages(item){
+  return (item.files || [])
+    .filter(file => String(file.file_role_id || '').trim() === 'image')
+    .map(file => safeUrl(file.file_url || file.thumbnail_url))
+    .filter(Boolean)
+    .map((url, index) => `<button type="button" onclick="openGallery('${escAttr(item.news_id)}', ${index})"><img src="${escAttr(toImageUrl(url))}" alt=""></button>`)
+    .join('');
+}
+
+function getContentImageUrls(item){
+  return (item.files || [])
+    .filter(file => String(file.file_role_id || '').trim() === 'image')
+    .map(file => safeUrl(file.file_url || file.thumbnail_url))
+    .filter(Boolean);
+}
+
+function openGallery(newsId, startIndex){
+  const item = allNews.find(row => row.news_id === newsId);
+  galleryImages = item ? getContentImageUrls(item) : [];
+  if(!galleryImages.length) return;
+  galleryIndex = Math.max(0, Math.min(Number(startIndex) || 0, galleryImages.length - 1));
+  renderGallery();
+  document.getElementById('galleryModal').classList.add('open');
+  document.getElementById('galleryModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeGallery(){
+  const modal = document.getElementById('galleryModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function moveGallery(delta){
+  if(!galleryImages.length) return;
+  galleryIndex = (galleryIndex + delta + galleryImages.length) % galleryImages.length;
+  renderGallery();
+}
+
+function renderGallery(){
+  const image = document.getElementById('galleryImage');
+  const caption = document.getElementById('galleryCaption');
+  const url = galleryImages[galleryIndex] || '';
+  image.src = toImageUrl(url);
+  caption.textContent = `${galleryIndex + 1} / ${galleryImages.length}`;
+}
+
+function setLang(nextLang){
+  lang = nextLang === 'EN' ? 'EN' : 'TH';
+  document.getElementById('langThBtn').classList.toggle('active', lang === 'TH');
+  document.getElementById('langEnBtn').classList.toggle('active', lang === 'EN');
+  renderNews();
+}
+
+function clearFilters(){
+  document.getElementById('searchInput').value = '';
+  document.getElementById('categoryFilter').value = '';
+  document.getElementById('sdgFilter').value = '';
+  renderNews();
+}
+
+function displayTitle(item){
+  return lang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en;
+}
+
+function displayContent(item){
+  return lang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en;
+}
+
+function parseSdgTags(value){
+  return String(value || '').split(',').map(item => item.trim()).filter(Boolean);
+}
+
+function renderSdgBadges(value){
+  return parseSdgTags(value).map(tag => `<span class="badge sdg">SDG-${esc(tag)}</span>`).join('');
+}
+
+function displayDate(value){
+  const date = new Date(value);
+  if(!value || isNaN(date.getTime())) return '-';
+  if(lang === 'EN') return date.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  return date.toLocaleDateString('th-TH', { year:'numeric', month:'long', day:'numeric' });
+}
+
+function normalizeDate(value){
+  const text = String(value || '').trim();
+  if(!text) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  const date = new Date(text);
+  if(isNaN(date.getTime())) return text;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+
+function toImageUrl(url){
+  const value = safeUrl(url);
+  const match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/);
+  if(match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200`;
+  return value;
+}
+
+function safeUrl(value){
+  const text = String(value || '').trim();
+  if(!text || text === '-' || text.toLowerCase() === 'undefined' || text.toLowerCase() === 'null') return '';
+  return text;
+}
+
+function truncate(value, max){
+  const text = String(value || '').trim();
+  if(text.length <= max) return text;
+  return text.slice(0, max - 1) + '…';
+}
+
+function unique(values){
+  return Array.from(new Set(values.map(value => String(value || '').trim()).filter(Boolean)));
+}
+
+function esc(value){
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+function escAttr(value){ return esc(value); }
+</script>
+</body>
+</html>

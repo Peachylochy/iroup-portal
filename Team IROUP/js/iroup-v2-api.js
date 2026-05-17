@@ -352,6 +352,12 @@
       },
       eventList: function () {
         return request('v2.public.event.list');
+      },
+      newsList: function () {
+        return request('v2.public.news.list');
+      },
+      knowledgeList: function () {
+        return request('v2.public.knowledge.list');
       }
     },
 

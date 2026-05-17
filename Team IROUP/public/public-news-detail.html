@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข่าวประชาสัมพันธ์ - iROUP</title>
+<link rel="stylesheet" href="../css/iroup-theme.css">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#1A6DB5;--blue-light:#4BBDE8;--blue-pale:#E8F4FD;
+  --navy:#0F2D5A;--navy-dark:#071828;
+  --green:#5BAD3E;--green-pale:#EBF7E3;
+  --gold:#D4890A;--gold-pale:#FEF3DC;
+  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#DDE2EA;
+  --gray-600:#6B7A8D;--gray-800:#2D3748;--white:#fff;
+  --shadow-sm:0 1px 4px rgba(15,45,90,.08);
+  --shadow-md:0 4px 16px rgba(15,45,90,.12);
+  --shadow-lg:0 12px 44px rgba(15,45,90,.18);
+}
+body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--navy)}
+button,input,select{font:inherit}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.nav-link{font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
+.nav-link:hover,.nav-link.active{color:var(--blue);border-bottom-color:var(--blue)}
+.nav-lang{display:flex;background:var(--gray-200);border-radius:8px;padding:3px;gap:2px}
+.nav-lang-btn{padding:4px 12px;border:0;border-radius:6px;background:transparent;font-size:11px;font-weight:700;cursor:pointer;color:var(--gray-600)}
+.nav-lang-btn.active{background:var(--blue);color:#fff}
+.nav-admin-btn{padding:7px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:20px;font-size:12px;font-weight:700;color:#fff;text-decoration:none}
+.loading,.empty,.error-state{max-width:900px;margin:48px auto;text-align:center;padding:42px 18px;color:var(--gray-600);font-family:'Sarabun',sans-serif;background:#fff;border:1px dashed var(--gray-300);border-radius:18px}
+.spinner{width:30px;height:30px;border-radius:50%;border:4px solid #E4EEF8;border-top-color:var(--blue);animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.article-shell{display:none}
+.article-hero{background:linear-gradient(135deg,#E8F4FD 0%,#F8FBFF 52%,#EBF7E3 100%);padding:34px 5% 28px}
+.hero-inner{max-width:1040px;margin:0 auto}
+.back-link{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;color:var(--blue);text-decoration:none;font-weight:800;font-size:13px}
+.badge-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;background:var(--blue-pale);color:var(--blue);font-family:'Sarabun',sans-serif}
+.badge.category{background:var(--green-pale);color:var(--green)}
+.badge.sdg{background:var(--gold-pale);color:#9b6200}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.18;font-weight:900;color:var(--navy-dark);max-width:920px}
+.meta{margin-top:14px;font-size:14px;color:var(--gray-600);font-family:'Sarabun',sans-serif}
+.hero-cover{max-width:1040px;margin:24px auto 0;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,var(--blue-pale),#fff);box-shadow:var(--shadow-lg);aspect-ratio:16/8;display:grid;place-items:center;color:var(--blue);font-size:48px;font-weight:900}
+.hero-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.article-main{padding:36px 5% 60px}
+.article-grid{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:34px;align-items:start}
+.article-body{background:#fff;border:1px solid var(--gray-200);border-radius:22px;padding:34px;box-shadow:var(--shadow-sm)}
+.article-content{font-family:'Sarabun',sans-serif;font-size:18px;line-height:2.05;color:var(--gray-800);white-space:pre-wrap;max-width:760px}
+.side-panel{position:sticky;top:84px;background:#fff;border:1px solid var(--gray-200);border-radius:18px;padding:18px;box-shadow:var(--shadow-sm)}
+.side-title{font-weight:900;margin-bottom:12px}
+.action-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:12px;padding:11px 14px;background:var(--blue-pale);color:var(--blue);font-weight:900;text-decoration:none;margin-top:10px;cursor:pointer}
+.action-btn.image{background:var(--green-pale);color:var(--green)}
+.gallery-section{max-width:1040px;margin:30px auto 0}
+.section-title{font-size:22px;font-weight:900;margin-bottom:14px;color:var(--navy-dark)}
+.image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.image-thumb{height:132px;border:0;border-radius:14px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm);cursor:pointer;padding:0}
+.image-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-modal{position:fixed;inset:0;background:rgba(3,12,24,.88);z-index:300;display:none;align-items:center;justify-content:center;padding:24px}
+.gallery-modal.open{display:flex}
+.gallery-panel{width:min(1100px,100%);display:grid;grid-template-columns:56px 1fr 56px;gap:14px;align-items:center}
+.gallery-stage{background:#071828;border-radius:18px;min-height:320px;max-height:78vh;display:grid;place-items:center;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.38)}
+.gallery-stage img{max-width:100%;max-height:78vh;object-fit:contain;display:block}
+.gallery-nav,.gallery-close{border:0;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;font-weight:900}
+.gallery-nav{width:56px;height:56px;font-size:30px}
+.gallery-close{position:absolute;top:18px;right:18px;width:44px;height:44px;font-size:24px}
+.gallery-caption{position:absolute;left:24px;right:24px;bottom:16px;text-align:center;color:rgba(255,255,255,.78);font-family:'Sarabun',sans-serif;font-size:13px}
+footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(255,255,255,.5);font-size:11px;font-family:'Sarabun',sans-serif}
+@media(max-width:900px){
+  nav{height:auto;padding:12px 5%;align-items:flex-start;gap:12px}.nav-links{gap:10px;justify-content:flex-end}
+  .article-grid{grid-template-columns:1fr}.side-panel{position:static}.article-body{padding:24px}.article-content{font-size:16px}
+  .hero-cover{aspect-ratio:4/3}.gallery-panel{grid-template-columns:42px 1fr 42px}.gallery-nav{width:42px;height:42px;font-size:24px}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="public-landing.html">
+    <img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'">
+  </a>
+  <div class="nav-links">
+    <a href="public-mou.html" class="nav-link">MOU</a>
+    <a href="public-scholar.html" class="nav-link">ทุนการศึกษา</a>
+    <a href="public-events.html" class="nav-link">กิจกรรม</a>
+    <a href="public-news.html" class="nav-link active">ข่าว</a>
+    <a href="public-knowledge.html" class="nav-link">คลังความรู้</a>
+    <a href="public-mobility.html" class="nav-link">Mobility</a>
+    <div class="nav-lang">
+      <button id="langThBtn" class="nav-lang-btn active" type="button" onclick="setLang('TH')">TH</button>
+      <button id="langEnBtn" class="nav-lang-btn" type="button" onclick="setLang('EN')">EN</button>
+    </div>
+    <a href="../index.html" class="nav-admin-btn">Admin</a>
+  </div>
+</nav>
+
+<div id="loadingState" class="loading"><div class="spinner"></div>กำลังโหลดข่าว...</div>
+<div id="errorState" class="error-state" style="display:none"></div>
+
+<article id="articleShell" class="article-shell">
+  <section class="article-hero">
+    <div class="hero-inner">
+      <a class="back-link" href="public-news.html">← กลับไปหน้าข่าว</a>
+      <div id="badgeRow" class="badge-row"></div>
+      <h1 id="articleTitle"></h1>
+      <div id="articleMeta" class="meta"></div>
+    </div>
+    <div id="heroCover" class="hero-cover">NEWS</div>
+  </section>
+
+  <main class="article-main">
+    <div class="article-grid">
+      <section class="article-body">
+        <div id="articleContent" class="article-content"></div>
+      </section>
+      <aside class="side-panel">
+        <div class="side-title">การดำเนินการ</div>
+        <a class="action-btn" href="public-news.html">กลับไปหน้าข่าว</a>
+        <a id="externalLinkBtn" class="action-btn" href="#" target="_blank" rel="noopener" style="display:none">เปิดลิงก์เพิ่มเติม</a>
+        <button id="galleryBtn" class="action-btn image" type="button" onclick="openGallery(0)" style="display:none">ดูรูปภาพ</button>
+      </aside>
+    </div>
+    <section id="gallerySection" class="gallery-section" style="display:none">
+      <h2 class="section-title">รูปภาพเพิ่มเติม</h2>
+      <div id="imageGrid" class="image-grid"></div>
+    </section>
+  </main>
+</article>
+
+<div id="galleryModal" class="gallery-modal" aria-hidden="true">
+  <button class="gallery-close" type="button" onclick="closeGallery()" aria-label="Close">&times;</button>
+  <div class="gallery-panel">
+    <button class="gallery-nav" type="button" onclick="moveGallery(-1)" aria-label="Previous">&lsaquo;</button>
+    <div class="gallery-stage"><img id="galleryImage" src="" alt=""></div>
+    <button class="gallery-nav" type="button" onclick="moveGallery(1)" aria-label="Next">&rsaquo;</button>
+  </div>
+  <div id="galleryCaption" class="gallery-caption"></div>
+</div>
+
+<footer>© 2569 International Relations Office · University of Phayao</footer>
+
+<script src="../js/iroup-config.js"></script>
+<script src="../js/iroup-v2-endpoint.js"></script>
+<script src="../js/iroup-v2-api.js"></script>
+<script>
+let currentLang = 'TH';
+let currentItem = null;
+let galleryImages = [];
+let galleryIndex = 0;
+
+document.addEventListener('DOMContentLoaded', loadDetail);
+
+async function loadDetail() {
+  const id = new URLSearchParams(window.location.search).get('id') || '';
+  if (!id) return showError('ไม่พบรหัสข่าว');
+  try {
+    const response = await IROUP_V2.public.newsList();
+    if (!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public news API error');
+    const rows = (response.data || []).map(normalizeNews);
+    currentItem = rows.find(item => String(item.news_id || '') === String(id));
+    if (!currentItem) return showError('ไม่พบข่าว หรือข่าวนี้ไม่ได้เปิดเผยสาธารณะ');
+    renderDetail();
+  } catch (error) {
+    showError(error.message || String(error));
+  }
+}
+
+function normalizeNews(row) {
+  const files = Array.isArray(row.files) ? row.files.filter(isPublicFile) : [];
+  return {
+    news_id: row.news_id || '',
+    title_th: row.title_th || '',
+    title_en: row.title_en || '',
+    content_th: row.content_th || '',
+    content_en: row.content_en || '',
+    publish_date: normalizeDate(row.publish_date),
+    category: row.category || '',
+    sdg_tags: row.sdg_tags || '',
+    link_url: safeUrl(row.link_url),
+    cover_url: safeUrl(row.cover_url) || firstFileUrl(files, 'cover') || firstFileUrl(files, 'image'),
+    files: files
+  };
+}
+
+function renderDetail() {
+  const item = currentItem;
+  const title = displayTitle(item) || '-';
+  document.title = title + ' - iROUP';
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('articleShell').style.display = 'block';
+  document.getElementById('articleTitle').textContent = title;
+  document.getElementById('articleMeta').textContent = displayDate(item.publish_date);
+  document.getElementById('articleContent').textContent = displayContent(item) || '-';
+  document.getElementById('badgeRow').innerHTML =
+    (item.category ? '<span class="badge category">' + esc(item.category) + '</span>' : '') + renderSdgBadges(item.sdg_tags);
+  document.getElementById('heroCover').innerHTML = item.cover_url
+    ? '<img src="' + escAttr(toImageUrl(item.cover_url)) + '" alt="' + escAttr(title) + '">'
+    : 'NEWS';
+  const linkBtn = document.getElementById('externalLinkBtn');
+  if (item.link_url) {
+    linkBtn.href = item.link_url;
+    linkBtn.style.display = '';
+  } else {
+    linkBtn.style.display = 'none';
+  }
+  galleryImages = getImageUrls(item);
+  renderGallerySection();
+}
+
+function renderGallerySection() {
+  const section = document.getElementById('gallerySection');
+  const grid = document.getElementById('imageGrid');
+  const galleryBtn = document.getElementById('galleryBtn');
+  if (!galleryImages.length) {
+    section.style.display = 'none';
+    galleryBtn.style.display = 'none';
+    return;
+  }
+  galleryBtn.style.display = '';
+  section.style.display = '';
+  grid.innerHTML = galleryImages.map((url, index) =>
+    '<button class="image-thumb" type="button" onclick="openGallery(' + index + ')"><img src="' + escAttr(toImageUrl(url)) + '" alt=""></button>'
+  ).join('');
+}
+
+function setLang(nextLang) {
+  currentLang = nextLang === 'EN' ? 'EN' : 'TH';
+  document.getElementById('langThBtn').classList.toggle('active', currentLang === 'TH');
+  document.getElementById('langEnBtn').classList.toggle('active', currentLang === 'EN');
+  if (currentItem) renderDetail();
+}
+
+function openGallery(startIndex) {
+  if (!galleryImages.length) return;
+  galleryIndex = Math.max(0, Math.min(Number(startIndex) || 0, galleryImages.length - 1));
+  renderGallery();
+  document.getElementById('galleryModal').classList.add('open');
+  document.getElementById('galleryModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeGallery() {
+  const modal = document.getElementById('galleryModal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function moveGallery(delta) {
+  if (!galleryImages.length) return;
+  galleryIndex = (galleryIndex + delta + galleryImages.length) % galleryImages.length;
+  renderGallery();
+}
+
+function renderGallery() {
+  const url = galleryImages[galleryIndex] || '';
+  document.getElementById('galleryImage').src = toImageUrl(url);
+  document.getElementById('galleryCaption').textContent = (galleryIndex + 1) + ' / ' + galleryImages.length;
+}
+
+document.addEventListener('keydown', function(event) {
+  const open = document.getElementById('galleryModal').classList.contains('open');
+  if (event.key === 'Escape' && open) closeGallery();
+  if (!open) return;
+  if (event.key === 'ArrowLeft') moveGallery(-1);
+  if (event.key === 'ArrowRight') moveGallery(1);
+});
+
+function getImageUrls(item) {
+  return (item.files || [])
+    .filter(file => String(file.file_role_id || '').trim() === 'image')
+    .map(file => safeUrl(file.file_url || file.thumbnail_url))
+    .filter(Boolean);
+}
+
+function isPublicFile(file) {
+  return file && String(file.visibility_level || '').trim() === 'public';
+}
+
+function firstFileUrl(files, role) {
+  const file = (files || []).find(item => String(item.file_role_id || '').trim() === role);
+  return file ? safeUrl(file.file_url || file.thumbnail_url) : '';
+}
+
+function displayTitle(item) {
+  return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en;
+}
+
+function displayContent(item) {
+  return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en;
+}
+
+function renderSdgBadges(value) {
+  return String(value || '').split(',').map(item => item.trim()).filter(Boolean)
+    .map(tag => '<span class="badge sdg">SDG-' + esc(tag) + '</span>').join('');
+}
+
+function displayDate(value) {
+  const date = new Date(value);
+  if (!value || isNaN(date.getTime())) return '-';
+  if (currentLang === 'EN') return date.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  return date.toLocaleDateString('th-TH', { year:'numeric', month:'long', day:'numeric' });
+}
+
+function normalizeDate(value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  const date = new Date(text);
+  if (isNaN(date.getTime())) return text;
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+}
+
+function toImageUrl(url) {
+  const value = safeUrl(url);
+  const match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/);
+  if (match && match[1]) return 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1600';
+  return value;
+}
+
+function safeUrl(value) {
+  const text = String(value || '').trim();
+  if (!text || text === '-' || text.toLowerCase() === 'undefined' || text.toLowerCase() === 'null') return '';
+  return text;
+}
+
+function showError(message) {
+  document.getElementById('loadingState').style.display = 'none';
+  const error = document.getElementById('errorState');
+  error.style.display = '';
+  error.innerHTML = esc(message) + '<br><br><a class="action-btn" href="public-news.html" style="max-width:220px;margin:12px auto 0">กลับไปหน้าข่าว</a>';
+}
+
+function esc(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function escAttr(value) { return esc(value); }
+</script>
+</body>
+</html>

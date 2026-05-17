@@ -32,12 +32,14 @@ const IROUP_V2_SHEETS = {
   TRAVEL_PARTICIPANT: 'TRAVEL_PARTICIPANT',
   SCHOLARSHIP: 'SCHOLARSHIP',
   EVENT: 'EVENT',
+  NEWS: 'NEWS',
+  KNOWLEDGE: 'KNOWLEDGE',
 
   BUDGET: 'BUDGET',
   FILES: 'FILES'
 };
 
-const IROUP_V2_MODULES = ['mou', 'mobility', 'travel', 'scholarship', 'event'];
+const IROUP_V2_MODULES = ['mou', 'mobility', 'travel', 'scholarship', 'event', 'news', 'knowledge'];
 
 const IROUP_V2_PUBLIC_MODULES = {
   MOU: 'mou',
