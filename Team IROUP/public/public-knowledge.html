@@ -1,455 +1,335 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>คลังความรู้ — iROUP</title>
+<title>คลังความรู้ | iROUP</title>
+<script>
+(function(){
+  var theme = localStorage.getItem('iroup_public_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --blue:#1A6DB5;--blue-light:#4BBDE8;--blue-pale:#E8F4FD;
-  --navy:#0F2D5A;--navy-dark:#071828;
-  --green:#5BAD3E;--green-pale:#EBF7E3;
-  --gold:#D4890A;--gold-pale:#FEF3DC;
-  --red:#D63B32;--red-pale:#FDECEA;
-  --purple:#7C3AED;--purple-pale:#F0EBFF;
-  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#DDE2EA;
-  --gray-400:#B8C2D0;--gray-600:#6B7A8D;--gray-800:#2D3748;
-  --white:#FFFFFF;
-  --shadow-sm:0 1px 4px rgba(15,45,90,0.08);
-  --shadow-md:0 4px 16px rgba(15,45,90,0.12);
-  --shadow-lg:0 8px 32px rgba(15,45,90,0.16);
+  --bg:#07111f;--surface:#0c1b2d;--surface-2:#10243a;--surface-3:#132b46;
+  --line:rgba(100,190,255,.16);--line-strong:rgba(96,165,250,.28);
+  --text:#eef7ff;--muted:#8ba7c2;--soft:#c7d8ec;--dim:#5f7898;
+  --blue:#2387ff;--cyan:#2bd8ff;--violet:#8b5cf6;--gold:#f7b733;--green:#5ee38c;--red:#ff6b6b;
+  --shadow:0 24px 70px rgba(0,0,0,.28);--radius:18px;
+}
+:root[data-theme="light"]{
+  --bg:#f4f9fd;--surface:#ffffff;--surface-2:#f6fbff;--surface-3:#eaf4ff;
+  --line:rgba(19,74,124,.12);--line-strong:rgba(26,109,181,.22);
+  --text:#0b2340;--muted:#63758c;--soft:#344b66;--dim:#8495a8;
+  --blue:#176fe8;--cyan:#22aee8;--violet:#7c3aed;--gold:#d69014;--green:#2eaa56;--red:#df4b4b;
+  --shadow:0 18px 50px rgba(34,71,108,.13);
 }
 html{scroll-behavior:smooth}
-body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--navy)}
-
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.nav-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.nav-link{font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent}
-.nav-link:hover{color:var(--blue)}
-.nav-link.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
-.nav-lang{display:flex;background:var(--gray-200);border-radius:8px;padding:3px;gap:2px}
-.nav-lang-btn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:var(--gray-600);transition:all .2s}
-.nav-lang-btn.active{background:var(--blue);color:#fff}
-.nav-admin-btn{padding:7px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:20px;font-size:12px;font-weight:700;color:#fff;text-decoration:none}
-
-/* HERO */
-.page-hero{background:linear-gradient(135deg,#F0EBFF 0%,#E8F4FD 50%,#EBF7E3 100%);padding:48px 5%}
-.page-hero h1{font-size:32px;font-weight:800;color:var(--navy-dark);margin-bottom:8px}
-.page-hero p{font-size:14px;color:var(--gray-600);font-family:'Sarabun',sans-serif}
-.hero-kpi{display:flex;gap:32px;margin-top:24px;flex-wrap:wrap}
-.hkpi-num{font-size:36px;font-weight:900;color:var(--purple);letter-spacing:-1px}
-.hkpi-label{font-size:11px;color:rgba(15,45,90,0.6);font-family:'Sarabun',sans-serif;margin-top:2px}
-
-.content{padding:32px 5%;max-width:1400px;margin:0 auto;width:100%}
-
-/* FILTER */
-.filter-bar{background:var(--white);border-radius:12px;padding:14px 18px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px}
-.search-wrap{flex:1;position:relative;min-width:200px}
-.search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:'Prompt',sans-serif;outline:none;transition:border .15s}
-.search-wrap input:focus{border-color:var(--blue-light)}
-.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px}
-.filter-select{padding:8px 12px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:12px;font-family:'Prompt',sans-serif;outline:none;background:var(--white);cursor:pointer}
-.pills{display:flex;gap:5px;flex-wrap:wrap}
-.pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-300);color:var(--gray-600);background:var(--white);transition:all .2s;font-family:'Sarabun',sans-serif}
-.pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-
-/* SECTION LABEL */
-.section-label{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:6px;padding-bottom:8px;border-bottom:2px solid var(--purple-pale)}
-.result-count{font-size:12px;color:var(--gray-600);font-weight:400;font-family:'Sarabun',sans-serif;margin-left:auto}
-
-/* CARDS GRID */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:32px}
-
-/* KNOWLEDGE CARD */
-.kn-card{background:var(--white);border-radius:16px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);overflow:hidden;transition:all .25s;display:flex;flex-direction:column}
-.kn-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
-.card-cover{height:160px;background:var(--purple-pale);overflow:hidden;position:relative;flex-shrink:0}
-.card-cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
-.kn-card:hover .card-cover img{transform:scale(1.05)}
-.card-cover-fallback{height:100%;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:900;color:var(--purple);background:linear-gradient(135deg,var(--purple-pale),#FAF7FF)}
-.card-cat-badge{position:absolute;bottom:10px;left:12px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(124,58,237,0.85);color:#fff;backdrop-filter:blur(4px);font-family:'Sarabun',sans-serif}
-.card-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:6px}
-.card-title{font-size:14px;font-weight:700;color:var(--navy);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-excerpt{font-size:12px;color:var(--gray-600);font-family:'Sarabun',sans-serif;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:2px;flex:1}
-.card-footer{padding:10px 16px;border-top:1px solid var(--gray-200);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-
-/* MEDIA BADGES */
-.media-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;font-family:'Sarabun',sans-serif;text-decoration:none}
-.badge-pdf{background:var(--red-pale);color:var(--red)}
-.badge-video{background:#FEE2E2;color:#DC2626}
-.badge-link{background:var(--blue-pale);color:var(--blue)}
-.badge-image{background:var(--green-pale);color:var(--green)}
-.cat-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--purple-pale);color:var(--purple);font-weight:600;font-family:'Sarabun',sans-serif}
-
-/* EMPTY */
-.empty-state{text-align:center;padding:60px 20px;color:var(--gray-400);font-family:'Sarabun',sans-serif}
-.empty-state .icon{font-size:48px;margin-bottom:12px}
-.empty-state p{font-size:14px}
-
-.loading{text-align:center;padding:40px;color:var(--gray-400);font-family:'Sarabun',sans-serif}
-.modal{position:fixed;inset:0;background:rgba(7,24,40,.58);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
-.modal.open{display:flex}
-.modal-panel{width:min(900px,100%);background:#fff;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}
-.modal-cover{height:260px;background:linear-gradient(135deg,var(--purple-pale),#fff);display:grid;place-items:center;color:var(--purple);font-weight:900;font-size:42px;overflow:hidden}
-.modal-cover img{width:100%;height:100%;object-fit:cover;display:block}
-.modal-body{padding:24px}
-.modal-title{font-size:24px;font-weight:900;line-height:1.35;color:var(--navy-dark);margin:10px 0}
-.modal-content{font-family:'Sarabun',sans-serif;font-size:15px;line-height:1.9;color:var(--gray-800);white-space:pre-wrap}
-.modal-actions{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid var(--gray-200);flex-wrap:wrap}
-.action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
-.action-btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:10px;padding:9px 12px;background:var(--blue-pale);color:var(--blue);font-weight:800;text-decoration:none;font-family:'Sarabun',sans-serif;cursor:pointer}
-.action-btn.pdf{background:var(--red-pale);color:var(--red)}
-.action-btn.video{background:#FEE2E2;color:#DC2626}
-.action-btn.image{background:var(--green-pale);color:var(--green)}
-.image-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
-.image-strip button{display:block;width:92px;height:70px;border-radius:10px;overflow:hidden;background:var(--gray-100);border:1px solid var(--gray-200);padding:0;cursor:pointer}
-.image-strip button:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
-.image-strip img{width:100%;height:100%;object-fit:cover;display:block}
-.gallery-modal{position:fixed;inset:0;background:rgba(3,12,24,.86);z-index:300;display:none;align-items:center;justify-content:center;padding:24px}
-.gallery-modal.open{display:flex}
-.gallery-panel{width:min(1100px,100%);display:grid;grid-template-columns:56px 1fr 56px;gap:14px;align-items:center}
-.gallery-stage{background:#071828;border-radius:18px;min-height:320px;max-height:78vh;display:grid;place-items:center;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.38)}
-.gallery-stage img{max-width:100%;max-height:78vh;object-fit:contain;display:block}
-.gallery-nav,.gallery-close{border:0;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;font-weight:900}
-.gallery-nav{width:56px;height:56px;font-size:30px}
-.gallery-nav:hover,.gallery-close:hover{background:rgba(255,255,255,.24)}
-.gallery-close{position:absolute;top:18px;right:18px;width:44px;height:44px;font-size:24px}
-.gallery-caption{position:absolute;left:24px;right:24px;bottom:16px;text-align:center;color:rgba(255,255,255,.78);font-family:'Sarabun',sans-serif;font-size:13px}
-footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;font-family:'Sarabun',sans-serif;margin-top:40px}
-@media(max-width:900px){.gallery-panel{grid-template-columns:42px 1fr 42px;gap:8px}.gallery-nav{width:42px;height:42px;font-size:24px}}
+body{min-height:100vh;background:
+  radial-gradient(circle at 16% 5%,rgba(35,135,255,.18),transparent 32%),
+  radial-gradient(circle at 85% 6%,rgba(139,92,246,.14),transparent 28%),
+  var(--bg);color:var(--text);font-family:'Prompt',sans-serif}
+:root[data-theme="light"] body{background:linear-gradient(180deg,#f7fbff 0,#eef6fd 42%,#fbfdff 100%)}
+a{color:inherit;text-decoration:none}button,input,select{font:inherit}
+.topbar{position:sticky;top:0;z-index:50;height:64px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;gap:22px;background:rgba(7,17,31,.8);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .topbar{background:rgba(255,255,255,.86)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{height:32px;width:auto;display:block}.brand-fallback{display:none;color:var(--text);font-weight:900}
+.nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.nav a,.theme-toggle,.lang-btn{border:1px solid transparent;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;color:var(--soft);background:transparent;cursor:pointer}
+.nav a:hover,.nav a.active{background:rgba(35,135,255,.14);border-color:rgba(35,135,255,.28);color:var(--text)}
+.lang{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:3px}
+:root[data-theme="light"] .lang{background:#fff}.lang-btn{padding:6px 10px}.lang-btn.active{background:var(--blue);color:#fff}
+.theme-toggle{background:rgba(255,255,255,.06);border-color:var(--line);min-width:58px}:root[data-theme="light"] .theme-toggle{background:#fff}.admin-link{background:rgba(255,255,255,.06)!important;border-color:var(--line)!important}
+.hero{position:relative;overflow:hidden;min-height:300px;padding:54px 5% 44px;background-image:linear-gradient(90deg,rgba(7,17,31,.98) 0%,rgba(7,17,31,.72) 36%,rgba(7,17,31,.04) 78%),url("../assets/knowledge-hero-dark.webp");background-size:cover;background-position:center right;border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .hero{background-image:linear-gradient(90deg,rgba(247,251,255,.98) 0%,rgba(247,251,255,.76) 36%,rgba(247,251,255,.04) 78%),url("../assets/knowledge-hero-light.webp")}
+.hero-inner{position:relative;z-index:1;width:min(1440px,90%);margin:0 auto}
+.hero-kicker{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,var(--green),var(--violet));box-shadow:0 16px 34px rgba(35,135,255,.24);font-size:26px;margin-bottom:18px}
+.hero h1{font-size:clamp(30px,3.6vw,50px);line-height:1.12;font-weight:900;letter-spacing:0;color:var(--text);max-width:790px}
+.lead{margin-top:10px;color:var(--muted);font-family:'Sarabun',sans-serif;font-size:16px;max-width:760px;line-height:1.65}
+.hero-kpis{display:flex;gap:48px;margin-top:28px;flex-wrap:wrap}.kpi-num{font-size:38px;line-height:1;font-weight:900;letter-spacing:0}.kpi-num.total{color:var(--violet)}.kpi-num.pdf{color:var(--gold)}.kpi-num.cat{color:var(--cyan)}
+.kpi-label{font-size:12px;color:var(--muted);font-weight:800;margin-top:8px;font-family:'Sarabun',sans-serif}
+.shell{width:min(1440px,90%);margin:0 auto;padding:28px 0 58px}
+.filter-bar{display:grid;grid-template-columns:minmax(280px,1fr) minmax(180px,240px) auto;gap:10px;align-items:center;background:rgba(12,27,45,.8);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:26px}
+:root[data-theme="light"] .filter-bar{background:rgba(255,255,255,.92)}
+.search-wrap{position:relative}.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--blue);font-size:15px;line-height:1}
+.input,.select{width:100%;height:44px;border:1px solid var(--line);background:rgba(0,0,0,.14);color:var(--text);border-radius:13px;padding:0 13px;outline:none}.input{padding-left:40px}
+:root[data-theme="light"] .input,:root[data-theme="light"] .select{background:#fff}.select option{color:#0b2340;background:#fff}
+.pills{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.pill{height:42px;border:1px solid var(--line);background:var(--surface-2);color:var(--soft);border-radius:999px;padding:0 14px;font-size:12px;font-weight:900;cursor:pointer}.pill.on{background:linear-gradient(135deg,var(--blue),var(--violet));color:#fff;border-color:transparent}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:2px 0 16px}.section-title{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:900}.section-count{color:var(--muted);font-size:13px;font-family:'Sarabun',sans-serif}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}.card{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 46px rgba(0,0,0,.12);min-height:374px;display:flex;flex-direction:column;transition:.2s ease}.card:hover{transform:translateY(-4px);border-color:var(--line-strong);box-shadow:var(--shadow)}
+.cover{height:156px;background:linear-gradient(135deg,rgba(139,92,246,.16),rgba(43,216,255,.08)),var(--surface-3);display:grid;place-items:center;color:var(--blue);font-size:28px;font-weight:900;overflow:hidden}.cover img{width:100%;height:100%;object-fit:cover;display:block}.more{position:absolute;top:12px;right:12px;width:32px;height:26px;border-radius:999px;background:rgba(7,17,31,.58);color:#fff;display:grid;place-items:center;font-weight:900;border:1px solid rgba(255,255,255,.14)}
+.body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}.badges{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:900;font-family:'Sarabun',sans-serif}.badge.category{background:rgba(139,92,246,.14);color:var(--violet)}.badge.pdf{background:rgba(255,107,107,.14);color:var(--red)}.badge.video{background:rgba(35,135,255,.13);color:var(--blue)}.badge.image{background:rgba(94,227,140,.13);color:var(--green)}
+.title{font-size:16px;font-weight:900;line-height:1.45;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.excerpt{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:13.5px;line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.footer-row{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-family:'Sarabun',sans-serif;font-size:12.5px}.read-more{color:var(--blue);font-weight:900;white-space:nowrap}
+.state{padding:44px 18px;text-align:center;color:var(--muted);font-family:'Sarabun',sans-serif;background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius);grid-column:1/-1}.spinner{width:30px;height:30px;border-radius:50%;border:4px solid rgba(35,135,255,.16);border-top-color:var(--blue);animation:spin 1s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}
+footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:var(--dim);font-family:'Sarabun',sans-serif;font-size:12px}
+@media(max-width:980px){.topbar{height:auto;min-height:64px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.nav{max-width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start}.filter-bar{grid-template-columns:1fr}.hero-inner,.shell{width:92%}.hero-kpis{gap:28px}.section-head{align-items:flex-start;flex-direction:column}}
+@media(max-width:640px){.hero{padding:34px 4%}.hero-kicker{width:46px;height:46px}.cards{grid-template-columns:1fr}.cover{height:170px}.nav{width:100%}}
 </style>
 </head>
 <body>
+<header class="topbar">
+  <a class="brand" href="public-landing.html"><img src="../assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="brand-fallback">iROUP</span></a>
+  <nav class="nav" aria-label="Public navigation">
+    <a href="public-news.html" data-i18n="navNews">ข่าวสาร</a>
+    <a class="active" href="public-knowledge.html" data-i18n="navKnowledge">คลังความรู้</a>
+    <a href="public-scholar.html" data-i18n="navScholar">ทุนการศึกษา</a>
+    <a href="public-events.html" data-i18n="navEvents">กิจกรรม</a>
+    <a href="public-mou.html">MOU</a>
+    <a href="public-mobility.html">Mobility</a>
+    <span class="lang"><button class="lang-btn active" type="button" data-lang="TH" onclick="setLang('TH')">TH</button><button class="lang-btn" type="button" data-lang="EN" onclick="setLang('EN')">EN</button></span>
+    <button class="theme-toggle" type="button" id="themeToggle" onclick="toggleTheme()">Dark</button>
+    <a class="admin-link" href="../knowledge.html" data-i18n="admin">Admin</a>
+  </nav>
+</header>
 
-<nav>
-  <a class="nav-logo" href="public-landing.html">
-    <img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'">
-  </a>
-  <div class="nav-links">
-    <a href="public-mou.html" class="nav-link">🤝 MOU</a>
-    <a href="public-scholar.html" class="nav-link">🎓 ทุนการศึกษา</a>
-    <a href="public-events.html" class="nav-link">📅 กิจกรรม</a>
-    <a href="public-mobility.html" class="nav-link">👥 Mobility</a>
-    <a href="public-news.html" class="nav-link">📰 ข่าวสาร</a>
-    <a href="public-knowledge.html" class="nav-link active">📚 คลังความรู้</a>
-    <div class="nav-lang">
-      <div class="nav-lang-btn active" onclick="setLang('TH')">TH</div>
-      <div class="nav-lang-btn" onclick="setLang('EN')">EN</div>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-kicker" aria-hidden="true">▣</div>
+    <h1 data-i18n="heroTitle">คลังความรู้ด้านความสัมพันธ์ระหว่างประเทศ</h1>
+    <p class="lead" data-i18n="heroLead">เอกสาร บทความ วิดีโอ และสื่อการเรียนรู้ด้านงานวิเทศสัมพันธ์</p>
+    <div class="hero-kpis" aria-label="Knowledge summary">
+      <div><div class="kpi-num total" id="kpiTotal">-</div><div class="kpi-label" data-i18n="kpiTotal">บทความทั้งหมด</div></div>
+      <div><div class="kpi-num pdf" id="kpiPdf">-</div><div class="kpi-label" data-i18n="kpiPdf">ไฟล์ PDF</div></div>
+      <div><div class="kpi-num cat" id="kpiCategories">-</div><div class="kpi-label" data-i18n="kpiCategories">หมวดหมู่</div></div>
     </div>
-    <a href="../knowledge.html" class="nav-admin-btn">🔐 Admin</a>
   </div>
-</nav>
+</section>
 
-<!-- HERO -->
-<div class="page-hero">
-  <h1>📚 <span id="hero-title">คลังความรู้ด้านความสัมพันธ์ระหว่างประเทศ</span></h1>
-  <p id="hero-sub">เอกสาร บทความ วิดีโอ และสื่อการเรียนรู้ด้านงานวิเทศสัมพันธ์ · International Relations Knowledge Repository</p>
-  <div class="hero-kpi">
-    <div><div class="hkpi-num" id="kpi-total">—</div><div class="hkpi-label" id="kpi-total-label">บทความทั้งหมด</div></div>
-    <div><div class="hkpi-num" style="color:#F5A623" id="kpi-pdf">—</div><div class="hkpi-label" id="kpi-pdf-label">มีไฟล์ PDF</div></div>
-    <div><div class="hkpi-num" style="color:#4BBDE8" id="kpi-cat">—</div><div class="hkpi-label" id="kpi-cat-label">หมวดหมู่</div></div>
-  </div>
-</div>
-
-<!-- CONTENT -->
-<div class="content">
-  <div class="filter-bar">
+<main class="shell">
+  <section class="filter-bar" aria-label="Knowledge filters">
     <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="ค้นหาบทความ..." oninput="renderCards()">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input class="input" id="searchInput" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="ค้นหาบทความ..." oninput="onFilterChange()">
     </div>
-    <select class="filter-select" id="catFilter" onchange="renderCards()">
-      <option value="">ทุกหมวดหมู่</option>
-    </select>
+    <select class="select" id="categoryFilter" onchange="onFilterChange()" aria-label="Category"></select>
     <div class="pills" id="typePills">
-      <div class="pill on" onclick="setTypePill(this,'')">ทั้งหมด</div>
-      <div class="pill" onclick="setTypePill(this,'pdf')">📄 PDF</div>
-      <div class="pill" onclick="setTypePill(this,'video')">▶️ วิดีโอ</div>
-      <div class="pill" onclick="setTypePill(this,'image')">🖼 รูปภาพ</div>
+      <button class="pill on" type="button" data-type="" onclick="setTypeFilter(this)" data-i18n="all">ทั้งหมด</button>
+      <button class="pill" type="button" data-type="pdf" onclick="setTypeFilter(this)">PDF</button>
+      <button class="pill" type="button" data-type="video" onclick="setTypeFilter(this)" data-i18n="video">วิดีโอ</button>
+      <button class="pill" type="button" data-type="image" onclick="setTypeFilter(this)" data-i18n="image">รูปภาพ</button>
     </div>
-  </div>
+  </section>
 
-  <div class="section-label">
-    📋 <span id="section-text">บทความทั้งหมด</span>
-    <span class="result-count" id="resultCount"></span>
-  </div>
-  <div class="cards-grid" id="knCards"><div class="loading">⏳ กำลังโหลด...</div></div>
-</div>
+  <section class="section-head">
+    <h2 class="section-title"><span aria-hidden="true">▣</span><span data-i18n="allKnowledge">บทความทั้งหมด</span></h2>
+    <div class="section-count" id="resultCount">-</div>
+  </section>
 
-<footer>© 2569 International Relations Office · University of Phayao</footer>
+  <section id="knowledgeGrid" class="cards" aria-live="polite">
+    <div class="state"><div class="spinner"></div><span data-i18n="loading">กำลังโหลด...</span></div>
+  </section>
+</main>
 
-<div id="detailModal" class="modal" aria-hidden="true">
-  <article class="modal-panel">
-    <div id="modalCover" class="modal-cover">📚</div>
-    <div class="modal-body">
-      <div id="modalBadges" class="card-footer" style="border-top:0;padding:0"></div>
-      <h2 id="modalTitle" class="modal-title"></h2>
-      <div id="modalContent" class="modal-content"></div>
-      <div id="modalActions" class="action-row"></div>
-      <div id="modalImages" class="image-strip"></div>
-    </div>
-    <div class="modal-actions">
-      <span></span>
-      <button class="action-btn" type="button" onclick="closeDetail()">ปิด</button>
-    </div>
-  </article>
-</div>
-
-<div id="galleryModal" class="gallery-modal" aria-hidden="true">
-  <button class="gallery-close" type="button" onclick="closeGallery()" aria-label="Close">&times;</button>
-  <div class="gallery-panel">
-    <button class="gallery-nav" type="button" onclick="moveGallery(-1)" aria-label="Previous">&lsaquo;</button>
-    <div class="gallery-stage"><img id="galleryImage" src="" alt=""></div>
-    <button class="gallery-nav" type="button" onclick="moveGallery(1)" aria-label="Next">&rsaquo;</button>
-  </div>
-  <div id="galleryCaption" class="gallery-caption"></div>
-</div>
+<footer>© 2569 International Relations Office - University of Phayao</footer>
 
 <script src="../js/iroup-config.js"></script>
 <script src="../js/iroup-v2-endpoint.js"></script>
 <script src="../js/iroup-v2-api.js"></script>
 <script>
-let allKn = [];
-let currentLang = 'TH';
-let currentType = '';
-let galleryImages = [];
-let galleryIndex = 0;
+var allKnowledge = [];
+var currentLang = normalizeLang(localStorage.getItem('iroup_public_lang') || 'TH');
+var currentType = '';
 
-/* ── LANG ─────────────────────────────────────────── */
-function setLang(l) {
-  currentLang = l;
-  document.querySelectorAll('.nav-lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l));
-  updateLangText();
-  renderCards();
-}
-
-function updateLangText() {
-  const isTH = currentLang === 'TH';
-  document.getElementById('hero-title').textContent = isTH
-    ? 'คลังความรู้ด้านความสัมพันธ์ระหว่างประเทศ' : 'International Relations Knowledge Repository';
-  document.getElementById('hero-sub').textContent = isTH
-    ? 'เอกสาร บทความ วิดีโอ และสื่อการเรียนรู้ด้านงานวิเทศสัมพันธ์'
-    : 'Documents, Articles, Videos & Learning Materials';
-  document.getElementById('kpi-total-label').textContent = isTH ? 'บทความทั้งหมด' : 'Total Articles';
-  document.getElementById('kpi-pdf-label').textContent   = isTH ? 'มีไฟล์ PDF' : 'With PDF';
-  document.getElementById('kpi-cat-label').textContent   = isTH ? 'หมวดหมู่' : 'Categories';
-  document.getElementById('section-text').textContent    = isTH ? 'บทความทั้งหมด' : 'All Articles';
-  document.getElementById('searchInput').placeholder     = isTH ? 'ค้นหาบทความ...' : 'Search articles...';
-  const catSel = document.getElementById('catFilter');
-  if (catSel.options[0]) catSel.options[0].textContent = isTH ? 'ทุกหมวดหมู่' : 'All Categories';
-}
-
-/* ── TYPE PILL ────────────────────────────────────── */
-function setTypePill(el, val) {
-  currentType = val;
-  document.querySelectorAll('#typePills .pill').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
-  renderCards();
-}
-
-/* ── LOAD DATA ────────────────────────────────────── */
-async function loadData() {
-  try {
-    const res = await IROUP_V2.public.knowledgeList();
-    if (!res.success) throw new Error(res.error || 'API error');
-    allKn = res.data || [];
-
-    /* KPI */
-    const pdfCount = allKn.filter(k => k.pdf_url).length;
-    const cats = [...new Set(allKn.map(k => k.category).filter(Boolean))];
-    document.getElementById('kpi-total').textContent = allKn.length;
-    document.getElementById('kpi-pdf').textContent   = pdfCount;
-    document.getElementById('kpi-cat').textContent   = cats.length;
-
-    /* Category filter */
-    const catSel = document.getElementById('catFilter');
-    cats.sort().forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c; opt.textContent = c;
-      catSel.appendChild(opt);
-    });
-
-    renderCards();
-  } catch(e) {
-    document.getElementById('knCards').innerHTML = '<div class="loading">⚠️ ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง</div>';
-    console.error(e);
+var I18N = {
+  TH: {
+    navNews:'ข่าวสาร',navKnowledge:'คลังความรู้',navScholar:'ทุนการศึกษา',navEvents:'กิจกรรม',admin:'Admin',
+    heroTitle:'คลังความรู้ด้านความสัมพันธ์ระหว่างประเทศ',
+    heroLead:'เอกสาร บทความ วิดีโอ และสื่อการเรียนรู้ด้านงานวิเทศสัมพันธ์',
+    kpiTotal:'บทความทั้งหมด',kpiPdf:'ไฟล์ PDF',kpiCategories:'หมวดหมู่',
+    searchPlaceholder:'ค้นหาบทความ...',allCategories:'ทุกหมวดหมู่',all:'ทั้งหมด',video:'วิดีโอ',image:'รูปภาพ',
+    allKnowledge:'บทความทั้งหมด',loading:'กำลังโหลด...',noData:'ไม่พบบทความตามเงื่อนไขที่เลือก',loadFail:'ไม่สามารถโหลดข้อมูลได้',
+    items:'รายการ',readMore:'อ่านต่อ',fallback:'KNOWLEDGE'
+  },
+  EN: {
+    navNews:'News',navKnowledge:'Knowledge',navScholar:'Scholarships',navEvents:'Events',admin:'Admin',
+    heroTitle:'International Relations Knowledge Repository',
+    heroLead:'Documents, articles, videos, and learning materials from the International Relations Office.',
+    kpiTotal:'Total Articles',kpiPdf:'PDF Files',kpiCategories:'Categories',
+    searchPlaceholder:'Search articles...',allCategories:'All categories',all:'All',video:'Video',image:'Image',
+    allKnowledge:'All Articles',loading:'Loading...',noData:'No articles match the selected filters.',loadFail:'Unable to load knowledge data',
+    items:'items',readMore:'Read more',fallback:'KNOWLEDGE'
   }
-}
+};
 
-/* ── RENDER ───────────────────────────────────────── */
-function renderCards() {
-  const q      = (document.getElementById('searchInput').value || '').toLowerCase();
-  const catVal = document.getElementById('catFilter').value;
-  const isTH   = currentLang === 'TH';
-
-  const filtered = allKn.filter(k => {
-    const title   = isTH ? (k.title_th || k.title_en || '') : (k.title_en || k.title_th || '');
-    const content = isTH ? (k.content_th || '') : (k.content_en || '');
-    const matchQ  = !q || title.toLowerCase().includes(q) || content.toLowerCase().includes(q) || (k.category || '').toLowerCase().includes(q);
-    const matchC  = !catVal || k.category === catVal;
-    const matchT  = !currentType
-      || (currentType === 'pdf'   && k.pdf_url)
-      || (currentType === 'video' && k.video_url)
-      || (currentType === 'image' && (getCoverUrl(k) || getImageUrls(k).length) && !k.pdf_url && !k.video_url);
-    return matchQ && matchC && matchT;
-  });
-
-  document.getElementById('resultCount').textContent = `${filtered.length} ${isTH ? 'รายการ' : 'items'}`;
-
-  const grid = document.getElementById('knCards');
-  if (!filtered.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">📭</div><p>${isTH ? 'ไม่พบข้อมูลที่ตรงกับการค้นหา' : 'No articles found matching your search'}</p></div>`;
-    return;
-  }
-  grid.innerHTML = filtered.map(k => renderKnCard(k, isTH)).join('');
-}
-
-function renderKnCard(k, isTH) {
-  const title   = isTH ? (k.title_th || k.title_en || '—') : (k.title_en || k.title_th || '—');
-  const content = isTH ? (k.content_th || '') : (k.content_en || '');
-  const cat     = k.category || '';
-
-  /* Cover */
-  const coverUrl = getCoverUrl(k) || firstImageUrl(k);
-  const coverHtml = coverUrl
-    ? `<img src="${escHtml(toImageUrl(coverUrl))}" alt="${escHtml(title)}" onerror="this.parentElement.innerHTML='<div class=\\'card-cover-fallback\\'>📚</div>'">`
-    : k.video_url
-      ? `<div class="card-cover-fallback" style="background:linear-gradient(135deg,#FEE2E2,#FECACA)">▶️</div>`
-      : `<div class="card-cover-fallback">📚</div>`;
-
-  const catBadge = cat ? `<div class="card-cat-badge">${escHtml(cat)}</div>` : '';
-
-  /* Media badges (footer) */
-  let badgesHtml = '';
-  if (k.pdf_url)   badgesHtml += `<a class="media-badge badge-pdf" href="${escHtml(k.pdf_url)}" target="_blank" rel="noopener">📄 PDF</a>`;
-  if (k.video_url) badgesHtml += `<a class="media-badge badge-video" href="${escHtml(k.video_url)}" target="_blank" rel="noopener">▶️ ${isTH ? 'วิดีโอ' : 'Video'}</a>`;
-  if (k.link_url)  badgesHtml += `<a class="media-badge badge-link" href="${escHtml(k.link_url)}" target="_blank" rel="noopener">🔗 ${isTH ? 'ลิงก์' : 'Link'}</a>`;
-  if ((getCoverUrl(k) || getImageUrls(k).length) && !k.pdf_url && !k.video_url) badgesHtml += `<span class="media-badge badge-image">🖼 ${isTH ? 'รูปภาพ' : 'Image'}</span>`;
-
-  return `
-    <div class="kn-card" onclick="openDetail('${escHtml(k.knowledge_id || '')}', event)" style="cursor:pointer">
-      <div class="card-cover">${coverHtml}${catBadge}</div>
-      <div class="card-body">
-        ${cat ? `<span class="cat-tag">${escHtml(cat)}</span>` : ''}
-        <div class="card-title">${escHtml(title)}</div>
-        ${content ? `<div class="card-excerpt">${escHtml(content)}</div>` : ''}
-      </div>
-      ${badgesHtml ? `<div class="card-footer">${badgesHtml}</div>` : ''}
-    </div>`;
-}
-
-function openDetail(knowledgeId, event) {
-  if (event && event.target && event.target.closest && event.target.closest('.media-badge')) return;
-  if (!knowledgeId) return;
-  window.location.href = 'public-knowledge-detail.html?id=' + encodeURIComponent(knowledgeId);
-}
-
-function closeDetail() {
-  document.getElementById('detailModal').classList.remove('open');
-  document.getElementById('detailModal').setAttribute('aria-hidden', 'true');
-  closeGallery();
-}
-
-function renderModalBadges(item, isTH) {
-  let html = '';
-  if (item.category) html += `<span class="cat-tag">${escHtml(item.category)}</span>`;
-  if (item.pdf_url) html += `<span class="media-badge badge-pdf">📄 PDF</span>`;
-  if (item.video_url) html += `<span class="media-badge badge-video">▶️ ${isTH ? 'วิดีโอ' : 'Video'}</span>`;
-  if (getCoverUrl(item) || getImageUrls(item).length) html += `<span class="media-badge badge-image">🖼 ${isTH ? 'รูปภาพ' : 'Image'}</span>`;
-  return html;
-}
-
-function renderModalActions(item, isTH) {
-  let html = '';
-  if (item.pdf_url) html += `<a class="action-btn pdf" href="${escHtml(item.pdf_url)}" target="_blank" rel="noopener">📄 PDF</a>`;
-  if (item.video_url) html += `<a class="action-btn video" href="${escHtml(item.video_url)}" target="_blank" rel="noopener">▶️ ${isTH ? 'เปิดวิดีโอ' : 'Open video'}</a>`;
-  if (item.link_url) html += `<a class="action-btn" href="${escHtml(item.link_url)}" target="_blank" rel="noopener">🔗 ${isTH ? 'เปิดลิงก์เพิ่มเติม' : 'Open link'}</a>`;
-  if (getImageUrls(item).length) html += `<button class="action-btn image" type="button" onclick="openGallery('${escHtml(item.knowledge_id || '')}', 0)">🖼 ${isTH ? 'ดูรูปภาพ' : 'View images'}</button>`;
-  return html;
-}
-
-function renderImageThumbnails(item) {
-  return getImageUrls(item)
-    .map((url, index) => `<button type="button" onclick="openGallery('${escHtml(item.knowledge_id || '')}', ${index})"><img src="${escHtml(toImageUrl(url))}" alt=""></button>`)
-    .join('');
-}
-
-function getImageUrls(item) {
-  const files = Array.isArray(item.files) ? item.files : [];
-  const urls = files
-    .filter(file => String(file.file_role_id || (file.file_role && file.file_role.file_role_id) || '').trim() === 'image')
-    .map(file => file.file_url || file.thumbnail_url || file.url || '')
-    .filter(Boolean);
-  return urls;
-}
-
-function firstImageUrl(item) {
-  return getImageUrls(item)[0] || '';
-}
-
-function getCoverUrl(item) {
-  const files = Array.isArray(item.files) ? item.files : [];
-  const coverFiles = files.filter(file => String(file.file_role_id || (file.file_role && file.file_role.file_role_id) || '').trim() === 'cover');
-  const coverFile = coverFiles.length ? coverFiles[coverFiles.length - 1] : null;
-  return item.cover_image_url || item.cover_url || (coverFile ? (coverFile.file_url || coverFile.thumbnail_url || coverFile.url || '') : '');
-}
-
-function openGallery(knowledgeId, startIndex) {
-  const item = allKn.find(k => String(k.knowledge_id || '') === String(knowledgeId || ''));
-  galleryImages = item ? getImageUrls(item) : [];
-  if (!galleryImages.length) return;
-  galleryIndex = Math.max(0, Math.min(Number(startIndex) || 0, galleryImages.length - 1));
-  renderGallery();
-  document.getElementById('galleryModal').classList.add('open');
-  document.getElementById('galleryModal').setAttribute('aria-hidden', 'false');
-}
-
-function closeGallery() {
-  const modal = document.getElementById('galleryModal');
-  if (!modal) return;
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
-}
-
-function moveGallery(delta) {
-  if (!galleryImages.length) return;
-  galleryIndex = (galleryIndex + delta + galleryImages.length) % galleryImages.length;
-  renderGallery();
-}
-
-function renderGallery() {
-  const url = galleryImages[galleryIndex] || '';
-  document.getElementById('galleryImage').src = toImageUrl(url);
-  document.getElementById('galleryCaption').textContent = `${galleryIndex + 1} / ${galleryImages.length}`;
-}
-
-function toImageUrl(url) {
-  const value = String(url || '').trim();
-  const match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/);
-  if (match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200`;
-  return value;
-}
-
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Escape') {
-    if (document.getElementById('galleryModal').classList.contains('open')) closeGallery();
-    else if (document.getElementById('detailModal').classList.contains('open')) closeDetail();
-  }
-  if (!document.getElementById('galleryModal').classList.contains('open')) return;
-  if (event.key === 'ArrowLeft') moveGallery(-1);
-  if (event.key === 'ArrowRight') moveGallery(1);
+document.addEventListener('DOMContentLoaded', function(){
+  applyLanguage(false);
+  applyTheme();
+  loadKnowledge();
 });
 
-function escHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+async function loadKnowledge(){
+  var grid = document.getElementById('knowledgeGrid');
+  grid.innerHTML = '<div class="state"><div class="spinner"></div>' + esc(t('loading')) + '</div>';
+  try{
+    var response = await IROUP_V2.public.knowledgeList();
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public knowledge API error');
+    allKnowledge = normalizeList(response).map(normalizeKnowledge).filter(function(item){ return item.id; });
+    populateFilters();
+    updateKpis();
+    renderKnowledge();
+  }catch(error){
+    grid.innerHTML = '<div class="state">' + esc(t('loadFail')) + '<br>' + esc(error.message || String(error)) + '</div>';
+    document.getElementById('resultCount').textContent = '0 ' + t('items');
+  }
 }
 
-loadData();
+function normalizeList(res){
+  var data = res && typeof res.data !== 'undefined' ? res.data : res;
+  if(Array.isArray(data)) return data;
+  var keys = ['rows','records','items','knowledge'];
+  for(var i=0;i<keys.length;i++){ if(data && Array.isArray(data[keys[i]])) return data[keys[i]]; }
+  return [];
+}
+
+function normalizeKnowledge(row){
+  var files = collectFiles(row).filter(isPublicFile);
+  var cover = safeUrl(row.cover_url || row.cover_image_url || row.thumbnail_url) || firstFileUrl(files, 'cover') || firstFileUrl(files, 'image');
+  return {
+    id: clean(row.knowledge_id || row.id),
+    title_th: clean(row.title_th || row.title || row.name_th),
+    title_en: clean(row.title_en || row.name_en),
+    content_th: clean(row.content_th || row.content || row.summary_th || row.description_th),
+    content_en: clean(row.content_en || row.summary_en || row.description_en),
+    category: clean(row.category || row.knowledge_type || row.type),
+    video_url: safeUrl(row.video_url),
+    link_url: safeUrl(row.link_url || row.url),
+    pdf_url: safeUrl(row.pdf_url),
+    cover_url: cover,
+    files: files
+  };
+}
+
+function populateFilters(){
+  var select = document.getElementById('categoryFilter');
+  var categories = unique(allKnowledge.map(function(item){ return item.category; })).sort(function(a,b){ return a.localeCompare(b); });
+  select.innerHTML = '<option value="">' + esc(t('allCategories')) + '</option>' + categories.map(function(item){ return '<option value="' + escAttr(item) + '">' + esc(item) + '</option>'; }).join('');
+}
+
+function updateKpis(){
+  document.getElementById('kpiTotal').textContent = allKnowledge.length.toLocaleString();
+  document.getElementById('kpiPdf').textContent = allKnowledge.filter(function(item){ return item.pdf_url; }).length.toLocaleString();
+  document.getElementById('kpiCategories').textContent = unique(allKnowledge.map(function(item){ return item.category; })).length.toLocaleString();
+}
+
+function renderKnowledge(){
+  var rows = filteredKnowledge();
+  document.getElementById('resultCount').textContent = rows.length.toLocaleString() + ' ' + t('items');
+  var grid = document.getElementById('knowledgeGrid');
+  if(!rows.length){ grid.innerHTML = '<div class="state">' + esc(t('noData')) + '</div>'; return; }
+  grid.innerHTML = rows.map(renderCard).join('');
+}
+
+function renderCard(item){
+  var title = displayTitle(item) || '-';
+  var content = displayContent(item);
+  return '<article class="card">' +
+    '<a href="public-knowledge-detail.html?id=' + encodeURIComponent(item.id) + '" aria-label="' + escAttr(title) + '">' +
+      '<div class="cover">' + (item.cover_url ? '<img src="' + escAttr(toImageUrl(item.cover_url, 1200)) + '" alt="' + escAttr(title) + '">' : '<span>' + esc(t('fallback')) + '</span>') + '</div>' +
+    '</a>' +
+    '<div class="more" aria-hidden="true">...</div>' +
+    '<div class="body">' +
+      '<div class="badges">' + (item.category ? '<span class="badge category">' + esc(item.category) + '</span>' : '') + renderMediaBadges(item) + '</div>' +
+      '<a class="title" href="public-knowledge-detail.html?id=' + encodeURIComponent(item.id) + '">' + esc(title) + '</a>' +
+      '<p class="excerpt">' + esc(truncate(content, 170)) + '</p>' +
+      '<div class="footer-row"><span>' + esc(mediaSummary(item)) + '</span><a class="read-more" href="public-knowledge-detail.html?id=' + encodeURIComponent(item.id) + '">' + esc(t('readMore')) + ' -></a></div>' +
+    '</div>' +
+  '</article>';
+}
+
+function filteredKnowledge(){
+  var q = clean(document.getElementById('searchInput').value).toLowerCase();
+  var category = document.getElementById('categoryFilter').value;
+  return allKnowledge.filter(function(item){
+    if(category && item.category !== category) return false;
+    if(currentType === 'pdf' && !item.pdf_url) return false;
+    if(currentType === 'video' && !item.video_url) return false;
+    if(currentType === 'image' && !getImageUrls(item).length && !item.cover_url) return false;
+    if(!q) return true;
+    var text = [item.title_th,item.title_en,item.content_th,item.content_en,item.category].join(' ').toLowerCase();
+    return text.indexOf(q) >= 0;
+  });
+}
+
+function setTypeFilter(button){
+  currentType = button.getAttribute('data-type') || '';
+  document.querySelectorAll('#typePills .pill').forEach(function(item){ item.classList.remove('on'); });
+  button.classList.add('on');
+  renderKnowledge();
+}
+
+function onFilterChange(){ renderKnowledge(); }
+
+function setLang(lang){
+  currentLang = normalizeLang(lang);
+  localStorage.setItem('iroup_public_lang', currentLang);
+  applyLanguage(true);
+}
+
+function applyLanguage(rerender){
+  document.documentElement.lang = currentLang === 'EN' ? 'en' : 'th';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){ el.placeholder = t(el.getAttribute('data-i18n-placeholder')); });
+  document.querySelectorAll('.lang-btn').forEach(function(btn){ btn.classList.toggle('active', btn.dataset.lang === currentLang); });
+  document.title = (currentLang === 'EN' ? 'Knowledge' : 'คลังความรู้') + ' | iROUP';
+  if(allKnowledge.length) populateFilters();
+  if(rerender) renderKnowledge();
+}
+
+function applyTheme(){
+  var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('themeToggle').textContent = theme === 'light' ? 'Light' : 'Dark';
+}
+
+function toggleTheme(){
+  var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('iroup_public_theme', next);
+  applyTheme();
+}
+
+function displayTitle(item){ return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en; }
+function displayContent(item){ return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en; }
+function renderMediaBadges(item){
+  var html = '';
+  if(item.pdf_url) html += '<span class="badge pdf">PDF</span>';
+  if(item.video_url) html += '<span class="badge video">' + esc(t('video')) + '</span>';
+  if(getImageUrls(item).length || item.cover_url) html += '<span class="badge image">' + esc(t('image')) + '</span>';
+  return html;
+}
+function mediaSummary(item){
+  var parts = [];
+  if(item.pdf_url) parts.push('PDF');
+  if(item.video_url) parts.push(t('video'));
+  if(getImageUrls(item).length || item.cover_url) parts.push(t('image'));
+  return parts.join(' · ') || '-';
+}
+function collectFiles(row){
+  var groups = [];
+  if(Array.isArray(row.files)) groups.push(row.files);
+  if(row.files && typeof row.files === 'object' && !Array.isArray(row.files)){
+    Object.keys(row.files).forEach(function(key){ if(Array.isArray(row.files[key])) groups.push(row.files[key]); });
+  }
+  if(Array.isArray(row.public_files)) groups.push(row.public_files);
+  if(row.file_summary && Array.isArray(row.file_summary.files)) groups.push(row.file_summary.files);
+  return groups.reduce(function(acc, group){ return acc.concat(group); }, []).filter(Boolean);
+}
+function isPublicFile(file){ var visibility = clean(file && file.visibility_level); return !visibility || visibility === 'public'; }
+function firstFileUrl(files, role){ var match = (files || []).find(function(file){ return clean(file.file_role_id || (file.file_role && file.file_role.file_role_id) || file.role).toLowerCase() === role; }); return match ? safeUrl(match.file_url || match.thumbnail_url || match.url || match.drive_url) : ''; }
+function getImageUrls(item){ return (item.files || []).filter(function(file){ return clean(file.file_role_id || (file.file_role && file.file_role.file_role_id) || file.role).toLowerCase() === 'image'; }).map(function(file){ return safeUrl(file.file_url || file.thumbnail_url || file.url || file.drive_url); }).filter(Boolean); }
+function toImageUrl(url, size){ var value = safeUrl(url); var match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/); if(match && match[1]) return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(match[1]) + '&sz=w' + (size || 1200); return value; }
+function truncate(value, max){ var text = clean(value).replace(/\s+/g,' '); return text.length <= max ? text : text.slice(0, max - 1).trim() + '…'; }
+function normalizeLang(lang){ return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH'; }
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.TH[key] || key; }
+function unique(values){ return Array.from(new Set((values || []).map(clean).filter(Boolean))); }
+function clean(value){ return String(value === null || value === undefined ? '' : value).trim(); }
+function safeUrl(value){ var text = clean(value); return (!text || text === '-' || text.toLowerCase() === 'undefined' || text.toLowerCase() === 'null') ? '' : text; }
+function esc(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escAttr(value){ return esc(value); }
 </script>
 </body>
 </html>

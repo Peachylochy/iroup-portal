@@ -1,126 +1,111 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>คลังความรู้ - iROUP</title>
+<title>คลังความรู้ | iROUP</title>
+<script>
+(function(){
+  var theme = localStorage.getItem('iroup_public_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --blue:#1A6DB5;--blue-pale:#E8F4FD;--navy:#0F2D5A;--navy-dark:#071828;
-  --green:#5BAD3E;--green-pale:#EBF7E3;--red:#D63B32;--red-pale:#FDECEA;
-  --purple:#7C3AED;--purple-pale:#F0EBFF;--gray-100:#F8F9FB;--gray-200:#EEF1F5;
-  --gray-300:#DDE2EA;--gray-600:#6B7A8D;--gray-800:#2D3748;--white:#fff;
-  --shadow-sm:0 1px 4px rgba(15,45,90,.08);--shadow-lg:0 12px 44px rgba(15,45,90,.18);
+  --bg:#07111f;--surface:#0c1b2d;--surface-2:#10243a;--surface-3:#132b46;
+  --line:rgba(100,190,255,.16);--line-strong:rgba(96,165,250,.28);
+  --text:#eef7ff;--muted:#8ba7c2;--soft:#c7d8ec;--dim:#5f7898;
+  --blue:#2387ff;--cyan:#2bd8ff;--violet:#8b5cf6;--gold:#f7b733;--green:#5ee38c;--red:#ff6b6b;
+  --shadow:0 24px 70px rgba(0,0,0,.28);--radius:18px;
 }
-body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--navy)}
-button,input,select{font:inherit}
-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.nav-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.nav-link{font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
-.nav-link:hover,.nav-link.active{color:var(--blue);border-bottom-color:var(--blue)}
-.nav-lang{display:flex;background:var(--gray-200);border-radius:8px;padding:3px;gap:2px}
-.nav-lang-btn{padding:4px 12px;border:0;border-radius:6px;background:transparent;font-size:11px;font-weight:700;cursor:pointer;color:var(--gray-600)}
-.nav-lang-btn.active{background:var(--blue);color:#fff}
-.nav-admin-btn{padding:7px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:20px;font-size:12px;font-weight:700;color:#fff;text-decoration:none}
-.loading,.error-state{max-width:900px;margin:48px auto;text-align:center;padding:42px 18px;color:var(--gray-600);font-family:'Sarabun',sans-serif;background:#fff;border:1px dashed var(--gray-300);border-radius:18px}
-.spinner{width:30px;height:30px;border-radius:50%;border:4px solid #E4EEF8;border-top-color:var(--purple);animation:spin 1s linear infinite;margin:0 auto 12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.article-shell{display:none}
-.article-hero{background:linear-gradient(135deg,#F0EBFF 0%,#E8F4FD 52%,#EBF7E3 100%);padding:34px 5% 28px}
-.hero-inner{max-width:1040px;margin:0 auto}
-.back-link{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;color:var(--purple);text-decoration:none;font-weight:800;font-size:13px}
-.badge-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;background:var(--purple-pale);color:var(--purple);font-family:'Sarabun',sans-serif}
-.badge.pdf{background:var(--red-pale);color:var(--red)}
-.badge.video{background:#FEE2E2;color:#DC2626}
-.badge.image{background:var(--green-pale);color:var(--green)}
-h1{font-size:clamp(30px,5vw,52px);line-height:1.18;font-weight:900;color:var(--navy-dark);max-width:920px}
-.hero-cover{max-width:1040px;margin:24px auto 0;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,var(--purple-pale),#fff);box-shadow:var(--shadow-lg);aspect-ratio:16/8;display:grid;place-items:center;color:var(--purple);font-size:48px;font-weight:900}
-.hero-cover img{width:100%;height:100%;object-fit:cover;display:block}
-.article-main{padding:36px 5% 60px}
-.article-grid{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:34px;align-items:start}
-.article-body{background:#fff;border:1px solid var(--gray-200);border-radius:22px;padding:34px;box-shadow:var(--shadow-sm)}
-.article-content{font-family:'Sarabun',sans-serif;font-size:18px;line-height:2.05;color:var(--gray-800);white-space:pre-wrap;max-width:760px}
-.side-panel{position:sticky;top:84px;background:#fff;border:1px solid var(--gray-200);border-radius:18px;padding:18px;box-shadow:var(--shadow-sm)}
-.side-title{font-weight:900;margin-bottom:12px}
-.action-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:12px;padding:11px 14px;background:var(--blue-pale);color:var(--blue);font-weight:900;text-decoration:none;margin-top:10px;cursor:pointer}
-.action-btn.pdf{background:var(--red-pale);color:var(--red)}
-.action-btn.video{background:#FEE2E2;color:#DC2626}
-.action-btn.image{background:var(--green-pale);color:var(--green)}
-.gallery-section{max-width:1040px;margin:30px auto 0}
-.section-title{font-size:22px;font-weight:900;margin-bottom:14px;color:var(--navy-dark)}
-.image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
-.image-thumb{height:132px;border:0;border-radius:14px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm);cursor:pointer;padding:0}
-.image-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.gallery-modal{position:fixed;inset:0;background:rgba(3,12,24,.88);z-index:300;display:none;align-items:center;justify-content:center;padding:24px}
-.gallery-modal.open{display:flex}
-.gallery-panel{width:min(1100px,100%);display:grid;grid-template-columns:56px 1fr 56px;gap:14px;align-items:center}
-.gallery-stage{background:#071828;border-radius:18px;min-height:320px;max-height:78vh;display:grid;place-items:center;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.38)}
-.gallery-stage img{max-width:100%;max-height:78vh;object-fit:contain;display:block}
-.gallery-nav,.gallery-close{border:0;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;font-weight:900}
-.gallery-nav{width:56px;height:56px;font-size:30px}.gallery-close{position:absolute;top:18px;right:18px;width:44px;height:44px;font-size:24px}
-.gallery-caption{position:absolute;left:24px;right:24px;bottom:16px;text-align:center;color:rgba(255,255,255,.78);font-family:'Sarabun',sans-serif;font-size:13px}
-footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(255,255,255,.5);font-size:11px;font-family:'Sarabun',sans-serif}
-@media(max-width:900px){
-  nav{height:auto;padding:12px 5%;align-items:flex-start;gap:12px}.nav-links{gap:10px;justify-content:flex-end}
-  .article-grid{grid-template-columns:1fr}.side-panel{position:static}.article-body{padding:24px}.article-content{font-size:16px}
-  .hero-cover{aspect-ratio:4/3}.gallery-panel{grid-template-columns:42px 1fr 42px}.gallery-nav{width:42px;height:42px;font-size:24px}
+:root[data-theme="light"]{
+  --bg:#f4f9fd;--surface:#ffffff;--surface-2:#f6fbff;--surface-3:#eaf4ff;
+  --line:rgba(19,74,124,.12);--line-strong:rgba(26,109,181,.22);
+  --text:#0b2340;--muted:#63758c;--soft:#344b66;--dim:#8495a8;
+  --blue:#176fe8;--cyan:#22aee8;--violet:#7c3aed;--gold:#d69014;--green:#2eaa56;--red:#df4b4b;
+  --shadow:0 18px 50px rgba(34,71,108,.13);
 }
+html{scroll-behavior:smooth}
+body{min-height:100vh;background:
+  radial-gradient(circle at 16% 5%,rgba(35,135,255,.18),transparent 32%),
+  radial-gradient(circle at 85% 6%,rgba(139,92,246,.14),transparent 28%),
+  var(--bg);color:var(--text);font-family:'Prompt',sans-serif}
+:root[data-theme="light"] body{background:linear-gradient(180deg,#f7fbff 0,#eef6fd 42%,#fbfdff 100%)}
+a{color:inherit;text-decoration:none}button{font:inherit}
+.topbar{position:sticky;top:0;z-index:50;height:64px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;gap:22px;background:rgba(7,17,31,.8);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .topbar{background:rgba(255,255,255,.86)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{height:32px;width:auto;display:block}.brand-fallback{display:none;color:var(--text);font-weight:900}
+.nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.nav a,.theme-toggle,.lang-btn{border:1px solid transparent;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;color:var(--soft);background:transparent;cursor:pointer}
+.nav a:hover,.nav a.active{background:rgba(35,135,255,.14);border-color:rgba(35,135,255,.28);color:var(--text)}
+.lang{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:3px}
+:root[data-theme="light"] .lang{background:#fff}.lang-btn{padding:6px 10px}.lang-btn.active{background:var(--blue);color:#fff}
+.theme-toggle{background:rgba(255,255,255,.06);border-color:var(--line);min-width:58px}:root[data-theme="light"] .theme-toggle{background:#fff}.admin-link{background:rgba(255,255,255,.06)!important;border-color:var(--line)!important}
+.loading,.error-state{width:min(940px,90%);margin:48px auto;text-align:center;padding:42px 18px;color:var(--muted);font-family:'Sarabun',sans-serif;background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius)}
+.spinner{width:30px;height:30px;border-radius:50%;border:4px solid rgba(35,135,255,.16);border-top-color:var(--blue);animation:spin 1s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}
+.article-shell{display:none}.hero{position:relative;overflow:hidden;padding:34px 5% 0;background-image:linear-gradient(90deg,rgba(7,17,31,.98) 0%,rgba(7,17,31,.72) 42%,rgba(7,17,31,.04) 82%),url("../assets/knowledge-hero-dark.webp");background-size:cover;background-position:center right;border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .hero{background-image:linear-gradient(90deg,rgba(247,251,255,.98) 0%,rgba(247,251,255,.78) 42%,rgba(247,251,255,.04) 82%),url("../assets/knowledge-hero-light.webp")}
+.hero-inner{width:min(1040px,90%);margin:0 auto;padding:12px 0 26px}.back-link{display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-size:13px;font-weight:900;margin-bottom:20px}
+.badges{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:11.5px;font-weight:900;font-family:'Sarabun',sans-serif}.badge.category{background:rgba(139,92,246,.14);color:var(--violet)}.badge.pdf{background:rgba(255,107,107,.14);color:var(--red)}.badge.video{background:rgba(35,135,255,.13);color:var(--blue)}.badge.image{background:rgba(94,227,140,.13);color:var(--green)}
+h1{font-size:clamp(30px,4.6vw,56px);line-height:1.18;font-weight:900;letter-spacing:0;color:var(--text);max-width:900px}.cover{width:min(900px,90%);margin:8px auto -52px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(139,92,246,.16),rgba(43,216,255,.08)),var(--surface-3);box-shadow:var(--shadow);aspect-ratio:16/8;display:grid;place-items:center;color:var(--blue);font-size:42px;font-weight:900;border:1px solid var(--line)}.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.main{width:min(1040px,90%);margin:0 auto;padding:86px 0 58px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:start}.article-card,.side-card{background:rgba(12,27,45,.86);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 46px rgba(0,0,0,.12)}:root[data-theme="light"] .article-card,:root[data-theme="light"] .side-card{background:rgba(255,255,255,.94)}
+.article-card{padding:30px}.content{font-family:'Sarabun',sans-serif;font-size:17px;line-height:2;color:var(--soft);white-space:pre-wrap}:root[data-theme="light"] .content{color:#223a58}.side-card{position:sticky;top:84px;padding:16px}.side-title{font-size:15px;font-weight:900;margin-bottom:12px}
+.action-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:42px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--text);font-weight:900;margin-top:9px;cursor:pointer}.action-btn.primary{background:linear-gradient(135deg,var(--blue),var(--violet));border-color:transparent;color:#fff}.action-btn.pdf{background:rgba(255,107,107,.14);color:var(--red)}.action-btn.video{background:rgba(35,135,255,.13);color:var(--blue)}.action-btn.green{background:rgba(94,227,140,.13);color:var(--green)}
+.gallery-section{margin-top:26px}.section-title{font-size:20px;font-weight:900;margin-bottom:13px}.image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.thumb{height:112px;border:0;border-radius:12px;overflow:hidden;background:var(--surface-3);cursor:pointer;padding:0;box-shadow:0 12px 30px rgba(0,0,0,.1)}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-modal{position:fixed;inset:0;background:rgba(3,12,24,.9);z-index:100;display:none;align-items:center;justify-content:center;padding:22px}.gallery-modal.open{display:flex}.gallery-panel{width:min(1120px,100%);display:grid;grid-template-columns:48px 1fr 48px;gap:12px;align-items:center}.gallery-stage{background:#050b16;border-radius:16px;min-height:300px;max-height:78vh;display:grid;place-items:center;overflow:hidden;box-shadow:var(--shadow)}.gallery-stage img{max-width:100%;max-height:78vh;object-fit:contain;display:block}.gallery-nav,.gallery-close{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;font-weight:900;cursor:pointer}.gallery-nav{width:48px;height:48px;font-size:28px}.gallery-close{position:absolute;top:16px;right:16px;width:42px;height:42px;font-size:24px}.gallery-caption{position:absolute;left:24px;right:24px;bottom:14px;text-align:center;color:rgba(255,255,255,.76);font-family:'Sarabun',sans-serif;font-size:13px}
+footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:var(--dim);font-family:'Sarabun',sans-serif;font-size:12px}
+@media(max-width:960px){.topbar{height:auto;min-height:64px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.nav{max-width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start}.layout{grid-template-columns:1fr}.side-card{position:static}.article-card{padding:22px}.cover{aspect-ratio:4/3}.gallery-panel{grid-template-columns:38px 1fr 38px}.gallery-nav{width:38px;height:38px}}
+@media(max-width:640px){.hero{padding-left:0;padding-right:0}.hero-inner,.cover,.main{width:92%}.content{font-size:16px}.image-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<nav>
-  <a class="nav-logo" href="public-landing.html">
-    <img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'">
-  </a>
-  <div class="nav-links">
-    <a href="public-mou.html" class="nav-link">MOU</a>
-    <a href="public-scholar.html" class="nav-link">ทุนการศึกษา</a>
-    <a href="public-events.html" class="nav-link">กิจกรรม</a>
-    <a href="public-news.html" class="nav-link">ข่าวสาร</a>
-    <a href="public-knowledge.html" class="nav-link active">คลังความรู้</a>
-    <a href="public-mobility.html" class="nav-link">Mobility</a>
-    <div class="nav-lang">
-      <button id="langThBtn" class="nav-lang-btn active" type="button" onclick="setLang('TH')">TH</button>
-      <button id="langEnBtn" class="nav-lang-btn" type="button" onclick="setLang('EN')">EN</button>
-    </div>
-    <a href="../knowledge.html" class="nav-admin-btn">Admin</a>
-  </div>
-</nav>
+<header class="topbar">
+  <a class="brand" href="public-landing.html"><img src="../assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="brand-fallback">iROUP</span></a>
+  <nav class="nav" aria-label="Public navigation">
+    <a href="public-news.html" data-i18n="navNews">ข่าวสาร</a>
+    <a class="active" href="public-knowledge.html" data-i18n="navKnowledge">คลังความรู้</a>
+    <a href="public-scholar.html" data-i18n="navScholar">ทุนการศึกษา</a>
+    <a href="public-events.html" data-i18n="navEvents">กิจกรรม</a>
+    <a href="public-mou.html">MOU</a>
+    <a href="public-mobility.html">Mobility</a>
+    <span class="lang"><button class="lang-btn active" type="button" data-lang="TH" onclick="setLang('TH')">TH</button><button class="lang-btn" type="button" data-lang="EN" onclick="setLang('EN')">EN</button></span>
+    <button class="theme-toggle" type="button" id="themeToggle" onclick="toggleTheme()">Dark</button>
+    <a class="admin-link" href="../knowledge.html" data-i18n="admin">Admin</a>
+  </nav>
+</header>
 
-<div id="loadingState" class="loading"><div class="spinner"></div>กำลังโหลดบทความ...</div>
+<div id="loadingState" class="loading"><div class="spinner"></div><span data-i18n="loading">กำลังโหลดบทความ...</span></div>
 <div id="errorState" class="error-state" style="display:none"></div>
 
 <article id="articleShell" class="article-shell">
-  <section class="article-hero">
+  <section class="hero">
     <div class="hero-inner">
-      <a class="back-link" href="public-knowledge.html">← กลับไปคลังความรู้</a>
-      <div id="badgeRow" class="badge-row"></div>
+      <a class="back-link" href="public-knowledge.html" data-i18n="back">← กลับไปคลังความรู้</a>
+      <div id="badgeRow" class="badges"></div>
       <h1 id="articleTitle"></h1>
     </div>
-    <div id="heroCover" class="hero-cover">📚</div>
+    <div id="heroCover" class="cover">KNOWLEDGE</div>
   </section>
 
-  <main class="article-main">
-    <div class="article-grid">
-      <section class="article-body">
-        <div id="articleContent" class="article-content"></div>
+  <main class="main">
+    <div class="layout">
+      <section class="article-card">
+        <div id="articleContent" class="content"></div>
       </section>
-      <aside class="side-panel">
-        <div class="side-title">การดำเนินการ</div>
-        <a class="action-btn" href="public-knowledge.html">กลับไปคลังความรู้</a>
-        <a id="pdfBtn" class="action-btn pdf" href="#" target="_blank" rel="noopener" style="display:none">เปิด PDF</a>
-        <a id="videoBtn" class="action-btn video" href="#" target="_blank" rel="noopener" style="display:none">เปิดวิดีโอ</a>
-        <a id="externalLinkBtn" class="action-btn" href="#" target="_blank" rel="noopener" style="display:none">เปิดลิงก์เพิ่มเติม</a>
-        <button id="galleryBtn" class="action-btn image" type="button" onclick="openGallery(0)" style="display:none">ดูรูปภาพ</button>
+      <aside class="side-card">
+        <div class="side-title" data-i18n="actions">การดำเนินการ</div>
+        <a class="action-btn primary" href="public-knowledge.html" data-i18n="backShort">กลับไปคลังความรู้</a>
+        <a id="pdfBtn" class="action-btn pdf" href="#" target="_blank" rel="noopener" style="display:none">PDF</a>
+        <a id="videoBtn" class="action-btn video" href="#" target="_blank" rel="noopener" style="display:none" data-i18n="openVideo">เปิดวิดีโอ</a>
+        <a id="externalLinkBtn" class="action-btn" href="#" target="_blank" rel="noopener" style="display:none" data-i18n="external">เปิดลิงก์เพิ่มเติม</a>
+        <button id="galleryBtn" class="action-btn green" type="button" onclick="openGallery(0)" style="display:none" data-i18n="images">รูปภาพ</button>
       </aside>
     </div>
     <section id="gallerySection" class="gallery-section" style="display:none">
-      <h2 class="section-title">รูปภาพประกอบ</h2>
+      <h2 class="section-title" data-i18n="moreImages">รูปภาพประกอบ</h2>
       <div id="imageGrid" class="image-grid"></div>
     </section>
   </main>
@@ -136,46 +121,79 @@ footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(
   <div id="galleryCaption" class="gallery-caption"></div>
 </div>
 
-<footer>© 2569 International Relations Office · University of Phayao</footer>
+<footer>© 2569 International Relations Office - University of Phayao</footer>
 
 <script src="../js/iroup-config.js"></script>
 <script src="../js/iroup-v2-endpoint.js"></script>
 <script src="../js/iroup-v2-api.js"></script>
 <script>
-let currentLang = 'TH';
-let currentItem = null;
-let galleryImages = [];
-let galleryIndex = 0;
+var currentLang = normalizeLang(localStorage.getItem('iroup_public_lang') || 'TH');
+var currentItem = null;
+var galleryImages = [];
+var galleryIndex = 0;
 
-document.addEventListener('DOMContentLoaded', loadDetail);
+var I18N = {
+  TH: {navNews:'ข่าวสาร',navKnowledge:'คลังความรู้',navScholar:'ทุนการศึกษา',navEvents:'กิจกรรม',admin:'Admin',loading:'กำลังโหลดบทความ...',back:'← กลับไปคลังความรู้',backShort:'กลับไปคลังความรู้',actions:'การดำเนินการ',openVideo:'เปิดวิดีโอ',external:'เปิดลิงก์เพิ่มเติม',images:'รูปภาพ',moreImages:'รูปภาพประกอบ',missingId:'ไม่พบรหัสบทความ',notFound:'ไม่พบบทความ หรือบทความนี้ไม่ได้เปิดเผยสาธารณะ'},
+  EN: {navNews:'News',navKnowledge:'Knowledge',navScholar:'Scholarships',navEvents:'Events',admin:'Admin',loading:'Loading article...',back:'← Back to knowledge',backShort:'Back to knowledge',actions:'Actions',openVideo:'Open video',external:'Open external link',images:'Images',moreImages:'Supporting images',missingId:'Knowledge ID was not found.',notFound:'Article was not found or is not public.'}
+};
 
-async function loadDetail() {
-  const id = new URLSearchParams(window.location.search).get('id') || '';
-  if (!id) return showError('ไม่พบรหัสบทความ');
-  try {
-    const response = await IROUP_V2.public.knowledgeList();
-    if (!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public knowledge API error');
-    currentItem = (response.data || []).find(item => String(item.knowledge_id || '') === String(id));
-    if (!currentItem) return showError('ไม่พบบทความ หรือบทความนี้ไม่ได้เปิดเผยสาธารณะ');
+document.addEventListener('DOMContentLoaded', function(){
+  applyLanguage(false);
+  applyTheme();
+  loadDetail();
+});
+
+async function loadDetail(){
+  var id = new URLSearchParams(window.location.search).get('id') || '';
+  if(!id) return showError(t('missingId'));
+  try{
+    var response = await IROUP_V2.public.knowledgeList();
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public knowledge API error');
+    var rows = normalizeList(response).map(normalizeKnowledge);
+    currentItem = rows.find(function(item){ return String(item.id) === String(id); });
+    if(!currentItem) return showError(t('notFound'));
     renderDetail();
-  } catch (error) {
+  }catch(error){
     showError(error.message || String(error));
   }
 }
 
-function renderDetail() {
-  const item = currentItem;
-  const title = displayTitle(item) || '-';
-  const coverUrl = getCoverUrl(item) || firstImageUrl(item);
-  document.title = title + ' - iROUP';
+function normalizeList(res){
+  var data = res && typeof res.data !== 'undefined' ? res.data : res;
+  if(Array.isArray(data)) return data;
+  var keys = ['rows','records','items','knowledge'];
+  for(var i=0;i<keys.length;i++){ if(data && Array.isArray(data[keys[i]])) return data[keys[i]]; }
+  return [];
+}
+
+function normalizeKnowledge(row){
+  var files = collectFiles(row).filter(isPublicFile);
+  var cover = safeUrl(row.cover_url || row.cover_image_url || row.thumbnail_url) || firstFileUrl(files, 'cover') || firstFileUrl(files, 'image');
+  return {
+    id: clean(row.knowledge_id || row.id),
+    title_th: clean(row.title_th || row.title || row.name_th),
+    title_en: clean(row.title_en || row.name_en),
+    content_th: clean(row.content_th || row.content || row.summary_th || row.description_th),
+    content_en: clean(row.content_en || row.summary_en || row.description_en),
+    category: clean(row.category || row.knowledge_type || row.type),
+    video_url: safeUrl(row.video_url),
+    link_url: safeUrl(row.link_url || row.url),
+    pdf_url: safeUrl(row.pdf_url),
+    cover_url: cover,
+    files: files
+  };
+}
+
+function renderDetail(){
+  var item = currentItem;
+  var title = displayTitle(item) || '-';
+  document.title = title + ' | iROUP';
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('articleShell').style.display = 'block';
   document.getElementById('articleTitle').textContent = title;
   document.getElementById('articleContent').textContent = displayContent(item) || '-';
   document.getElementById('badgeRow').innerHTML = renderBadges(item);
-  document.getElementById('heroCover').innerHTML = coverUrl
-    ? '<img src="' + escAttr(toImageUrl(coverUrl)) + '" alt="' + escAttr(title) + '">'
-    : '📚';
+  document.getElementById('heroCover').innerHTML = item.cover_url ? '<img src="' + escAttr(toImageUrl(item.cover_url, 1600)) + '" alt="' + escAttr(title) + '">' : 'KNOWLEDGE';
   setAction('pdfBtn', item.pdf_url);
   setAction('videoBtn', item.video_url);
   setAction('externalLinkBtn', item.link_url);
@@ -183,140 +201,115 @@ function renderDetail() {
   renderGallerySection();
 }
 
-function renderBadges(item) {
-  let html = '';
-  if (item.category) html += '<span class="badge">' + esc(item.category) + '</span>';
-  if (item.pdf_url) html += '<span class="badge pdf">PDF</span>';
-  if (item.video_url) html += '<span class="badge video">วิดีโอ</span>';
-  if (getImageUrls(item).length) html += '<span class="badge image">รูปภาพ</span>';
+function renderBadges(item){
+  var html = '';
+  if(item.category) html += '<span class="badge category">' + esc(item.category) + '</span>';
+  if(item.pdf_url) html += '<span class="badge pdf">PDF</span>';
+  if(item.video_url) html += '<span class="badge video">' + esc(t('openVideo')) + '</span>';
+  if(getImageUrls(item).length || item.cover_url) html += '<span class="badge image">' + esc(t('images')) + '</span>';
   return html;
 }
 
-function setAction(id, url) {
-  const el = document.getElementById(id);
-  const safe = safeUrl(url);
-  if (!safe) {
-    el.style.display = 'none';
-    return;
-  }
+function setAction(id, url){
+  var el = document.getElementById(id);
+  var safe = safeUrl(url);
+  if(!safe){ el.style.display = 'none'; return; }
   el.href = safe;
   el.style.display = '';
 }
 
-function renderGallerySection() {
-  const section = document.getElementById('gallerySection');
-  const grid = document.getElementById('imageGrid');
-  const galleryBtn = document.getElementById('galleryBtn');
-  if (!galleryImages.length) {
-    section.style.display = 'none';
-    galleryBtn.style.display = 'none';
-    return;
-  }
-  galleryBtn.style.display = '';
+function renderGallerySection(){
+  var section = document.getElementById('gallerySection');
+  var grid = document.getElementById('imageGrid');
+  var button = document.getElementById('galleryBtn');
+  if(!galleryImages.length){ section.style.display = 'none'; button.style.display = 'none'; return; }
+  button.style.display = '';
   section.style.display = '';
-  grid.innerHTML = galleryImages.map((url, index) =>
-    '<button class="image-thumb" type="button" onclick="openGallery(' + index + ')"><img src="' + escAttr(toImageUrl(url)) + '" alt=""></button>'
-  ).join('');
+  grid.innerHTML = galleryImages.map(function(url, index){
+    return '<button class="thumb" type="button" onclick="openGallery(' + index + ')"><img src="' + escAttr(toImageUrl(url, 700)) + '" alt=""></button>';
+  }).join('');
 }
 
-function setLang(nextLang) {
-  currentLang = nextLang === 'EN' ? 'EN' : 'TH';
-  document.getElementById('langThBtn').classList.toggle('active', currentLang === 'TH');
-  document.getElementById('langEnBtn').classList.toggle('active', currentLang === 'EN');
-  if (currentItem) renderDetail();
+function setLang(lang){
+  currentLang = normalizeLang(lang);
+  localStorage.setItem('iroup_public_lang', currentLang);
+  applyLanguage(true);
 }
 
-function openGallery(startIndex) {
-  if (!galleryImages.length) return;
+function applyLanguage(rerender){
+  document.documentElement.lang = currentLang === 'EN' ? 'en' : 'th';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('.lang-btn').forEach(function(btn){ btn.classList.toggle('active', btn.dataset.lang === currentLang); });
+  if(rerender && currentItem) renderDetail();
+}
+
+function applyTheme(){
+  var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('themeToggle').textContent = theme === 'light' ? 'Light' : 'Dark';
+}
+
+function toggleTheme(){
+  var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('iroup_public_theme', next);
+  applyTheme();
+}
+
+function openGallery(startIndex){
+  if(!galleryImages.length) return;
   galleryIndex = Math.max(0, Math.min(Number(startIndex) || 0, galleryImages.length - 1));
   renderGallery();
-  document.getElementById('galleryModal').classList.add('open');
-  document.getElementById('galleryModal').setAttribute('aria-hidden', 'false');
+  var modal = document.getElementById('galleryModal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
 }
 
-function closeGallery() {
-  const modal = document.getElementById('galleryModal');
+function closeGallery(){
+  var modal = document.getElementById('galleryModal');
   modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('aria-hidden','true');
 }
 
-function moveGallery(delta) {
-  if (!galleryImages.length) return;
+function moveGallery(delta){
+  if(!galleryImages.length) return;
   galleryIndex = (galleryIndex + delta + galleryImages.length) % galleryImages.length;
   renderGallery();
 }
 
-function renderGallery() {
-  const url = galleryImages[galleryIndex] || '';
-  document.getElementById('galleryImage').src = toImageUrl(url);
+function renderGallery(){
+  var url = galleryImages[galleryIndex] || '';
+  document.getElementById('galleryImage').src = toImageUrl(url, 1600);
   document.getElementById('galleryCaption').textContent = (galleryIndex + 1) + ' / ' + galleryImages.length;
 }
 
-document.addEventListener('keydown', function(event) {
-  const open = document.getElementById('galleryModal').classList.contains('open');
-  if (event.key === 'Escape' && open) closeGallery();
-  if (!open) return;
-  if (event.key === 'ArrowLeft') moveGallery(-1);
-  if (event.key === 'ArrowRight') moveGallery(1);
+document.addEventListener('keydown', function(event){
+  var open = document.getElementById('galleryModal').classList.contains('open');
+  if(event.key === 'Escape' && open) closeGallery();
+  if(!open) return;
+  if(event.key === 'ArrowLeft') moveGallery(-1);
+  if(event.key === 'ArrowRight') moveGallery(1);
 });
 
-function getImageUrls(item) {
-  const files = Array.isArray(item.files) ? item.files : [];
-  const urls = files
-    .filter(file => String(file.visibility_level || '').trim() === 'public')
-    .filter(file => String(file.file_role_id || (file.file_role && file.file_role.file_role_id) || '').trim() === 'image')
-    .map(file => safeUrl(file.file_url || file.thumbnail_url || file.url || ''))
-    .filter(Boolean);
-  return urls;
-}
-
-function firstImageUrl(item) {
-  return getImageUrls(item)[0] || '';
-}
-
-function getCoverUrl(item) {
-  const files = Array.isArray(item.files) ? item.files : [];
-  const coverFiles = files
-    .filter(file => String(file.visibility_level || '').trim() === 'public')
-    .filter(file => String(file.file_role_id || (file.file_role && file.file_role.file_role_id) || '').trim() === 'cover');
-  const coverFile = coverFiles.length ? coverFiles[coverFiles.length - 1] : null;
-  return safeUrl(item.cover_image_url || item.cover_url || (coverFile ? (coverFile.file_url || coverFile.thumbnail_url || coverFile.url || '') : ''));
-}
-
-function displayTitle(item) {
-  return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en;
-}
-
-function displayContent(item) {
-  return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en;
-}
-
-function toImageUrl(url) {
-  const value = safeUrl(url);
-  const match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/);
-  if (match && match[1]) return 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1600';
-  return value;
-}
-
-function safeUrl(value) {
-  const text = String(value || '').trim();
-  if (!text || text === '-' || text.toLowerCase() === 'undefined' || text.toLowerCase() === 'null') return '';
-  return text;
-}
-
-function showError(message) {
+function showError(message){
   document.getElementById('loadingState').style.display = 'none';
-  const error = document.getElementById('errorState');
+  var error = document.getElementById('errorState');
   error.style.display = '';
-  error.innerHTML = esc(message) + '<br><br><a class="action-btn" href="public-knowledge.html" style="max-width:240px;margin:12px auto 0">กลับไปคลังความรู้</a>';
+  error.innerHTML = esc(message) + '<br><br><a class="action-btn primary" href="public-knowledge.html" style="max-width:240px;margin:12px auto 0">' + esc(t('backShort')) + '</a>';
 }
 
-function esc(value) {
-  return String(value === null || value === undefined ? '' : value)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-}
-function escAttr(value) { return esc(value); }
+function displayTitle(item){ return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en; }
+function displayContent(item){ return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en; }
+function collectFiles(row){ var groups = []; if(Array.isArray(row.files)) groups.push(row.files); if(row.files && typeof row.files === 'object' && !Array.isArray(row.files)){ Object.keys(row.files).forEach(function(key){ if(Array.isArray(row.files[key])) groups.push(row.files[key]); }); } if(Array.isArray(row.public_files)) groups.push(row.public_files); if(row.file_summary && Array.isArray(row.file_summary.files)) groups.push(row.file_summary.files); return groups.reduce(function(acc, group){ return acc.concat(group); }, []).filter(Boolean); }
+function isPublicFile(file){ var visibility = clean(file && file.visibility_level); return !visibility || visibility === 'public'; }
+function firstFileUrl(files, role){ var match = (files || []).find(function(file){ return clean(file.file_role_id || (file.file_role && file.file_role.file_role_id) || file.role).toLowerCase() === role; }); return match ? safeUrl(match.file_url || match.thumbnail_url || match.url || match.drive_url) : ''; }
+function getImageUrls(item){ return (item.files || []).filter(function(file){ return clean(file.file_role_id || (file.file_role && file.file_role.file_role_id) || file.role).toLowerCase() === 'image'; }).map(function(file){ return safeUrl(file.file_url || file.thumbnail_url || file.url || file.drive_url); }).filter(Boolean); }
+function toImageUrl(url, size){ var value = safeUrl(url); var match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/); if(match && match[1]) return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(match[1]) + '&sz=w' + (size || 1200); return value; }
+function normalizeLang(lang){ return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH'; }
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.TH[key] || key; }
+function clean(value){ return String(value === null || value === undefined ? '' : value).trim(); }
+function safeUrl(value){ var text = clean(value); return (!text || text === '-' || text.toLowerCase() === 'undefined' || text.toLowerCase() === 'null') ? '' : text; }
+function esc(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escAttr(value){ return esc(value); }
 </script>
 </body>
 </html>
