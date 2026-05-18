@@ -2662,3 +2662,39 @@ Next tasks:
 ### Strategic Direction
 
 Knowledge articles are evolving from generic repository records into publication-style content entries with distinct hero/cover presentation separate from gallery media.
+
+---
+
+## Session: 2026-05-18 - Public Pages Visual Redesign Continuation
+
+Public outcomes:
+- Promoted `public-landing.html` into the cinematic live V2 landing page with the real MOU atlas, light/dark mode, country flags, and Mobility Flow graph.
+- Redesigned `public-mou.html` with the new MOU hero assets, correct public navigation order, live V2 MOU data, D3/TopoJSON map, Chart.js summary, filters, and light/dark mode.
+- Redesigned `public-mobility.html` as a no-hero dashboard-first public page, keeping live V2 public Mobility and Travel routes.
+- Added 10-item pagination to the Mobility card list and Staff Travel timeline so long datasets do not make the page grow endlessly.
+- Preserved D3/TopoJSON map rendering and Chart.js dashboard behavior for Mobility.
+
+Standards confirmed:
+- Public pages should share the top navigation order: ข่าวสาร, คลังความรู้, ทุนการศึกษา, กิจกรรม, MOU, Mobility.
+- Public pages need a localStorage-backed light/dark mode toggle using `iroup_public_theme`.
+- Long public lists should paginate by default, with 10 rows/cards per page unless a module has a stronger reason to show more.
+
+Next:
+- Continue redesigning remaining public pages one by one, starting with News / Knowledge / Scholarship / Events as needed.
+
+---
+
+## Session: 2026-05-18 - Public Mobility Stabilization
+
+Public Mobility outcomes:
+- Fixed `public-mobility.html` data loading after redesign by restoring the correct script order and paths: `iroup-v2-endpoint.js`, `iroup-config.js`, then `iroup-v2-api.js` from the `js/` folder.
+- Added working TH/EN language toggle for the Mobility public page using `iroup_public_lang` in localStorage.
+- Fixed Thai text encoding that had displayed as `????` by restoring the Thai translation set.
+- Fixed country display when the V2 DTO returns `country` as an object, preventing `[object Object]` in the top-country panel.
+- Kept live V2 public routes unchanged: `IROUP_V2.public.mobilityList()` and `IROUP_V2.public.travelList()`.
+
+Verification:
+- Inline script parse passed.
+- `git diff --check` passed with CRLF warnings only.
+- Local smoke test returned HTTP 200.
+- Confirmed the Thai page title renders correctly in the browser and no `????` markers remain.

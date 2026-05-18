@@ -1,297 +1,76 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOU ต่างประเทศ — iROUP</title>
+<title>ระบบ MOU ต่างประเทศ - iROUP</title>
 <link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.dataset.theme = localStorage.getItem('iroup_public_theme') || 'dark';</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --blue:#1A6DB5;--blue-light:#4BBDE8;--blue-pale:#E8F4FD;
-  --navy:#0F2D5A;--navy-dark:#071828;
-  --green:#5BAD3E;--green-pale:#EBF7E3;
-  --gold:#D4890A;--gold-pale:#FEF3DC;
-  --red:#D63B32;--red-pale:#FDECEA;
-  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#DDE2EA;
-  --gray-400:#B8C2D0;--gray-600:#6B7A8D;--gray-800:#2D3748;
-  --white:#FFFFFF;
-  --shadow-sm:0 1px 4px rgba(15,45,90,0.08);
-  --shadow-md:0 4px 16px rgba(15,45,90,0.12);
-}
-html{scroll-behavior:smooth}
-body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--navy)}
-
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.nav-links{display:flex;align-items:center;gap:20px}
-.nav-link{font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent}
-.nav-link:hover{color:var(--blue)}
-.nav-link.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
-.nav-lang{display:flex;background:var(--gray-200);border-radius:8px;padding:3px;gap:2px}
-.nav-lang-btn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:var(--gray-600);transition:all .2s}
-.nav-lang-btn.active{background:var(--blue);color:#fff}
-.nav-admin-btn{padding:7px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:20px;font-size:12px;font-weight:700;color:#fff;text-decoration:none}
-
-/* HERO */
-.page-hero{background:linear-gradient(135deg, #E8F4FD 0%, #F0F7FF 50%, #EBF7E3 100%);padding:48px 5%}
-.page-hero h1{font-size:32px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px}
-.page-hero p{font-size:14px;color:rgba(255,255,255,0.6);font-family:'Sarabun',sans-serif}
-.hero-kpi{display:flex;gap:32px;margin-top:24px}
-.hkpi{text-align:center}
-.hkpi-num{font-size:36px;font-weight:900;color:var(--blue-light);letter-spacing:-1px}
-.hkpi-label{font-size:11px;color:rgba(255,255,255,0.5);font-family:'Sarabun',sans-serif;margin-top:2px}
-
-/* CONTENT */
-.content{padding:32px 5%;display:flex;flex-direction:column;gap:24px;max-width:1400px;margin:0 auto;width:100%}
-
-/* CARDS */
-.card{background:var(--white);border-radius:16px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);overflow:hidden}
-.card-header{padding:16px 20px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
-.card-title{font-size:14px;font-weight:700;color:var(--navy)}
-.card-body{padding:20px}
-
-/* MAP */
-.map-dark{background:var(--navy-dark);border-radius:16px;overflow:hidden;min-height:300px;position:relative}
-.map-header{padding:16px 20px 0;color:#fff}
-.map-title{font-size:14px;font-weight:700}
-.map-sub{font-size:11px;color:rgba(255,255,255,0.4);font-family:'Sarabun',sans-serif;margin-top:2px}
-.map-legend{display:flex;gap:14px;padding:10px 20px 0}
-.ml-item{display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,0.5);font-family:'Sarabun',sans-serif}
-.ml-dot{width:8px;height:8px;border-radius:2px}
-#mouMapDiv{width:100%;height:280px;position:relative;display:flex;align-items:center;justify-content:center}
-#mouMapMsg{text-align:center;color:rgba(255,255,255,0.4);font-family:'Sarabun',sans-serif;font-size:13px}
-#leafletMouMap{width:100%;height:280px;display:none}
-#svgMouMap{width:100%;height:280px;display:block;background:#071828}
-#mouMapTooltip{position:absolute;background:rgba(10,20,40,0.92);color:#fff;padding:7px 12px;border-radius:8px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(75,189,232,0.3);font-family:Prompt,sans-serif;z-index:50;white-space:nowrap}
-
-/* GRID */
-.grid-2{display:grid;grid-template-columns:1fr 340px;gap:20px}
-
-/* FILTER */
-.filter-bar{background:var(--white);border-radius:12px;padding:14px 18px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.search-wrap{flex:1;position:relative;min-width:200px}
-.search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:'Prompt',sans-serif;outline:none;transition:border .15s}
-.search-wrap input:focus{border-color:var(--blue-light)}
-.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px}
-.filter-select{padding:8px 12px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:12px;font-family:'Prompt',sans-serif;outline:none;background:var(--white);cursor:pointer;color:var(--gray-800)}
-.pills{display:flex;gap:5px;flex-wrap:wrap}
-.pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-300);color:var(--gray-600);background:var(--white);transition:all .2s;font-family:'Sarabun',sans-serif}
-.pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-
-/* TABLE */
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
-thead{background:var(--gray-100)}
-th{padding:10px 14px;text-align:left;font-weight:600;color:var(--gray-600);font-size:11px;border-bottom:1px solid var(--gray-200);font-family:'Sarabun',sans-serif;text-transform:uppercase;letter-spacing:0.3px;white-space:nowrap}
-td{padding:11px 14px;border-bottom:1px solid var(--gray-200);color:var(--gray-800);vertical-align:middle}
-tr:hover td{background:var(--blue-pale)}
-.uni-name{font-weight:600;color:var(--navy);font-size:13px}
-.dept-name{font-size:11px;color:var(--gray-600);font-family:'Sarabun',sans-serif;margin-top:2px}
-.flag-cell{display:flex;align-items:center;gap:6px}
-.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Sarabun',sans-serif}
-.badge::before{content:'';width:5px;height:5px;border-radius:50%}
-.b-active{background:var(--green-pale);color:var(--green)}
-.b-active::before{background:var(--green)}
-.b-soon{background:var(--gold-pale);color:var(--gold)}
-.b-soon::before{background:var(--gold)}
-.b-expired{background:var(--gray-200);color:var(--gray-600)}
-.b-expired::before{background:var(--gray-400)}
-.type-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--blue-pale);color:var(--blue);font-weight:600;font-family:'Sarabun',sans-serif}
-.date-text{font-size:11px;color:var(--gray-700);font-family:'Sarabun',sans-serif;white-space:nowrap}
-
-/* CHART */
-.chart-wrap{position:relative;height:320px}
-
-/* LOADING */
-.loading{text-align:center;padding:40px;color:var(--gray-400);font-family:'Sarabun',sans-serif;font-size:13px}
-
-/* FOOTER */
-footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;font-family:'Sarabun',sans-serif;margin-top:40px}
-
-
-
-
-  50%{transform:translateY(-15px) scale(1.05)}
-}
-
-
-
-
-
-100%{background-position:-200% 0}}
-
-
-
-
-
-
-
-.page-hero, 
-/* Remove dark overlay */
-.page-hero::after, 
-.page-hero::before, 
-
-/* Light glass orbs */
-
-  50%{transform:translateY(-15px) scale(1.05)}
-}
-
-
-
-/* KPI on light hero */
-
-.hkpi-label { color: rgba(15,45,90,0.6) !important; }
-.page-hero h1 { color: var(--navy-dark) !important; }
-.page-hero p { color: var(--gray-600) !important; }
-.page-hero .hkpi-num { filter: none; }
-
-
-
-/* ============================================================
-   ROUND 7 — MOBILE RESPONSIVE FIXES
-   ============================================================ */
-@media (max-width: 960px){
-  nav{height:auto;min-height:60px;padding:10px 4%;gap:10px;flex-wrap:wrap;position:sticky;background:rgba(255,255,255,.96);box-shadow:0 1px 16px rgba(15,45,90,.08)}
-  .nav-logo{min-width:0}.nav-logo-text{font-size:15px}.nav-links{order:3;width:100%;display:flex;gap:10px;overflow-x:auto;padding:4px 0 2px;scrollbar-width:none}.nav-links::-webkit-scrollbar{display:none}
-  .nav-link{font-size:12px;white-space:nowrap;padding:6px 10px;border-radius:999px;background:var(--gray-100, #F8F9FB)}
-  .nav-lang{margin-left:auto}.nav-admin-btn{padding:7px 12px;font-size:11px}
-  .page-hero{padding:34px 5% 28px!important;text-align:center}.page-hero h1{font-size:30px!important}.page-hero p{font-size:13px!important}
-  .hero-kpi{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:12px!important;justify-content:stretch!important}.hkpi{padding:12px;background:rgba(255,255,255,.52);border-radius:14px}
-  .content{padding:18px 4%!important}.grid-2,.grid-3{grid-template-columns:1fr!important}.filter-bar{align-items:stretch!important}.search-wrap{min-width:100%!important}.filter-select{width:100%}.status-pills{width:100%;overflow-x:auto;padding-bottom:2px}
-  .cards-grid,.scholar-grid,.features-grid{grid-template-columns:1fr!important}.map-stats-row{grid-template-columns:repeat(2,1fr)!important}.table-wrap{border-radius:12px;overflow-x:auto}.table-wrap table{min-width:760px}
-  .event-item,.event-row{align-items:flex-start!important}.map-dark,.card{min-width:0}.chart-wrap{min-height:240px}.hero-btns{justify-content:center}.hero-stats{justify-content:center;flex-wrap:wrap}
-}
-@media (max-width: 640px){
-  .hero{min-height:auto!important;display:block!important;padding:90px 5% 40px!important;text-align:center}.hero-title{font-size:34px!important}.hero-title .accent2{font-size:24px!important}.hero-sub{font-size:14px!important}.hero-btns a{width:100%;justify-content:center}.hero-stats{display:grid!important;grid-template-columns:repeat(2,1fr);gap:10px}.stat-divider{display:none}.hero-visual{margin-top:18px}.globy-wrap{width:min(310px,90vw)!important;height:min(310px,90vw)!important;margin:auto}.globy-bubble{font-size:10px;transform:scale(.9)}.gb1{left:0!important}.gb2{right:0!important}.gb3{left:0!important}.gb4{right:0!important}
-  section{padding:46px 5%!important}.section-title{font-size:26px!important}.section-sub{font-size:13px!important}.about-strip{display:block!important;text-align:center;padding:36px 5%!important}.about-globy{margin-bottom:18px}.about-contact{justify-content:center}footer{display:block!important;text-align:center}.footer-logo{justify-content:center;margin-bottom:10px}.footer-admin{margin-top:12px}
-  .page-hero h1{font-size:26px!important}.hero-kpi{grid-template-columns:1fr 1fr!important}.hkpi-num{font-size:26px!important}.event-item,.event-row{display:grid!important;grid-template-columns:auto 1fr;gap:10px!important}.event-item .ev-arrow,.event-row .ev-arrow{display:none}
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#1A6DB5;--blue2:#4BBDE8;--cyan:#22d3ee;--gold:#F5A623;--green:#5BAD3E;--red:#D63B32;--navy:#071828;--text:#f8fbff;--muted:#8fa6c4;--dim:#5f7898;--bg:#03101f;--panel:rgba(7,24,40,.78);--panel2:rgba(9,31,52,.7);--line:rgba(97,165,220,.18);--chip:rgba(255,255,255,.07);--shadow:0 22px 60px rgba(0,0,0,.28);--hero:url('../assets/MOU-hero-earth-dark-.webp')}
+html[data-theme="light"]{--text:#071828;--muted:#516782;--dim:#7b8ca4;--bg:#edf6fd;--panel:rgba(255,255,255,.86);--panel2:rgba(255,255,255,.72);--line:rgba(15,45,90,.13);--chip:rgba(26,109,181,.08);--shadow:0 20px 50px rgba(15,45,90,.13);--hero:url('../assets/MOU-hero-earth-light.webp')}
+html{scroll-behavior:smooth}body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 80% 0,rgba(34,211,238,.15),transparent 36%),linear-gradient(180deg,transparent,#04101d 58%);pointer-events:none;z-index:-1}html[data-theme="light"] body:before{background:linear-gradient(180deg,rgba(232,244,253,.7),rgba(255,255,255,.25) 45%,rgba(232,244,253,.9))}
+a{text-decoration:none;color:inherit}.topbar{position:sticky;top:0;z-index:50;height:72px;padding:0 clamp(18px,4vw,72px);display:flex;align-items:center;justify-content:space-between;background:rgba(3,16,31,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}html[data-theme="light"] .topbar{background:rgba(255,255,255,.88)}.brand{display:flex;align-items:center;gap:12px}.brand img{height:40px}.brand-fallback{font-weight:900;color:var(--text)}.nav{display:flex;align-items:center;gap:6px}.nav-link{font-size:13px;font-weight:700;color:var(--muted);padding:12px 11px;border-radius:14px;border-bottom:2px solid transparent}.nav-link:hover{background:var(--chip);color:var(--text)}.nav-link.active{color:var(--blue2);background:rgba(34,211,238,.09);border-bottom-color:var(--blue2)}.nav-tools{display:flex;align-items:center;gap:8px}.seg{display:flex;background:var(--chip);border:1px solid var(--line);border-radius:16px;padding:3px}.seg button,.icon-btn,.admin-btn{border:0;font-family:Prompt,sans-serif;font-weight:800;cursor:pointer}.seg button{padding:8px 12px;border-radius:12px;background:transparent;color:var(--muted)}.seg button.active{background:linear-gradient(135deg,#1e88ff,#1a6db5);color:#fff}.icon-btn{min-width:58px;height:39px;padding:0 10px;border-radius:15px;background:var(--chip);color:var(--text);border:1px solid var(--line)}.admin-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:18px;background:var(--panel);border:1px solid var(--line);font-size:13px;color:var(--text)}.hero{min-height:330px;padding:58px clamp(20px,5vw,86px) 46px;background-image:linear-gradient(90deg,var(--bg) 0%,rgba(3,16,31,.76) 35%,rgba(3,16,31,.04) 72%),var(--hero);background-size:cover;background-position:center right;border-bottom:1px solid var(--line)}html[data-theme="light"] .hero{background-image:linear-gradient(90deg,rgba(248,252,255,.96) 0%,rgba(248,252,255,.82) 38%,rgba(248,252,255,.08) 74%),var(--hero)}.hero-inner{max-width:1180px}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(34,211,238,.1);border:1px solid var(--line);color:var(--blue2);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.hero h1{font-size:clamp(34px,4vw,54px);line-height:1.12;letter-spacing:-.04em;margin-top:22px}.hero h1 span{color:#61a5ff}.hero p{max-width:630px;color:var(--muted);font-family:Sarabun,sans-serif;font-size:16px;margin-top:14px}.hero-kpi{display:grid;grid-template-columns:repeat(4,minmax(110px,160px));gap:1px;margin-top:34px;max-width:690px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--line)}.hkpi{padding:18px 20px;background:var(--panel)}.hkpi-num{font-size:38px;font-weight:900;letter-spacing:-.05em;color:var(--blue2)}.hkpi-label{font-size:12px;color:var(--muted);font-family:Sarabun,sans-serif}.content{max-width:1320px;margin:-6px auto 0;padding:0 clamp(16px,4vw,40px) 38px}.grid-2{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:18px}.panel{background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}.panel-title{font-size:17px;font-weight:900}.panel-sub{font-size:12px;color:var(--muted);font-family:Sarabun,sans-serif;margin-top:4px}.map-legend{display:flex;gap:15px;flex-wrap:wrap;padding:14px 22px 0}.ml-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-family:Sarabun,sans-serif}.ml-dot{width:10px;height:10px;border-radius:50%}#mouMapDiv{position:relative;height:355px;overflow:hidden}#svgMouMap{width:100%;height:100%;display:block}#mouMapMsg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--muted);font-family:Sarabun,sans-serif}#mouMapTooltip{position:absolute;background:rgba(4,14,28,.94);color:#fff;padding:9px 12px;border-radius:10px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(75,189,232,.36);z-index:10;white-space:nowrap}.chart-wrap{height:355px;padding:16px}.filter-bar{margin:18px 0 14px;display:grid;grid-template-columns:1fr 150px auto;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}.search-wrap{position:relative}.search-wrap input,.filter-select{width:100%;height:44px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.12);color:var(--text);font-family:Prompt,sans-serif;padding:0 14px;outline:none}html[data-theme="light"] .search-wrap input,html[data-theme="light"] .filter-select{background:#fff}.search-wrap input{padding-left:42px}.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--blue2)}.pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pill{height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--muted);font-family:Prompt,sans-serif;font-weight:800;cursor:pointer}.pill.on{background:linear-gradient(135deg,#1e88ff,#0f5aa4);color:#fff}.table-wrap{overflow-x:auto}.mou-table{width:100%;border-collapse:collapse;min-width:850px}.mou-table th{padding:13px 18px;text-align:left;color:var(--muted);font-size:12px;font-weight:800;border-bottom:1px solid var(--line);font-family:Sarabun,sans-serif}.mou-table td{padding:15px 18px;border-bottom:1px solid var(--line);font-size:13px;color:var(--text);vertical-align:middle}.mou-table tr:hover td{background:rgba(75,189,232,.06)}.muted{color:var(--muted);font-family:Sarabun,sans-serif}.strong{font-weight:900}.flag-cell{display:flex;align-items:center;gap:8px}.flag-img{width:22px;height:16px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.22)}.type-tag,.badge{display:inline-flex;align-items:center;border-radius:999px;font-weight:900;font-size:11px}.type-tag{padding:4px 10px;background:rgba(30,136,255,.13);color:#4bbde8}.badge{gap:6px;padding:5px 10px}.badge:before{content:"";width:7px;height:7px;border-radius:50%}.b-active{background:rgba(91,173,62,.14);color:#71d15a}.b-active:before{background:#71d15a}.b-soon{background:rgba(245,166,35,.14);color:#f5a623}.b-soon:before{background:#f5a623}.b-expired{background:rgba(214,59,50,.12);color:#ff7870}.b-expired:before{background:#ff7870}.loading{text-align:center;padding:38px;color:var(--muted);font-family:Sarabun,sans-serif}.footer{text-align:center;padding:24px;color:var(--dim);font-size:12px;font-family:Sarabun,sans-serif;border-top:1px solid var(--line)}@media(max-width:980px){.topbar{height:auto;gap:12px;flex-wrap:wrap;padding:12px 18px}.nav{order:3;width:100%;overflow-x:auto}.grid-2{grid-template-columns:1fr}.filter-bar{grid-template-columns:1fr}.hero-kpi{grid-template-columns:repeat(2,1fr)}}@media(max-width:640px){.hero{padding:36px 18px}.hero-kpi{grid-template-columns:1fr 1fr}.hkpi{padding:14px}.nav-link{white-space:nowrap}.admin-btn span{display:none}}
 </style>
 </head>
 <body>
-
-<nav id="mainNav">
-  <a class="nav-logo" href="public-landing.html">
-    <img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-    <span style="display:none;font-size:16px;font-weight:800;color:var(--navy)">iROUP</span>
-  </a>
-  <div class="nav-links">
-    <a href="public-mou.html" class="nav-link active">🤝 MOU</a>
-    <a href="public-scholar.html" class="nav-link">🎓 ทุนการศึกษา</a>
-    <a href="public-events.html" class="nav-link">📅 กิจกรรม</a>
-    <a href="public-mobility.html" class="nav-link">👥 Mobility</a>
-    <div class="nav-lang">
-      <div class="nav-lang-btn active" onclick="setLang('TH')">TH</div>
-      <div class="nav-lang-btn" onclick="setLang('EN')">EN</div>
-    </div>
-    <a href="index.html" class="nav-admin-btn">🔐 Admin</a>
+<header class="topbar">
+  <a class="brand" href="public-landing.html"><img src="../assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="brand-fallback" style="display:none">iROUP</span></a>
+  <nav class="nav">
+    <a href="public-news.html" class="nav-link">ข่าวสาร</a>
+    <a href="public-knowledge.html" class="nav-link">คลังความรู้</a>
+    <a href="public-scholar.html" class="nav-link">ทุนการศึกษา</a>
+    <a href="public-events.html" class="nav-link">กิจกรรม</a>
+    <a href="public-mou.html" class="nav-link active">MOU</a>
+    <a href="public-mobility.html" class="nav-link">Mobility</a>
+  </nav>
+  <div class="nav-tools">
+    <div class="seg"><button class="lang-btn active" onclick="setLang('TH')">TH</button><button class="lang-btn" onclick="setLang('EN')">EN</button></div>
+    <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">Dark</button>
+    <a class="admin-btn" href="index.html"><span>Admin</span></a>
   </div>
-</nav>
-
-<div class="page-hero">
-  <h1 id="hero-title">🤝 MOU ต่างประเทศ</h1>
-  <p id="hero-sub">ข้อมูลความร่วมมือทางวิชาการกับสถาบันทั่วโลก · International Academic Cooperation</p>
-  <div class="hero-kpi">
-    <div class="hkpi"><div class="hkpi-num" id="kpi-total">—</div><div class="hkpi-label" id="kpi-total-label">MOU ทั้งหมด</div></div>
-    <div class="hkpi"><div class="hkpi-num" id="kpi-active" style="color:#7BC842">—</div><div class="hkpi-label">Active</div></div>
-    <div class="hkpi"><div class="hkpi-num" id="kpi-soon" style="color:#F5A623">—</div><div class="hkpi-label">ใกล้หมดอายุ</div></div>
-    <div class="hkpi"><div class="hkpi-num" id="kpi-country" style="color:#4BBDE8">—</div><div class="hkpi-label">ประเทศ</div></div>
-  </div>
-</div>
-
-<div class="content">
-
-  <!-- MAP + CHART -->
-  <div class="grid-2">
-    <div class="map-dark">
-      <div class="map-header">
-        <div class="map-title">🗺️ แผนที่ความร่วมมือนานาชาติ</div>
-        <div class="map-sub">Hover เพื่อดูรายละเอียด</div>
-      </div>
-      <div class="map-legend">
-        <div class="ml-item"><div class="ml-dot" style="background:#4BBDE8;border-radius:50%"></div>1–3 MOU</div>
-        <div class="ml-item"><div class="ml-dot" style="background:#1A6DB5;border-radius:50%"></div>4–7 MOU</div>
-        <div class="ml-item"><div class="ml-dot" style="background:#F5A623;border-radius:50%"></div>8+ MOU</div>
-      </div>
-      <div id="mouMapDiv" style="position:relative;overflow:hidden">
-        <div id="mouMapMsg"><div style="font-size:28px;margin-bottom:6px">🗺️</div><div>กำลังโหลดแผนที่...</div></div>
-        <svg id="svgMouMap" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet"></svg>
-        <div id="mouMapTooltip"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">📊 MOU Active แยกตามหน่วยงาน</div>
-      </div>
-      <div class="card-body" style="padding:12px">
-        <div class="chart-wrap"><canvas id="deptChart"></canvas></div>
-      </div>
+</header>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">V2 Public MOU Atlas</div>
+    <h1 id="heroTitle">MOU ต่างประเทศ</h1>
+    <p id="heroSub">ข้อมูลความร่วมมือทางวิชาการกับสถาบันทั่วโลก - International Academic Cooperation</p>
+    <div class="hero-kpi">
+      <div class="hkpi"><div class="hkpi-num" id="kpi-total">-</div><div class="hkpi-label" id="labelTotal">MOU ทั้งหมด</div></div>
+      <div class="hkpi"><div class="hkpi-num" id="kpi-active" style="color:var(--green)">-</div><div class="hkpi-label">Active</div></div>
+      <div class="hkpi"><div class="hkpi-num" id="kpi-soon" style="color:var(--gold)">-</div><div class="hkpi-label" id="labelSoon">ใกล้หมดอายุ</div></div>
+      <div class="hkpi"><div class="hkpi-num" id="kpi-country">-</div><div class="hkpi-label" id="labelCountry">ประเทศ</div></div>
     </div>
   </div>
-
-  <!-- FILTER -->
-  <div class="filter-bar">
-    <span style="font-size:12px;font-weight:600;color:var(--gray-600)">🔍</span>
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="ค้นหาชื่อสถาบัน ประเทศ หรือหน่วยงาน..." oninput="filterTable()">
+</section>
+<main class="content">
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head"><div><div class="panel-title">แผนที่ความร่วมมือทางนานาชาติ</div><div class="panel-sub">Hover เพื่อดูรายละเอียด</div></div></div>
+      <div class="map-legend"><div class="ml-item"><span class="ml-dot" style="background:#4BBDE8"></span>1-3 MOU</div><div class="ml-item"><span class="ml-dot" style="background:#1A6DB5"></span>4-7 MOU</div><div class="ml-item"><span class="ml-dot" style="background:#F5A623"></span>8+ MOU</div></div>
+      <div id="mouMapDiv"><div id="mouMapMsg">กำลังโหลดข้อมูล...</div><svg id="svgMouMap" aria-label="MOU map"></svg><div id="mouMapTooltip"></div></div>
     </div>
-    <select class="filter-select" id="continentFilter" onchange="filterTable()">
-      <option value="">ทุกทวีป</option>
-      <option value="asia">เอเชีย</option>
-      <option value="europe">ยุโรป</option>
-      <option value="america">อเมริกา</option>
-      <option value="oceania">โอเชียเนีย</option>
-      <option value="africa">แอฟริกา</option>
-    </select>
-    <div class="pills">
-      <div class="pill on" onclick="setPill(this,'')">ทั้งหมด</div>
-      <div class="pill" onclick="setPill(this,'active')">Active</div>
-      <div class="pill" onclick="setPill(this,'soon')">ใกล้หมด</div>
-      <div class="pill" onclick="setPill(this,'expired')">หมดอายุ</div>
+    <div class="panel">
+      <div class="panel-head"><div><div class="panel-title">MOU Active แยกตามหน่วยงาน</div><div class="panel-sub">Active MOU by UP unit</div></div></div>
+      <div class="chart-wrap"><canvas id="deptChart"></canvas></div>
     </div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">📋 รายการ MOU ทั้งหมด</div>
-      <div id="tableCount" style="font-size:11px;color:var(--gray-600);font-family:'Sarabun',sans-serif">กำลังโหลด...</div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>หน่วยงาน ม.พะเยา</th>
-            <th>องค์กรต่างประเทศ</th>
-            <th>ประเทศ</th>
-            <th>ประเภท</th>
-            <th>ช่วงความร่วมมือ</th>
-            <th>สถานะ</th>
-          </tr>
-        </thead>
-        <tbody id="mouTableBody">
-          <tr><td colspan="7" class="loading">⏳ กำลังโหลดข้อมูล...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-
-<footer>
-  © 2569 International Relations Office · University of Phayao · ข้อมูลอัพเดตโดยทีมงานวิเทศฯ
-</footer>
-
+  </section>
+  <section class="filter-bar">
+    <div class="search-wrap"><span class="search-icon"></span><input id="searchInput" type="text" placeholder="ค้นหาชื่อสถาบัน ประเทศ หรือหน่วยงาน..."></div>
+    <select class="filter-select" id="continentFilter"><option value="">ทุกทวีป</option><option value="asia">เอเชีย</option><option value="europe">ยุโรป</option><option value="america">อเมริกา</option><option value="oceania">โอเชียเนีย</option><option value="africa">แอฟริกา</option></select>
+    <div class="pills"><button class="pill on" data-status="">ทั้งหมด</button><button class="pill" data-status="active">Active</button><button class="pill" data-status="soon">ใกล้หมดอายุ</button><button class="pill" data-status="expired">หมดอายุ</button></div>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><div><div class="panel-title">รายการ MOU ทั้งหมด</div><div class="panel-sub" id="tableCount">กำลังโหลดข้อมูล...</div></div></div>
+    <div class="table-wrap"><table class="mou-table"><thead><tr><th>#</th><th>หน่วยงาน ม.พะเยา</th><th>องค์กรต่างประเทศ</th><th>ประเทศ</th><th>ประเภท</th><th>ช่วงความร่วมมือ</th><th>สถานะ</th></tr></thead><tbody id="mouTableBody"><tr><td colspan="7" class="loading">กำลังโหลดข้อมูล...</td></tr></tbody></table></div>
+  </section>
+</main>
+<footer class="footer">(c) 2569 International Relations Office - University of Phayao - ข้อมูลอัพเดตเมื่อวันที่ 19 พฤษภาคม 2569</footer>
 <script src="../js/iroup-config.js"></script>
 <script src="../js/iroup-v2-endpoint.js"></script>
 <script src="../js/iroup-v2-api.js"></script>
@@ -299,379 +78,42 @@ footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(
 let allMou = [];
 let currentStatus = '';
 let mouChart = null;
-
-// ============================================================
-// LOAD DATA
-// ============================================================
-async function loadData() {
-  try {
-    const response = await IROUP_V2.public.mouList();
-    if (!response.success) throw new Error(response.error || 'V2 MOU API error');
-    const data = (response.data || []).map(normalizePublicMou);
-    allMou = data;
-    updateKPI(data);
-    renderTable(data);
-    renderChart(data);
-    loadMap(data);
-  } catch(e) {
-    document.getElementById('mouTableBody').innerHTML =
-      '<tr><td colspan="7" class="loading">⚠️ ไม่สามารถโหลดข้อมูลได้</td></tr>';
-  }
-}
-
-function normalizePublicMou(row) {
-  const country = normalizePublicCountryName(row.country || row.country_name || row.country_code || row.countryCode);
-  const continent = normalizePublicContinentName(row.continent);
-  const unit = normalizePublicUnitName(row.unit);
-  const fileUrl = firstPublicFileUrl(row.files);
-  return {
-    ID: row.mou_id || '',
-    'องค์กร_ตปท': row.partner_org_name || row.partner_org_name_en || row.partner_org || '',
-    'ประเทศ': normalizeMapCountryName(country || row.country || row.country_name || row.country_code || row.countryCode || ''),
-    'ทวีป': continent || row.continent || '',
-    'หน่วยงาน_UP': unit || row.up_unit || '',
-    'ประเภท': row.mou_type || row.type || 'MOU',
-    'วันเริ่ม': row.start_date || '',
-    'วันสิ้นสุด': row.end_date || '',
-    'ปีงบ': row.fiscal_year || '',
-    public_file_url: row.public_file_url || fileUrl || '',
-    public_status: row.status || ''
-  };
-}
-
-function normalizePublicCountryName(country) {
-  if (!country) return '';
-  if (typeof country !== 'object') return String(country || '');
-  return country.country_name_en || country.country_name || country.display_name || country.name_en || country.name || country.country_name_th || country.name_th || country.iso2 || country.country_code || country.countryCode || country.country_id || '';
-}
-
-function normalizeMapCountryName(country) {
-  if (!country) return '';
-  const raw = typeof country === 'object' ? normalizePublicCountryName(country) : String(country || '');
-  const cleaned = raw
-    .replace(/^[A-Z]{2,3}\s*[-–—:]?\s+/i, '')
-    .replace(/\s*\([A-Z]{2,3}\)\s*$/i, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  const key = cleaned.toLowerCase();
-  const aliases = {
-    au: 'Australia',
-    aus: 'Australia',
-    australia: 'Australia',
-    jp: 'Japan',
-    jpn: 'Japan',
-    japan: 'Japan',
-    kr: 'South Korea',
-    kor: 'South Korea',
-    korea: 'South Korea',
-    'republic of korea': 'South Korea',
-    uk: 'United Kingdom',
-    gb: 'United Kingdom',
-    gbr: 'United Kingdom',
-    'united kingdom': 'United Kingdom',
-    us: 'USA',
-    usa: 'USA',
-    'u.s.a.': 'USA',
-    'united states': 'USA',
-    'united states of america': 'USA',
-    cn: 'China',
-    chn: 'China',
-    china: 'China',
-    'people’s republic of china': 'China',
-    "people's republic of china": 'China',
-    'pr china': 'China',
-    th: 'Thailand',
-    tha: 'Thailand',
-    thailand: 'Thailand',
-    tw: 'Taiwan',
-    twn: 'Taiwan',
-    taiwan: 'Taiwan',
-    de: 'Germany',
-    deu: 'Germany',
-    germany: 'Germany',
-    ญี่ปุ่น: 'Japan',
-    จีน: 'China',
-    เกาหลีใต้: 'South Korea',
-    ไต้หวัน: 'Taiwan',
-    เยอรมนี: 'Germany',
-    สหรัฐอเมริกา: 'USA',
-    ไทย: 'Thailand',
-    ออสเตรเลีย: 'Australia'
-  };
-  return aliases[key] || cleaned;
-}
-
-function normalizePublicContinentName(continent) {
-  if (!continent) return '';
-  if (typeof continent !== 'object') return String(continent || '');
-  return continent.continent_name_en || continent.continent_name_th || continent.name_en || continent.name_th || continent.continent_id || '';
-}
-
-function normalizePublicUnitName(unit) {
-  if (!unit) return '';
-  if (typeof unit !== 'object') return String(unit || '');
-  return unit.unit_name_th || unit.unit_name_en || unit.name_th || unit.name_en || unit.unit_id || '';
-}
-
-function firstPublicFileUrl(files) {
-  const list = Array.isArray(files) ? files : [];
-  const found = list.find(file => file && file.file_url);
-  return found ? found.file_url : '';
-}
-
-function updateKPI(data) {
-  const today = new Date();
-  const active = data.filter(m => {
-    const s = IROUP.getMouStatus(m['วันสิ้นสุด']);
-    return s.status === 'active';
-  }).length;
-  const soon = data.filter(m => {
-    const s = IROUP.getMouStatus(m['วันสิ้นสุด']);
-    return s.status === 'soon';
-  }).length;
-  const countries = [...new Set(data.map(m => normalizeMapCountryName(m['ประเทศ'])).filter(Boolean))].length;
-
-  document.getElementById('kpi-total').textContent  = data.length;
-  document.getElementById('kpi-active').textContent = active;
-  document.getElementById('kpi-soon').textContent   = soon;
-  document.getElementById('kpi-country').textContent = countries;
-}
-
-// ============================================================
-// TABLE
-// ============================================================
-function renderTable(data) {
-  const tbody = document.getElementById('mouTableBody');
-  if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="loading">ไม่พบข้อมูล</td></tr>';
-    document.getElementById('tableCount').textContent = '0 รายการ';
-    return;
-  }
-  tbody.innerHTML = data.map((m, i) => {
-    const s = IROUP.getMouStatus(m['วันสิ้นสุด']);
-    const bClass = s.status === 'active' ? 'b-active' : s.status === 'soon' ? 'b-soon' : 'b-expired';
-    const flags = {'China':'🇨🇳','Japan':'🇯🇵','South Korea':'🇰🇷','Germany':'🇩🇪',
-      'Australia':'🇦🇺','Taiwan':'🇹🇼','USA':'🇺🇸','United Kingdom':'🇬🇧',
-      'France':'🇫🇷','Netherlands':'🇳🇱','Vietnam':'🇻🇳','Myanmar':'🇲🇲',
-      'Indonesia':'🇮🇩','Malaysia':'🇲🇾','Philippines':'🇵🇭','Singapore':'🇸🇬',
-      'India':'🇮🇳','Thailand':'🇹🇭','Sweden':'🇸🇪','Norway':'🇳🇴'};
-    const flag = flags[m['ประเทศ']] || '🌍';
-    return `<tr>
-      <td style="color:var(--gray-400);font-size:11px">${i+1}</td>
-      <td>
-        <div class="uni-name">${m['หน่วยงาน_UP'] || '—'}</div>
-      </td>
-      <td><div class="uni-name">${m['องค์กร_ตปท'] || '—'}</div></td>
-      <td><div class="flag-cell">${flag} <span>${m['ประเทศ'] || '—'}</span></div></td>
-      <td><span class="type-tag">${m['ประเภท'] || 'MOU'}</span></td>
-      <td>
-        <div class="date-text">${IROUP.formatDate(m['วันเริ่ม'])} – ${IROUP.formatDate(m['วันสิ้นสุด'])}</div>
-      </td>
-      <td><span class="badge ${bClass}">${s.label}</span></td>
-    </tr>`;
-  }).join('');
-  document.getElementById('tableCount').textContent = `${data.length} รายการ`;
-}
-
-function normalizeText(v) {
-  return (v === null || v === undefined ? '' : String(v))
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function getSearchBlob(row) {
-  const aliases = {
-    'China':'จีน cn ประเทศจีน', 'Japan':'ญี่ปุ่น jp ประเทศญี่ปุ่น', 'South Korea':'เกาหลีใต้ korea kr เกาหลี',
-    'Germany':'เยอรมนี de ประเทศเยอรมนี', 'USA':'สหรัฐอเมริกา us united states อเมริกา',
-    'United Kingdom':'อังกฤษ uk สหราชอาณาจักร', 'Taiwan':'ไต้หวัน tw', 'Australia':'ออสเตรเลีย au'
-  };
-  const country = row['ประเทศ'] || '';
-  const type = row['ประเภท'] || 'MOU';
-  return normalizeText([
-    ...Object.values(row || {}),
-    type,
-    'mou memorandum agreement cooperation ความร่วมมือ บันทึกข้อตกลง',
-    row['หน่วยงาน_UP'] || '',
-    row['องค์กร_ตปท'] || '',
-    row['ประเทศ'] || '',
-    aliases[country] || ''
-  ].join(' | '));
-}
-
-function matchContinent(row, cont) {
-  if (!cont) return true;
-  const val = normalizeText(row['ทวีป']);
-  const map = {
-    asia: ['asia','เอเชีย'],
-    europe: ['europe','ยุโรป'],
-    america: ['america','americas','อเมริกา','อเมริกาเหนือ','อเมริกาใต้'],
-    oceania: ['oceania','โอเชียเนีย','ออสเตรเลีย'],
-    africa: ['africa','แอฟริกา']
-  };
-  return (map[cont] || [cont]).some(x => val.includes(normalizeText(x)));
-}
-
-function filterTable() {
-  const q = normalizeText(document.getElementById('searchInput')?.value || '');
-  const cont = document.getElementById('continentFilter')?.value || '';
-  const filtered = allMou.filter(m => {
-    const matchQ = !q || getSearchBlob(m).includes(q);
-    const matchCont = matchContinent(m, cont);
-    const matchS = !currentStatus || IROUP.getMouStatus(m['วันสิ้นสุด']).status === currentStatus;
-    return matchQ && matchCont && matchS;
-  });
-  renderTable(filtered);
-}
-
-function setPill(el, status) {
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
-  currentStatus = status;
-  filterTable();
-}
-
-// ============================================================
-// CHART
-// ============================================================
-function renderChart(data) {
-  const today = new Date();
-  const deptCount = {};
-  data.forEach(m => {
-    if (IROUP.getMouStatus(m['วันสิ้นสุด']).status !== 'active') return;
-    const dept = m['หน่วยงาน_UP'] || 'อื่นๆ';
-    deptCount[dept] = (deptCount[dept] || 0) + 1;
-  });
-
-  const sorted = Object.entries(deptCount).sort((a,b) => b[1]-a[1]).slice(0, 10);
-  const labels = sorted.map(([k]) => k.replace('คณะ','').replace('วิทยาลัย','ว.').replace('สำนักงาน','สนง.'));
-  const values = sorted.map(([,v]) => v);
-  const colors = values.map((_,i) => i===0?'#1A6DB5':i<3?'#4BBDE8':'#A8D8F0');
-
-  const ctx = document.getElementById('deptChart').getContext('2d');
-  if (mouChart) mouChart.destroy();
-  mouChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'MOU Active',
-        data: values,
-        backgroundColor: colors,
-        borderRadius: 6,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => `${c.raw} MOU` } }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 } } },
-        y: { grid: { display: false }, ticks: { font: { size: 10, family: "'Sarabun',sans-serif" } } }
-      }
-    }
-  });
-}
-
-// ============================================================
-// MAP (D3/TopoJSON) — same visual language as public landing
-// ============================================================
-function loadMap(data) {
-  const msg = document.getElementById('mouMapMsg');
-  if (msg) msg.style.display = 'none';
-
-  const countryData = {};
-  (data || []).forEach(m => {
-    const country = normalizeMapCountryName(m['ประเทศ']);
-    if (!country) return;
-    countryData[country] = (countryData[country] || 0) + 1;
-  });
-
-  const alias = {
-    'Korea':'South Korea','Republic of Korea':'South Korea','UK':'United Kingdom','United States':'USA','United States of America':'USA','U.S.A.':'USA','China':'China','People’s Republic of China':'China','PR China':'China','AU':'Australia','AUS':'Australia','JP':'Japan','JPN':'Japan','ญี่ปุ่น':'Japan','จีน':'China','เกาหลีใต้':'South Korea','ไต้หวัน':'Taiwan','เยอรมนี':'Germany','สหรัฐอเมริกา':'USA','ไทย':'Thailand','ออสเตรเลีย':'Australia'
-  };
-  const cNames = {4:'Afghanistan',36:'Australia',56:'Belgium',76:'Brazil',104:'Myanmar',116:'Cambodia',124:'Canada',156:'China',170:'Colombia',208:'Denmark',276:'Germany',300:'Greece',356:'India',360:'Indonesia',372:'Ireland',376:'Israel',380:'Italy',392:'Japan',410:'South Korea',458:'Malaysia',484:'Mexico',528:'Netherlands',554:'New Zealand',578:'Norway',586:'Pakistan',608:'Philippines',616:'Poland',620:'Portugal',643:'Russia',682:'Saudi Arabia',724:'Spain',752:'Sweden',756:'Switzerland',764:'Thailand',792:'Turkey',826:'United Kingdom',840:'USA',704:'Vietnam',158:'Taiwan',250:'France'};
-  const mapData = {};
-  Object.entries(countryData).forEach(([country,count]) => {
-    const mapCountry = normalizeMapCountryName(alias[country] || country);
-    mapData[mapCountry] = (mapData[mapCountry] || 0) + Number(count||0);
-  });
-
-  const svg = d3.select('#svgMouMap');
-  svg.selectAll('*').remove();
-  const box = document.getElementById('mouMapDiv');
-  const w = Math.max(700, box?.clientWidth || 900), h = 280;
-  svg.attr('viewBox', `0 0 ${w} ${h}`);
-
-  const defs = svg.append('defs');
-  const grad = defs.append('radialGradient').attr('id','mouMapGrad').attr('cx','50%').attr('cy','40%');
-  grad.append('stop').attr('offset','0%').attr('stop-color','#14345A');
-  grad.append('stop').attr('offset','100%').attr('stop-color','#071828');
-  svg.append('rect').attr('width',w).attr('height',h).attr('fill','url(#mouMapGrad)');
-
-  const projection = d3.geoNaturalEarth1().scale(w/6.35).translate([w/2, h/2 + 14]);
-  const path = d3.geoPath().projection(projection);
-  const tip = document.getElementById('mouMapTooltip');
-  const showTip=(html,x,y)=>{ if(!tip) return; tip.innerHTML=html; tip.style.left=(x+14)+'px'; tip.style.top=(y+14)+'px'; tip.style.opacity='1'; };
-  const hideTip=()=>{ if(tip) tip.style.opacity='0'; };
-  function colorScale(c){ return c >= 8 ? '#F5A623' : c >= 4 ? '#1A6DB5' : '#4BBDE8'; }
-
-  const drawDots = () => {
-    const COORDS = {
-      'China':[35.86,104.19],'Japan':[36.2,138.2],'South Korea':[36.5,127.9],'Taiwan':[23.7,121.0],'Germany':[51.2,10.4],'France':[46.2,2.2],'United Kingdom':[55.4,-3.4],'Australia':[-25.3,133.8],'New Zealand':[-40.9,174.9],'USA':[37.1,-95.7],'Canada':[56.1,-106.3],'Vietnam':[14.1,108.3],'Myanmar':[21.9,95.9],'Indonesia':[-2.5,118.0],'Malaysia':[4.2,109.5],'Philippines':[12.9,121.8],'Singapore':[1.35,103.8],'India':[20.6,78.9],'Thailand':[15.9,100.9],'Netherlands':[52.1,5.3],'Sweden':[60.1,18.6],'Norway':[64.5,17.9]
-    };
-    const g = svg.append('g');
-    Object.entries(mapData).forEach(([country,count])=>{
-      const coords=COORDS[country]; if(!coords) return;
-      const p=projection([coords[1],coords[0]]); if(!p) return;
-      const color=colorScale(count);
-      g.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',7+Math.min(8,count)).attr('fill',color).attr('fill-opacity',.85).attr('stroke','#fff').attr('stroke-width',1.5).style('filter',`drop-shadow(0 0 8px ${color})`).style('cursor','pointer')
-        .on('mousemove',ev=>showTip(`<strong>${country}</strong><br>${count} MOU`,ev.offsetX,ev.offsetY)).on('mouseleave',hideTip);
-    });
-  };
-
-  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
-    .then(r=>r.json())
-    .then(world=>{
-      const countries = topojson.feature(world, world.objects.countries);
-      svg.append('g').selectAll('path').data(countries.features).join('path')
-        .attr('d',path)
-        .attr('fill',d=>{ const c=mapData[cNames[+d.id] || ''] || 0; return c ? colorScale(c) : 'rgba(255,255,255,0.08)'; })
-        .attr('stroke','rgba(255,255,255,0.12)').attr('stroke-width',0.45)
-        .style('cursor',d=>(mapData[cNames[+d.id] || ''] ? 'pointer':'default'))
-        .on('mousemove',function(ev,d){ const name=cNames[+d.id]||''; const c=mapData[name]||0; if(c){ d3.select(this).attr('fill','#7BC842'); showTip(`<strong>${name}</strong><br>${c} MOU`,ev.offsetX,ev.offsetY); } })
-        .on('mouseleave',function(ev,d){ const name=cNames[+d.id]||''; const c=mapData[name]||0; d3.select(this).attr('fill',c?colorScale(c):'rgba(255,255,255,0.08)'); hideTip(); });
-      drawDots();
-    })
-    .catch(()=>drawDots());
-}
-
-// ============================================================
-// LANG
-// ============================================================
-function setLang(lang) {
-  document.querySelectorAll('.nav-lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang));
-  if (lang === 'EN') {
-    document.getElementById('hero-title').textContent = '🤝 International MOUs';
-    document.getElementById('hero-sub').textContent = 'Academic cooperation data with institutions worldwide';
-    document.getElementById('kpi-total-label').textContent = 'Total MOUs';
-  } else {
-    document.getElementById('hero-title').textContent = '🤝 MOU ต่างประเทศ';
-    document.getElementById('hero-sub').textContent = 'ข้อมูลความร่วมมือทางวิชาการกับสถาบันทั่วโลก';
-    document.getElementById('kpi-total-label').textContent = 'MOU ทั้งหมด';
-  }
-}
-
-document.getElementById('searchInput')?.addEventListener('input', filterTable);
+let currentLang = 'TH';
+const TEXT = {
+  TH: {hero:'MOU ต่างประเทศ', sub:'ข้อมูลความร่วมมือทางวิชาการกับสถาบันทั่วโลก - International Academic Cooperation', total:'MOU ทั้งหมด', soon:'ใกล้หมดอายุ', country:'ประเทศ', rows:'รายการ', noData:'ไม่พบข้อมูล', loadFail:'ไม่สามารถโหลดข้อมูลได้'},
+  EN: {hero:'International MOUs', sub:'International academic cooperation with partner institutions worldwide', total:'Total MOUs', soon:'Expiring Soon', country:'Countries', rows:'items', noData:'No MOU data found', loadFail:'Unable to load data'}
+};
+const COUNTRY_CODE = {USA:'us','United States':'us','China':'cn','Japan':'jp','South Korea':'kr','Germany':'de','France':'fr','United Kingdom':'gb','Australia':'au','Canada':'ca','Malaysia':'my','Singapore':'sg','Thailand':'th','Taiwan':'tw','Vietnam':'vn','Myanmar':'mm','Indonesia':'id','Philippines':'ph','India':'in','Netherlands':'nl','Sweden':'se','Norway':'no','New Zealand':'nz'};
+const MAP_IDS = {36:'Australia',56:'Belgium',76:'Brazil',104:'Myanmar',116:'Cambodia',124:'Canada',156:'China',208:'Denmark',276:'Germany',356:'India',360:'Indonesia',372:'Ireland',380:'Italy',392:'Japan',410:'South Korea',458:'Malaysia',528:'Netherlands',554:'New Zealand',578:'Norway',608:'Philippines',616:'Poland',620:'Portugal',643:'Russia',724:'Spain',752:'Sweden',756:'Switzerland',764:'Thailand',826:'United Kingdom',840:'USA',704:'Vietnam',158:'Taiwan',250:'France'};
+function clean(v){ return v == null ? '' : String(v).trim(); }
+function esc(v){ return clean(v).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function first(v){ return Array.isArray(v) ? (v[0] || '') : v; }
+function pick(obj, keys){ for (const k of keys){ const v = obj && obj[k]; if (v !== undefined && v !== null && String(v).trim() !== '') return v; } return ''; }
+function normalizePublicName(value, keys){ if (!value) return ''; if (typeof value !== 'object') return clean(value); return clean(pick(value, keys)); }
+function countryName(value){ return normalizePublicName(value, ['country_name_en','country_name','display_name','name_en','name','country_name_th','name_th','iso2','country_code','country_id']); }
+function unitName(value){ return normalizePublicName(value, ['unit_name_th','unit_name_en','name_th','name_en','unit_id']); }
+function continentName(value){ return normalizePublicName(value, ['continent_name_en','continent_name_th','name_en','name_th','continent_id']); }
+function mapCountryName(value){ const raw = countryName(value) || clean(value); const key = raw.replace(/^CTRY[-_]?/i,'').replace(/^[A-Z]{2,3}[\s\-:]+/,'').trim().toLowerCase(); const aliases = {us:'USA',usa:'USA','united states':'USA','united states of america':'USA',uk:'United Kingdom',gb:'United Kingdom',gbr:'United Kingdom',cn:'China',chn:'China',jp:'Japan',jpn:'Japan',kr:'South Korea',kor:'South Korea','republic of korea':'South Korea',de:'Germany',deu:'Germany',au:'Australia',aus:'Australia',tw:'Taiwan',twn:'Taiwan',th:'Thailand',tha:'Thailand','czech republic':'Czechia'}; return aliases[key] || raw; }
+function flagHtml(country){ const iso = COUNTRY_CODE[country] || COUNTRY_CODE[mapCountryName(country)] || ''; return iso ? '<img class="flag-img" src="https://flagcdn.com/w20/' + iso + '.png" alt="">' : '<span>World</span>'; }
+function normalizeMou(row){ const country = mapCountryName(row.country || row.country_name || row.country_code || row.countryCode || row.country_id); const files = Array.isArray(row.files) ? row.files : []; return { id: clean(row.mou_id || row.id), partner: clean(row.partner_org_name || row.partner_org_name_en || row.partner_org || row.institution_name || row.organization_name || ''), country, continent: continentName(row.continent) || clean(row.continent || ''), unit: unitName(row.unit) || clean(row.up_unit || row.up_unit_name || row.unit_name || row.up_unit_id || ''), type: clean(row.mou_type || row.type || 'MOU'), start: clean(row.start_date || row.signed_date || ''), end: clean(row.end_date || row.expire_date || ''), fiscal: clean(row.fiscal_year || ''), statusRaw: clean(row.status || row.public_status || ''), file: clean(row.public_file_url || (files.find(f => f && f.file_url) || {}).file_url || '') }; }
+function getStatus(m){ if (window.IROUP && typeof IROUP.getMouStatus === 'function') { try { return IROUP.getMouStatus(m.end); } catch(e){} } const raw = m.statusRaw.toLowerCase(); if (raw.includes('cancel') || raw.includes('expired')) return {status:'expired',label:'Expired'}; if (!m.end) return {status:'active',label:'Active'}; const diff = (new Date(m.end) - new Date()) / 86400000; if (diff < 0) return {status:'expired',label:'Expired'}; if (diff <= 180) return {status:'soon',label:'Soon'}; return {status:'active',label:'Active'}; }
+function formatDate(v){ if (!v) return '-'; if (window.IROUP && typeof IROUP.formatDate === 'function') { try { return IROUP.formatDate(v); } catch(e){} } const d = new Date(v); return isNaN(d) ? v : d.toLocaleDateString(currentLang === 'TH' ? 'th-TH' : 'en-US', {year:'2-digit',month:'short',day:'numeric'}); }
+async function loadData(){ try { const res = await IROUP_V2.public.mouList(); if (!res.success) throw new Error(res.error || 'V2 MOU API error'); allMou = (res.data || []).filter(r => clean(r.mou_id || r.id)).map(normalizeMou); updateKPI(allMou); renderTable(allMou); renderChart(allMou); renderMap(allMou); } catch(e) { document.getElementById('mouTableBody').innerHTML = '<tr><td colspan="7" class="loading">' + TEXT[currentLang].loadFail + '</td></tr>'; console.error(e); } }
+function updateKPI(data){ const active = data.filter(m => getStatus(m).status === 'active').length; const soon = data.filter(m => getStatus(m).status === 'soon').length; const countries = new Set(data.map(m => m.country).filter(Boolean)).size; document.getElementById('kpi-total').textContent = data.length; document.getElementById('kpi-active').textContent = active; document.getElementById('kpi-soon').textContent = soon; document.getElementById('kpi-country').textContent = countries; }
+function renderTable(data){ const tbody = document.getElementById('mouTableBody'); if (!data.length){ tbody.innerHTML = '<tr><td colspan="7" class="loading">' + TEXT[currentLang].noData + '</td></tr>'; document.getElementById('tableCount').textContent = '0 ' + TEXT[currentLang].rows; return; } tbody.innerHTML = data.map(function(m,i){ const st = getStatus(m); const cls = st.status === 'active' ? 'b-active' : st.status === 'soon' ? 'b-soon' : 'b-expired'; return '<tr><td class="muted">' + (i+1) + '</td><td><div class="strong">' + esc(m.unit || '-') + '</div></td><td><div class="strong">' + esc(m.partner || '-') + '</div></td><td><div class="flag-cell">' + flagHtml(m.country) + '<span>' + esc(m.country || '-') + '</span></div></td><td><span class="type-tag">' + esc(m.type || 'MOU') + '</span></td><td class="muted">' + esc(formatDate(m.start)) + ' - ' + esc(formatDate(m.end)) + '</td><td><span class="badge ' + cls + '">' + esc(st.label || st.status) + '</span></td></tr>'; }).join(''); document.getElementById('tableCount').textContent = data.length + ' ' + TEXT[currentLang].rows; }
+function searchable(m){ return [m.partner,m.country,m.continent,m.unit,m.type,m.statusRaw,'mou cooperation agreement'].join(' ').toLowerCase(); }
+function matchContinent(m, key){ if (!key) return true; const v = (m.continent || '').toLowerCase(); const map = {asia:['asia','เอเชีย'],europe:['europe','ยุโรป'],america:['america','americas','อเมริกา'],oceania:['oceania','โอเชียเนีย','australia'],africa:['africa','แอฟริกา']}; return (map[key] || [key]).some(x => v.includes(x.toLowerCase())); }
+function filterTable(){ const q = clean(document.getElementById('searchInput').value).toLowerCase(); const cont = document.getElementById('continentFilter').value; const rows = allMou.filter(m => (!q || searchable(m).includes(q)) && matchContinent(m, cont) && (!currentStatus || getStatus(m).status === currentStatus)); renderTable(rows); }
+function renderChart(data){ const dept = {}; data.forEach(m => { if (getStatus(m).status !== 'active') return; const k = m.unit || 'Other'; dept[k] = (dept[k] || 0) + 1; }); const rows = Object.entries(dept).sort((a,b)=>b[1]-a[1]).slice(0,8); const ctx = document.getElementById('deptChart').getContext('2d'); if (mouChart) mouChart.destroy(); const dark = document.documentElement.dataset.theme !== 'light'; mouChart = new Chart(ctx,{type:'bar',data:{labels:rows.map(r=>r[0]),datasets:[{data:rows.map(r=>r[1]),backgroundColor:rows.map((_,i)=>i===0?'#1e88ff':'#4BBDE8'),borderRadius:8,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' MOU'}}},scales:{x:{grid:{color:dark?'rgba(255,255,255,.08)':'rgba(15,45,90,.12)'},ticks:{color:dark?'#c7d7ec':'#516782'}},y:{grid:{display:false},ticks:{color:dark?'#f8fbff':'#071828',font:{family:'Sarabun',size:12}}}}}}); }
+function renderMap(data){ const msg = document.getElementById('mouMapMsg'); if (msg) msg.style.display = data.length ? 'none' : 'grid'; const counts = {}; data.forEach(m => { if (!m.country) return; counts[m.country] = (counts[m.country] || 0) + 1; }); const svg = d3.select('#svgMouMap'); svg.selectAll('*').remove(); const box = document.getElementById('mouMapDiv'); const w = Math.max(720, box.clientWidth || 900), h = 355; svg.attr('viewBox','0 0 '+w+' '+h); const dark = document.documentElement.dataset.theme !== 'light'; const defs = svg.append('defs'); const grad = defs.append('radialGradient').attr('id','mouBg').attr('cx','50%').attr('cy','45%'); grad.append('stop').attr('offset','0%').attr('stop-color',dark?'#123a63':'#f8fbff'); grad.append('stop').attr('offset','100%').attr('stop-color',dark?'#020817':'#e4f3fd'); svg.append('rect').attr('width',w).attr('height',h).attr('fill','url(#mouBg)'); const projection = d3.geoNaturalEarth1().scale(w/6.1).translate([w/2,h/2+18]); const path = d3.geoPath().projection(projection); const tip = document.getElementById('mouMapTooltip'); const color = c => c >= 8 ? '#F5A623' : c >= 4 ? '#1A6DB5' : '#4BBDE8'; const show = (html,x,y) => { tip.innerHTML = html; tip.style.left = (x+14)+'px'; tip.style.top = (y+14)+'px'; tip.style.opacity = 1; }; const hide = () => tip.style.opacity = 0; fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r=>r.json()).then(world => { const countries = topojson.feature(world, world.objects.countries); svg.append('g').selectAll('path').data(countries.features).join('path').attr('d',path).attr('fill',d => { const n = MAP_IDS[+d.id] || ''; const c = counts[n] || 0; return c ? color(c) : (dark ? 'rgba(130,170,210,.14)' : 'rgba(145,178,205,.18)'); }).attr('stroke',dark?'rgba(255,255,255,.13)':'rgba(15,45,90,.11)').attr('stroke-width',.5).on('mousemove',function(ev,d){ const n = MAP_IDS[+d.id] || ''; const c = counts[n] || 0; if (!c) return; d3.select(this).attr('fill','#7BC842'); show('<strong>'+esc(n)+'</strong><br>'+c+' MOU',ev.offsetX,ev.offsetY); }).on('mouseleave',function(ev,d){ const n = MAP_IDS[+d.id] || ''; const c = counts[n] || 0; d3.select(this).attr('fill',c ? color(c) : (dark ? 'rgba(130,170,210,.14)' : 'rgba(145,178,205,.18)')); hide(); }); drawNodes(); }).catch(drawNodes); function drawNodes(){ const coords = {'USA':[37.1,-95.7],China:[35.86,104.19],Japan:[36.2,138.2],'South Korea':[36.5,127.9],Taiwan:[23.7,121],Germany:[51.2,10.4],France:[46.2,2.2],'United Kingdom':[55.4,-3.4],Australia:[-25.3,133.8],Thailand:[15.9,100.9],Malaysia:[4.2,109.5],Singapore:[1.35,103.8],Vietnam:[14.1,108.3]}; Object.entries(counts).forEach(([n,c]) => { const ll = coords[n]; if (!ll) return; const p = projection([ll[1],ll[0]]); if (!p) return; svg.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',6+Math.min(8,c)).attr('fill',color(c)).attr('stroke','#fff').attr('stroke-width',1.6).style('filter','drop-shadow(0 0 12px '+color(c)+')').on('mousemove',ev=>show('<strong>'+esc(n)+'</strong><br>'+c+' MOU',ev.offsetX,ev.offsetY)).on('mouseleave',hide); }); } }
+function setLang(lang){ currentLang = lang; document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang)); const t = TEXT[lang]; document.getElementById('heroTitle').textContent = t.hero; document.getElementById('heroSub').textContent = t.sub; document.getElementById('labelTotal').textContent = t.total; document.getElementById('labelSoon').textContent = t.soon; document.getElementById('labelCountry').textContent = t.country; renderTable(allMou); }
+function applyTheme(){ const theme = localStorage.getItem('iroup_public_theme') || 'dark'; document.documentElement.dataset.theme = theme; document.getElementById('themeToggle').textContent = theme === 'light' ? 'Light' : 'Dark'; }
+function toggleTheme(){ const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; localStorage.setItem('iroup_public_theme', next); applyTheme(); renderChart(allMou); renderMap(allMou); }
+document.querySelectorAll('.pill').forEach(btn => btn.addEventListener('click', function(){ document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); btn.classList.add('on'); currentStatus = btn.dataset.status || ''; filterTable(); }));
+document.getElementById('searchInput').addEventListener('input', filterTable);
+document.getElementById('continentFilter').addEventListener('change', filterTable);
+applyTheme();
 loadData();
 </script>
-
-
-
 </body>
 </html>

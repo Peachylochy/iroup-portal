@@ -3248,3 +3248,37 @@ Knowledge articles are evolving from generic repository records into
 publication-style content entries with distinct hero/cover presentation separate
 from gallery media. This aligns the Knowledge module with how Events, Scholarship,
 and News already handle featured imagery.
+
+---
+
+## Public Landing, MOU, and Mobility Visual System Pass (May 2026)
+
+This pass moved the public-facing experience toward a consistent V2 visual system while keeping the data live and route-driven.
+
+Implementation notes:
+- The landing page now uses the real live MOU atlas as its primary narrative instead of decorative map artwork.
+- MOU public was redesigned around the uploaded dark/light earth hero assets and keeps live V2 public MOU data, D3/TopoJSON map rendering, charts, filters, and table behavior.
+- Mobility public was redesigned as a dashboard-first page without a large hero, because the value of this module is scanning movement data, charts, and lists quickly.
+- Mobility cards and staff travel timeline now paginate at 10 items per page to prevent long public datasets from stretching the page indefinitely.
+- Light/dark mode is shared through the `iroup_public_theme` localStorage key.
+
+Lessons learned:
+- Public relation pages should be redesigned one module at a time so each page can preserve its live route behavior while improving presentation.
+- Long public lists need pagination early, not after the dataset becomes large.
+- Mobility benefits more from a compact operational dashboard than a cinematic hero section.
+
+---
+
+## Public Mobility Stabilization Note (May 2026)
+
+After the dashboard-first Mobility redesign, the page required a stabilization pass.
+
+Implementation notes:
+- Data did not load because the page referenced the wrong frontend script path. The page now loads `../js/iroup-v2-endpoint.js`, `../js/iroup-config.js`, and `../js/iroup-v2-api.js` in the required order.
+- TH/EN switching was upgraded from visual-only buttons into a real page-local language system stored in `iroup_public_lang`.
+- Thai labels were restored after an encoding issue caused them to render as question marks.
+- Country display now handles V2 DTO country objects instead of converting them to `[object Object]`.
+
+Lesson learned:
+- Public pages that use V2 routes must keep the endpoint config script before the V2 API adapter.
+- For Thai-heavy pages, verify rendered Thai text after automated edits, not only JavaScript syntax.

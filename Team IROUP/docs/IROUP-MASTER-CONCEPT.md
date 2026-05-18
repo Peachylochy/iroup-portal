@@ -577,3 +577,20 @@ Status addendum — Travel V2-native baseline complete:
 - Strategic direction: Knowledge articles are evolving from generic repository records
   into publication-style content entries with distinct hero/cover presentation
   separate from gallery media.
+
+---
+
+## Current Status Addendum - Public UX Redesign (2026-05-18)
+
+- `public-landing.html` is now the active cinematic V2 public landing page with live MOU atlas, KPI overlap, Mobility Flow graph, country flags, and light/dark theme support.
+- `public-mou.html` has been redesigned with live V2 public MOU data, real D3/TopoJSON map, Chart.js summary, filters, table, and the new MOU hero assets.
+- `public-mobility.html` has been redesigned as a compact no-hero dashboard page with live V2 public Mobility/Travel data, charts, map, cards, timeline, and 10-item pagination.
+
+---
+
+## Current Status Addendum - Public Mobility Stabilization (2026-05-18)
+
+- `public-mobility.html` is now stabilized after the dashboard-first redesign.
+- Data loading uses the correct V2 adapter script stack from `js/` and continues to use live V2 public Mobility/Travel routes.
+- TH/EN switching is active through `iroup_public_lang` localStorage.
+- Thai encoding and country object rendering issues are fixed.
