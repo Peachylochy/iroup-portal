@@ -3347,3 +3347,13 @@ Verification:
 Lesson learned:
 - Dashboard visual work must account for `js/iroup-sidebar.js`, because that
   script injects final sidebar CSS after the page's inline styles.
+
+Follow-up palette note:
+- The first pass improved polish but still read visually like the old dashboard
+  because the dark-blue hero remained dominant.
+- A smaller palette alignment pass shifted the live dashboard toward the Web
+  design reference without a structural rewrite:
+  pastel blue/lavender page background, light glass sidebar, white/light hero
+  panel, and softer white topbar/cards.
+- The current approach intentionally avoids migrating the React mock or changing
+  live report/data rendering.

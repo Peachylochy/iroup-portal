@@ -3217,3 +3217,16 @@ Verification:
 - Layout check confirmed the dashboard has no horizontal overflow at the tested
   desktop viewport and the hero remains a two-column layout.
 - `git diff --check` passed with Windows CRLF warning only.
+
+Follow-up adjustment:
+
+- Applied a smaller dashboard palette alignment pass after review showed the
+  page still felt too close to the previous dark-blue dashboard.
+- Shifted the live dashboard colors closer to the Web design reference:
+  - pastel blue/lavender page background
+  - light glass sidebar
+  - white/light hero panel instead of the large dark-blue hero block
+  - softer white topbar, cards, panels, and ecosystem links
+- Kept Globy and the current layout in place for now to avoid a larger
+  structural rewrite.
+- No backend, API, DTO, auth, or dashboard data-flow changes were made.
