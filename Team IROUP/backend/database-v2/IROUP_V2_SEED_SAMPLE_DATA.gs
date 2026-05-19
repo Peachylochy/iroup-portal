@@ -377,25 +377,7 @@ function seedUPUnitMaster() {
 }
 
 function seedCountryMaster() {
-  const rows = [
-    { country_id: 'CTRY-TH', iso2: 'TH', country_name_en: 'Thailand', country_name_th: 'ไทย', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇹🇭', search_alias: 'thailand thai', active: true, sort_order: 10 },
-    { country_id: 'CTRY-JP', iso2: 'JP', country_name_en: 'Japan', country_name_th: 'ญี่ปุ่น', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇯🇵', search_alias: 'japan japanese', active: true, sort_order: 20 },
-    { country_id: 'CTRY-CN', iso2: 'CN', country_name_en: 'China', country_name_th: 'จีน', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇨🇳', search_alias: 'china chinese', active: true, sort_order: 30 },
-    { country_id: 'CTRY-KR', iso2: 'KR', country_name_en: 'South Korea', country_name_th: 'เกาหลีใต้', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇰🇷', search_alias: 'korea korean', active: true, sort_order: 40 },
-    { country_id: 'CTRY-TW', iso2: 'TW', country_name_en: 'Taiwan', country_name_th: 'ไต้หวัน', continent_en: 'Asia', continent_th: 'เอเชีย', flag_emoji: '🇹🇼', search_alias: 'taiwan', active: true, sort_order: 50 },
-    { country_id: 'CTRY-AU', iso2: 'AU', country_name_en: 'Australia', country_name_th: 'ออสเตรเลีย', continent_en: 'Oceania', continent_th: 'โอเชียเนีย', flag_emoji: '🇦🇺', search_alias: 'australia', active: true, sort_order: 60 },
-    { country_id: 'CTRY-US', iso2: 'US', country_name_en: 'United States', country_name_th: 'สหรัฐอเมริกา', continent_en: 'North America', continent_th: 'อเมริกาเหนือ', flag_emoji: '🇺🇸', search_alias: 'usa america', active: true, sort_order: 70 },
-    { country_id: 'CTRY-GB', iso2: 'GB', country_name_en: 'United Kingdom', country_name_th: 'สหราชอาณาจักร', continent_en: 'Europe', continent_th: 'ยุโรป', flag_emoji: '🇬🇧', search_alias: 'uk england britain', active: true, sort_order: 80 },
-    { country_id: 'CTRY-FR', iso2: 'FR', country_name_en: 'France', country_name_th: 'ฝรั่งเศส', continent_en: 'Europe', continent_th: 'ยุโรป', flag_emoji: '🇫🇷', search_alias: 'france french', active: true, sort_order: 90 },
-    { country_id: 'CTRY-DE', iso2: 'DE', country_name_en: 'Germany', country_name_th: 'เยอรมนี', continent_en: 'Europe', continent_th: 'ยุโรป', flag_emoji: '🇩🇪', search_alias: 'germany german', active: true, sort_order: 100 }
-  ];
-
-  const cleanup = deleteV2RowsByKeyPrefix_(IROUP_V2_SHEETS.COUNTRY_MASTER, 'country_id', 'CTRY-');
-  if (!cleanup.success) {
-    return { success: false, inserted: 0, skipped: 0, error: cleanup.error, data: [] };
-  }
-
-  return seedV2MasterRowsSkippingDuplicates_(IROUP_V2_SHEETS.COUNTRY_MASTER, 'country_id', rows, 'COUNTRY_MASTER');
+  return upsertV2GlobalCountryMaster();
 }
 
 function deleteV2RowsByKeyPrefix_(sheetName, idField, prefix) {
@@ -588,9 +570,9 @@ function getV2SampleDataBatches_() {
   ];
 
   batches[IROUP_V2_SHEETS.SCHOLARSHIP] = [
-    { scholarship_id: 'TEST-SCH-001', title_th: 'Fake Public Scholarship', title_en: 'Fake Public Scholarship', institution_name: 'Fake Japan Foundation', country_id: 'TEST-JP', scholarship_type: 'exchange', funding_type: 'full', target_group: 'student', cover_summary: 'Fake coverage summary', coverage_th: 'Fake coverage TH', coverage_en: 'Fake coverage EN', publish_date: yesterday, open_date: yesterday, close_date: nextMonth, detail_url: 'https://example.invalid/test-scholarship', apply_url: 'https://example.invalid/apply', link_url: 'https://example.invalid/link', pin: true, status: 'active', public_visible: true, is_deleted: false, created_by: 'TEST-SEED', updated_by: 'TEST-SEED', created_at: now, updated_at: now },
-    { scholarship_id: 'TEST-SCH-DRAFT', title_th: 'Fake Draft Scholarship', title_en: 'Fake Draft Scholarship', institution_name: 'Fake Draft Foundation', country_id: 'TEST-KR', scholarship_type: 'degree', funding_type: 'partial', target_group: 'student', cover_summary: 'Draft only', coverage_th: 'Draft', coverage_en: 'Draft', publish_date: now, open_date: nextWeek, close_date: nextMonth, detail_url: '', apply_url: '', link_url: '', pin: false, status: 'draft', public_visible: false, is_deleted: false, created_by: 'TEST-SEED', updated_by: 'TEST-SEED', created_at: now, updated_at: now },
-    { scholarship_id: 'TEST-SCH-EXPIRED', title_th: 'Fake Expired Scholarship', title_en: 'Fake Expired Scholarship', institution_name: 'Fake Expired Foundation', country_id: 'TEST-AU', scholarship_type: 'short course', funding_type: 'full', target_group: 'student', cover_summary: 'Expired', coverage_th: 'Expired', coverage_en: 'Expired', publish_date: expiredStart, open_date: expiredStart, close_date: expiredEnd, detail_url: 'https://example.invalid/expired', apply_url: '', link_url: '', pin: false, status: 'expired', public_visible: true, is_deleted: false, created_by: 'TEST-SEED', updated_by: 'TEST-SEED', created_at: now, updated_at: now }
+    { scholarship_id: 'TEST-SCH-001', title_th: 'Fake Public Scholarship', title_en: 'Fake Public Scholarship', institution_name: 'Fake Japan Foundation', country_id: 'TEST-JP', scholarship_type: 'exchange', funding_type: 'full', target_group: 'student', cover_summary: 'Fake coverage summary', coverage_th: 'Fake coverage TH', coverage_en: 'Fake coverage EN', content_th: 'Fake public scholarship content TH', content_en: 'Fake public scholarship content EN', publish_date: yesterday, open_date: yesterday, close_date: nextMonth, detail_url: 'https://example.invalid/test-scholarship', apply_url: 'https://example.invalid/apply', link_url: 'https://example.invalid/link', pin: true, status: 'active', public_visible: true, is_deleted: false, created_by: 'TEST-SEED', updated_by: 'TEST-SEED', created_at: now, updated_at: now },
+    { scholarship_id: 'TEST-SCH-DRAFT', title_th: 'Fake Draft Scholarship', title_en: 'Fake Draft Scholarship', institution_name: 'Fake Draft Foundation', country_id: 'TEST-KR', scholarship_type: 'degree', funding_type: 'partial', target_group: 'student', cover_summary: 'Draft only', coverage_th: 'Draft', coverage_en: 'Draft', content_th: 'Draft content TH', content_en: 'Draft content EN', publish_date: now, open_date: nextWeek, close_date: nextMonth, detail_url: '', apply_url: '', link_url: '', pin: false, status: 'draft', public_visible: false, is_deleted: false, created_by: 'TEST-SEED', updated_by: 'TEST-SEED', created_at: now, updated_at: now },
+    { scholarship_id: 'TEST-SCH-EXPIRED', title_th: 'Fake Expired Scholarship', title_en: 'Fake Expired Scholarship', institution_name: 'Fake Expired Foundation', country_id: 'TEST-AU', scholarship_type: 'short course', funding_type: 'full', target_group: 'student', cover_summary: 'Expired', coverage_th: 'Expired', coverage_en: 'Expired', content_th: 'Expired content TH', content_en: 'Expired content EN', publish_date: expiredStart, open_date: expiredStart, close_date: expiredEnd, detail_url: 'https://example.invalid/expired', apply_url: '', link_url: '', pin: false, status: 'expired', public_visible: true, is_deleted: false, created_by: 'TEST-SEED', updated_by: 'TEST-SEED', created_at: now, updated_at: now }
   ];
 
   batches[IROUP_V2_SHEETS.EVENT] = [

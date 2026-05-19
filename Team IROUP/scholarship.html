@@ -186,6 +186,14 @@ button,input,select,textarea{font:inherit}
               <label class="label" for="coverageEn">สิทธิประโยชน์ (EN)</label>
               <textarea id="coverageEn" class="textarea" name="coverage_en"></textarea>
             </div>
+            <div class="field full">
+              <label class="label" for="contentTh">เนื้อหารายละเอียดทุน (TH)<span class="hint">ใช้สำหรับหน้า public detail แบบข่าว</span></label>
+              <textarea id="contentTh" class="textarea" name="content_th" rows="10"></textarea>
+            </div>
+            <div class="field full">
+              <label class="label" for="contentEn">Scholarship detail content (EN)<span class="hint">Optional</span></label>
+              <textarea id="contentEn" class="textarea" name="content_en" rows="10"></textarea>
+            </div>
           </div>
         </section>
 
@@ -524,6 +532,8 @@ async function openEditModal(scholarshipId) {
   $('#coverSummary').value = item.cover_summary || '';
   $('#coverageTh').value = item.coverage_th || '';
   $('#coverageEn').value = item.coverage_en || '';
+  $('#contentTh').value = item.content_th || '';
+  $('#contentEn').value = item.content_en || '';
   $('#publishDate').value = item.publish_date || '';
   $('#openDate').value = item.open_date || '';
   $('#closeDate').value = item.close_date || '';
@@ -627,6 +637,8 @@ function buildPayloadFromForm() {
     cover_summary: $('#coverSummary').value.trim(),
     coverage_th: $('#coverageTh').value.trim(),
     coverage_en: $('#coverageEn').value.trim(),
+    content_th: $('#contentTh').value.trim(),
+    content_en: $('#contentEn').value.trim(),
     publish_date: $('#publishDate').value,
     open_date: $('#openDate').value,
     close_date: $('#closeDate').value,
@@ -738,7 +750,7 @@ async function uploadPendingScholarshipFiles(recordId) {
       module: 'scholarship',
       record_id: recordId,
       file_role_id: item.role === 'poster' ? 'poster' : 'attachment',
-      visibility_level: item.role === 'poster' ? 'public' : 'internal'
+      visibility_level: 'public'
     };
     const res = await IROUP_V2.admin.fileUpload(payload);
     if (!res || !res.success) throw new Error(res?.error || 'อัปโหลดไฟล์ไม่สำเร็จ');

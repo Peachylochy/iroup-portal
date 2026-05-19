@@ -417,4 +417,138 @@ Public pages ควรมีเพิ่มจาก admin:
 ---
 
 *Created: 2026-05-17*
+
+---
+
+## Implementation Addendum - Public Redesign Stabilization (2026-05-18)
+
+Current stabilized public redesign state:
+
+- `public-landing.html` is the active cinematic V2 public landing page.
+- `public-mou.html` has been redesigned with live V2 public MOU data, D3/TopoJSON,
+  Chart.js, redesigned filters/table, light/dark support, and new MOU hero assets.
+- `public-mobility.html` has been redesigned as a compact dashboard-first public
+  page with live V2 Mobility/Travel data, charts, map, cards, timeline, and
+  pagination.
+- Mobility TH/EN switching uses `localStorage.iroup_public_lang`.
+- Public theme persistence uses `localStorage.iroup_public_theme` where active.
+
+Updated UX rule:
+
+- For data-heavy public pages, prefer compact dashboard-first layouts over oversized
+  hero-first pages.
+- Large cinematic hero treatment is appropriate for the public landing page and
+  selected narrative pages, but analytics-heavy pages should expose filters, KPIs,
+  charts, maps, and lists quickly.
+
+Migration rule:
+
+- Start the Design System migration incrementally with `Team IROUP/css/iroup-design.css`
+  and `Team IROUP/js/iroup-theme.js`.
+- Add `ir-*` classes CSS-first and keep each page reversible.
+- Do not refactor V2 adapters, backend routes, OAuth/session behavior, or DTO
+  boundaries during UI migration.
+- Preserve D3 and Chart.js behavior when migrating public MOU and Mobility styling.
+
+---
+
+## Implementation Addendum - News/Knowledge Public Pattern (2026-05-18)
+
+Completed public list/detail pattern:
+
+- `public-news.html`
+- `public-news-detail.html`
+- `public-knowledge.html`
+- `public-knowledge-detail.html`
+
+Pattern now considered stable for content-style public modules:
+
+- dark/light mode persisted with `localStorage.iroup_public_theme`
+- TH/EN persisted with `localStorage.iroup_public_lang`
+- unified public nav order:
+  ข่าวสาร, คลังความรู้, ทุนการศึกษา, กิจกรรม, MOU, Mobility
+- dark/light hero graphics per module
+- live V2 public route as the only data source
+- search and filter controls
+- glass/card-based list presentation
+- detail pages for full content
+- media/action panel on detail pages
+- image gallery support where records include public image files
+- pagination for long public lists when useful
+
+NEWS-specific pattern:
+
+- List page links to `public-news-detail.html?id=...`.
+- Detail page renders cover, badges, content, action panel, and additional image
+  gallery.
+- Old list-page modal/gallery behavior should not be the primary reading flow.
+
+Knowledge-specific pattern:
+
+- List page links to `public-knowledge-detail.html?id=...`.
+- Detail page renders cover, content, PDF/video/link actions, and image gallery.
+- Knowledge cards and detail hero should prefer dedicated cover images when present.
+
+Next UI migration target:
+
+- `public-scholar.html` should reuse this content-module pattern, adjusted for
+  deadline, level, country, application status, and urgency badge behavior.
+
+---
+
+## Implementation Addendum - Scholarship Public Pattern (2026-05-19)
+
+Completed public opportunity pattern:
+
+- `public-scholar.html`
+
+Scholarship page pattern:
+
+- dark/light hero graphics:
+  - `scholarship-hero-dark.webp`
+  - `scholarship-hero-light.webp`
+- live V2 public route only: `IROUP_V2.public.scholarshipList()`
+- shared public state keys:
+  - `iroup_public_theme`
+  - `iroup_public_lang`
+- unified public nav order
+- hero KPI summary
+- search, country, level/target, and status filters
+- separate open-now and all-scholarship sections
+- cards with cover/poster preview, status, type/funding/target tags, summary,
+  apply/file actions, deadline, and days-left indicator
+
+Next UI migration target:
+
+- `public-events.html`, adapted for calendar/timeline/event status behavior.
+
+---
+
+## Implementation Addendum - Scholarship Detail Content Pattern (2026-05-19)
+
+Scholarship is now treated as a content-style public system with list/detail flow:
+
+- `public-scholar.html`
+- `public-scholar-detail.html`
+
+Design pattern for the future detail page:
+
+- Reuse the Scholarship hero asset family for both dark and light mode.
+- Keep dark/light mode persisted with `iroup_public_theme`.
+- Keep TH/EN persisted with `iroup_public_lang`.
+- Use the same unified public nav order as NEWS, Knowledge, and Scholarship list.
+- Render scholarship metadata as compact opportunity facts: country, institution,
+  funding type, target group, status, apply deadline, and days-left where available.
+- Render `content_th` / `content_en` as the main article-style body so Peach can paste
+  full scholarship descriptions without splitting every section into separate fields.
+- Keep action panels for application link, detail link, and public file downloads.
+- Cards on `public-scholar.html` should eventually navigate to
+  `public-scholar-detail.html?id=...` when the detail page is added.
+
+Admin/data-entry implication:
+
+- Scholarship admin needs article body textareas for `content_th` and `content_en`.
+- Existing structured fields should remain because they power filters, tags, cards,
+  and deadline behavior.
+
 *Use with: Cowork / Codex — "ทำ UI Redesign ตาม IROUP-DESIGN-SYSTEM.md"*

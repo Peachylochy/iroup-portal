@@ -594,3 +594,141 @@ Status addendum — Travel V2-native baseline complete:
 - Data loading uses the correct V2 adapter script stack from `js/` and continues to use live V2 public Mobility/Travel routes.
 - TH/EN switching is active through `iroup_public_lang` localStorage.
 - Thai encoding and country object rendering issues are fixed.
+
+---
+
+## Current Status Addendum - Public Landing/MOU/Mobility Stabilized (2026-05-18)
+
+- `public-landing.html` is now the active cinematic V2 public landing page.
+- The landing page includes live V2 MOU atlas integration, KPI overlap content,
+  Mobility Flow graph, country flags, and light/dark theme support.
+- `public-mou.html` is redesigned around live V2 public MOU DTOs with a real
+  D3/TopoJSON world map, Chart.js summary, redesigned filters, redesigned table,
+  and new MOU hero assets.
+- `public-mobility.html` is redesigned as a compact dashboard-first page using
+  live V2 public Mobility and Travel routes, charts, map, cards, timeline, and
+  pagination.
+- Public TH/EN switching for Mobility is stabilized through
+  `localStorage.iroup_public_lang`.
+- Thai encoding, country object rendering, and V2 adapter loading path issues are
+  fixed for the redesigned Mobility page.
+- Public pages remain V2-only with no V1 fallback.
+- Public/private DTO boundaries remain mandatory; Mobility and Travel participant
+  personal data must not be exposed publicly.
+- For data-heavy public pages, dashboard-first UX is now preferred over oversized
+  hero-first layouts.
+
+Next direction:
+
+- Begin incremental Design System migration using `Team IROUP/css/iroup-design.css`
+  and `Team IROUP/js/iroup-theme.js`.
+- Use `ir-*` classes incrementally and keep the migration reversible and CSS-first.
+- Do not refactor backend/API/auth/session logic during UI redesign.
+
+---
+
+## Current Status Addendum - Public News/Knowledge Redesign (2026-05-18)
+
+- `public-news.html` and `public-news-detail.html` are now redesigned as a complete
+  public NEWS list/detail system.
+- `public-knowledge.html` and `public-knowledge-detail.html` are now redesigned as a
+  complete public Knowledge list/detail system.
+- Both systems preserve their live V2 public routes and public DTO boundaries:
+  - `v2.public.news.list`
+  - `v2.public.knowledge.list`
+- Both systems now follow the public redesign pattern:
+  hero graphic, dark/light mode, TH/EN switching, unified public nav, live V2 card
+  grid, search/filter controls, detail pages, and media/gallery support.
+- NEWS detail pages now support cover/content presentation and additional image
+  gallery viewing.
+- Knowledge detail pages now support cover/content presentation plus PDF, video,
+  external link, and image gallery actions.
+- Public language state uses `localStorage.iroup_public_lang`.
+- Public theme state uses `localStorage.iroup_public_theme`.
+
+Current public redesign wave status:
+
+- Landing: active cinematic V2 portal, pending final ecosystem polish.
+- MOU: redesigned V2 atlas/dashboard page.
+- Mobility: redesigned compact dashboard-first page.
+- News: redesigned list/detail complete.
+- Knowledge: redesigned list/detail complete.
+- Scholarship: next recommended page.
+- Events: recommended after Scholarship.
+
+Strategic framing:
+
+- The public side is now evolving from a basic information website into an
+  International Relations Public Information System with three layers:
+  information portal, international intelligence dashboard, and knowledge/service
+  platform.
+
+---
+
+## Current Status Addendum - Public Scholarship Redesign (2026-05-19)
+
+- `public-scholar.html` is now redesigned as the public Scholarship opportunity page.
+- It preserves the live V2 public route `v2.public.scholarship.list`.
+- It uses the current public redesign pattern: hero graphic, dark/light mode, TH/EN
+  switching, unified public nav, live V2 cards, search/filter controls, and status
+  sections.
+- Scholarship hero assets:
+  - `scholarship-hero-dark.webp`
+  - `scholarship-hero-light.webp`
+- Scholarship public UX now emphasizes open opportunities, deadline urgency, country,
+  level/target group, funding/status tags, apply links, and public files.
+
+Updated public redesign wave status:
+
+- Landing: active cinematic V2 portal, pending final ecosystem polish.
+- MOU: redesigned V2 atlas/dashboard page.
+- Mobility: redesigned compact dashboard-first page.
+- News: redesigned list/detail complete.
+- Knowledge: redesigned list/detail complete.
+- Scholarship: redesigned opportunity page complete.
+- Events: next recommended page.
+
+---
+
+## Current Status Addendum - Scholarship Article Detail Support (2026-05-19)
+
+- Scholarship has been confirmed as a public system module, not only a card/list
+  announcement page.
+- The public Scholarship flow should become:
+  - `public-scholar.html` = opportunity list and filters.
+  - `public-scholar-detail.html?id=...` = full scholarship reading/detail page.
+- The detail page should follow the same content-reading pattern as NEWS and
+  Knowledge, but tuned for scholarship opportunity metadata.
+- To keep data entry practical, Scholarship will use article-style long content
+  fields instead of many separate long sections:
+  - `content_th`
+  - `content_en`
+- Existing structured Scholarship fields remain useful for cards, filters, search,
+  deadline state, funding tags, country, institution, application links, and files.
+- Admin Scholarship form must support the new long content fields before Peach adds
+  real scholarship records.
+- Existing live V2 sheets need a schema repair step to add the new columns without
+  shifting old data:
+  - run `addV2ScholarshipContentColumns()` after the updated V2 repair script is in
+    the Apps Script project.
+- Public/private DTO boundaries remain mandatory; the future Scholarship detail page
+  must consume public DTO data only.
+
+---
+
+## Current Status Addendum - Global Country Master (2026-05-19)
+
+- `COUNTRY_MASTER` is now prepared for real worldwide data entry.
+- A new helper `upsertV2GlobalCountryMaster()` adds/updates 249 ISO 3166-1
+  country/territory rows.
+- Stable country IDs remain based on alpha-2 codes:
+  - `CTRY-TH`
+  - `CTRY-MY`
+  - `CTRY-JP`
+  - `CTRY-US`
+- The helper preserves existing references by updating rows in place when the
+  `country_id` already exists.
+- Country rows include alpha-2, alpha-3, English/Thai display names, continent,
+  flag emoji, search alias, active flag, and sort order.
+- Real data entry for MOU, Mobility, Travel, Scholarship, and Events should use
+  `COUNTRY_MASTER` IDs instead of free-text country names.

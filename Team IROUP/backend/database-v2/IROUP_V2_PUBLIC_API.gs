@@ -373,6 +373,8 @@ function mapV2PublicScholarshipDto_(row, ctx) {
     cover_summary: row.cover_summary || '',
     coverage_th: row.coverage_th || '',
     coverage_en: row.coverage_en || '',
+    content_th: row.content_th || '',
+    content_en: row.content_en || '',
     publish_date: row.publish_date || '',
     open_date: row.open_date || '',
     close_date: row.close_date || '',

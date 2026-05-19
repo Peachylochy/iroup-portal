@@ -3,498 +3,518 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>กิจกรรม — iROUP</title>
+<title>กิจกรรม | iROUP</title>
+<script>
+(function(){
+  var theme = localStorage.getItem('iroup_public_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --blue:#1A6DB5;--blue-light:#4BBDE8;--blue-pale:#E8F4FD;
-  --navy:#0F2D5A;--navy-dark:#071828;
-  --green:#5BAD3E;--green-pale:#EBF7E3;
-  --gold:#D4890A;--gold-pale:#FEF3DC;
-  --red:#D63B32;--red-pale:#FDECEA;
-  --purple:#7C3AED;--purple-pale:#F0EBFF;
-  --teal:#0D9488;--teal-pale:#E0F7F5;
-  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#DDE2EA;
-  --gray-400:#B8C2D0;--gray-600:#6B7A8D;--gray-800:#2D3748;
-  --white:#FFFFFF;
-  --shadow-sm:0 1px 4px rgba(15,45,90,0.08);
-  --shadow-md:0 4px 16px rgba(15,45,90,0.12);
+  --bg:#061526;--bg-2:#071d33;--surface:rgba(10,29,50,.82);--surface-2:rgba(14,38,64,.74);
+  --card:rgba(10,32,56,.88);--line:rgba(111,159,214,.22);--line-strong:rgba(93,178,255,.36);
+  --text:#f3f8ff;--soft:#c7d9ec;--muted:#8aa6c4;--dim:#5f7898;
+  --blue:#2387ff;--cyan:#2bd8ff;--violet:#8b5cf6;--gold:#f7b733;--green:#5ee38c;--red:#ff6b7a;
+  --shadow:0 24px 70px rgba(0,0,0,.28);--radius:18px;
+  --hero:url("../assets/events-hero-dark.webp");
+}
+:root[data-theme="light"]{
+  --bg:#f6fbff;--bg-2:#eaf5ff;--surface:rgba(255,255,255,.88);--surface-2:rgba(246,251,255,.92);
+  --card:#fff;--line:rgba(31,84,142,.13);--line-strong:rgba(35,135,255,.24);
+  --text:#0d2542;--soft:#274461;--muted:#657991;--dim:#8a9aab;
+  --blue:#176fe8;--cyan:#21aee8;--violet:#7c3aed;--gold:#d99012;--green:#2ea85b;--red:#dc4254;
+  --shadow:0 18px 50px rgba(34,71,108,.13);
+  --hero:url("../assets/events-hero-light.webp");
 }
 html{scroll-behavior:smooth}
-body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--navy)}
-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.nav-links{display:flex;align-items:center;gap:20px}
-.nav-link{font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;border-bottom:2px solid transparent;padding:4px 0}
-.nav-link:hover{color:var(--blue)}
-.nav-link.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
-.nav-lang{display:flex;background:var(--gray-200);border-radius:8px;padding:3px;gap:2px}
-.nav-lang-btn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:var(--gray-600);transition:all .2s}
-.nav-lang-btn.active{background:var(--blue);color:#fff}
-.nav-admin-btn{padding:7px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:20px;font-size:12px;font-weight:700;color:#fff;text-decoration:none}
-.page-hero{background:linear-gradient(135deg, #E0F7F5 0%, #E8F4FD 50%, #EBF7E3 100%);padding:48px 5%}
-.page-hero h1{font-size:32px;font-weight:800;margin-bottom:8px}
-.page-hero p{font-size:14px;color:rgba(255,255,255,0.6);font-family:'Sarabun',sans-serif}
-.hero-kpi{display:flex;gap:32px;margin-top:24px}
-.hkpi-num{font-size:36px;font-weight:900;color:#5ECFBF;letter-spacing:-1px}
-.hkpi-label{font-size:11px;color:rgba(255,255,255,0.5);font-family:'Sarabun',sans-serif;margin-top:2px}
-
-.content{padding:32px 5%;max-width:1400px;margin:0 auto;width:100%;display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
-
-/* MINI CALENDAR */
-.calendar-card{background:var(--white);border-radius:16px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);overflow:hidden;position:sticky;top:80px}
-.cal-header{background:var(--navy-dark);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
-.cal-month-label{font-size:14px;font-weight:700;color:#fff}
-.cal-nav-btn{width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .15s}
-.cal-nav-btn:hover{background:rgba(255,255,255,0.1)}
-.cal-grid{padding:12px}
-.cal-day-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
-.cal-day-label{text-align:center;font-size:10px;font-weight:600;color:var(--gray-400);font-family:'Sarabun',sans-serif;padding:4px 0}
-.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-day{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;position:relative;transition:all .15s;font-family:'Sarabun',sans-serif;color:var(--gray-800)}
-.cal-day:hover{background:var(--blue-pale)}
-.cal-day.empty{color:var(--gray-300);cursor:default}
-.cal-day.empty:hover{background:transparent}
-.cal-day.today{background:var(--blue);color:#fff;font-weight:700}
-.cal-day.has-event::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--blue-light)}
-.cal-day.today.has-event::after{background:#fff}
-.cal-day.selected{background:var(--blue-pale);color:var(--blue);font-weight:700;border:1.5px solid var(--blue)}
-.cal-legend{padding:12px 12px 14px;border-top:1px solid var(--gray-200);display:flex;flex-direction:column;gap:6px}
-.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-600);font-family:'Sarabun',sans-serif}
-.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-
-/* EVENT LIST */
-.events-col{}
-.filter-bar{background:var(--white);border-radius:12px;padding:12px 16px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.pills{display:flex;gap:5px;flex-wrap:wrap}
-.pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-300);color:var(--gray-600);background:var(--white);transition:all .2s;font-family:'Sarabun',sans-serif}
-.pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-
-.events-list{display:flex;flex-direction:column;gap:10px}
-.event-item{background:var(--white);border-radius:12px;padding:14px 18px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s}
-.event-item:hover{box-shadow:var(--shadow-md);transform:translateX(4px)}
-.ev-date{text-align:center;min-width:50px;flex-shrink:0}
-.ev-date-box{border-radius:10px;padding:8px 6px;min-width:50px}
-.ev-day{font-size:22px;font-weight:900;line-height:1}
-.ev-month{font-size:9px;font-family:'Sarabun',sans-serif;text-transform:uppercase;margin-top:1px}
-.ev-vline{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0;min-height:40px}
-.ev-body{flex:1}
-.ev-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
-.ev-meta{font-size:11px;color:var(--gray-600);font-family:'Sarabun',sans-serif;display:flex;flex-wrap:wrap;gap:8px}
-.ev-type-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'Sarabun',sans-serif;white-space:nowrap}
-.t-travel{background:#DBEAFE;color:#1E40AF}
-.t-inbound{background:var(--purple-pale);color:var(--purple)}
-.t-meet{background:var(--green-pale);color:var(--green)}
-.t-train{background:var(--gold-pale);color:var(--gold)}
-.t-exchange{background:var(--teal-pale);color:var(--teal)}
-.ev-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:'Sarabun',sans-serif}
-.ev-poster{width:86px;height:58px;border-radius:10px;overflow:hidden;background:var(--gray-100);flex-shrink:0;border:1px solid var(--gray-200)}
-.ev-poster img{width:100%;height:100%;object-fit:cover;display:block}
-.ev-poster-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue-pale),#fff);font-size:24px}
-.ev-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.ev-file-btn{font-size:10px;font-weight:700;text-decoration:none;border-radius:8px;padding:4px 8px;background:var(--green-pale);color:var(--green);font-family:'Sarabun',sans-serif;white-space:nowrap}
-
-.es-upcoming{background:var(--blue-pale);color:var(--blue)}
-.es-ongoing{background:var(--green-pale);color:var(--green)}
-.es-done{background:var(--gray-200);color:var(--gray-600)}
-.ev-arrow{color:var(--blue-light);font-size:18px;flex-shrink:0}
-.loading{text-align:center;padding:40px;color:var(--gray-400);font-family:'Sarabun',sans-serif}
-footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;font-family:'Sarabun',sans-serif;margin-top:40px;grid-column:1/-1}
-
-
-
-
-  50%{transform:translateY(-15px) scale(1.05)}
-}
-
-
-
-
-
-100%{background-position:-200% 0}}
-
-
-
-
-
-
-
-.page-hero, 
-/* Remove dark overlay */
-.page-hero::after, 
-.page-hero::before, 
-
-/* Light glass orbs */
-
-  50%{transform:translateY(-15px) scale(1.05)}
-}
-
-
-
-/* KPI on light hero */
-
-.hkpi-label { color: rgba(15,45,90,0.6) !important; }
-.page-hero h1 { color: var(--navy-dark) !important; }
-.page-hero p { color: var(--gray-600) !important; }
-.page-hero .hkpi-num { filter: none; }
-
+body{min-height:100vh;background:
+  radial-gradient(circle at 80% 10%,rgba(35,135,255,.18),transparent 28%),
+  linear-gradient(180deg,var(--bg),#04101d 55%,var(--bg));color:var(--text);font-family:'Prompt',sans-serif;letter-spacing:0}
+:root[data-theme="light"] body{background:linear-gradient(180deg,#fbfdff 0%,#f5faff 46%,#fff 100%)}
+a{color:inherit}
+.topbar{position:sticky;top:0;z-index:100;height:62px;padding:0 4%;display:flex;align-items:center;justify-content:space-between;background:rgba(4,14,27,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .topbar{background:rgba(255,255,255,.86)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{height:32px;width:auto;display:block}.brand-fallback{display:none;color:var(--text);font-weight:900}
+.nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.nav a,.theme-toggle,.lang-btn{border:1px solid transparent;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;color:var(--soft);background:transparent;cursor:pointer;text-decoration:none}
+.nav a:hover,.nav a.active{background:rgba(35,135,255,.14);border-color:rgba(35,135,255,.28);color:var(--text)}
+.lang{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:3px}
+:root[data-theme="light"] .lang{background:#fff}.lang-btn{padding:6px 10px}.lang-btn.active{background:var(--blue);color:#fff}
+.theme-toggle{background:rgba(255,255,255,.06);border-color:var(--line);min-width:58px}:root[data-theme="light"] .theme-toggle{background:#fff}.admin-link{background:rgba(35,135,255,.18)!important;border-color:rgba(35,135,255,.3)!important}
+.hero{position:relative;overflow:hidden;min-height:316px;padding:54px 5% 48px;background-image:linear-gradient(90deg,rgba(6,18,33,.98) 0%,rgba(6,18,33,.74) 34%,rgba(6,18,33,.08) 74%),var(--hero);background-size:cover;background-position:center right;border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .hero{background-image:linear-gradient(90deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.72) 34%,rgba(255,255,255,.08) 74%),var(--hero)}
+.hero-inner{position:relative;z-index:1;width:min(1440px,90%);margin:0 auto}
+.hero h1{font-size:clamp(30px,3.2vw,46px);line-height:1.12;font-weight:900;letter-spacing:0;color:var(--text);max-width:720px;overflow-wrap:anywhere}
+.lead{margin-top:10px;color:var(--muted);font-family:'Sarabun',sans-serif;font-size:16px;max-width:760px;line-height:1.65}
+.hero-kpis{display:flex;gap:44px;margin-top:28px;flex-wrap:wrap}
+.hero-kpis>div{min-width:78px}
+.kpi-num{font-size:40px;line-height:1;font-weight:900;letter-spacing:0}
+.kpi-num.total{color:var(--green)}.kpi-num.upcoming{color:var(--cyan)}.kpi-num.ongoing{color:var(--gold)}
+.kpi-label{font-size:12px;color:var(--muted);font-weight:800;margin-top:8px;font-family:'Sarabun',sans-serif}
+.shell{width:min(1440px,90%);margin:0 auto;padding:28px 0 58px}
+.filter-bar{display:grid;grid-template-columns:minmax(260px,1fr) minmax(150px,190px) minmax(130px,170px) auto;gap:10px;align-items:center;background:rgba(12,27,45,.82);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);margin:-6px auto 26px}
+:root[data-theme="light"] .filter-bar{background:#fff}
+.input-wrap{position:relative}.input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cyan);font-size:14px}
+.input,.select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.04);color:var(--text);font-family:'Prompt',sans-serif;font-weight:700;font-size:12px;outline:none;padding:0 12px}
+.input{padding-left:40px}.input::placeholder{color:var(--muted)}.select option{color:#10253d;background:#fff}
+:root[data-theme="light"] .input,:root[data-theme="light"] .select{background:#fff;color:var(--text)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{height:36px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--soft);font-family:'Prompt',sans-serif;font-size:11px;font-weight:900;padding:0 12px;cursor:pointer}
+.pill.active{background:var(--blue);border-color:var(--blue);color:#fff}.pill:hover{border-color:var(--line-strong)}
+.section{margin-top:26px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.section-title{font-size:15px;font-weight:900;display:flex;gap:9px;align-items:center}
+.section-count{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:12px;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,25,44,.9));box-shadow:0 18px 52px rgba(0,0,0,.16);transition:transform .2s,box-shadow .2s,border-color .2s}
+:root[data-theme="light"] .card{background:#fff;box-shadow:0 14px 42px rgba(31,84,142,.12)}
+.card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
+.poster{height:178px;overflow:hidden;background:linear-gradient(135deg,rgba(35,135,255,.12),rgba(139,92,246,.16));display:grid;place-items:center;color:var(--cyan);font-size:42px;font-weight:900}
+.poster img{width:100%;height:100%;object-fit:cover;display:block}
+.pin{position:absolute;top:12px;right:12px;border-radius:999px;background:rgba(247,183,51,.16);border:1px solid rgba(247,183,51,.3);color:var(--gold);font-size:11px;font-weight:900;padding:5px 9px}
+.card-body{padding:16px}
+.card-main{display:flex;gap:12px;align-items:flex-start}
+.card-text{min-width:0;flex:1}
+.card h3{font-size:16px;line-height:1.35;font-weight:900;color:var(--text);margin-bottom:6px}
+.meta-line{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:13px;line-height:1.45}
+.country-flag{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--line);font-size:15px;vertical-align:middle;margin-right:6px}
+.status{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;white-space:nowrap}
+.status.upcoming{background:rgba(35,135,255,.16);color:var(--cyan)}
+.status.ongoing{background:rgba(94,227,140,.16);color:var(--green)}
+.status.done{background:rgba(127,145,166,.16);color:var(--muted)}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tag{border-radius:8px;padding:5px 9px;background:rgba(35,135,255,.13);color:var(--cyan);font-size:11px;font-weight:800;font-family:'Sarabun',sans-serif}
+.tag.type{background:rgba(139,92,246,.15);color:#bba6ff}
+.tag.mode-online{background:rgba(43,216,255,.12);color:var(--cyan)}
+.tag.mode-onsite{background:rgba(94,227,140,.12);color:var(--green)}
+.tag.mode-hybrid{background:rgba(247,183,51,.12);color:var(--gold)}
+.date-range{font-family:'Sarabun',sans-serif;color:var(--soft);font-size:13px;margin-top:10px;display:flex;align-items:center;gap:6px}
+.date-range .cal-icon{color:var(--cyan);font-size:13px}
+.summary{font-family:'Sarabun',sans-serif;color:var(--soft);font-size:13px;line-height:1.6;margin-top:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.action{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;text-decoration:none;padding:8px 11px;font-size:12px;font-weight:900;color:var(--soft);background:rgba(255,255,255,.04)}
+.action.primary{background:rgba(35,135,255,.14);border-color:rgba(35,135,255,.28);color:var(--cyan)}
+.action.join{background:rgba(94,227,140,.12);border-color:rgba(94,227,140,.28);color:var(--green)}
+:root[data-theme="light"] .action{background:#f7fbff}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:14px;padding-top:12px;font-family:'Sarabun',sans-serif;font-size:12px;color:var(--muted)}
+.state{padding:44px 18px;text-align:center;color:var(--muted);font-family:'Sarabun',sans-serif;background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius);grid-column:1/-1}
+.spinner{width:30px;height:30px;border-radius:50%;border:4px solid rgba(35,135,255,.16);border-top-color:var(--blue);animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:var(--dim);font-family:'Sarabun',sans-serif;font-size:12px}
+@media(max-width:980px){.topbar{height:auto;min-height:64px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.nav{max-width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start}.filter-bar{grid-template-columns:1fr}.hero-inner,.shell{width:92%}.hero-kpis{gap:28px}.section-head{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:1fr}}
+@media(max-width:640px){.hero{padding:34px 4%;min-height:280px}.poster{height:172px}.nav{width:100%}.card-main{flex-direction:column}.status{align-self:flex-start}.card-foot{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
+<header class="topbar">
+  <a class="brand" href="public-landing.html"><img src="../assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="brand-fallback">iROUP</span></a>
+  <nav class="nav" aria-label="Public navigation">
+    <a href="public-news.html" data-i18n="navNews">ข่าวสาร</a>
+    <a href="public-knowledge.html" data-i18n="navKnowledge">คลังความรู้</a>
+    <a href="public-scholar.html" data-i18n="navScholar">ทุนการศึกษา</a>
+    <a class="active" href="public-events.html" data-i18n="navEvents">กิจกรรม</a>
+    <a href="public-mou.html">MOU</a>
+    <a href="public-mobility.html">Mobility</a>
+    <span class="lang"><button class="lang-btn active" type="button" data-lang="TH" onclick="setLang('TH')">TH</button><button class="lang-btn" type="button" data-lang="EN" onclick="setLang('EN')">EN</button></span>
+    <button class="theme-toggle" type="button" id="themeToggle" onclick="toggleTheme()">Dark</button>
+    <a class="admin-link" href="../events.html" data-i18n="admin">Admin</a>
+  </nav>
+</header>
 
-<nav>
-  <a class="nav-logo" href="public-landing.html">
-    <img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'">
-  </a>
-  <div class="nav-links">
-    <a href="public-mou.html" class="nav-link">🤝 MOU</a>
-    <a href="public-scholar.html" class="nav-link">🎓 ทุนการศึกษา</a>
-    <a href="public-events.html" class="nav-link active">📅 กิจกรรม</a>
-    <a href="public-mobility.html" class="nav-link">👥 Mobility</a>
-    <div class="nav-lang">
-      <div class="nav-lang-btn active" onclick="setLang('TH')">TH</div>
-      <div class="nav-lang-btn" onclick="setLang('EN')">EN</div>
-    </div>
-    <a href="index.html" class="nav-admin-btn">🔐 Admin</a>
-  </div>
-</nav>
-
-<div class="page-hero">
-  <h1>📅 กิจกรรม & โครงการ</h1>
-  <p>ปฏิทินกิจกรรมนานาชาติ การเดินทาง Exchange และโปรแกรมพิเศษ</p>
-  <div class="hero-kpi">
-    <div><div class="hkpi-num" id="kpi-total">—</div><div class="hkpi-label">กิจกรรมทั้งหมด</div></div>
-    <div><div class="hkpi-num" style="color:#7BC842" id="kpi-upcoming">—</div><div class="hkpi-label">กำลังจะมาถึง</div></div>
-    <div><div class="hkpi-num" style="color:#F5A623" id="kpi-ongoing">—</div><div class="hkpi-label">กำลังดำเนินการ</div></div>
-  </div>
-</div>
-
-<div class="content">
-  <!-- MINI CALENDAR -->
-  <div class="calendar-card">
-    <div class="cal-header">
-      <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
-      <div class="cal-month-label" id="calMonthLabel">—</div>
-      <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
-    </div>
-    <div class="cal-grid">
-      <div class="cal-day-labels">
-        <div class="cal-day-label">อา</div><div class="cal-day-label">จ</div>
-        <div class="cal-day-label">อ</div><div class="cal-day-label">พ</div>
-        <div class="cal-day-label">พฤ</div><div class="cal-day-label">ศ</div>
-        <div class="cal-day-label">ส</div>
-      </div>
-      <div class="cal-days" id="calDays"></div>
-    </div>
-    <div class="cal-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#DBEAFE"></div>การเดินทาง</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--purple-pale)"></div>Inbound</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--green-pale)"></div>ประชุม</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--gold-pale)"></div>อบรม</div>
+<section class="hero">
+  <div class="hero-inner">
+    <h1 data-i18n="heroTitle">กิจกรรมนานาชาติ</h1>
+    <p class="lead" data-i18n="heroLead">ปฏิทินกิจกรรม การเดินทาง Exchange และโปรแกรมพิเศษของมหาวิทยาลัยพะเยา · International Events & Activities</p>
+    <div class="hero-kpis" aria-label="Event summary">
+      <div><div class="kpi-num total" id="kpiTotal">-</div><div class="kpi-label" data-i18n="kpiTotal">กิจกรรมทั้งหมด</div></div>
+      <div><div class="kpi-num upcoming" id="kpiUpcoming">-</div><div class="kpi-label" data-i18n="kpiUpcoming">กำลังจะมาถึง</div></div>
+      <div><div class="kpi-num ongoing" id="kpiOngoing">-</div><div class="kpi-label" data-i18n="kpiOngoing">กำลังดำเนินการ</div></div>
     </div>
   </div>
+</section>
 
-  <!-- EVENT LIST -->
-  <div class="events-col">
-    <div class="filter-bar">
-      <div class="pills">
-        <div class="pill on" onclick="setPill(this,'')">ทั้งหมด</div>
-        <div class="pill" onclick="setPill(this,'upcoming')">Upcoming</div>
-        <div class="pill" onclick="setPill(this,'ongoing')">Ongoing</div>
-        <div class="pill" onclick="setPill(this,'done')">เสร็จสิ้น</div>
-      </div>
-      <select class="filter-select" id="typeFilter" onchange="renderEvents()" style="margin-left:auto">
-        <option value="">ทุกประเภท</option>
-        <option>การเดินทาง</option><option>Inbound</option>
-        <option>ประชุม</option><option>อบรม</option><option>Exchange</option>
-      </select>
+<main class="shell">
+  <section class="filter-bar" aria-label="Event filters">
+    <div class="input-wrap">
+      <span class="input-icon" aria-hidden="true">⌕</span>
+      <input class="input" id="searchInput" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="ค้นหาชื่อกิจกรรม หรือสถานที่..." oninput="onFilterChange()">
     </div>
-    <div class="events-list" id="eventList">
-      <div class="loading">⏳ กำลังโหลด...</div>
+    <select class="select" id="countryFilter" onchange="onFilterChange()"><option value="" data-i18n="allCountries">ทุกประเทศ</option></select>
+    <select class="select" id="typeFilter" onchange="onFilterChange()"><option value="" data-i18n="allTypes">ทุกประเภท</option></select>
+    <div class="pills" role="tablist" aria-label="Status filter">
+      <button class="pill active" type="button" data-status="" onclick="setStatusFilter('')" data-i18n="all">ทั้งหมด</button>
+      <button class="pill" type="button" data-status="upcoming" onclick="setStatusFilter('upcoming')" data-i18n="upcoming">กำลังจะมาถึง</button>
+      <button class="pill" type="button" data-status="ongoing" onclick="setStatusFilter('ongoing')" data-i18n="ongoing">กำลังดำเนินการ</button>
+      <button class="pill" type="button" data-status="done" onclick="setStatusFilter('done')" data-i18n="done">เสร็จสิ้น</button>
     </div>
-  </div>
-</div>
+  </section>
 
-<footer style="display:block">© 2569 International Relations Office · University of Phayao</footer>
+  <section class="section" id="activeSection">
+    <div class="section-head">
+      <h2 class="section-title"><span aria-hidden="true">📅</span><span data-i18n="activeSection">กำลังดำเนินการและกำลังจะมาถึง</span></h2>
+      <div class="section-count" id="activeCount"></div>
+    </div>
+    <div class="cards" id="activeCards"><div class="state"><div class="spinner"></div><span data-i18n="loading">กำลังโหลดกิจกรรม...</span></div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title"><span aria-hidden="true">▣</span><span data-i18n="allSection">กิจกรรมทั้งหมด</span></h2>
+      <div class="section-count" id="resultCount"></div>
+    </div>
+    <div class="cards" id="allCards"></div>
+  </section>
+</main>
+
+<footer>© 2569 International Relations Office - University of Phayao</footer>
 
 <script src="../js/iroup-config.js"></script>
 <script src="../js/iroup-v2-endpoint.js"></script>
 <script src="../js/iroup-v2-api.js"></script>
 <script>
-let allEvents = [];
-let currentFilter = '';
-let selectedDate  = null;
-let calYear  = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-const TYPE_CLASS = {'การเดินทาง':'t-travel','Inbound':'t-inbound','ประชุม':'t-meet','อบรม':'t-train','Exchange':'t-exchange'};
-const TYPE_EMOJI = {'การเดินทาง':'✈️','Inbound':'🌏','ประชุม':'🤝','อบรม':'📚','Exchange':'🔄'};
+var allEvents = [];
+var currentLang = normalizeLang(localStorage.getItem('iroup_public_lang') || 'TH');
+var currentStatus = '';
 
+var I18N = {
+  TH: {
+    navNews:'ข่าวสาร',navKnowledge:'คลังความรู้',navScholar:'ทุนการศึกษา',navEvents:'กิจกรรม',admin:'Admin',
+    heroTitle:'กิจกรรมนานาชาติ',
+    heroLead:'ปฏิทินกิจกรรม การเดินทาง Exchange และโปรแกรมพิเศษของมหาวิทยาลัยพะเยา · International Events & Activities',
+    kpiTotal:'กิจกรรมทั้งหมด',kpiUpcoming:'กำลังจะมาถึง',kpiOngoing:'กำลังดำเนินการ',
+    searchPlaceholder:'ค้นหาชื่อกิจกรรม หรือสถานที่...',allCountries:'ทุกประเทศ',allTypes:'ทุกประเภท',
+    all:'ทั้งหมด',upcoming:'กำลังจะมาถึง',ongoing:'กำลังดำเนินการ',done:'เสร็จสิ้น',
+    activeSection:'กำลังดำเนินการและกำลังจะมาถึง',allSection:'กิจกรรมทั้งหมด',loading:'กำลังโหลดกิจกรรม...',
+    noActive:'ไม่มีกิจกรรมที่กำลังดำเนินการหรือกำลังจะมาถึง',noData:'ไม่พบกิจกรรมตามเงื่อนไขที่เลือก',loadFail:'ไม่สามารถโหลดข้อมูลกิจกรรมได้',
+    items:'รายการ',detail:'รายละเอียด',join:'เข้าร่วม',file:'ไฟล์แนบ',
+    upcomingStatus:'กำลังจะมาถึง',ongoingStatus:'กำลังดำเนินการ',doneStatus:'เสร็จสิ้น',
+    modeOnline:'ออนไลน์',modeOnsite:'ออนไซต์',modeHybrid:'ไฮบริด',
+    themeDark:'Dark',themeLight:'Light'
+  },
+  EN: {
+    navNews:'News',navKnowledge:'Knowledge',navScholar:'Scholarships',navEvents:'Events',admin:'Admin',
+    heroTitle:'International Events & Activities',
+    heroLead:'Upcoming international events, travel programs, exchanges, and special activities at University of Phayao.',
+    kpiTotal:'Total Events',kpiUpcoming:'Upcoming',kpiOngoing:'Ongoing',
+    searchPlaceholder:'Search event name or location...',allCountries:'All Countries',allTypes:'All Types',
+    all:'All',upcoming:'Upcoming',ongoing:'Ongoing',done:'Past',
+    activeSection:'Ongoing & Upcoming',allSection:'All Events',loading:'Loading events...',
+    noActive:'No ongoing or upcoming events.',noData:'No events match the selected filters.',loadFail:'Unable to load event data.',
+    items:'items',detail:'Details',join:'Join',file:'Attachment',
+    upcomingStatus:'Upcoming',ongoingStatus:'Ongoing',doneStatus:'Past',
+    modeOnline:'Online',modeOnsite:'Onsite',modeHybrid:'Hybrid',
+    themeDark:'Dark',themeLight:'Light'
+  }
+};
 
-function escHtml(v){
-  return String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-function fixDriveUrl(url){
-  const u = String(url || '').trim();
-  if(!u || u === '-' || u.toLowerCase() === 'undefined' || u.toLowerCase() === 'null') return '';
-  // Google Drive /file/d/xxx/view links do not always render in <img>.
-  // Use thumbnail endpoint for image previews; keep original URL only for file buttons.
-  const m = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
-  if(m && m[1]) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1200`;
-  return u;
-}
-function simpleLink(url,label){
-  const u=String(url||'').trim();
-  if(!u || u==='-' || u.toLowerCase()==='undefined' || u.toLowerCase()==='null') return '';
-  return `<a href="${escHtml(u)}" target="_blank" rel="noopener" class="ev-file-btn">${label}</a>`;
-}
+document.addEventListener('DOMContentLoaded', function(){
+  applyLanguage(false);
+  applyTheme();
+  loadEvents();
+});
 
-async function loadData() {
-  try {
-    const response = await IROUP_V2.public.eventList();
-    if (!response.success) throw new Error(response.error || 'V2 event API error');
-    const data = (response.data || []).map(normalizePublicEvent);
-    allEvents = data.sort((a,b) => new Date(a['วันเริ่ม']) - new Date(b['วันเริ่ม']));
-    const today = new Date();
-    const upcoming = data.filter(e => new Date(e['วันเริ่ม']) > today).length;
-    const ongoing  = data.filter(e => {
-      const s = IROUP.getStatus(e['วันเริ่ม'], e['วันสิ้นสุด']);
-      return s.status === 'active';
-    }).length;
-    document.getElementById('kpi-total').textContent    = data.length;
-    document.getElementById('kpi-upcoming').textContent = upcoming;
-    document.getElementById('kpi-ongoing').textContent  = ongoing;
-    renderCalendar();
+async function loadEvents(){
+  document.getElementById('activeCards').innerHTML = '<div class="state"><div class="spinner"></div>' + esc(t('loading')) + '</div>';
+  document.getElementById('allCards').innerHTML = '';
+  try{
+    var response = await IROUP_V2.public.eventList();
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public event API error');
+    allEvents = normalizeList(response).map(normalizeEvent).filter(function(item){ return item.id; }).sort(sortEvents);
+    populateFilters();
+    updateKpis();
     renderEvents();
-  } catch(e) {
-    document.getElementById('eventList').innerHTML = '<div class="loading">⚠️ ไม่สามารถโหลดข้อมูลได้</div>';
+  }catch(error){
+    document.getElementById('activeCards').innerHTML = '<div class="state">' + esc(t('loadFail')) + '<br>' + esc(error.message || String(error)) + '</div>';
+    document.getElementById('allCards').innerHTML = '';
+    document.getElementById('resultCount').textContent = '0 ' + t('items');
+    document.getElementById('activeCount').textContent = '';
   }
 }
 
-function normalizePublicEvent(row) {
-  const country = normalizePublicCountryName(row.country);
-  const continent = normalizePublicContinentName(row.continent);
-  const organizer = normalizePublicUnitName(row.organizer);
-  const fileUrl = firstPublicFileUrl(row.files);
+function normalizeList(response){
+  if(Array.isArray(response.data)) return response.data;
+  if(response.data && Array.isArray(response.data.items)) return response.data.items;
+  return [];
+}
+
+function normalizeEvent(row){
+  var files = flattenFiles(row.files);
   return {
-    ID: row.event_id || '',
-    'ชื่อกิจกรรม': row.title_th || row.title_en || row.title || '',
-    'ประเภท': row.event_type || row.type || '',
-    'ประเทศ': country || row.country || '',
-    'ทวีป': continent || row.continent || '',
-    'หน่วยงาน': organizer || row.institution || '',
-    'สถานที่': row.location || country || row.country || '',
-    'จำนวน': row.participant_count || '',
-    'วันเริ่ม': row.start_date || '',
-    'วันสิ้นสุด': row.end_date || row.start_date || '',
-    'เวลาเริ่ม': row.start_time || '',
-    'เวลาสิ้นสุด': row.end_time || '',
-    'รายละเอียด': row.detail_th || row.detail_en || row.detail || '',
-    Link: row.link_url || row.meeting_url || row.detail_url || '',
-    Poster_URL: row.poster_url || firstPublicImageUrl(row.files) || '',
-    'ไฟล์_URL': row.public_file_url || fileUrl || '',
-    Pin: isPublicTruthy(row.pin) ? 'TRUE' : '',
-    Status: row.status || ''
+    id: row.event_id || row.id || '',
+    title_th: row.title_th || row.title || '',
+    title_en: row.title_en || row.title || row.title_th || '',
+    event_type: row.event_type || row.type || '',
+    event_mode: String(row.event_mode || '').toLowerCase(),
+    organizer_th: unitName(row.organizer, 'TH'),
+    organizer_en: unitName(row.organizer, 'EN'),
+    country: row.country,
+    country_name_th: countryName(row.country, 'TH'),
+    country_name_en: countryName(row.country, 'EN'),
+    country_flag: countryFlag(row.country),
+    country_id: countryId(row.country),
+    location: row.location || '',
+    meeting_url: row.meeting_url || '',
+    start_date: row.start_date || '',
+    end_date: row.end_date || row.start_date || '',
+    start_time: row.start_time || '',
+    end_time: row.end_time || '',
+    participant_count: row.participant_count || '',
+    detail_th: row.detail_th || '',
+    detail_en: row.detail_en || '',
+    link_url: row.link_url || '',
+    status_raw: row.status || '',
+    pin: truthy(row.pin),
+    files: files,
+    poster: posterUrl(files)
   };
 }
 
-function normalizePublicCountryName(country) {
-  if (!country) return '';
-  if (typeof country !== 'object') return String(country || '');
-  return country.country_name_en || country.country_name_th || country.country_id || '';
+function unitName(unit, lang){
+  if(!unit) return '';
+  if(typeof unit === 'string') return unit;
+  return lang === 'EN'
+    ? (unit.unit_name_en || unit.unit_name_th || unit.unit_id || '')
+    : (unit.unit_name_th || unit.unit_name_en || unit.unit_id || '');
 }
-
-function normalizePublicContinentName(continent) {
-  if (!continent) return '';
-  if (typeof continent !== 'object') return String(continent || '');
-  return continent.continent_name_en || continent.continent_name_th || continent.continent_id || '';
+function countryName(country, lang){
+  if(!country) return '';
+  if(typeof country === 'string') return country;
+  return lang === 'EN'
+    ? (country.country_name_en || country.name_en || country.country_name_th || country.name_th || country.country_id || '')
+    : (country.country_name_th || country.name_th || country.country_name_en || country.name_en || country.country_id || '');
 }
-
-function normalizePublicUnitName(unit) {
-  if (!unit) return '';
-  if (typeof unit !== 'object') return String(unit || '');
-  return unit.unit_name_th || unit.unit_name_en || unit.unit_id || '';
+function countryId(country){
+  if(!country || typeof country !== 'object') return '';
+  return country.country_id || country.iso2 || country.iso3 || '';
 }
-
-function firstPublicFileUrl(files) {
-  const list = Array.isArray(files) ? files : [];
-  const found = list.find(file => file && file.file_url);
-  return found ? found.file_url : '';
+function countryFlag(country){
+  if(!country || typeof country !== 'object') return '';
+  return country.flag_emoji || '';
 }
-
-function firstPublicImageUrl(files) {
-  const list = Array.isArray(files) ? files : [];
-  const found = list.find(file => {
-    const mime = String(file && file.mime_type || '').toLowerCase();
-    return file && file.file_url && mime.indexOf('image/') === 0;
+function displayCountry(item){
+  var name = currentLang === 'EN' ? (item.country_name_en || item.country_name_th) : (item.country_name_th || item.country_name_en);
+  return [item.country_flag, name].filter(Boolean).join(' ');
+}
+function displayOrganizer(item){
+  return currentLang === 'EN' ? (item.organizer_en || item.organizer_th) : (item.organizer_th || item.organizer_en);
+}
+function flattenFiles(files){
+  if(!files) return [];
+  if(Array.isArray(files)) return files.filter(Boolean);
+  if(typeof files !== 'object') return [];
+  return Object.keys(files).reduce(function(acc,key){ return acc.concat(Array.isArray(files[key]) ? files[key] : []); }, []).filter(Boolean);
+}
+function posterUrl(files){
+  var poster = files.find(function(file){
+    var role = fileRoleKey(file);
+    var mime = String(file.mime_type || '').toLowerCase();
+    return (role === 'poster' || role === 'cover' || role === 'image' || mime.indexOf('image/') === 0) && (file.thumbnail_url || file.file_url || file.url);
   });
-  return found ? found.file_url : '';
+  return poster ? previewUrl(poster.thumbnail_url || poster.file_url || poster.url) : '';
 }
-
-function isPublicTruthy(value) {
-  return ['true', 'yes', 'y', '1', 'pin', 'pinned'].includes(String(value || '').trim().toLowerCase());
+function publicFile(files){
+  return files.find(function(file){
+    if(!file || !(file.file_url || file.url)) return false;
+    var role = fileRoleKey(file);
+    var mime = String(file.mime_type || '').toLowerCase();
+    if(role === 'poster' || role === 'cover' || role === 'image') return false;
+    if(mime.indexOf('image/') === 0) return false;
+    return true;
+  }) || null;
 }
+function fileRoleKey(file){
+  var raw = String(file.file_role_id || file.role_id || file.role || file.file_role_name || '').toLowerCase();
+  if(raw.indexOf('poster') >= 0) return 'poster';
+  if(raw.indexOf('cover') >= 0) return 'cover';
+  if(raw.indexOf('image') >= 0 || raw.indexOf('banner') >= 0) return 'image';
+  if(raw.indexOf('attach') >= 0 || raw.indexOf('pdf') >= 0 || raw.indexOf('document') >= 0) return 'attachment';
+  return raw;
+}
+function previewUrl(url){
+  var u = String(url || '').trim();
+  var match = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
+  return match && match[1] ? 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1200' : u;
+}
+function truthy(value){ return ['true','yes','y','1','pin','pinned'].indexOf(String(value || '').trim().toLowerCase()) >= 0; }
 
-function renderEvents() {
-  const type = document.getElementById('typeFilter').value;
-  let filtered = allEvents.filter(e => {
-    const s = IROUP.getStatus(e['วันเริ่ม'], e['วันสิ้นสุด']);
-    const matchS = !currentFilter ||
-      (currentFilter === 'upcoming' && s.status === 'upcoming') ||
-      (currentFilter === 'ongoing'  && s.status === 'active') ||
-      (currentFilter === 'done'     && s.status === 'done');
-    const matchT = !type || e['ประเภท'] === type;
-    const matchD = !selectedDate || (
-      new Date(e['วันเริ่ม']) <= selectedDate &&
-      new Date(e['วันสิ้นสุด'] || e['วันเริ่ม']) >= selectedDate
-    );
-    return matchS && matchT && matchD;
+function eventStatus(item){
+  var startDate = parseDate(item.start_date);
+  var endDate = parseDate(item.end_date) || startDate;
+  var today = startOfDay(new Date());
+  if(startDate && today < startDate) return {status:'upcoming',label:t('upcomingStatus')};
+  if(endDate && today > endDate) return {status:'done',label:t('doneStatus')};
+  return {status:'ongoing',label:t('ongoingStatus')};
+}
+function parseDate(value){
+  if(!value) return null;
+  var d = new Date(value);
+  if(Number.isNaN(d.getTime())) return null;
+  return startOfDay(d);
+}
+function startOfDay(date){ return new Date(date.getFullYear(), date.getMonth(), date.getDate()); }
+
+function sortEvents(a, b){
+  if(a.pin && !b.pin) return -1;
+  if(b.pin && !a.pin) return 1;
+  var order = {ongoing:0,upcoming:1,done:2};
+  var sa = order[eventStatus(a).status] != null ? order[eventStatus(a).status] : 9;
+  var sb = order[eventStatus(b).status] != null ? order[eventStatus(b).status] : 9;
+  if(sa !== sb) return sa - sb;
+  return dateVal(a.start_date) - dateVal(b.start_date);
+}
+function dateVal(value){ var d = new Date(value || '2999-12-31'); return Number.isNaN(d.getTime()) ? 9999999999999 : d.getTime(); }
+
+function populateFilters(){
+  var countryMap = {};
+  var typeSet = {};
+  allEvents.forEach(function(item){
+    var cid = item.country_id || item.country_name_en || item.country_name_th;
+    if(cid) countryMap[cid] = displayCountry(item);
+    if(item.event_type) typeSet[item.event_type] = true;
   });
-
-  if (filtered.length === 0) {
-    document.getElementById('eventList').innerHTML = '<div class="loading">ไม่พบกิจกรรม</div>';
-    return;
-  }
-
-  document.getElementById('eventList').innerHTML = filtered.map(e => {
-    const d    = new Date(e['วันเริ่ม']);
-    const day  = d.getDate();
-    const mon  = THAI_MONTHS[d.getMonth()].slice(0,3) + '.';
-    const type = e['ประเภท'] || 'กิจกรรม';
-    const cls  = TYPE_CLASS[type] || 't-meet';
-    const emo  = TYPE_EMOJI[type] || '📅';
-    const s    = IROUP.getStatus(e['วันเริ่ม'], e['วันสิ้นสุด']);
-    const esCls = s.status === 'upcoming' ? 'es-upcoming' : s.status === 'active' ? 'es-ongoing' : 'es-done';
-    const esLbl = s.status === 'upcoming' ? 'Upcoming' : s.status === 'active' ? 'Ongoing' : 'เสร็จสิ้น';
-
-    const dateColors = {
-      'การเดินทาง':['#DBEAFE','#1E40AF'],
-      'Inbound':['#EDE9FE','#5B21B6'],
-      'ประชุม':['#DCFCE7','#166534'],
-      'อบรม':['#FEF9C3','#854D0E'],
-      'Exchange':['#CCFBF1','#134E4A'],
-    };
-    const [bgC, textC] = dateColors[type] || ['#E8F4FD','#1A6DB5'];
-    const lineColors = {'การเดินทาง':'#1A6DB5','Inbound':'#7C3AED','ประชุม':'#5BAD3E','อบรม':'#D4890A','Exchange':'#0D9488'};
-    const lineColor = lineColors[type] || '#1A6DB5';
-    const poster = fixDriveUrl(e['Poster_URL']);
-    const posterBlock = poster ? `<div class="ev-poster"><img src="${escHtml(poster)}" alt="${escHtml(e['ชื่อกิจกรรม']||'poster')}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;ev-poster-fallback&quot;>📅</div>'"></div>` : `<div class="ev-poster"><div class="ev-poster-fallback">📅</div></div>`;
-    const fileBlock = simpleLink(e['ไฟล์_URL'],'📎 ไฟล์');
-
-    return `<div class="event-item">
-      <div class="ev-date">
-        <div class="ev-date-box" style="background:${bgC}">
-          <div class="ev-day" style="color:${textC}">${day}</div>
-          <div class="ev-month" style="color:${textC}">${mon}</div>
-        </div>
-      </div>
-      <div class="ev-vline" style="background:${lineColor}"></div>
-      <div class="ev-body">
-        <div class="ev-title">${e['ชื่อกิจกรรม']||'—'}</div>
-        <div class="ev-meta">
-          <span>📍 ${e['สถานที่']||'—'}</span>
-          ${e['จำนวน'] ? `<span>👥 ${e['จำนวน']} คน</span>` : ''}
-          ${e['หน่วยงาน'] ? `<span>🏫 ${e['หน่วยงาน']}</span>` : ''}
-        </div>
-      </div>
-      ${posterBlock}
-      <div class="ev-actions">
-        <span class="ev-type-tag ${cls}">${emo} ${type}</span>
-        <span class="ev-status ${esCls}">${esLbl}</span>
-        ${fileBlock}
-      </div>
-      <div class="ev-arrow">›</div>
-    </div>`;
-  }).join('');
+  var countries = Object.keys(countryMap).sort(function(a,b){ return (countryMap[a]||'').localeCompare(countryMap[b]||''); });
+  var types = Object.keys(typeSet).sort();
+  document.getElementById('countryFilter').innerHTML = '<option value="">' + esc(t('allCountries')) + '</option>' + countries.map(function(k){ return '<option value="' + escAttr(k) + '">' + esc(countryMap[k]) + '</option>'; }).join('');
+  document.getElementById('typeFilter').innerHTML = '<option value="">' + esc(t('allTypes')) + '</option>' + types.map(function(type){ return '<option value="' + escAttr(type) + '">' + esc(type) + '</option>'; }).join('');
 }
 
-// ============================================================
-// MINI CALENDAR
-// ============================================================
-function renderCalendar() {
-  const label = document.getElementById('calMonthLabel');
-  const grid  = document.getElementById('calDays');
-  const today = new Date();
+function updateKpis(){
+  var upcoming = allEvents.filter(function(item){ return eventStatus(item).status === 'upcoming'; }).length;
+  var ongoing = allEvents.filter(function(item){ return eventStatus(item).status === 'ongoing'; }).length;
+  document.getElementById('kpiTotal').textContent = allEvents.length;
+  document.getElementById('kpiUpcoming').textContent = upcoming;
+  document.getElementById('kpiOngoing').textContent = ongoing;
+}
 
-  label.textContent = `${THAI_MONTHS[calMonth]} ${calYear + 543}`;
-
-  // หาวันที่มี event ในเดือนนี้
-  const eventDays = new Set();
-  allEvents.forEach(e => {
-    const start = new Date(e['วันเริ่ม']);
-    const end   = new Date(e['วันสิ้นสุด'] || e['วันเริ่ม']);
-    let cur = new Date(start);
-    while (cur <= end) {
-      if (cur.getFullYear() === calYear && cur.getMonth() === calMonth) {
-        eventDays.add(cur.getDate());
-      }
-      cur.setDate(cur.getDate() + 1);
-    }
+function filteredEvents(){
+  var q = document.getElementById('searchInput').value.trim().toLowerCase();
+  var country = document.getElementById('countryFilter').value;
+  var type = document.getElementById('typeFilter').value;
+  return allEvents.filter(function(item){
+    var status = eventStatus(item).status;
+    if(currentStatus && status !== currentStatus) return false;
+    if(country && (item.country_id || item.country_name_en || item.country_name_th) !== country) return false;
+    if(type && item.event_type !== type) return false;
+    if(!q) return true;
+    var haystack = [item.title_th,item.title_en,item.event_type,item.location,item.country_name_th,item.country_name_en,item.organizer_th,item.organizer_en,item.detail_th,item.detail_en].join(' ').toLowerCase();
+    return haystack.indexOf(q) >= 0;
   });
-
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-
-  let html = '';
-  // Empty cells
-  for (let i = 0; i < firstDay; i++) {
-    html += '<div class="cal-day empty"></div>';
-  }
-  // Days
-  for (let d = 1; d <= daysInMonth; d++) {
-    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-    const hasEvent = eventDays.has(d);
-    const isSelected = selectedDate &&
-      selectedDate.getDate() === d &&
-      selectedDate.getMonth() === calMonth &&
-      selectedDate.getFullYear() === calYear;
-    const cls = [
-      isToday ? 'today' : '',
-      hasEvent ? 'has-event' : '',
-      isSelected ? 'selected' : '',
-    ].filter(Boolean).join(' ');
-    html += `<div class="cal-day ${cls}" onclick="selectDay(${d})">${d}</div>`;
-  }
-  grid.innerHTML = html;
 }
 
-function selectDay(d) {
-  const clicked = new Date(calYear, calMonth, d);
-  if (selectedDate && selectedDate.getTime() === clicked.getTime()) {
-    selectedDate = null; // deselect
-  } else {
-    selectedDate = clicked;
-  }
-  renderCalendar();
+function renderEvents(){
+  var rows = filteredEvents();
+  var activeRows = rows.filter(function(item){ var s = eventStatus(item).status; return s === 'ongoing' || s === 'upcoming'; });
+  var doneRows = rows.filter(function(item){ return eventStatus(item).status === 'done'; });
+  document.getElementById('activeCards').innerHTML = activeRows.length ? activeRows.map(renderCard).join('') : '<div class="state">' + esc(t('noActive')) + '</div>';
+  document.getElementById('allCards').innerHTML = doneRows.length ? doneRows.map(renderCard).join('') : '<div class="state">' + esc(t('noData')) + '</div>';
+  document.getElementById('activeCount').textContent = activeRows.length + ' ' + t('items');
+  document.getElementById('resultCount').textContent = rows.length + ' ' + t('items');
+}
+
+function renderCard(item){
+  var status = eventStatus(item);
+  var title = currentLang === 'EN' ? (item.title_en || item.title_th) : (item.title_th || item.title_en);
+  var summary = currentLang === 'EN' ? (item.detail_en || item.detail_th) : (item.detail_th || item.detail_en);
+  var file = publicFile(item.files);
+  var detailHref = 'public-events-detail.html?id=' + encodeURIComponent(item.id);
+  var joinUrl = item.meeting_url || item.link_url || '';
+  var modeClass = item.event_mode === 'online' ? 'mode-online' : item.event_mode === 'hybrid' ? 'mode-hybrid' : item.event_mode ? 'mode-onsite' : '';
+  var modeLabel = item.event_mode === 'online' ? t('modeOnline') : item.event_mode === 'hybrid' ? t('modeHybrid') : item.event_mode === 'onsite' ? t('modeOnsite') : '';
+  var orgDisplay = displayOrganizer(item);
+  var countryDisplay = displayCountry(item);
+  var locationLine = item.location || (item.event_mode === 'online' ? t('modeOnline') : '') || countryDisplay;
+  return '<article class="card">' +
+    (item.pin ? '<span class="pin">📌 Pinned</span>' : '') +
+    '<a href="' + escAttr(detailHref) + '" aria-label="' + escAttr(title) + '"><div class="poster">' +
+      (item.poster ? '<img src="' + escAttr(item.poster) + '" alt="' + escAttr(title) + '" loading="lazy" onerror="this.parentElement.innerHTML=\'📅\'">' : '📅') +
+    '</div></a>' +
+    '<div class="card-body">' +
+      '<div class="card-main">' +
+        '<div class="card-text">' +
+          '<h3><a href="' + escAttr(detailHref) + '">' + esc(title || '-') + '</a></h3>' +
+          '<div class="meta-line">' +
+            (item.country_flag ? '<span class="country-flag">' + esc(item.country_flag) + '</span>' : '') +
+            esc(locationLine || '-') +
+            (orgDisplay ? ' · ' + esc(orgDisplay) : '') +
+          '</div>' +
+        '</div>' +
+        '<span class="status ' + escAttr(status.status) + '">' + esc(status.label) + '</span>' +
+      '</div>' +
+      '<div class="date-range"><span class="cal-icon">📅</span>' + esc(formatDateRange(item.start_date, item.end_date)) + '</div>' +
+      '<div class="tag-row">' +
+        (item.event_type ? '<span class="tag type">' + esc(item.event_type) + '</span>' : '') +
+        (modeClass && modeLabel ? '<span class="tag ' + escAttr(modeClass) + '">' + esc(modeLabel) + '</span>' : '') +
+        (item.participant_count ? '<span class="tag">👥 ' + esc(String(item.participant_count)) + '</span>' : '') +
+      '</div>' +
+      (summary ? '<p class="summary">' + esc(summary) + '</p>' : '') +
+      '<div class="actions">' +
+        '<a class="action" href="' + escAttr(detailHref) + '">' + esc(t('detail')) + '</a>' +
+        (joinUrl ? '<a class="action join" target="_blank" rel="noopener" href="' + escAttr(joinUrl) + '">' + esc(t('join')) + '</a>' : '') +
+        (file ? '<a class="action" target="_blank" rel="noopener" href="' + escAttr(file.file_url || file.url) + '">' + esc(t('file')) + '</a>' : '') +
+      '</div>' +
+      '<div class="card-foot">' +
+        '<span>' + esc(countryDisplay || '-') + '</span>' +
+        (item.start_time ? '<span>' + esc(item.start_time) + (item.end_time ? ' – ' + esc(item.end_time) : '') + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+  '</article>';
+}
+
+function setStatusFilter(status){
+  currentStatus = status || '';
+  document.querySelectorAll('.pill').forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-status') === currentStatus); });
   renderEvents();
 }
+function onFilterChange(){ renderEvents(); }
 
-function changeMonth(dir) {
-  calMonth += dir;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  selectedDate = null;
-  renderCalendar();
-  renderEvents();
+function formatDateRange(start, end){
+  if(!start) return '-';
+  var s = new Date(start);
+  var e = end ? new Date(end) : null;
+  if(Number.isNaN(s.getTime())) return String(start);
+  var locale = currentLang === 'EN' ? 'en-US' : 'th-TH';
+  var opts = { day:'numeric', month:'short', year:'2-digit' };
+  var sStr = s.toLocaleDateString(locale, opts);
+  if(!e || Number.isNaN(e.getTime()) || e.toDateString() === s.toDateString()) return sStr;
+  return sStr + ' – ' + e.toLocaleDateString(locale, opts);
 }
 
-function setPill(el, status) {
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
-  currentFilter = status;
-  renderEvents();
+function setLang(lang){
+  currentLang = normalizeLang(lang);
+  localStorage.setItem('iroup_public_lang', currentLang);
+  applyLanguage(true);
+}
+function applyLanguage(rerender){
+  var dict = I18N[currentLang] || I18N.TH;
+  document.documentElement.lang = currentLang === 'EN' ? 'en' : 'th';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ var key = el.getAttribute('data-i18n'); if(dict[key]) el.textContent = dict[key]; });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){ var key = el.getAttribute('data-i18n-placeholder'); if(dict[key]) el.placeholder = dict[key]; });
+  document.querySelectorAll('.lang-btn').forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang); });
+  applyTheme();
+  populateFilters();
+  if(rerender) renderEvents();
+}
+function normalizeLang(lang){ return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH'; }
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.TH[key] || key; }
+
+function toggleTheme(){
+  var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('iroup_public_theme', next);
+  applyTheme();
+}
+function applyTheme(){
+  var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  var btn = document.getElementById('themeToggle');
+  if(btn) btn.textContent = isLight ? t('themeLight') : t('themeDark');
 }
 
-function setLang(lang) {
-  document.querySelectorAll('.nav-lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang));
-}
-
-loadData();
+function esc(value){ return String(value == null ? '' : value).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+function escAttr(value){ return esc(value).replace(/`/g,'&#96;'); }
 </script>
-
-
-
 </body>
 </html>

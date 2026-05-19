@@ -2698,3 +2698,376 @@ Verification:
 - `git diff --check` passed with CRLF warnings only.
 - Local smoke test returned HTTP 200.
 - Confirmed the Thai page title renders correctly in the browser and no `????` markers remain.
+
+---
+
+## Session: 2026-05-18 - Public Landing + Public MOU + Public Mobility Redesign Stabilization
+
+Completed:
+
+- `public-landing.html` is now the active cinematic V2 public landing page.
+- Added live V2 MOU atlas integration.
+- Added live KPI overlap section.
+- Added Mobility Flow graph.
+- Added country flags support.
+- Added light/dark theme support.
+- Preserved V2 public runtime architecture.
+
+Public MOU outcomes:
+
+- `public-mou.html` redesigned with:
+  - live V2 public MOU route
+  - real D3/TopoJSON world map
+  - Chart.js summary section
+  - redesigned filters
+  - redesigned table
+  - new MOU hero assets
+- Existing V2 public DTO architecture preserved.
+
+Public Mobility outcomes:
+
+- `public-mobility.html` redesigned into compact dashboard-first layout.
+- Uses live V2 public Mobility/Travel routes.
+- Added charts, map, cards, timeline, and pagination.
+- TH/EN switching stabilized using localStorage: `iroup_public_lang`.
+- Fixed Thai encoding problems.
+- Fixed country object rendering problems.
+- Corrected V2 adapter loading from `js/` path.
+- Stabilized browser rendering after redesign.
+
+Standards confirmed:
+
+- Preserve V2 public DTO boundaries.
+- Do not expose participant personal data.
+- Public pages remain V2-only with no V1 fallback.
+- Dashboard-first UX direction is now preferred over oversized hero-first layouts for data-heavy pages.
+
+Next recommended phase:
+
+- Begin Design System migration using:
+  - `Team IROUP/css/iroup-design.css`
+  - `Team IROUP/js/iroup-theme.js`
+- Migrate pages incrementally using the new `ir-*` component classes.
+- Keep migration reversible and CSS-first.
+- Do not refactor backend/API/auth/session logic during UI redesign.
+
+Important constraints:
+
+- Preserve Google OAuth/session behavior.
+- Preserve V2 runtime architecture.
+- Preserve GitHub Pages compatibility.
+- Preserve D3 and Chart.js functionality.
+- Preserve public/private DTO safety boundaries.
+- Append documentation only; do not rewrite prior history.
+
+---
+
+## Session: 2026-05-18 - Public News + Public Knowledge Redesign Wave
+
+Completed:
+
+- Redesigned `public-news.html` as the current public NEWS list page.
+- Redesigned `public-news-detail.html` as the current public NEWS detail page.
+- Redesigned `public-knowledge.html` as the current public Knowledge list page.
+- Redesigned `public-knowledge-detail.html` as the current public Knowledge detail page.
+- Preserved the existing live V2 public routes:
+  - `IROUP_V2.public.newsList()` / `v2.public.news.list`
+  - `IROUP_V2.public.knowledgeList()` / `v2.public.knowledge.list`
+- No backend/App Script route changes were required.
+- No V1 public fallback was reintroduced.
+
+Public NEWS outcomes:
+
+- `public-news.html` now uses the redesigned public visual pattern:
+  - dark/light mode using `iroup_public_theme`
+  - TH/EN switching using `iroup_public_lang`
+  - unified public nav order
+  - hero graphics for dark/light modes
+  - live V2 card grid
+  - search/filter/category/SDG controls
+  - KPI summary from live records
+  - 10-item pagination
+  - card/detail navigation through `public-news-detail.html?id=...`
+- Removed the old list-page modal/gallery behavior in favor of the detail page flow.
+- `public-news-detail.html` now renders live NEWS records by URL id and includes:
+  - cover image support
+  - badges, publish date, category, and SDG tags
+  - content rendering
+  - action panel
+  - additional image gallery
+  - gallery modal for viewing additional images
+  - dark/light and TH/EN support
+
+Public Knowledge outcomes:
+
+- `public-knowledge.html` now uses the redesigned public visual pattern:
+  - dark/light mode using `iroup_public_theme`
+  - TH/EN switching using `iroup_public_lang`
+  - unified public nav order
+  - hero graphics for dark/light modes
+  - live V2 card grid
+  - search/category filters
+  - type filters for all/PDF/video/image
+  - card/detail navigation through `public-knowledge-detail.html?id=...`
+- `public-knowledge-detail.html` now renders live Knowledge records by URL id and includes:
+  - cover image support
+  - content rendering
+  - PDF/video/link action panel
+  - image gallery
+  - dark/light and TH/EN support
+
+Standards confirmed:
+
+- Public list/detail modules should use the shared public redesign pattern:
+  hero graphic, dark/light, TH/EN, unified nav, live V2 route, glass/card styling,
+  search/filter controls, pagination where useful, and detail pages for full content.
+- Public pages must keep consuming V2 public DTOs only.
+- Public pages must not call admin routes.
+- Public pages must not expose private/internal fields.
+- UI redesign must not refactor backend/API/auth/session logic.
+
+Validation noted from the implementation session:
+
+- Inline script parse checks passed for the redesigned NEWS and Knowledge pages.
+- `git diff --check` passed with CRLF warnings only.
+- Local HTTP smoke tests returned 200 for list/detail pages.
+- Visual smoke checks passed for NEWS and Knowledge list/detail pages.
+
+Next recommended phase:
+
+- Continue the public redesign wave with `public-scholar.html`.
+- After Scholarship, continue to `public-events.html`.
+- Revisit `public-mobility.html`, `public-mou.html`, and `public-landing.html` after
+  the list/detail module pattern is stable.
+
+---
+
+## Session: 2026-05-19 - Public Scholarship Redesign
+
+Completed:
+
+- Redesigned `public-scholar.html` using the current public redesign pattern.
+- Added dark/light hero support using:
+  - `Team IROUP/assets/scholarship-hero-dark.webp`
+  - `Team IROUP/assets/scholarship-hero-light.webp`
+- Preserved the existing live V2 public Scholarship route:
+  - `IROUP_V2.public.scholarshipList()` / `v2.public.scholarship.list`
+- No backend/App Script route changes were made.
+- No V1 public fallback was reintroduced.
+
+Public Scholarship outcomes:
+
+- Added public top navigation consistent with News/Knowledge:
+  ข่าวสาร, คลังความรู้, ทุนการศึกษา, กิจกรรม, MOU, Mobility.
+- Added dark/light mode persistence through `iroup_public_theme`.
+- Added TH/EN persistence through `iroup_public_lang`.
+- Added hero KPI summary for total scholarships, open scholarships, and upcoming scholarships.
+- Added dashboard-style filter bar:
+  - search
+  - country filter
+  - level/target filter
+  - status pills
+- Added separate sections:
+  - currently open scholarships
+  - all scholarships
+- Added scholarship cards with poster/cover preview, status pill, tags, summary,
+  apply/file actions, deadline, and days-left indicator.
+
+Standards confirmed:
+
+- `public-scholar.html` now belongs to the redesigned content/opportunity public module pattern.
+- Public Scholarship remains V2-only and public DTO-safe.
+- Scholarship redesign did not touch admin routes, auth/session behavior, or backend contracts.
+
+Validation:
+
+- Inline script parse check passed.
+- `git diff --check` passed with CRLF warnings only.
+- Local HTTP smoke test returned 200.
+- File-based Chrome visual smoke confirmed the hero and layout render; live data requires the normal V2 endpoint runtime.
+
+Next recommended phase:
+
+- Continue public redesign with `public-events.html`.
+
+---
+
+## Session: 2026-05-19 - Scholarship Article Content Fields
+
+Completed:
+
+- Added article-style scholarship content fields:
+  - `content_th`
+  - `content_en`
+- Updated the V2 Scholarship schema builder so new V2 sheets include these columns.
+- Added a repair helper for the existing live V2 sheet:
+  - `addV2ScholarshipContentColumns()`
+- Updated V2 Scholarship admin write normalization and sheet-row mapping.
+- Updated V2 admin Scholarship DTOs to return `content_th/content_en`.
+- Updated V2 public Scholarship DTOs to return `content_th/content_en`.
+- Updated Scholarship sample seed rows with content values.
+- Updated `scholarship.html` admin modal with two large textareas:
+  - เนื้อหารายละเอียดทุน (TH)
+  - Scholarship detail content (EN)
+- Updated `public-scholar.html` normalization/search fallback so content fields are available for the next detail page.
+
+Design decision:
+
+- Scholarship detail content will follow the News/Knowledge model: one long
+  article-style content field per language, instead of many rigid subsection fields.
+- Structured fields remain for filtering/cards: title, country, institution, type,
+  funding, target group, dates, status, apply link, files, and poster.
+
+Operational note:
+
+- Before adding real Scholarship content in the live spreadsheet, run
+  `addV2ScholarshipContentColumns()` in the isolated V2 Apps Script project so the
+  existing `SCHOLARSHIP` sheet gains `content_th/content_en` without shifting old data.
+
+Next recommended phase:
+
+- Create `public-scholar-detail.html`.
+- Update `public-scholar.html` cards to open `public-scholar-detail.html?id=...`
+  while keeping apply/file actions available.
+
+---
+
+## Session: 2026-05-19 - Global Country Master Prepared
+
+Completed:
+
+- Added a V2 global country master upsert helper:
+  - `upsertV2GlobalCountryMaster()`
+- Added 249 ISO 3166-1 alpha-2 / alpha-3 country and territory codes for
+  `COUNTRY_MASTER`.
+- Country IDs use the existing stable pattern:
+  - `CTRY-TH`
+  - `CTRY-MY`
+  - `CTRY-US`
+  - etc.
+- Added generated country display support:
+  - English country name
+  - Thai country name where Apps Script `Intl.DisplayNames` is available
+  - flag emoji
+  - continent bucket
+  - search alias
+  - active status
+  - sort order
+- Updated `seedCountryMaster()` so it now delegates to the global upsert instead of
+  reseeding only the old 10-country baseline.
+
+Operational note:
+
+- Before Peach enters real MOU, Mobility, Travel, Scholarship, or Event data that
+  references countries, run:
+  - `upsertV2GlobalCountryMaster()`
+- The function updates existing `CTRY-*` rows and inserts missing rows. It does not
+  delete custom/test country rows.
+- Existing references to stable IDs such as `CTRY-TH`, `CTRY-JP`, and `CTRY-MY`
+  remain safe.
+
+Source basis:
+
+- ISO 3166-1 alpha-2 / alpha-3 country code list mirrored by RIPE NCC.
+- Operational continent buckets are used for IROUP filters/reporting.
+
+---
+
+## Session: 2026-05-19 - Events Public Page Redesign
+
+Completed:
+
+- **Redesigned `public-events.html`** to match the stable public redesign pattern
+  (same as News / Knowledge / Scholarship).
+  - Old design: gradient-only hero, list layout, no dark/light mode, no proper TH/EN,
+    old-style nav with emojis.
+  - New design:
+    - Dark/light hero webp assets: `events-hero-dark.webp` / `events-hero-light.webp`
+    - Dark/light mode via `iroup_public_theme` localStorage
+    - TH/EN toggle via `iroup_public_lang` localStorage
+    - Unified public nav order: ข่าวสาร / คลังความรู้ / ทุนการศึกษา / กิจกรรม (active) / MOU / Mobility
+    - Card grid (auto-fill, minmax 320px) replacing old list+calendar layout
+    - Two sections: "กำลังดำเนินการและกำลังจะมาถึง" + "กิจกรรมทั้งหมด"
+    - KPI bar: total / upcoming / ongoing
+    - Filters: search, country dropdown, event type dropdown, status pills
+    - Event-specific card UX: poster/cover from FILES, status badge (upcoming/ongoing/done),
+      date range (start–end), event_mode badge (online/onsite/hybrid), country flag,
+      organizer (unit), participant_count, join link (meeting_url), attachment file
+    - Cards link to `public-events-detail.html?id=...`
+  - V2 public DTO boundary preserved: only `IROUP_V2.public.eventList()` called.
+  - No admin routes, no participant personal data exposed.
+
+- **Created `public-events-detail.html`** (new file, did not exist before).
+  - Same nav/hero/theme/lang pattern as scholarship detail.
+  - Hero: events-hero-dark/light.webp assets with 98%→8% gradient overlay.
+  - Loads full event list via `IROUP_V2.public.eventList()`, finds by `event_id`.
+  - Layout: cover image + article (detail_th/detail_en) + sticky facts panel.
+  - Facts panel: date range, time range, location, country + flag, organizer, event type,
+    event mode, participant count.
+  - Action buttons: Join (meeting_url), Event Website (link_url if different), Attachment.
+  - Status badge in hero: upcoming / ongoing / done derived from start_date / end_date.
+  - "Back to Events" link returns to `public-events.html`.
+
+Files changed:
+- `public/public-events.html` — full rewrite (redesign)
+- `public/public-events-detail.html` — new file created
+
+V2 API route used: `v2.public.event.list` → `IROUP_V2.public.eventList()`
+
+---
+
+## Session: 2026-05-19 - Public Scholarship Card/Detail Fixes
+
+Completed:
+
+- Enlarged Scholarship public card poster area and aligned the card grid closer to
+  the News card pattern.
+- Added country flag support on public Scholarship cards.
+- Fixed Scholarship card action labels:
+  - internal detail: `อ่านรายละเอียด`
+  - application link: `สมัครทุน`
+  - attachment link: `ไฟล์แนบ`
+- Added `public-scholar-detail.html` as the public Scholarship detail baseline.
+- Scholarship cards now link to `public-scholar-detail.html?id=...`.
+- Public detail page uses the Scholarship hero family, TH/EN state, dark/light state,
+  poster image, article-style `content_th/content_en`, facts panel, apply link,
+  external detail link, and attachment link.
+- Public Scholarship file button now excludes poster/cover/image files so the
+  attachment action does not open the cover image.
+- Admin Scholarship uploads now save attachment files with public visibility because
+  scholarship attachments are intended for public opportunity pages.
+- Added repair helper for existing Scholarship attachments uploaded before this fix:
+  - `makeV2ScholarshipAttachmentsPublic()`
+
+Operational note:
+
+- If existing Scholarship attachments were uploaded before this change and should
+  appear publicly, run `makeV2ScholarshipAttachmentsPublic()` once after deploying
+  the updated V2 repair script.
+
+---
+
+## Session: 2026-05-19 - UP_UNIT_MASTER Real Data
+
+Completed:
+
+- Created `IROUP_V2_UP_UNIT_MASTER.gs` with full official UP unit list.
+- Added `upsertV2UPUnitMaster()` — safe to re-run; existing rows updated in place
+  by `unit_id`, new rows appended.
+- Covered 51 units across all types: คณะ, วิทยาลัย, วิทยาเขต, โรงเรียน, กอง,
+  ศูนย์, สำนักงาน, สถาบัน, หน่วย, งาน, อุทยาน, โรงพยาบาล.
+- `unit_id` format: `UPUNIT-[CODE]` (e.g. `UPUNIT-AGRI`, `UPUNIT-ICT`).
+- `unit_code` (abbreviation) confirmed per official bilingual unit list with
+  two corrections: AGRI (Agriculture), DOES (Division of Educational Services).
+- Added `UPUNIT-UPILI` — สถาบันนวัตกรรมการเรียนรู้ / Innovative Learning Institute.
+- `UPUNIT-UPLC` (ศูนย์ภาษา) has `parent_unit_id = UPUNIT-LA` (คณะศิลปศาสตร์).
+- Excluded venue-only entries: ห้องประชุมอธิการบดี, ห้องประชุม อพ.สธ.,
+  อาคารสงวนเสริมศรี.
+- Old sample unit rows (`UNIT-*` prefix) manually deleted from the live sheet
+  before running the upsert — `cleanupV2SampleData()` does not cover this prefix.
+
+Deployment steps:
+
+1. Copy `IROUP_V2_UP_UNIT_MASTER.gs` into the Apps Script project.
+2. Run `upsertV2UPUnitMaster()` once from the editor.
+3. Verify rows in the `UP_UNIT_MASTER` sheet.

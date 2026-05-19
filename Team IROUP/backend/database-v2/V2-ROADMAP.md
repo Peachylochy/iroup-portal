@@ -1076,3 +1076,207 @@ Next gate:
   UI/navigation pass.
 
 ---
+
+## Public Landing + Public MOU + Public Mobility Redesign Stabilization
+
+Date: 2026-05-18
+
+Status: stabilized public V2 redesign wave.
+
+Scope:
+
+- `public-landing.html` is now the active cinematic V2 public landing page.
+- Landing page additions include live V2 MOU atlas integration, KPI overlap section,
+  Mobility Flow graph, country flags, and light/dark theme support.
+- `public-mou.html` is redesigned on the existing V2 public MOU DTO route with a
+  real D3/TopoJSON world map, Chart.js summary section, redesigned filters,
+  redesigned table, and new MOU hero assets.
+- `public-mobility.html` is redesigned as a compact dashboard-first public page
+  using live V2 public Mobility and Travel routes.
+- Mobility public page now includes charts, map, cards, timeline, and pagination.
+- Mobility TH/EN switching is stabilized through `localStorage.iroup_public_lang`.
+- Thai encoding problems, country object rendering problems, and V2 adapter loading
+  path issues are fixed for the redesigned Mobility page.
+
+Architecture preserved:
+
+- V2 public DTO routes remain the only public runtime source for these pages.
+- No V1 fallback is reintroduced.
+- Public/private DTO safety boundaries remain enforced.
+- Participant personal data for Mobility and Travel remains non-public.
+- Google OAuth/session behavior, V2 runtime architecture, GitHub Pages compatibility,
+  D3, and Chart.js behavior must be preserved during UI work.
+
+Next recommended phase:
+
+- Begin incremental Design System migration using:
+  - `Team IROUP/css/iroup-design.css`
+  - `Team IROUP/js/iroup-theme.js`
+- Migrate pages with `ir-*` component classes.
+- Keep the migration reversible and CSS-first.
+- Do not refactor backend/API/auth/session logic during UI redesign.
+
+UX rule confirmed:
+
+- Dashboard-first UX is now preferred over oversized hero-first layouts for
+  data-heavy public pages.
+
+## Public News + Public Knowledge Redesign Wave
+
+Date: 2026-05-18
+
+Status: public content-module redesign pattern stabilized.
+
+Scope:
+
+- `public-news.html` redesigned as the public NEWS list page.
+- `public-news-detail.html` redesigned as the public NEWS detail page.
+- `public-knowledge.html` redesigned as the public Knowledge list page.
+- `public-knowledge-detail.html` redesigned as the public Knowledge detail page.
+
+Runtime preserved:
+
+- NEWS continues to use `IROUP_V2.public.newsList()` / `v2.public.news.list`.
+- Knowledge continues to use `IROUP_V2.public.knowledgeList()` /
+  `v2.public.knowledge.list`.
+- No backend route changes were required.
+- No V1 public fallback was reintroduced.
+- Public DTO safety boundaries remain active.
+
+Public NEWS behavior:
+
+- List page supports dark/light mode, TH/EN, unified nav, hero graphics, live V2
+  card grid, search/filter/category/SDG controls, KPI summary, and pagination.
+- List cards navigate to `public-news-detail.html?id=...`.
+- Detail page renders live record data by URL id, including cover image, metadata,
+  badges, content, action panel, and additional image gallery with modal viewing.
+
+Public Knowledge behavior:
+
+- List page supports dark/light mode, TH/EN, unified nav, hero graphics, live V2
+  card grid, search/category filters, and type filters for all/PDF/video/image.
+- List cards navigate to `public-knowledge-detail.html?id=...`.
+- Detail page renders live record data by URL id, including cover image, content,
+  PDF/video/link actions, and image gallery.
+
+Design rules confirmed:
+
+- Content-style public modules should use a list/detail structure rather than
+  keeping all reading behavior in a list-page modal.
+- Shared public page state keys:
+  - `iroup_public_theme`
+  - `iroup_public_lang`
+- Public redesign work must not refactor backend/API/auth/session logic.
+
+Next recommended phase:
+
+- Redesign `public-scholar.html` next using the NEWS/Knowledge list-detail pattern.
+- Follow with `public-events.html`.
+- Later revisit Mobility, MOU, and Landing for final ecosystem consistency once the
+  content-module pattern is locked.
+
+## Public Scholarship Redesign
+
+Date: 2026-05-19
+
+Status: public Scholarship opportunity page redesigned.
+
+Scope:
+
+- `public-scholar.html` redesigned using the current public redesign pattern.
+- Uses dark/light Scholarship hero assets from `Team IROUP/assets/`.
+- Preserves the existing V2 public Scholarship route.
+
+Runtime preserved:
+
+- Scholarship continues to use `IROUP_V2.public.scholarshipList()` /
+  `v2.public.scholarship.list`.
+- No backend route changes were required.
+- No V1 public fallback was reintroduced.
+- Public DTO safety boundaries remain active.
+
+Public Scholarship behavior:
+
+- Supports dark/light mode through `iroup_public_theme`.
+- Supports TH/EN through `iroup_public_lang`.
+- Includes unified public nav order.
+- Includes hero KPIs for total, open, and upcoming scholarships.
+- Includes search, country, level/target, and status filters.
+- Separates currently open scholarships from all scholarships.
+- Renders cards with poster preview, status, tags, summary, apply/file actions,
+  deadline, and days-left indicator.
+
+Next recommended phase:
+
+- Redesign `public-events.html` next.
+
+---
+
+## Scholarship Article Content Fields
+
+Date: 2026-05-19
+
+Status: Scholarship admin/data contract prepared for future public detail page.
+
+Decision:
+
+- Scholarship should support a full public detail reading page, similar to NEWS and
+  Knowledge.
+- To keep admin data entry practical, full scholarship descriptions will be stored in
+  article-style long fields:
+  - `content_th`
+  - `content_en`
+- Structured Scholarship metadata remains in place for cards, filters, deadline
+  states, country/institution display, funding tags, apply links, and public files.
+
+Backend/admin scope:
+
+- V2 Scholarship sheet schema now includes `content_th` and `content_en`.
+- Admin Scholarship create/edit payloads now preserve `content_th` and `content_en`.
+- Public Scholarship DTOs now expose `content_th` and `content_en` for public detail
+  rendering.
+- Admin Scholarship form now includes long textareas for the detail body.
+
+Operational requirement:
+
+- Existing live V2 sheets must be repaired before Peach enters real scholarship
+  detail content.
+- Run `addV2ScholarshipContentColumns()` in the V2 Apps Script project to add the
+  missing live `SCHOLARSHIP` columns without shifting existing records.
+
+Next recommended phase:
+
+- Build `public-scholar-detail.html`.
+- Update `public-scholar.html` cards to navigate to
+  `public-scholar-detail.html?id=...`.
+- Keep all Scholarship public rendering on public DTOs only.
+
+---
+
+## Global Country Master
+
+Date: 2026-05-19
+
+Status: V2 country lookup prepared for real worldwide data entry.
+
+Scope:
+
+- Added `IROUP_V2_COUNTRY_MASTER_GLOBAL.gs`.
+- Added `upsertV2GlobalCountryMaster()`.
+- Added 249 ISO 3166-1 country/territory rows using stable `CTRY-{alpha2}` IDs.
+- Updated `seedCountryMaster()` to call the global upsert helper.
+
+Behavior:
+
+- Existing rows with matching `country_id` are updated in place.
+- Missing rows are inserted.
+- Custom/test rows are not deleted.
+- Country rows include `iso2`, `iso3`, display names, continent fields, flag emoji,
+  search alias, active status, and sort order.
+
+Operational requirement:
+
+- Run `upsertV2GlobalCountryMaster()` once in the V2 Apps Script project before
+  entering real country-linked records.
+- Use `COUNTRY_MASTER.country_id` in MOU, Mobility, Travel, Scholarship, and Event
+  records.

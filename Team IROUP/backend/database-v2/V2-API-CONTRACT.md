@@ -1351,3 +1351,202 @@ Before frontend migration starts:
 - Confirm admin list vs detail endpoints for each module.
 - Add write contracts separately for admin add/edit/delete flows.
 - Keep production `Code.gs` untouched until deployment wiring is explicitly approved.
+
+---
+
+## Contract Addendum - Public Redesign Stabilization
+
+Date: 2026-05-18
+
+Status:
+
+- Public landing, MOU, and Mobility redesign wave is stabilized on V2 public DTOs.
+- Public pages remain V2-only with no V1 fallback.
+
+Routes actively preserved by the redesign:
+
+- `v2.public.mou.list`
+- `v2.public.mobility.list`
+- `v2.public.travel.list`
+- `v2.public.news.list`
+- `v2.public.knowledge.list`
+
+Runtime notes:
+
+- `public-landing.html` now consumes live V2 MOU atlas-style data and preserves the
+  V2 public runtime boundary.
+- `public-mou.html` continues to use the live V2 public MOU route while rendering
+  a real D3/TopoJSON world map and Chart.js summary.
+- `public-mobility.html` continues to use live V2 public Mobility and Travel
+  routes while rendering charts, map, cards, timeline, and pagination.
+- Mobility TH/EN switching is persisted in `localStorage.iroup_public_lang`.
+- Public theme state is persisted in `localStorage.iroup_public_theme` where active.
+
+Safety rules reaffirmed:
+
+- Public pages must consume public DTOs only.
+- Public pages must not call admin routes.
+- Public pages must not expose Mobility or Travel participant personal data.
+- Public pages must not reintroduce V1 public fallback reads.
+- UI redesign must not change backend route contracts, auth/session behavior, or
+  public/private DTO filtering.
+
+Design-system migration constraint:
+
+- The next UI phase should migrate incrementally to `Team IROUP/css/iroup-design.css`
+  and `Team IROUP/js/iroup-theme.js` using `ir-*` classes.
+- Keep the migration CSS-first and reversible.
+
+---
+
+## Contract Addendum - Public News/Knowledge Redesign
+
+Date: 2026-05-18
+
+Status:
+
+- Public NEWS and Knowledge list/detail pages have been redesigned on top of the
+  existing V2 public DTO routes.
+
+Routes actively preserved:
+
+- `v2.public.news.list`
+- `v2.public.knowledge.list`
+
+Runtime notes:
+
+- `public-news.html` uses `IROUP_V2.public.newsList()` for list rendering.
+- `public-news-detail.html` reads `?id=...`, loads the public NEWS list through the
+  same V2 public route, and renders the matching public record.
+- `public-knowledge.html` uses `IROUP_V2.public.knowledgeList()` for list rendering.
+- `public-knowledge-detail.html` reads `?id=...`, loads the public Knowledge list
+  through the same V2 public route, and renders the matching public record.
+- Public theme state is persisted in `localStorage.iroup_public_theme`.
+- Public language state is persisted in `localStorage.iroup_public_lang`.
+
+Safety rules reaffirmed:
+
+- NEWS and Knowledge public pages must consume public DTOs only.
+- Detail pages must not use admin detail routes.
+- Public files must remain governed by parent visibility, file visibility,
+  soft-delete status, and public-safe file role rules.
+- UI redesign must not change backend route contracts or public/private filtering.
+
+Current next frontend target:
+
+- `public-scholar.html` should be the next public redesign target.
+
+---
+
+## Contract Addendum - Public Scholarship Redesign
+
+Date: 2026-05-19
+
+Status:
+
+- Public Scholarship page has been redesigned on top of the existing V2 public DTO route.
+
+Route actively preserved:
+
+- `v2.public.scholarship.list`
+
+Runtime notes:
+
+- `public-scholar.html` uses `IROUP_V2.public.scholarshipList()` for list rendering.
+- Public theme state is persisted in `localStorage.iroup_public_theme`.
+- Public language state is persisted in `localStorage.iroup_public_lang`.
+- The redesign renders public scholarship records as opportunity cards with status,
+  deadline, days-left, type/funding/target tags, and public apply/file links.
+
+Safety rules reaffirmed:
+
+- Scholarship public page must consume public DTOs only.
+- Scholarship public page must not call admin routes.
+- Public files remain governed by public file visibility rules.
+- UI redesign must not change backend route contracts or public/private filtering.
+
+Current next frontend target:
+
+- `public-events.html`.
+
+---
+
+## Contract Addendum - Scholarship Article Content Fields
+
+Date: 2026-05-19
+
+Status:
+
+- Scholarship V2 contracts now support long-form public detail content.
+
+Schema/DTO additions:
+
+- `content_th`
+- `content_en`
+
+Affected surfaces:
+
+- `SCHOLARSHIP` sheet headers include `content_th` and `content_en`.
+- Admin Scholarship write payloads accept and persist `content_th` and `content_en`.
+- Admin Scholarship DTOs return `content_th` and `content_en`.
+- Public Scholarship DTOs return `content_th` and `content_en`.
+- `public-scholar.html` may use content fields as a summary/search fallback.
+- Future `public-scholar-detail.html` should render the selected record's content
+  fields as the main article-style body.
+
+Compatibility rule:
+
+- Existing V2 public route remains `v2.public.scholarship.list`.
+- No admin route should be used by public Scholarship pages.
+- No personal/private participant data is introduced into public Scholarship DTOs.
+
+Live sheet migration:
+
+- Existing deployed spreadsheets must run `addV2ScholarshipContentColumns()` before
+  relying on the admin form to persist `content_th` and `content_en`.
+
+---
+
+## Contract Addendum - Global Country Master
+
+Date: 2026-05-19
+
+Status:
+
+- `COUNTRY_MASTER` is prepared for complete global lookup use.
+
+Canonical ID rule:
+
+- Country IDs use `CTRY-{ISO_ALPHA_2}`.
+- Examples:
+  - `CTRY-TH`
+  - `CTRY-MY`
+  - `CTRY-GB`
+
+Supported fields:
+
+- `country_id`
+- `iso2`
+- `iso3`
+- `country_name_en`
+- `country_name_th`
+- `continent_en`
+- `continent_th`
+- `flag_emoji`
+- `search_alias`
+- `active`
+- `sort_order`
+
+Operational helper:
+
+- `upsertV2GlobalCountryMaster()` inserts/updates 249 ISO 3166-1 country/territory
+  rows.
+- Existing rows are updated in place by `country_id`.
+- Custom/test rows are preserved.
+
+Contract rule:
+
+- Admin forms and public DTOs should resolve country references through
+  `COUNTRY_MASTER.country_id`.
+- Public pages may render country names, continents, and flags from DTO country
+  objects, but must not rely on free-text country names as canonical keys.

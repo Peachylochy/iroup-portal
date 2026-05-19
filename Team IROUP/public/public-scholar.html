@@ -3,402 +3,485 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ทุนการศึกษา — iROUP</title>
+<title>ทุนการศึกษา | iROUP</title>
+<script>
+(function(){
+  var theme = localStorage.getItem('iroup_public_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --blue:#1A6DB5;--blue-light:#4BBDE8;--blue-pale:#E8F4FD;
-  --navy:#0F2D5A;--navy-dark:#071828;
-  --green:#5BAD3E;--green-pale:#EBF7E3;
-  --gold:#D4890A;--gold-pale:#FEF3DC;
-  --red:#D63B32;--red-pale:#FDECEA;
-  --gray-100:#F8F9FB;--gray-200:#EEF1F5;--gray-300:#DDE2EA;
-  --gray-400:#B8C2D0;--gray-600:#6B7A8D;--gray-800:#2D3748;
-  --white:#FFFFFF;
-  --shadow-sm:0 1px 4px rgba(15,45,90,0.08);
-  --shadow-md:0 4px 16px rgba(15,45,90,0.12);
-  --shadow-lg:0 8px 32px rgba(15,45,90,0.16);
+  --bg:#061526;--bg-2:#071d33;--surface:rgba(10,29,50,.82);--surface-2:rgba(14,38,64,.74);
+  --card:rgba(10,32,56,.88);--line:rgba(111,159,214,.22);--line-strong:rgba(93,178,255,.36);
+  --text:#f3f8ff;--soft:#c7d9ec;--muted:#8aa6c4;--dim:#5f7898;
+  --blue:#2387ff;--cyan:#2bd8ff;--violet:#8b5cf6;--gold:#f7b733;--green:#5ee38c;--red:#ff6b7a;
+  --shadow:0 24px 70px rgba(0,0,0,.28);--radius:18px;
+  --hero:url("../assets/scholarship-hero-dark.webp");
+}
+:root[data-theme="light"]{
+  --bg:#f6fbff;--bg-2:#eaf5ff;--surface:rgba(255,255,255,.88);--surface-2:rgba(246,251,255,.92);
+  --card:#fff;--line:rgba(31,84,142,.13);--line-strong:rgba(35,135,255,.24);
+  --text:#0d2542;--soft:#274461;--muted:#657991;--dim:#8a9aab;
+  --blue:#176fe8;--cyan:#21aee8;--violet:#7c3aed;--gold:#d99012;--green:#2ea85b;--red:#dc4254;
+  --shadow:0 18px 50px rgba(34,71,108,.13);
+  --hero:url("../assets/scholarship-hero-light.webp");
 }
 html{scroll-behavior:smooth}
-body{font-family:'Prompt',sans-serif;background:var(--gray-100);color:var(--navy)}
-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.nav-links{display:flex;align-items:center;gap:20px}
-.nav-link{font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent}
-.nav-link:hover{color:var(--blue)}
-.nav-link.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
-.nav-lang{display:flex;background:var(--gray-200);border-radius:8px;padding:3px;gap:2px}
-.nav-lang-btn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:var(--gray-600);transition:all .2s}
-.nav-lang-btn.active{background:var(--blue);color:#fff}
-.nav-admin-btn{padding:7px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:20px;font-size:12px;font-weight:700;color:#fff;text-decoration:none}
-
-/* HERO */
-.page-hero{background:linear-gradient(135deg, #EBF7E3 0%, #E8F6FD 50%, #FEF8EC 100%);padding:48px 5%}
-.page-hero h1{font-size:32px;font-weight:800;margin-bottom:8px}
-.page-hero p{font-size:14px;color:rgba(255,255,255,0.6);font-family:'Sarabun',sans-serif}
-.hero-kpi{display:flex;gap:32px;margin-top:24px}
-.hkpi-num{font-size:36px;font-weight:900;color:#7BC842;letter-spacing:-1px}
-.hkpi-label{font-size:11px;color:rgba(255,255,255,0.5);font-family:'Sarabun',sans-serif;margin-top:2px}
-
-.content{padding:32px 5%;max-width:1400px;margin:0 auto;width:100%}
-
-/* FILTER */
-.filter-bar{background:var(--white);border-radius:12px;padding:14px 18px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px}
-.search-wrap{flex:1;position:relative;min-width:200px}
-.search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:'Prompt',sans-serif;outline:none;transition:border .15s}
-.search-wrap input:focus{border-color:var(--blue-light)}
-.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px}
-.filter-select{padding:8px 12px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:12px;font-family:'Prompt',sans-serif;outline:none;background:var(--white);cursor:pointer}
-.pills{display:flex;gap:5px;flex-wrap:wrap}
-.pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-300);color:var(--gray-600);background:var(--white);transition:all .2s;font-family:'Sarabun',sans-serif}
-.pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-
-/* SECTION LABEL */
-.section-label{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:6px;padding-bottom:8px;border-bottom:2px solid var(--blue-pale)}
-
-/* CARDS GRID */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:32px}
-.scholar-card{background:var(--white);border-radius:16px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);overflow:hidden;transition:all .25s;cursor:pointer}
-.scholar-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
-.card-poster{height:118px;background:var(--blue-pale);overflow:hidden;position:relative}
-.card-poster img{width:100%;height:100%;object-fit:cover;display:block}
-.card-poster-fallback{height:100%;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--blue);background:linear-gradient(135deg,var(--blue-pale),#fff)}
-.card-actions{padding:0 16px 12px;display:flex;gap:6px;flex-wrap:wrap}
-.card-action-btn{font-size:11px;font-weight:700;text-decoration:none;border-radius:8px;padding:5px 10px;background:var(--blue-pale);color:var(--blue);font-family:'Sarabun',sans-serif}
-.card-action-btn.file{background:var(--green-pale);color:var(--green)}
-
-.card-top{padding:16px;display:flex;align-items:flex-start;gap:12px}
-.card-flag{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
-.card-info{flex:1}
-.card-name{font-size:13px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:3px}
-.card-org{font-size:11px;color:var(--gray-600);font-family:'Sarabun',sans-serif}
-.card-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;font-family:'Sarabun',sans-serif;white-space:nowrap;flex-shrink:0}
-.s-open{background:var(--green-pale);color:var(--green)}
-.s-upcoming{background:var(--blue-pale);color:var(--blue)}
-.s-closed{background:var(--gray-200);color:var(--gray-600)}
-.card-covers{padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:4px}
-.cover-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--blue-pale);color:var(--blue);font-weight:500;font-family:'Sarabun',sans-serif}
-.card-level{font-size:10px;padding:2px 7px;border-radius:4px;background:#F0EBFF;color:#7C3AED;font-weight:600;font-family:'Sarabun',sans-serif}
-.card-footer{padding:10px 16px;background:var(--gray-100);border-top:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
-.card-deadline{font-size:11px;color:var(--gray-600);font-family:'Sarabun',sans-serif}
-.days-urgent{font-size:11px;font-weight:700;color:var(--red)}
-.days-soon{font-size:11px;font-weight:700;color:var(--gold)}
-.days-ok{font-size:11px;font-weight:700;color:var(--green)}
-
-/* PIN badge */
-.pin-badge{position:absolute;top:8px;right:8px;background:var(--gold-pale);color:var(--gold);font-size:12px;padding:2px 6px;border-radius:6px}
-
-.loading{text-align:center;padding:40px;color:var(--gray-400);font-family:'Sarabun',sans-serif}
-footer{background:var(--navy-dark);padding:24px 5%;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;font-family:'Sarabun',sans-serif;margin-top:40px}
-
-
-
-
-  50%{transform:translateY(-15px) scale(1.05)}
-}
-
-
-
-
-
-100%{background-position:-200% 0}}
-
-
-
-
-
-
-
-.page-hero, 
-/* Remove dark overlay */
-.page-hero::after, 
-.page-hero::before, 
-
-/* Light glass orbs */
-
-  50%{transform:translateY(-15px) scale(1.05)}
-}
-
-
-
-/* KPI on light hero */
-
-.hkpi-label { color: rgba(15,45,90,0.6) !important; }
-.page-hero h1 { color: var(--navy-dark) !important; }
-.page-hero p { color: var(--gray-600) !important; }
-.page-hero .hkpi-num { filter: none; }
-
+body{min-height:100vh;background:
+  radial-gradient(circle at 80% 10%,rgba(35,135,255,.18),transparent 28%),
+  linear-gradient(180deg,var(--bg),#04101d 55%,var(--bg));color:var(--text);font-family:'Prompt',sans-serif;letter-spacing:0}
+:root[data-theme="light"] body{background:linear-gradient(180deg,#fbfdff 0%,#f5faff 46%,#fff 100%)}
+a{color:inherit}
+.topbar{position:sticky;top:0;z-index:100;height:62px;padding:0 4%;display:flex;align-items:center;justify-content:space-between;background:rgba(4,14,27,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .topbar{background:rgba(255,255,255,.86)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{height:32px;width:auto;display:block}.brand-fallback{display:none;color:var(--text);font-weight:900}
+.nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.nav a,.theme-toggle,.lang-btn{border:1px solid transparent;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;color:var(--soft);background:transparent;cursor:pointer;text-decoration:none}
+.nav a:hover,.nav a.active{background:rgba(35,135,255,.14);border-color:rgba(35,135,255,.28);color:var(--text)}
+.lang{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:3px}
+:root[data-theme="light"] .lang{background:#fff}.lang-btn{padding:6px 10px}.lang-btn.active{background:var(--blue);color:#fff}
+.theme-toggle{background:rgba(255,255,255,.06);border-color:var(--line);min-width:58px}:root[data-theme="light"] .theme-toggle{background:#fff}.admin-link{background:rgba(35,135,255,.18)!important;border-color:rgba(35,135,255,.3)!important}
+.hero{position:relative;overflow:hidden;min-height:316px;padding:54px 5% 48px;background-image:linear-gradient(90deg,rgba(6,18,33,.98) 0%,rgba(6,18,33,.74) 34%,rgba(6,18,33,.08) 74%),var(--hero);background-size:cover;background-position:center right;border-bottom:1px solid var(--line)}
+:root[data-theme="light"] .hero{background-image:linear-gradient(90deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.72) 34%,rgba(255,255,255,.08) 74%),var(--hero)}
+.hero-inner{position:relative;z-index:1;width:min(1440px,90%);margin:0 auto}
+.hero h1{font-size:clamp(30px,3.2vw,46px);line-height:1.12;font-weight:900;letter-spacing:0;color:var(--text);max-width:720px;overflow-wrap:anywhere}
+.lead{margin-top:10px;color:var(--muted);font-family:'Sarabun',sans-serif;font-size:16px;max-width:760px;line-height:1.65}
+.hero-kpis{display:flex;gap:44px;margin-top:28px;flex-wrap:wrap}
+.hero-kpis>div{min-width:78px}
+.kpi-num{font-size:40px;line-height:1;font-weight:900;letter-spacing:0}.kpi-num.total{color:var(--green)}.kpi-num.open{color:var(--gold)}.kpi-num.soon{color:var(--cyan)}
+.kpi-label{font-size:12px;color:var(--muted);font-weight:800;margin-top:8px;font-family:'Sarabun',sans-serif}
+.shell{width:min(1440px,90%);margin:0 auto;padding:28px 0 58px}
+.filter-bar{display:grid;grid-template-columns:minmax(260px,1fr) minmax(150px,190px) minmax(130px,170px) auto;gap:10px;align-items:center;background:rgba(12,27,45,.82);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);margin:-6px auto 26px}
+:root[data-theme="light"] .filter-bar{background:#fff}
+.input-wrap{position:relative}.input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cyan);font-size:14px}.input,.select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.04);color:var(--text);font-family:'Prompt',sans-serif;font-weight:700;font-size:12px;outline:none;padding:0 12px}
+.input{padding-left:40px}.input::placeholder{color:var(--muted)}.select option{color:#10253d;background:#fff}:root[data-theme="light"] .input,:root[data-theme="light"] .select{background:#fff;color:var(--text)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}.pill{height:36px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--soft);font-family:'Prompt',sans-serif;font-size:11px;font-weight:900;padding:0 12px;cursor:pointer}.pill.active{background:var(--blue);border-color:var(--blue);color:#fff}.pill:hover{border-color:var(--line-strong)}
+.section{margin-top:26px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.section-title{font-size:15px;font-weight:900;display:flex;gap:9px;align-items:center}.section-count{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:12px;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}.card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,25,44,.9));box-shadow:0 18px 52px rgba(0,0,0,.16);transition:transform .2s,box-shadow .2s,border-color .2s}
+:root[data-theme="light"] .card{background:#fff;box-shadow:0 14px 42px rgba(31,84,142,.12)}.card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
+.poster{height:178px;overflow:hidden;background:linear-gradient(135deg,rgba(35,135,255,.12),rgba(139,92,246,.16));display:grid;place-items:center;color:var(--cyan);font-size:42px;font-weight:900}
+.poster img{width:100%;height:100%;object-fit:cover;display:block}.pin{position:absolute;top:12px;right:12px;border-radius:999px;background:rgba(247,183,51,.16);border:1px solid rgba(247,183,51,.3);color:var(--gold);font-size:11px;font-weight:900;padding:5px 9px}
+.card-body{padding:16px}.card-main{display:flex;gap:12px;align-items:flex-start}.card-text{min-width:0;flex:1}.card h3{font-size:16px;line-height:1.35;font-weight:900;color:var(--text);margin-bottom:6px}.meta-line{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:13px;line-height:1.45}
+.country-flag{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--line);font-size:15px;vertical-align:middle;margin-right:6px}
+.status{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;white-space:nowrap}.status.open{background:rgba(46,168,91,.16);color:var(--green)}.status.upcoming{background:rgba(35,135,255,.16);color:var(--cyan)}.status.closed{background:rgba(127,145,166,.16);color:var(--muted)}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.tag{border-radius:8px;padding:5px 9px;background:rgba(35,135,255,.13);color:var(--cyan);font-size:11px;font-weight:800;font-family:'Sarabun',sans-serif}.tag.level{background:rgba(139,92,246,.15);color:#bba6ff}.tag.funding{background:rgba(46,168,91,.14);color:var(--green)}
+.summary{font-family:'Sarabun',sans-serif;color:var(--soft);font-size:13px;line-height:1.6;margin-top:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.action{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;text-decoration:none;padding:8px 11px;font-size:12px;font-weight:900;color:var(--soft);background:rgba(255,255,255,.04)}.action.primary{background:rgba(46,168,91,.16);border-color:rgba(46,168,91,.28);color:var(--green)}:root[data-theme="light"] .action{background:#f7fbff}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:14px;padding-top:12px;font-family:'Sarabun',sans-serif;font-size:12px;color:var(--muted)}.days{font-weight:900}.days.urgent{color:var(--red)}.days.soon{color:var(--gold)}.days.ok{color:var(--green)}
+.state{padding:44px 18px;text-align:center;color:var(--muted);font-family:'Sarabun',sans-serif;background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius);grid-column:1/-1}.spinner{width:30px;height:30px;border-radius:50%;border:4px solid rgba(35,135,255,.16);border-top-color:var(--blue);animation:spin 1s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}
+footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:var(--dim);font-family:'Sarabun',sans-serif;font-size:12px}
+@media(max-width:980px){.topbar{height:auto;min-height:64px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.nav{max-width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start}.filter-bar{grid-template-columns:1fr}.hero-inner,.shell{width:92%}.hero-kpis{gap:28px}.section-head{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:1fr}}
+@media(max-width:640px){.hero{padding:34px 4%;min-height:280px}.cards{grid-template-columns:1fr}.poster{height:172px}.nav{width:100%}.card-main{flex-direction:column}.status{align-self:flex-start}.card-foot{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
+<header class="topbar">
+  <a class="brand" href="public-landing.html"><img src="../assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="brand-fallback">iROUP</span></a>
+  <nav class="nav" aria-label="Public navigation">
+    <a href="public-news.html" data-i18n="navNews">ข่าวสาร</a>
+    <a href="public-knowledge.html" data-i18n="navKnowledge">คลังความรู้</a>
+    <a class="active" href="public-scholar.html" data-i18n="navScholar">ทุนการศึกษา</a>
+    <a href="public-events.html" data-i18n="navEvents">กิจกรรม</a>
+    <a href="public-mou.html">MOU</a>
+    <a href="public-mobility.html">Mobility</a>
+    <span class="lang"><button class="lang-btn active" type="button" data-lang="TH" onclick="setLang('TH')">TH</button><button class="lang-btn" type="button" data-lang="EN" onclick="setLang('EN')">EN</button></span>
+    <button class="theme-toggle" type="button" id="themeToggle" onclick="toggleTheme()">Dark</button>
+    <a class="admin-link" href="../scholarship.html" data-i18n="admin">Admin</a>
+  </nav>
+</header>
 
-<nav>
-  <a class="nav-logo" href="public-landing.html">
-    <img src="../assets/iroup-logo.png" alt="iROUP" style="height:34px;object-fit:contain" onerror="this.style.display='none'">
-  </a>
-  <div class="nav-links">
-    <a href="public-mou.html" class="nav-link">🤝 MOU</a>
-    <a href="public-scholar.html" class="nav-link active">🎓 ทุนการศึกษา</a>
-    <a href="public-events.html" class="nav-link">📅 กิจกรรม</a>
-    <a href="public-mobility.html" class="nav-link">👥 Mobility</a>
-    <div class="nav-lang">
-      <div class="nav-lang-btn active" onclick="setLang('TH')">TH</div>
-      <div class="nav-lang-btn" onclick="setLang('EN')">EN</div>
-    </div>
-    <a href="index.html" class="nav-admin-btn">🔐 Admin</a>
-  </div>
-</nav>
-
-<div class="page-hero">
-  <h1>🎓 ทุนการศึกษาต่างประเทศ</h1>
-  <p>ทุนการศึกษาสำหรับนิสิตและบุคลากร มหาวิทยาลัยพะเยา · International Scholarships</p>
-  <div class="hero-kpi">
-    <div><div class="hkpi-num" id="kpi-total">—</div><div class="hkpi-label">ทุนทั้งหมด</div></div>
-    <div><div class="hkpi-num" style="color:#F5A623" id="kpi-open">—</div><div class="hkpi-label">กำลังรับสมัคร</div></div>
-    <div><div class="hkpi-num" style="color:#4BBDE8" id="kpi-upcoming">—</div><div class="hkpi-label">เร็วๆ นี้</div></div>
-  </div>
-</div>
-
-<div class="content">
-  <!-- FILTER -->
-  <div class="filter-bar">
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="ค้นหาชื่อทุน หรือสถาบัน..." oninput="renderCards()">
-    </div>
-    <select class="filter-select" id="countryFilter" onchange="renderCards()">
-      <option value="">ทุกประเทศ</option>
-    </select>
-    <select class="filter-select" id="levelFilter" onchange="renderCards()">
-      <option value="">ทุกระดับ</option>
-      <option>ป.ตรี</option><option>ป.โท</option><option>ป.เอก</option><option>บุคลากร</option>
-    </select>
-    <div class="pills">
-      <div class="pill on" onclick="setPill(this,'')">ทั้งหมด</div>
-      <div class="pill" onclick="setPill(this,'open')">รับสมัคร</div>
-      <div class="pill" onclick="setPill(this,'upcoming')">เร็วๆ นี้</div>
-      <div class="pill" onclick="setPill(this,'closed')">ปิดแล้ว</div>
+<section class="hero">
+  <div class="hero-inner">
+    <h1 data-i18n="heroTitle">ทุนการศึกษาต่างประเทศ</h1>
+    <p class="lead" data-i18n="heroLead">ทุนการศึกษาสำหรับนิสิตและบุคลากร มหาวิทยาลัยพะเยา · International Scholarships</p>
+    <div class="hero-kpis" aria-label="Scholarship summary">
+      <div><div class="kpi-num total" id="kpiTotal">-</div><div class="kpi-label" data-i18n="kpiTotal">ทุนทั้งหมด</div></div>
+      <div><div class="kpi-num open" id="kpiOpen">-</div><div class="kpi-label" data-i18n="kpiOpen">กำลังเปิดสมัคร</div></div>
+      <div><div class="kpi-num soon" id="kpiUpcoming">-</div><div class="kpi-label" data-i18n="kpiUpcoming">เร็วๆ นี้</div></div>
     </div>
   </div>
+</section>
 
-  <!-- OPEN SCHOLARSHIPS -->
-  <div id="openSection">
-    <div class="section-label">🔥 กำลังรับสมัครตอนนี้</div>
-    <div class="cards-grid" id="openCards"><div class="loading">⏳ กำลังโหลด...</div></div>
-  </div>
+<main class="shell">
+  <section class="filter-bar" aria-label="Scholarship filters">
+    <div class="input-wrap">
+      <span class="input-icon" aria-hidden="true">⌕</span>
+      <input class="input" id="searchInput" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="ค้นหาชื่อทุน หรือสถาบัน..." oninput="onFilterChange()">
+    </div>
+    <select class="select" id="countryFilter" onchange="onFilterChange()"><option value="" data-i18n="allCountries">ทุกประเทศ</option></select>
+    <select class="select" id="levelFilter" onchange="onFilterChange()"><option value="" data-i18n="allLevels">ทุกระดับ</option></select>
+    <div class="pills" role="tablist" aria-label="Status filter">
+      <button class="pill active" type="button" data-status="" onclick="setStatusFilter('')" data-i18n="all">ทั้งหมด</button>
+      <button class="pill" type="button" data-status="open" onclick="setStatusFilter('open')" data-i18n="openNow">รับสมัคร</button>
+      <button class="pill" type="button" data-status="upcoming" onclick="setStatusFilter('upcoming')" data-i18n="upcoming">เร็วๆ นี้</button>
+      <button class="pill" type="button" data-status="closed" onclick="setStatusFilter('closed')" data-i18n="closed">ปิดแล้ว</button>
+    </div>
+  </section>
 
-  <!-- ALL SCHOLARSHIPS -->
-  <div id="allSection">
-    <div class="section-label">📋 ทุนทั้งหมด</div>
-    <div class="cards-grid" id="allCards"></div>
-  </div>
-</div>
+  <section class="section" id="openSection">
+    <div class="section-head">
+      <h2 class="section-title"><span aria-hidden="true">🔥</span><span data-i18n="openSection">กำลังรับสมัครตอนนี้</span></h2>
+      <div class="section-count" id="openCount"></div>
+    </div>
+    <div class="cards" id="openCards"><div class="state"><div class="spinner"></div><span data-i18n="loading">กำลังโหลดทุน...</span></div></div>
+  </section>
 
-<footer>© 2569 International Relations Office · University of Phayao</footer>
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title"><span aria-hidden="true">▣</span><span data-i18n="allSection">ทุนทั้งหมด</span></h2>
+      <div class="section-count" id="resultCount"></div>
+    </div>
+    <div class="cards" id="allCards"></div>
+  </section>
+</main>
+
+<footer>© 2569 International Relations Office - University of Phayao</footer>
 
 <script src="../js/iroup-config.js"></script>
 <script src="../js/iroup-v2-endpoint.js"></script>
 <script src="../js/iroup-v2-api.js"></script>
 <script>
-let allScholar = [];
-let currentFilter = '';
-const FLAGS = {'Japan':'🇯🇵','China':'🇨🇳','South Korea':'🇰🇷','Germany':'🇩🇪','Australia':'🇦🇺','France':'🇫🇷','USA':'🇺🇸','Taiwan':'🇹🇼','Thailand':'🇹🇭','Netherlands':'🇳🇱'};
-const BG = {'Japan':'#E8F4FD','China':'#FDECEA','South Korea':'#EBF7E3','Germany':'#F0EBFF','Australia':'#FEF3DC','France':'#E0F7F5','USA':'#DBEAFE','Taiwan':'#F3F0FF'};
+var allScholarships = [];
+var currentLang = normalizeLang(localStorage.getItem('iroup_public_lang') || 'TH');
+var currentStatus = '';
 
-async function loadData() {
-  try {
-    // V2 pilot: primary public scholarship data now flows through the isolated V2 adapter.
-    // Rendering below still uses the existing page-local compatibility shape.
-    const response = await IROUP_V2.public.scholarshipList();
-    if (!response.success) throw new Error(response.error || 'V2 scholarship API error');
-    const data = (response.data || []).map(normalizePublicScholarship);
-    allScholar = data.sort((a,b) => {
-      // Pin ขึ้นก่อน
-      if (a['Pin'] === 'TRUE' && b['Pin'] !== 'TRUE') return -1;
-      if (b['Pin'] === 'TRUE' && a['Pin'] !== 'TRUE') return 1;
-      return 0;
-    });
+var I18N = {
+  TH: {
+    navNews:'ข่าวสาร',navKnowledge:'คลังความรู้',navScholar:'ทุนการศึกษา',navEvents:'กิจกรรม',admin:'Admin',
+    heroTitle:'ทุนการศึกษาต่างประเทศ',
+    heroLead:'ทุนการศึกษาสำหรับนิสิตและบุคลากร มหาวิทยาลัยพะเยา · International Scholarships',
+    kpiTotal:'ทุนทั้งหมด',kpiOpen:'กำลังเปิดสมัคร',kpiUpcoming:'เร็วๆ นี้',
+    searchPlaceholder:'ค้นหาชื่อทุน หรือสถาบัน...',allCountries:'ทุกประเทศ',allLevels:'ทุกระดับ',
+    all:'ทั้งหมด',openNow:'รับสมัคร',upcoming:'เร็วๆ นี้',closed:'ปิดแล้ว',
+    openSection:'กำลังรับสมัครตอนนี้',allSection:'ทุนทั้งหมด',loading:'กำลังโหลดทุน...',
+    noOpen:'ยังไม่มีทุนที่กำลังรับสมัคร',noData:'ไม่พบข้อมูลทุนตามเงื่อนไขที่เลือก',loadFail:'ไม่สามารถโหลดข้อมูลทุนได้',
+    items:'รายการ',detail:'อ่านรายละเอียด',apply:'สมัครทุน',file:'ไฟล์แนบ',deadline:'ปิดรับ',daysLeft:'เหลือ',days:'วัน',
+    openStatus:'กำลังรับสมัคร',upcomingStatus:'ยังไม่เปิดรับ',closedStatus:'ปิดรับแล้ว',
+    noDeadline:'ไม่ระบุวันปิดรับ',themeDark:'Dark',themeLight:'Light'
+  },
+  EN: {
+    navNews:'News',navKnowledge:'Knowledge',navScholar:'Scholarships',navEvents:'Events',admin:'Admin',
+    heroTitle:'International Scholarships',
+    heroLead:'Scholarship opportunities for students and staff at the University of Phayao.',
+    kpiTotal:'Total',kpiOpen:'Open Now',kpiUpcoming:'Upcoming',
+    searchPlaceholder:'Search scholarship or institution...',allCountries:'All Countries',allLevels:'All Levels',
+    all:'All',openNow:'Open',upcoming:'Upcoming',closed:'Closed',
+    openSection:'Open for Applications',allSection:'All Scholarships',loading:'Loading scholarships...',
+    noOpen:'No scholarships are open right now.',noData:'No scholarships match the selected filters.',loadFail:'Unable to load scholarship data',
+    items:'items',detail:'Details',apply:'Apply',file:'Attachment',deadline:'Deadline',daysLeft:'left',days:'days',
+    openStatus:'Open',upcomingStatus:'Upcoming',closedStatus:'Closed',
+    noDeadline:'No deadline',themeDark:'Dark',themeLight:'Light'
+  }
+};
 
-    // KPI
-    const today = new Date();
-    const open = data.filter(s => {
-      const st = IROUP.getScholarStatus(s['วันเปิดรับ'], s['วันปิดรับ']);
-      return st.status === 'open';
-    }).length;
-    const upcoming = data.filter(s => {
-      const st = IROUP.getScholarStatus(s['วันเปิดรับ'], s['วันปิดรับ']);
-      return st.status === 'upcoming';
-    }).length;
+document.addEventListener('DOMContentLoaded', function(){
+  applyLanguage(false);
+  applyTheme();
+  loadScholarships();
+});
 
-    document.getElementById('kpi-total').textContent    = data.length;
-    document.getElementById('kpi-open').textContent     = open;
-    document.getElementById('kpi-upcoming').textContent = upcoming;
-
-    // Country filter
-    const countries = [...new Set(data.map(s => s['ประเทศ']).filter(Boolean))].sort();
-    const sel = document.getElementById('countryFilter');
-    countries.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c; opt.textContent = `${FLAGS[c]||'🌍'} ${c}`;
-      sel.appendChild(opt);
-    });
-
-    renderCards();
-  } catch(e) {
-    document.getElementById('openCards').innerHTML = '<div class="loading">⚠️ ไม่สามารถโหลดข้อมูลได้</div>';
+async function loadScholarships(){
+  document.getElementById('openCards').innerHTML = '<div class="state"><div class="spinner"></div>' + esc(t('loading')) + '</div>';
+  document.getElementById('allCards').innerHTML = '';
+  try{
+    var response = await IROUP_V2.public.scholarshipList();
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public scholarship API error');
+    allScholarships = normalizeList(response).map(normalizeScholarship).filter(function(item){ return item.id; }).sort(sortScholarships);
+    populateFilters();
+    updateKpis();
+    renderScholarships();
+  }catch(error){
+    document.getElementById('openCards').innerHTML = '<div class="state">' + esc(t('loadFail')) + '<br>' + esc(error.message || String(error)) + '</div>';
+    document.getElementById('allCards').innerHTML = '';
+    document.getElementById('resultCount').textContent = '0 ' + t('items');
+    document.getElementById('openCount').textContent = '';
   }
 }
 
-function normalizePublicScholarship(row) {
-  const country = normalizePublicCountryName(row.country);
-  const fileUrl = firstPublicFileUrl(row.files);
+function normalizeList(response){
+  if(Array.isArray(response.data)) return response.data;
+  if(response.data && Array.isArray(response.data.items)) return response.data.items;
+  return [];
+}
+
+function normalizeScholarship(row){
+  var files = flattenFiles(row.files);
   return {
-    ID: row.scholarship_id || '',
-    'ชื่อทุน': row.title_th || row.title_en || row.title || '',
-    'ประเทศ': country || row.country || '',
-    'สถาบัน': row.institution_name || row.institution || '',
-    'ระดับ': row.target_group || row.scholarship_type || row.level || '',
-    'วันประชาสัมพันธ์': row.publish_date || '',
-    'วันเปิดรับ': row.open_date || row.start_date || '',
-    'วันปิดรับ': row.close_date || row.end_date || '',
-    'ครอบคลุม': row.cover_summary || row.coverage_th || row.coverage_en || row.coverage || '',
-    Link: row.apply_url || row.detail_url || row.link_url || '',
-    Poster_URL: row.poster_url || firstPublicImageUrl(row.files) || '',
-    'ไฟล์_URL': row.public_file_url || fileUrl || '',
-    Pin: isPublicTruthy(row.pin) ? 'TRUE' : '',
-    public_status: row.status || ''
+    id: row.scholarship_id || row.id || '',
+    title_th: row.title_th || row.title || '',
+    title_en: row.title_en || row.title || row.title_th || '',
+    institution: row.institution_name || row.institution || '',
+    country: countryName(row.country),
+    country_name_en: countryName(row.country, 'EN'),
+    country_name_th: countryName(row.country, 'TH'),
+    country_flag: countryFlag(row.country),
+    country_id: countryId(row.country) || row.country_id || '',
+    scholarship_type: row.scholarship_type || '',
+    funding_type: row.funding_type || '',
+    target_group: row.target_group || row.level || '',
+    cover_summary: row.cover_summary || '',
+    coverage_th: row.coverage_th || row.coverage || '',
+    coverage_en: row.coverage_en || row.coverage || '',
+    content_th: row.content_th || '',
+    content_en: row.content_en || '',
+    publish_date: row.publish_date || '',
+    open_date: row.open_date || row.start_date || '',
+    close_date: row.close_date || row.end_date || '',
+    detail_url: row.detail_url || row.link_url || '',
+    apply_url: row.apply_url || '',
+    link_url: row.link_url || '',
+    status_raw: row.status || '',
+    pin: truthy(row.pin),
+    files: files,
+    poster: posterUrl(files)
   };
 }
 
-function normalizePublicCountryName(country) {
-  if (!country || typeof country !== 'object') return '';
-  return country.country_name_en || country.country_name_th || country.country_id || '';
+function countryName(country, lang){
+  if(!country) return '';
+  if(typeof country === 'string') return country;
+  var preferEn = String(lang || currentLang || '').toUpperCase() === 'EN';
+  return preferEn
+    ? (country.country_name_en || country.name_en || country.country_name_th || country.name_th || country.country_id || '')
+    : (country.country_name_th || country.name_th || country.country_name_en || country.name_en || country.country_id || '');
 }
-
-function firstPublicFileUrl(files) {
-  const list = Array.isArray(files) ? files : [];
-  const found = list.find(file => file && file.file_url);
-  return found ? found.file_url : '';
+function countryId(country){
+  if(!country || typeof country !== 'object') return '';
+  return country.country_id || country.iso2 || country.iso3 || '';
 }
-
-function firstPublicImageUrl(files) {
-  const list = Array.isArray(files) ? files : [];
-  const found = list.find(file => {
-    const mime = String(file && file.mime_type || '').toLowerCase();
-    return file && file.file_url && mime.indexOf('image/') === 0;
+function countryFlag(country){
+  if(!country || typeof country !== 'object') return '';
+  return country.flag_emoji || '';
+}
+function displayCountry(item){
+  var name = currentLang === 'EN' ? (item.country_name_en || item.country) : (item.country_name_th || item.country_name_en || item.country);
+  return [item.country_flag, name].filter(Boolean).join(' ');
+}
+function countryKey(item){
+  return item.country_id || item.country_name_en || item.country_name_th || item.country || '';
+}
+function flattenFiles(files){
+  if(!files) return [];
+  if(Array.isArray(files)) return files.filter(Boolean);
+  if(typeof files !== 'object') return [];
+  return Object.keys(files).reduce(function(acc,key){ return acc.concat(Array.isArray(files[key]) ? files[key] : []); }, []).filter(Boolean);
+}
+function posterUrl(files){
+  var poster = files.find(function(file){
+    var role = fileRoleKey(file);
+    var mime = String(file.mime_type || '').toLowerCase();
+    return (role === 'poster' || role === 'cover' || role === 'image' || mime.indexOf('image/') === 0) && (file.thumbnail_url || file.file_url || file.url);
   });
-  return found ? found.file_url : '';
+  return poster ? previewUrl(poster.thumbnail_url || poster.file_url || poster.url) : '';
 }
-
-function isPublicTruthy(value) {
-  return ['true', 'yes', 'y', '1', 'pin', 'pinned'].includes(String(value || '').trim().toLowerCase());
+function publicFile(files){
+  return files.find(function(file){
+    if(!file || !(file.file_url || file.url)) return false;
+    var role = fileRoleKey(file);
+    var mime = String(file.mime_type || '').toLowerCase();
+    if(role === 'poster' || role === 'cover' || role === 'image') return false;
+    if(mime.indexOf('image/') === 0) return false;
+    return true;
+  }) || null;
 }
-
-
-function escHtml(v){
-  return String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function fileRoleKey(file){
+  var raw = String(file.file_role_id || file.role_id || file.role || file.file_role_name || '').toLowerCase();
+  if(raw.indexOf('poster') >= 0) return 'poster';
+  if(raw.indexOf('cover') >= 0) return 'cover';
+  if(raw.indexOf('image') >= 0 || raw.indexOf('banner') >= 0) return 'image';
+  if(raw.indexOf('attach') >= 0 || raw.indexOf('pdf') >= 0 || raw.indexOf('document') >= 0) return 'attachment';
+  return raw;
 }
-function fixDriveUrl(url){
-  const u = String(url || '').trim();
-  if(!u || u === '-' || u.toLowerCase() === 'undefined' || u.toLowerCase() === 'null') return '';
-  // Google Drive /file/d/xxx/view links do not always render in <img>.
-  // Use thumbnail endpoint for image previews; keep original URL only for file buttons.
-  const m = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
-  if(m && m[1]) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1200`;
-  return u;
+function previewUrl(url){
+  var u = String(url || '').trim();
+  var match = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
+  return match && match[1] ? 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1200' : u;
 }
-function linkBtn(url,label,extraClass=''){
-  const u = String(url || '').trim();
-  if(!u || u === '-' || u.toLowerCase() === 'undefined' || u.toLowerCase() === 'null') return '';
-  return `<a href="${escHtml(u)}" target="_blank" rel="noopener" class="card-action-btn ${extraClass}">${label}</a>`;
-}
+function truthy(value){ return ['true','yes','y','1','pin','pinned'].indexOf(String(value || '').trim().toLowerCase()) >= 0; }
 
-function renderCards() {
-  const q       = document.getElementById('searchInput').value.toLowerCase();
-  const country = document.getElementById('countryFilter').value;
-  const level   = document.getElementById('levelFilter').value;
-
-  let filtered = allScholar.filter(s => {
-    const matchQ  = !q || (s['ชื่อทุน']+s['สถาบัน']).toLowerCase().includes(q);
-    const matchC  = !country || s['ประเทศ'] === country;
-    const matchL  = !level || (s['ระดับ']||'').includes(level);
-    const st      = IROUP.getScholarStatus(s['วันเปิดรับ'], s['วันปิดรับ']);
-    const matchS  = !currentFilter || st.status === currentFilter;
-    return matchQ && matchC && matchL && matchS;
-  });
-
-  const open   = filtered.filter(s => IROUP.getScholarStatus(s['วันเปิดรับ'], s['วันปิดรับ']).status === 'open');
-  const others = filtered.filter(s => IROUP.getScholarStatus(s['วันเปิดรับ'], s['วันปิดรับ']).status !== 'open');
-
-  document.getElementById('openSection').style.display = open.length > 0 ? 'block' : 'none';
-  document.getElementById('openCards').innerHTML = open.map(s => cardHTML(s)).join('') || '<div class="loading">ไม่มีทุนที่กำลังรับสมัคร</div>';
-  document.getElementById('allCards').innerHTML  = others.map(s => cardHTML(s)).join('') || '<div class="loading">ไม่พบข้อมูล</div>';
-}
-
-function cardHTML(s) {
-  const st      = IROUP.getScholarStatus(s['วันเปิดรับ'], s['วันปิดรับ']);
-  const flag    = FLAGS[s['ประเทศ']] || '🌍';
-  const bg      = BG[s['ประเทศ']] || '#F8F9FB';
-  const covers  = (s['ครอบคลุม']||'').split(',').map(x=>x.trim()).filter(Boolean);
-  const isPinned = s['Pin'] === 'TRUE';
-  const poster = fixDriveUrl(s['Poster_URL']);
-  const fileUrl = s['ไฟล์_URL'];
-  const linkUrl = s['Link'];
-
-  let statusClass = 's-closed', statusLabel = 'ปิดรับแล้ว';
-  if (st.status === 'open')     { statusClass = 's-open';     statusLabel = st.label || 'เปิดรับ'; }
-  if (st.status === 'upcoming') { statusClass = 's-upcoming'; statusLabel = st.label || 'ยังไม่เปิดรับ'; }
-
-  let daysHTML = '';
-  if (st.daysLeft !== null && st.daysLeft !== undefined) {
-    const cls = st.daysLeft <= 3 ? 'days-urgent' : st.daysLeft <= 10 ? 'days-soon' : 'days-ok';
-    daysHTML = `<span class="${cls}">⏰ เหลือ ${st.daysLeft} วัน</span>`;
+function scholarshipStatus(item){
+  var openDate = parseDate(item.open_date);
+  var closeDate = parseDate(item.close_date);
+  var today = startOfDay(new Date());
+  if(openDate && today < openDate) return {status:'upcoming',daysLeft:null,label:t('upcomingStatus')};
+  if(closeDate && today > closeDate) return {status:'closed',daysLeft:null,label:t('closedStatus')};
+  if(closeDate){
+    var diff = Math.max(0, Math.ceil((closeDate - today) / 86400000));
+    return {status:'open',daysLeft:diff,label:t('openStatus')};
   }
+  var raw = String(item.status_raw || '').toLowerCase();
+  if(raw === 'active' || raw === 'open') return {status:'open',daysLeft:null,label:t('openStatus')};
+  if(raw === 'upcoming') return {status:'upcoming',daysLeft:null,label:t('upcomingStatus')};
+  return {status: raw === 'closed' || raw === 'expired' ? 'closed' : 'open', daysLeft:null, label: raw === 'closed' || raw === 'expired' ? t('closedStatus') : t('openStatus')};
+}
+function parseDate(value){
+  if(!value) return null;
+  var d = new Date(value);
+  if(Number.isNaN(d.getTime())) return null;
+  return startOfDay(d);
+}
+function startOfDay(date){ return new Date(date.getFullYear(), date.getMonth(), date.getDate()); }
 
-  return `<div class="scholar-card" style="position:relative">
-    ${isPinned ? '<div class="pin-badge">📌</div>' : ''}
-    <div class="card-poster">
-      ${poster ? `<img src="${escHtml(poster)}" alt="${escHtml(s['ชื่อทุน']||'poster')}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;card-poster-fallback&quot;>${flag}</div>'">` : `<div class="card-poster-fallback" style="background:${bg}">${flag}</div>`}
-    </div>
-    <div class="card-top">
-      <div class="card-info">
-        <div class="card-name">${escHtml(s['ชื่อทุน']||'—')}</div>
-        <div class="card-org">${escHtml(s['สถาบัน']||'—')} · ${escHtml(s['ประเทศ']||'—')}</div>
-      </div>
-      <span class="card-status ${statusClass}">${statusLabel}</span>
-    </div>
-    <div class="card-covers">
-      ${covers.map(c => `<span class="cover-tag">${escHtml(c)}</span>`).join('')}
-      ${s['ระดับ'] ? `<span class="card-level">${escHtml(s['ระดับ'])}</span>` : ''}
-    </div>
-    <div class="card-actions">
-      ${linkBtn(linkUrl,'🔗 ลิงก์สมัคร')}
-      ${linkBtn(fileUrl,'📎 ไฟล์แนบ','file')}
-    </div>
-    <div class="card-footer">
-      <div class="card-deadline">📅 ปิดรับ ${IROUP.formatDate(s['วันปิดรับ'])}</div>
-      ${daysHTML}
-    </div>
-  </div>`;
+function sortScholarships(a,b){
+  if(a.pin && !b.pin) return -1;
+  if(b.pin && !a.pin) return 1;
+  var order = {open:0,upcoming:1,closed:2};
+  var sa = order[scholarshipStatus(a).status] ?? 9;
+  var sb = order[scholarshipStatus(b).status] ?? 9;
+  if(sa !== sb) return sa - sb;
+  return dateVal(a.close_date) - dateVal(b.close_date);
+}
+function dateVal(value){ var d = new Date(value || '2999-12-31'); return Number.isNaN(d.getTime()) ? 9999999999999 : d.getTime(); }
+
+function populateFilters(){
+  var countryMap = {};
+  allScholarships.forEach(function(item){
+    var key = countryKey(item);
+    if(key) countryMap[key] = displayCountry(item);
+  });
+  var countries = Object.keys(countryMap).sort(function(a,b){ return countryMap[a].localeCompare(countryMap[b]); });
+  var levels = unique(allScholarships.map(function(item){ return item.target_group; }).filter(Boolean)).sort();
+  document.getElementById('countryFilter').innerHTML = '<option value="">' + esc(t('allCountries')) + '</option>' + countries.map(function(key){ return '<option value="' + escAttr(key) + '">' + esc(countryMap[key]) + '</option>'; }).join('');
+  document.getElementById('levelFilter').innerHTML = '<option value="">' + esc(t('allLevels')) + '</option>' + levels.map(function(level){ return '<option value="' + escAttr(level) + '">' + esc(labelTarget(level)) + '</option>'; }).join('');
 }
 
-function setPill(el, status) {
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
-  currentFilter = status;
-  renderCards();
+function updateKpis(){
+  var open = allScholarships.filter(function(item){ return scholarshipStatus(item).status === 'open'; }).length;
+  var upcoming = allScholarships.filter(function(item){ return scholarshipStatus(item).status === 'upcoming'; }).length;
+  document.getElementById('kpiTotal').textContent = allScholarships.length;
+  document.getElementById('kpiOpen').textContent = open;
+  document.getElementById('kpiUpcoming').textContent = upcoming;
 }
 
-function setLang(lang) {
-  document.querySelectorAll('.nav-lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang));
+function filteredScholarships(){
+  var q = document.getElementById('searchInput').value.trim().toLowerCase();
+  var country = document.getElementById('countryFilter').value;
+  var level = document.getElementById('levelFilter').value;
+  return allScholarships.filter(function(item){
+    var status = scholarshipStatus(item).status;
+    if(currentStatus && status !== currentStatus) return false;
+    if(country && countryKey(item) !== country) return false;
+    if(level && item.target_group !== level) return false;
+    if(!q) return true;
+    var haystack = [item.title_th,item.title_en,item.institution,item.country,item.country_name_th,item.country_name_en,item.scholarship_type,item.funding_type,item.target_group,item.cover_summary,item.coverage_th,item.coverage_en,item.content_th,item.content_en].join(' ').toLowerCase();
+    return haystack.indexOf(q) >= 0;
+  });
 }
 
-loadData();
+function renderScholarships(){
+  var rows = filteredScholarships();
+  var openRows = rows.filter(function(item){ return scholarshipStatus(item).status === 'open'; });
+  var otherRows = rows.filter(function(item){ return scholarshipStatus(item).status !== 'open'; });
+  document.getElementById('openSection').style.display = openRows.length ? 'block' : 'block';
+  document.getElementById('openCards').innerHTML = openRows.length ? openRows.map(renderCard).join('') : '<div class="state">' + esc(t('noOpen')) + '</div>';
+  document.getElementById('allCards').innerHTML = otherRows.length ? otherRows.map(renderCard).join('') : '<div class="state">' + esc(t('noData')) + '</div>';
+  document.getElementById('openCount').textContent = openRows.length + ' ' + t('items');
+  document.getElementById('resultCount').textContent = rows.length + ' ' + t('items');
+}
+
+function renderCard(item){
+  var status = scholarshipStatus(item);
+  var title = currentLang === 'EN' ? (item.title_en || item.title_th) : (item.title_th || item.title_en);
+  var summary = currentLang === 'EN' ? (item.cover_summary || item.coverage_en || item.content_en || item.coverage_th) : (item.cover_summary || item.coverage_th || item.content_th || item.coverage_en);
+  var file = publicFile(item.files);
+  var detailHref = 'public-scholar-detail.html?id=' + encodeURIComponent(item.id);
+  var applyLink = item.apply_url || '';
+  var externalDetail = item.detail_url || item.link_url || '';
+  var dayClass = status.daysLeft !== null && status.daysLeft <= 3 ? 'urgent' : status.daysLeft !== null && status.daysLeft <= 14 ? 'soon' : 'ok';
+  return '<article class="card">' +
+    (item.pin ? '<span class="pin">Pinned</span>' : '') +
+    '<a href="' + escAttr(detailHref) + '" aria-label="' + escAttr(title) + '"><div class="poster">' + (item.poster ? '<img src="' + escAttr(item.poster) + '" alt="' + escAttr(title) + '" loading="lazy" onerror="this.parentElement.innerHTML=\'🎓\'">' : '🎓') + '</div></a>' +
+    '<div class="card-body">' +
+      '<div class="card-main">' +
+        '<div class="card-text">' +
+          '<h3><a href="' + escAttr(detailHref) + '">' + esc(title || '-') + '</a></h3>' +
+          '<div class="meta-line">' + (item.country_flag ? '<span class="country-flag">' + esc(item.country_flag) + '</span>' : '') + esc(item.institution || '-') + ' · ' + esc(displayCountry(item) || '-') + '</div>' +
+        '</div>' +
+        '<span class="status ' + escAttr(status.status) + '">' + esc(status.label) + '</span>' +
+      '</div>' +
+      '<div class="tag-row">' +
+        (item.scholarship_type ? '<span class="tag">' + esc(item.scholarship_type) + '</span>' : '') +
+        (item.funding_type ? '<span class="tag funding">' + esc(labelFunding(item.funding_type)) + '</span>' : '') +
+        (item.target_group ? '<span class="tag level">' + esc(labelTarget(item.target_group)) + '</span>' : '') +
+      '</div>' +
+      (summary ? '<p class="summary">' + esc(summary) + '</p>' : '') +
+      '<div class="actions">' +
+        '<a class="action" href="' + escAttr(detailHref) + '">' + esc(t('detail')) + '</a>' +
+        (applyLink ? '<a class="action primary" target="_blank" rel="noopener" href="' + escAttr(applyLink) + '">' + esc(t('apply')) + '</a>' : '') +
+        (externalDetail ? '<a class="action" target="_blank" rel="noopener" href="' + escAttr(externalDetail) + '">' + esc(t('detail')) + '</a>' : '') +
+        (file ? '<a class="action" target="_blank" rel="noopener" href="' + escAttr(file.file_url || file.url) + '">' + esc(t('file')) + '</a>' : '') +
+      '</div>' +
+      '<div class="card-foot">' +
+        '<span>' + esc(t('deadline')) + ' ' + esc(formatDate(item.close_date) || t('noDeadline')) + '</span>' +
+        (status.daysLeft !== null ? '<span class="days ' + dayClass + '">' + esc(t('daysLeft')) + ' ' + status.daysLeft + ' ' + esc(t('days')) + '</span>' : '<span class="days">' + esc(status.label) + '</span>') +
+      '</div>' +
+    '</div>' +
+  '</article>';
+}
+
+function setStatusFilter(status){
+  currentStatus = status || '';
+  document.querySelectorAll('.pill').forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-status') === currentStatus); });
+  renderScholarships();
+}
+function onFilterChange(){ renderScholarships(); }
+
+function setLang(lang){
+  currentLang = normalizeLang(lang);
+  localStorage.setItem('iroup_public_lang', currentLang);
+  applyLanguage(true);
+}
+function applyLanguage(rerender){
+  var dict = I18N[currentLang] || I18N.TH;
+  document.documentElement.lang = currentLang === 'EN' ? 'en' : 'th';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ var key = el.getAttribute('data-i18n'); if(dict[key]) el.textContent = dict[key]; });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){ var key = el.getAttribute('data-i18n-placeholder'); if(dict[key]) el.placeholder = dict[key]; });
+  document.querySelectorAll('.lang-btn').forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang); });
+  applyTheme();
+  populateFilters();
+  if(rerender) renderScholarships();
+}
+function normalizeLang(lang){ return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH'; }
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.TH[key] || key; }
+
+function toggleTheme(){
+  var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('iroup_public_theme', next);
+  applyTheme();
+}
+function applyTheme(){
+  var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  var btn = document.getElementById('themeToggle');
+  if(btn) btn.textContent = isLight ? t('themeLight') : t('themeDark');
+}
+
+function labelFunding(value){
+  var v = String(value || '').toLowerCase();
+  var th = {full:'ให้เต็มทุน',partial:'ให้บางส่วน',self:'ออกค่าใช้จ่ายเอง',both:'both'};
+  var en = {full:'Full funding',partial:'Partial funding',self:'Self-funded',both:'Both'};
+  return (currentLang === 'EN' ? en[v] : th[v]) || value;
+}
+function labelTarget(value){
+  var v = String(value || '').toLowerCase();
+  var th = {student:'นิสิต',staff:'บุคลากร',both:'นิสิต/บุคลากร'};
+  var en = {student:'Students',staff:'Staff',both:'Students/Staff'};
+  return (currentLang === 'EN' ? en[v] : th[v]) || value;
+}
+function formatDate(value){
+  if(!value) return '';
+  var d = new Date(value);
+  if(Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(currentLang === 'EN' ? 'en-US' : 'th-TH', { day:'numeric', month:'short', year:'2-digit' });
+}
+function unique(list){ return Array.from(new Set(list)); }
+function esc(value){ return String(value == null ? '' : value).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+function escAttr(value){ return esc(value).replace(/`/g,'&#96;'); }
 </script>
-
-
-
 </body>
 </html>
