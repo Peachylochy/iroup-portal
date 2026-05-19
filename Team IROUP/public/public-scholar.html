@@ -264,13 +264,17 @@ function countryFlag(country){
 }
 function displayCountry(item){
   var name = currentLang === 'EN' ? (item.country_name_en || item.country) : (item.country_name_th || item.country_name_en || item.country);
-  return [item.country_flag, name].filter(Boolean).join(' ');
+  return [countryFlagDisplay(item), name].filter(Boolean).join(' ');
 }
 function renderCountry(item){
   var name = currentLang === 'EN' ? (item.country_name_en || item.country) : (item.country_name_th || item.country_name_en || item.country);
-  var flag = flagEmojiFromCode(item.country_flag) || item.country_flag || '';
+  var flag = countryFlagDisplay(item);
   if(!flag && !name) return '';
-  return (flag ? '<span class="country-flag">' + esc(flag) + '</span>' : '') + esc(name || '');
+  return (flag ? '<span class="country-flag">' + esc(flag) + '</span> ' : '') + esc(name || '');
+}
+function countryFlagDisplay(item){
+  var raw = item ? String(item.country_flag || '').trim() : '';
+  return flagEmojiFromCode(raw) || raw || flagEmojiFromCode(item && item.country_id);
 }
 function countryKey(item){
   return item.country_id || item.country_name_en || item.country_name_th || item.country || '';
