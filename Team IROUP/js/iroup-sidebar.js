@@ -68,35 +68,37 @@
       #iroupSidebar,.iroup-sidebar,.iroup-shell{display:none!important}
       body{margin-left:0!important;padding-left:0!important}
       .sidebar{
-        width:250px!important;min-width:250px!important;max-width:250px!important;
-        height:100vh!important;background:#fff!important;color:#10233f!important;
-        border-right:1px solid #E6EDF6!important;display:flex!important;flex-direction:column!important;
+        width:256px!important;min-width:256px!important;max-width:256px!important;
+        height:100vh!important;background:rgba(255,255,255,.76)!important;color:#10233f!important;
+        border-right:1px solid rgba(230,237,246,.82)!important;display:flex!important;flex-direction:column!important;
         align-items:stretch!important;padding:0!important;gap:0!important;
         position:fixed!important;left:0!important;top:0!important;z-index:99999!important;
-        box-shadow:none!important;font-family:'Prompt',sans-serif!important;overflow:hidden!important;
+        box-shadow:10px 0 34px rgba(15,45,90,.06)!important;font-family:'Prompt',sans-serif!important;overflow:hidden!important;
+        backdrop-filter:blur(20px) saturate(180%)!important;-webkit-backdrop-filter:blur(20px) saturate(180%)!important;
       }
       .sidebar>*:not(.ir-final-brand):not(.ir-final-nav):not(.ir-final-user){display:none!important}
 
       .app{display:block!important;min-height:100vh!important}
       .main,.main-layout,.page{
-        margin-left:250px!important;
-        width:calc(100% - 250px)!important;
+        margin-left:256px!important;
+        width:calc(100% - 256px)!important;
         max-width:none!important;
         min-width:0!important;
       }
       .page{padding-left:20px!important;padding-right:20px!important}
       .main .content,.main-layout .content{max-width:none!important}
 
-      .ir-final-brand{height:76px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid #E6EDF6;flex-shrink:0}
+      .ir-final-brand{min-height:82px;display:flex;align-items:center;gap:12px;padding:18px 18px 14px;border-bottom:0;flex-shrink:0}
       .ir-final-brand img{width:68px;height:auto;object-fit:contain;display:block}
       .ir-final-brand-title{font-size:12px;color:#66758a;line-height:1.25}
       .ir-final-brand-title b{color:#0F2D5A;font-weight:900}
-      .ir-final-nav{padding:16px 12px;overflow:auto;flex:1}
-      .ir-final-section{font-size:11px;font-weight:800;color:#a0adbc;text-transform:uppercase;margin:18px 12px 8px;letter-spacing:.2px}
-      .ir-final-link{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;color:#26364e!important;font-weight:800;font-size:14px;cursor:pointer;font-family:'Prompt',sans-serif;transition:.18s;text-decoration:none!important;margin-bottom:4px;background:transparent;border:0}
+      .ir-final-nav{padding:8px 14px 18px;overflow:auto;flex:1}
+      .ir-final-section{font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;margin:18px 10px 8px;letter-spacing:.12em}
+      .ir-final-link{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;color:#26364e!important;font-weight:800;font-size:14px;cursor:pointer;font-family:'Prompt',sans-serif;transition:.18s;text-decoration:none!important;margin-bottom:4px;background:transparent;border:0}
       .ir-final-link:hover{background:#F1F7FD;color:#1A6DB5!important;transform:translateX(1px)}
-      .ir-final-link.active{background:#E8F4FD;color:#1A6DB5!important;box-shadow:inset 3px 0 0 #1A6DB5}
-      .ir-final-icon{font-size:20px;width:24px;text-align:center;flex:0 0 24px}
+      .ir-final-link.active{background:linear-gradient(135deg,rgba(26,109,181,.15),rgba(123,90,232,.10));color:#0f2d5a!important;box-shadow:none}
+      .ir-final-icon{font-size:17px;width:34px;height:34px;border-radius:11px;display:inline-grid;place-items:center;text-align:center;flex:0 0 34px;background:#fff;border:1px solid #e6edf6;box-shadow:0 2px 8px rgba(15,45,90,.04)}
+      .ir-final-link.active .ir-final-icon{background:linear-gradient(135deg,#1a6db5,#0f4f8e);color:#fff;border-color:transparent}
       .ir-final-user{margin-top:auto;padding:16px;border-top:1px solid #E6EDF6;display:flex;align-items:center;gap:10px;flex-shrink:0}
       .ir-final-avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#4BBDE8,#1A6DB5);display:grid;place-items:center;color:#fff;font-weight:900}
       .ir-final-user-name{font-size:12px;font-weight:900;color:#10233f}

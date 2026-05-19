@@ -3314,3 +3314,36 @@ Lesson learned:
 - Dashboard sidebar issues should be checked in both static fallback markup and
   the injected shared sidebar path. The rendered page may not be using the first
   template that appears in the HTML.
+
+---
+
+## Dashboard Visual System Pass (2026-05-19)
+
+After navigation stabilization, the dashboard still felt visually closer to the
+older admin shell than the newer design references in `Team IROUP/Web design`.
+This pass updated the live dashboard page without migrating it to the React mock
+or changing its data contracts.
+
+Implementation notes:
+- Kept the existing live dashboard JavaScript and report rendering pipeline.
+- Added dashboard-specific CSS overrides inspired by the Web design direction:
+  glass sidebar, softer page background, icon-box navigation, lighter header,
+  refined hero, toolbar, KPI, panels, insights, and table containers.
+- Updated the shared sidebar injector styling in `js/iroup-sidebar.js` so the
+  active rendered sidebar matches the dashboard visual pass instead of being
+  overwritten after page load.
+- Added an ecosystem quick-link strip below the hero for Public Web, Workspace,
+  and Workload Portfolio.
+- Tuned responsive breakpoints so the hero does not collapse too early on
+  desktop-width screens.
+
+Verification:
+- Browser DOM check confirmed the active sidebar still renders the correct links
+  and Public View points to `public/public-landing.html`.
+- Layout check confirmed no horizontal overflow at the tested desktop viewport.
+- Screenshot verification showed the visual pass rendering in the local browser.
+- No backend, DTO, API adapter, auth, or data model changes were made.
+
+Lesson learned:
+- Dashboard visual work must account for `js/iroup-sidebar.js`, because that
+  script injects final sidebar CSS after the page's inline styles.

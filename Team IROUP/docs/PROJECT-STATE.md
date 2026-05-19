@@ -3187,3 +3187,33 @@ Next recommended work:
 - Continue with Admin UX + Data Quality Stabilization.
 - Use the dashboard as the immediate admin-side UX stabilization target before
   adding new public modules.
+
+---
+
+## Session: 2026-05-19 - Dashboard Visual System Pass
+
+Completed:
+
+- Applied a limited visual/system pass to the live `dashboard.html` page using
+  the `Team IROUP/Web design` dashboard direction as reference.
+- Kept the existing dashboard data flow intact:
+  - `getReport` rendering remains in place
+  - V2 dashboard readiness bridge remains diagnostic/read-only
+  - no backend, DTO, API adapter, auth, or schema changes
+- Upgraded the dashboard shell:
+  - softer design-system page background
+  - glass-style fixed sidebar
+  - icon-box navigation states
+  - lighter dashboard header
+  - refined hero, KPI, toolbar, panel, and insight card styling
+- Added a small ecosystem quick-link strip for Public Web, Workspace, and
+  Workload Portfolio so the ecosystem area is no longer only sidebar text.
+
+Verification:
+
+- Browser DOM check confirmed sidebar navigation still has 12 links, no old
+  `NW`, `KN`, `WS`, or `PW` badges, and Public View still points to
+  `public/public-landing.html`.
+- Layout check confirmed the dashboard has no horizontal overflow at the tested
+  desktop viewport and the hero remains a two-column layout.
+- `git diff --check` passed with Windows CRLF warning only.
