@@ -367,6 +367,60 @@ async function fetchReport(year=''){
   return json;
 }
 
+async function hydrateDashboardScholarshipsFromV2(report){
+  // Keep the legacy report for other modules, but use the same V2 admin
+  // scholarship source as scholarship.html so dashboard counts/lists match.
+  if(!report || !report.data || !window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.scholarshipList){
+    return report;
+  }
+  try{
+    const res=await IROUP_V2.admin.scholarshipList({includeArchived:false,_:Date.now()});
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 scholarship list failed');
+    const rows=normalizeV2DashboardList(res).map(v2ScholarshipToDashboardRow);
+    report.data.scholar=rows;
+    report.total=report.total || {};
+    report.total.scholar=rows.length;
+    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.all=Object.values(report.data).flat().length;
+    report.summary=makeSummary(report.data);
+    console.info('[Dashboard] scholarship data hydrated from V2 admin list', {count:rows.length});
+  }catch(err){
+    console.warn('[Dashboard] V2 scholarship hydration failed; keeping report scholarship data.', err);
+  }
+  return report;
+}
+
+function normalizeV2DashboardList(res){
+  const data=res && res.data;
+  if(Array.isArray(data)) return data;
+  if(data && Array.isArray(data.items)) return data.items;
+  if(data && Array.isArray(data.rows)) return data.rows;
+  return [];
+}
+
+function v2ScholarshipToDashboardRow(item){
+  const country=item.country || {};
+  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
+  const level=item.scholarship_level || item.level || item.degree_level || item.target_group || '';
+  const amount=item.amount || item.budget_amount || item.funding_amount || item['จำนวนเงิน'] || 0;
+  return {
+    'ชื่อทุน': item.title_th || item.title_en || item.scholarship_id || '-',
+    'สถาบัน': item.institution_name || item.institution_name_th || item.institution_name_en || '-',
+    'ประเทศ': countryName,
+    'ระดับ': level,
+    'วันเปิดรับ': item.open_date || '',
+    'วันปิดรับ': item.close_date || '',
+    'ปีงบ': fiscalYearFromDate(item.close_date || item.open_date),
+    'จำนวนเงิน': amount
+  };
+}
+
+function fiscalYearFromDate(value){
+  const d=toDate(value);
+  if(!d) return '';
+  return String(d.getFullYear()+543+(d.getMonth()>=9?1:0));
+}
+
 function getV2AdminBridgeSession(){
   // V2 read-only auth bridge: reuse V1 session metadata only for readiness diagnostics.
   // The live V2 backend validates the opaque V1 adminToken through the isolated V2 token map.
@@ -454,6 +508,7 @@ async function reloadData(force=false){
         const c=JSON.parse(cached);
         if(Date.now()-c.ts<5*60*1000){
           state.raw=c.data;
+          await hydrateDashboardScholarshipsFromV2(state.raw);
           buildYearOptions();
           render();
           state.loading=false;
@@ -462,6 +517,7 @@ async function reloadData(force=false){
       }
     }
     const data=await fetchReport(state.year);
+    await hydrateDashboardScholarshipsFromV2(data);
     state.raw=data;
     localStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),data}));
     buildYearOptions();

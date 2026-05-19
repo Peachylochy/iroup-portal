@@ -3365,3 +3365,14 @@ Follow-up icon note:
   action buttons, KPI cards, and ecosystem quick links.
 - Verified in-browser that the active rendered dashboard sidebar and KPI row use
   SVG icons while preserving existing routes and report rendering.
+
+Follow-up data parity note:
+- Screenshot comparison exposed that the dashboard scholarship count/list did
+  not match the Scholarship admin module.
+- Root cause: dashboard still used legacy `IROUP.getReport()` aggregate rows,
+  while `scholarship.html` used the V2 admin scholarship list.
+- Dashboard now hydrates scholarship rows from
+  `IROUP_V2.admin.scholarshipList()` after the legacy report loads, so the
+  scholarship KPI/table use the same V2 source as the module page.
+- This is intentionally scoped to scholarships; other dashboard modules still
+  use the existing report aggregate until each module is checked.

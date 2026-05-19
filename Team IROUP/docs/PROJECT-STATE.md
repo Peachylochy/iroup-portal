@@ -3243,3 +3243,16 @@ Icon follow-up:
 - Browser DOM verification confirmed the active sidebar renders 12 SVG icons,
   KPI cards render 6 SVG icons, top actions render 3 SVG icons, and ecosystem
   quick links render 3 SVG icons.
+
+Data parity follow-up:
+
+- Confirmed the dashboard scholarship KPI/list and the Scholarship admin page
+  were reading different sources:
+  - dashboard used legacy `IROUP.getReport()` aggregate scholarship rows
+  - `scholarship.html` used `IROUP_V2.admin.scholarshipList()`
+- Updated the dashboard to hydrate only scholarship rows from
+  `IROUP_V2.admin.scholarshipList()` after `getReport()` loads.
+- The dashboard now keeps the legacy report aggregate for other modules for now,
+  but scholarship count/table/insights are based on the same V2 admin source as
+  the Scholarship module page.
+- Inline dashboard script syntax check passed.
