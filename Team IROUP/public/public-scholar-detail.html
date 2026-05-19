@@ -126,7 +126,17 @@ function publicFile(files){ return files.find(function(file){ if(!file || !(file
 function fileRoleKey(file){ var raw = String(file.file_role_id || file.role_id || file.role || file.file_role_name || '').toLowerCase(); if(raw.indexOf('poster') >= 0) return 'poster'; if(raw.indexOf('cover') >= 0) return 'cover'; if(raw.indexOf('image') >= 0 || raw.indexOf('banner') >= 0) return 'image'; if(raw.indexOf('attach') >= 0 || raw.indexOf('pdf') >= 0 || raw.indexOf('document') >= 0) return 'attachment'; return raw; }
 function previewUrl(url){ var u = String(url || '').trim(); var match = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/); return match && match[1] ? 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1600' : u; }
 function countryName(country, lang){ if(!country) return ''; if(typeof country === 'string') return country; var en = String(lang || currentLang).toUpperCase() === 'EN'; return en ? (country.country_name_en || country.country_name_th || country.country_id || '') : (country.country_name_th || country.country_name_en || country.country_id || ''); }
-function countryFlag(country){ return country && typeof country === 'object' ? country.flag_emoji || '' : ''; }
+function countryFlag(country){
+  if(!country || typeof country !== 'object') return '';
+  var flag = String(country.flag_emoji || '').trim();
+  if(/\p{Regional_Indicator}/u.test(flag)) return flag;
+  return flagEmojiFromCode(country.iso2 || country.country_id || '');
+}
+function flagEmojiFromCode(value){
+  var code = String(value || '').toUpperCase().replace(/^CTRY-/, '').slice(0, 2);
+  if(!/^[A-Z]{2}$/.test(code)) return '';
+  return String.fromCodePoint(code.charCodeAt(0) + 127397, code.charCodeAt(1) + 127397);
+}
 function labelFunding(value){ var v = String(value || '').toLowerCase(); var th = {full:'ทุนเต็มจำนวน',partial:'ทุนบางส่วน',self:'ออกค่าใช้จ่ายเอง',both:'both'}; var en = {full:'Full funding',partial:'Partial funding',self:'Self-funded',both:'Both'}; return (currentLang === 'EN' ? en[v] : th[v]) || value; }
 function labelTarget(value){ var v = String(value || '').toLowerCase(); var th = {student:'นิสิต',staff:'บุคลากร',both:'นิสิต/บุคลากร'}; var en = {student:'Students',staff:'Staff',both:'Students/Staff'}; return (currentLang === 'EN' ? en[v] : th[v]) || value; }
 function formatDate(value){ if(!value) return ''; var d = new Date(value); if(Number.isNaN(d.getTime())) return ''; return d.toLocaleDateString(currentLang === 'EN' ? 'en-US' : 'th-TH', { day:'numeric', month:'short', year:'numeric' }); }

@@ -13,6 +13,17 @@
 
 const IROUP_V2_UP_UNIT_DATA = [
 
+  {
+    unit_id: 'UPUNIT-UP',
+    unit_code: 'UP',
+    unit_name_th: 'มหาวิทยาลัยพะเยา',
+    unit_name_en: 'University of Phayao',
+    unit_type: 'มหาวิทยาลัย',
+    parent_unit_id: '',
+    active: true,
+    sort_order: 1
+  },
+
   // ── คณะ / วิทยาลัย / วิทยาเขต / โรงเรียน ──────────────────────────────
 
   {
@@ -619,4 +630,174 @@ function upsertV2UPUnitMasterRows_(rows) {
   });
 
   return { success: true, inserted: inserted, updated: updated, error: '', data: [] };
+}
+
+// ---------------------------------------------------------------------------
+// Unit reference audit/repair
+// ---------------------------------------------------------------------------
+
+const IROUP_V2_UNIT_REFERENCE_FIELDS = [
+  { sheetName: 'PERSON_STUDENT', idField: 'student_id', unitField: 'unit_id' },
+  { sheetName: 'PERSON_STAFF', idField: 'staff_id', unitField: 'unit_id' },
+  { sheetName: 'PERSON_MANUAL', idField: 'person_id', unitField: 'unit_id' },
+  { sheetName: 'MOU', idField: 'mou_id', unitField: 'up_unit_id' },
+  { sheetName: 'MOBILITY_PROJECT', idField: 'mobility_id', unitField: 'up_unit_id' },
+  { sheetName: 'MOBILITY_PARTICIPANT', idField: 'participant_id', unitField: 'unit_id_snapshot' },
+  { sheetName: 'TRAVEL_PARTICIPANT', idField: 'travel_participant_id', unitField: 'unit_id_snapshot' },
+  { sheetName: 'EVENT', idField: 'event_id', unitField: 'organizer_unit_id' },
+  { sheetName: 'BUDGET', idField: 'budget_id', unitField: 'budget_source_unit_id' }
+];
+
+const IROUP_V2_LEGACY_UP_UNIT_ID_MAP = {
+  'TEST-UNIT-IR': 'UPUNIT-UP',
+  'UNIT-IR': 'UPUNIT-UP',
+  'UNIT-IR-001': 'UPUNIT-UP',
+  'TEST-UNIT-SCI': 'UPUNIT-SCI',
+  'UNIT-SCI-001': 'UPUNIT-SCI',
+  'TEST-UNIT-ENG': 'UPUNIT-ENG',
+  'UNIT-ENG-001': 'UPUNIT-ENG',
+  'UNIT-MED-001': 'UPUNIT-MED',
+  'UNIT-NUR-001': 'UPUNIT-NUR',
+  'UNIT-LAW-001': 'UPUNIT-LAW',
+  'UNIT-BUS-001': 'UPUNIT-BCA',
+  'UNIT-EDU-001': 'UPUNIT-EDU',
+  'UNIT-DEN-001': 'UPUNIT-DENT',
+  'UNIT-PHA-001': 'UPUNIT-PHARM',
+  'UNIT-AGR-001': 'UPUNIT-AGRI',
+  'UNIT-ARC-001': 'UPUNIT-SAFA',
+  'UNIT-ICT-001': 'UPUNIT-ICT',
+  'UNIT-HUM-001': 'UPUNIT-POLSOC',
+  'UNIT-REG-001': 'UPUNIT-DOES'
+};
+
+function auditV2UPUnitReferences() {
+  const validUnits = getV2ActiveUPUnitIdSet_();
+  if (!validUnits.success) return validUnits;
+
+  const invalidRefs = [];
+  const checked = [];
+
+  IROUP_V2_UNIT_REFERENCE_FIELDS.forEach(function (spec) {
+    const sheetResult = getV2Sheet_(spec.sheetName);
+    if (!sheetResult.success) {
+      checked.push({ sheetName: spec.sheetName, success: false, error: sheetResult.error, checked: 0, invalid: 0 });
+      return;
+    }
+
+    const sheet = sheetResult.data;
+    const headers = getV2Headers_(sheet);
+    const idIndex = headers.indexOf(spec.idField);
+    const unitIndex = headers.indexOf(spec.unitField);
+    if (idIndex < 0 || unitIndex < 0) {
+      checked.push({ sheetName: spec.sheetName, success: false, error: 'Missing id/unit field', checked: 0, invalid: 0 });
+      return;
+    }
+
+    const values = sheet.getDataRange().getValues();
+    let checkedRows = 0;
+    let invalidRows = 0;
+    for (let rowIndex = 1; rowIndex < values.length; rowIndex++) {
+      const recordId = String(values[rowIndex][idIndex] || '').trim();
+      const unitId = String(values[rowIndex][unitIndex] || '').trim();
+      if (!recordId || !unitId) continue;
+      checkedRows++;
+      if (validUnits.ids[unitId]) continue;
+      invalidRows++;
+      invalidRefs.push({
+        sheetName: spec.sheetName,
+        rowNumber: rowIndex + 1,
+        idField: spec.idField,
+        recordId: recordId,
+        unitField: spec.unitField,
+        unitId: unitId,
+        suggestedUnitId: IROUP_V2_LEGACY_UP_UNIT_ID_MAP[unitId] || ''
+      });
+    }
+
+    checked.push({ sheetName: spec.sheetName, success: true, checked: checkedRows, invalid: invalidRows });
+  });
+
+  Logger.log('[V2 UP UNIT][AUDIT] invalid=' + invalidRefs.length + ' refs=' + JSON.stringify(invalidRefs));
+  return {
+    success: true,
+    invalid: invalidRefs.length,
+    checked: checked,
+    invalidRefs: invalidRefs,
+    error: ''
+  };
+}
+
+function repairV2LegacyUPUnitReferences() {
+  const validUnits = getV2ActiveUPUnitIdSet_();
+  if (!validUnits.success) return validUnits;
+
+  const summary = {
+    success: true,
+    updated: 0,
+    unresolved: [],
+    skipped: [],
+    error: ''
+  };
+
+  IROUP_V2_UNIT_REFERENCE_FIELDS.forEach(function (spec) {
+    const sheetResult = getV2Sheet_(spec.sheetName);
+    if (!sheetResult.success) {
+      summary.skipped.push({ sheetName: spec.sheetName, error: sheetResult.error });
+      return;
+    }
+
+    const sheet = sheetResult.data;
+    const headers = getV2Headers_(sheet);
+    const idIndex = headers.indexOf(spec.idField);
+    const unitIndex = headers.indexOf(spec.unitField);
+    if (idIndex < 0 || unitIndex < 0) {
+      summary.skipped.push({ sheetName: spec.sheetName, error: 'Missing id/unit field' });
+      return;
+    }
+
+    const values = sheet.getDataRange().getValues();
+    for (let rowIndex = 1; rowIndex < values.length; rowIndex++) {
+      const recordId = String(values[rowIndex][idIndex] || '').trim();
+      const unitId = String(values[rowIndex][unitIndex] || '').trim();
+      if (!recordId || !unitId || validUnits.ids[unitId]) continue;
+
+      const nextUnitId = IROUP_V2_LEGACY_UP_UNIT_ID_MAP[unitId] || '';
+      if (!nextUnitId || !validUnits.ids[nextUnitId]) {
+        summary.unresolved.push({
+          sheetName: spec.sheetName,
+          rowNumber: rowIndex + 1,
+          idField: spec.idField,
+          recordId: recordId,
+          unitField: spec.unitField,
+          unitId: unitId,
+          suggestedUnitId: nextUnitId
+        });
+        continue;
+      }
+
+      sheet.getRange(rowIndex + 1, unitIndex + 1).setValue(nextUnitId);
+      summary.updated++;
+    }
+  });
+
+  SpreadsheetApp.flush();
+  Logger.log('[V2 UP UNIT][REPAIR] updated=' + summary.updated + ' unresolved=' + summary.unresolved.length);
+  return summary;
+}
+
+function getV2ActiveUPUnitIdSet_() {
+  const read = readV2Sheet_(IROUP_V2_SHEETS.UP_UNIT_MASTER);
+  if (!read.success) {
+    return { success: false, ids: {}, error: read.error };
+  }
+
+  const ids = {};
+  (read.data || []).forEach(function (row) {
+    const id = String(row.unit_id || '').trim();
+    if (!id) return;
+    if (typeof row.active !== 'undefined' && row.active !== '' && !isTruthyV2_(row.active)) return;
+    ids[id] = true;
+  });
+
+  return { success: true, ids: ids, error: '' };
 }

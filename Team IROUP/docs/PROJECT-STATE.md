@@ -3071,3 +3071,88 @@ Deployment steps:
 1. Copy `IROUP_V2_UP_UNIT_MASTER.gs` into the Apps Script project.
 2. Run `upsertV2UPUnitMaster()` once from the editor.
 3. Verify rows in the `UP_UNIT_MASTER` sheet.
+
+---
+
+## Session: 2026-05-19 - UP Unit Reference Audit/Repair
+
+Completed:
+
+- Added Unit reference audit/repair helpers to `IROUP_V2_UP_UNIT_MASTER.gs`.
+- The audit covers every V2 sheet/field that currently stores a UP unit id:
+  - `PERSON_STUDENT.unit_id`
+  - `PERSON_STAFF.unit_id`
+  - `PERSON_MANUAL.unit_id`
+  - `MOU.up_unit_id`
+  - `MOBILITY_PROJECT.up_unit_id`
+  - `MOBILITY_PARTICIPANT.unit_id_snapshot`
+  - `TRAVEL_PARTICIPANT.unit_id_snapshot`
+  - `EVENT.organizer_unit_id`
+  - `BUDGET.budget_source_unit_id`
+- Added `auditV2UPUnitReferences()` to scan live data for unit ids that do not
+  exist in the current `UP_UNIT_MASTER`.
+- Added `repairV2LegacyUPUnitReferences()` to replace known legacy/sample ids
+  with the current `UPUNIT-*` ids when the mapping is unambiguous.
+- Added central university-level unit:
+  - `UPUNIT-UP`
+  - `unit_code = UP`
+  - `unit_name_th = มหาวิทยาลัยพะเยา`
+  - `unit_name_en = University of Phayao`
+- Confirmed International Relations sample ids should map to the university-level
+  unit because IR records are entered on behalf of University of Phayao:
+  - `TEST-UNIT-IR -> UPUNIT-UP`
+  - `UNIT-IR -> UPUNIT-UP`
+  - `UNIT-IR-001 -> UPUNIT-UP`
+- Known safe mappings include sample faculty/school ids such as
+  `TEST-UNIT-SCI -> UPUNIT-SCI`, `TEST-UNIT-ENG -> UPUNIT-ENG`,
+  `UNIT-ICT-001 -> UPUNIT-ICT`, and other direct faculty/unit matches.
+
+Important:
+
+- `UNIT-IR`, `TEST-UNIT-IR`, and `UNIT-IR-001` are now treated as central
+  University of Phayao records and can be repaired automatically.
+- If the audit returns other unresolved IR/unit variants, confirm whether they
+  should also map to `UPUNIT-UP` before adding another mapping.
+- Do not run `seedV2SampleData()` against the real data workbook.
+
+Recommended Apps Script order:
+
+1. Copy/update `IROUP_V2_UP_UNIT_MASTER.gs` in the Apps Script project.
+2. Run `upsertV2UPUnitMaster()`.
+3. Run `auditV2UPUnitReferences()`.
+4. If the audit only shows mapped legacy/sample ids, run
+   `repairV2LegacyUPUnitReferences()`.
+5. Run `auditV2UPUnitReferences()` again and confirm `invalid = 0`.
+6. If unresolved rows remain, paste the audit log back into Codex before doing
+   manual edits.
+
+---
+
+## Session: 2026-05-19 - End-of-Office Handoff Before Home Move
+
+Completed before handoff:
+
+- Public Events redesign and `public-events-detail.html` were completed and pushed
+  to GitHub in commit `8d57423`.
+- Public Scholarship card/detail fixes remain in the current workspace:
+  - larger card poster area
+  - country flag fallback
+  - clearer internal detail action (`อ่านต่อ`)
+  - clearer apply/external/file actions
+  - cover/poster images excluded from the public attachment button
+- UP Unit master stabilization remains in the current workspace:
+  - `UPUNIT-UP` added for University of Phayao / มหาวิทยาลัยพะเยา
+  - legacy IR unit ids map to `UPUNIT-UP`
+  - audit/repair helpers added for all V2 unit reference fields
+
+Current next discussion:
+
+- Do not start another large redesign before moving devices.
+- Next investigation after pulling at home should focus on `public-landing.html`
+  and admin/dashboard navigation:
+  - sidebar/public links still look text-heavy or old-system-like
+  - some public navigation links may still point to old paths or produce errors
+  - landing ecosystem/module section needs review against the latest public
+    redesign direction
+- Preserve V2 runtime architecture and avoid backend/API refactors during this
+  handoff unless a broken route is confirmed.
