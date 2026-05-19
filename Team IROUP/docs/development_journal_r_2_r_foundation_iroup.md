@@ -3357,3 +3357,11 @@ Follow-up palette note:
   panel, and softer white topbar/cards.
 - The current approach intentionally avoids migrating the React mock or changing
   live report/data rendering.
+
+Follow-up icon note:
+- Added a small inline SVG icon set for the live dashboard shell instead of
+  introducing a new icon dependency.
+- Replaced primary visible emoji icons in the shared sidebar injector, top
+  action buttons, KPI cards, and ecosystem quick links.
+- Verified in-browser that the active rendered dashboard sidebar and KPI row use
+  SVG icons while preserving existing routes and report rendering.

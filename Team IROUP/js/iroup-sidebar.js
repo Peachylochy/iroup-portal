@@ -7,27 +7,41 @@
 // ============================================================
 (function () {
   const current = (location.pathname.split('/').pop() || 'dashboard.html').toLowerCase();
+  const ICONS = {
+    dashboard:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg>',
+    mou:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12l3 3a3 3 0 0 0 4 0l3-3"></path><path d="M3 9l4-4 4 4"></path><path d="M21 9l-4-4-4 4"></path><path d="M7 5v8"></path><path d="M17 5v8"></path></svg>',
+    globe:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M4 12h16"></path><path d="M12 4a12 12 0 0 1 0 16"></path><path d="M12 4a12 12 0 0 0 0 16"></path></svg>',
+    plane:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-7-7 18-3-8-8-3z"></path><path d="M11 14l4-4"></path></svg>',
+    scholar:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-4 9 4-9 4-9-4z"></path><path d="M7 10v5c2 2 8 2 10 0v-5"></path><path d="M21 8v6"></path></svg>',
+    calendar:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M8 3v4"></path><path d="M16 3v4"></path><path d="M4 10h16"></path></svg>',
+    news:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"></path><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg>',
+    knowledge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 0-4-4z"></path><path d="M5 4v12"></path><path d="M9 8h6"></path><path d="M9 12h6"></path></svg>',
+    report:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"></path><path d="M14 3v5h5"></path><path d="M10 13h6"></path><path d="M10 17h4"></path></svg>',
+    public:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M4 12h16"></path><path d="M12 4v16"></path></svg>',
+    workspace:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="12" rx="2"></rect><path d="M9 21h6"></path><path d="M12 17v4"></path></svg>',
+    portfolio:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M9 7V5h6v2"></path><path d="M4 12h16"></path></svg>'
+  };
 
   const MENU = [
     { section: 'OVERVIEW', items: [
-      { icon: '📊', label: 'Executive Dashboard', href: 'dashboard.html', match: ['dashboard.html','dashboard-full.html',''] }
+      { icon: 'dashboard', label: 'Executive Dashboard', href: 'dashboard.html', match: ['dashboard.html','dashboard-full.html',''] }
     ]},
     { section: 'MANAGEMENT', items: [
-      { icon: '🤝', label: 'MOU', href: 'mou.html', match: ['mou.html'] },
-      { icon: '🌏', label: 'Mobility', href: 'mobility.html', match: ['mobility.html'] },
-      { icon: '✈️', label: 'การเดินทาง', href: 'travel.html', match: ['travel.html'] },
-      { icon: '🎓', label: 'ทุนการศึกษา', href: 'scholarship.html', match: ['scholarship.html'] },
-      { icon: '📅', label: 'กิจกรรม', href: 'events.html', match: ['events.html'] },
-      { icon: '📰', label: 'ข่าว', href: 'news.html', match: ['news.html'] },
-      { icon: '📚', label: 'คลังความรู้', href: 'knowledge.html', match: ['knowledge.html'] },
-      { icon: '📤', label: 'รายงาน & Export', href: 'report.html', match: ['report.html'] }
+      { icon: 'mou', label: 'MOU', href: 'mou.html', match: ['mou.html'] },
+      { icon: 'globe', label: 'Mobility', href: 'mobility.html', match: ['mobility.html'] },
+      { icon: 'plane', label: 'การเดินทาง', href: 'travel.html', match: ['travel.html'] },
+      { icon: 'scholar', label: 'ทุนการศึกษา', href: 'scholarship.html', match: ['scholarship.html'] },
+      { icon: 'calendar', label: 'กิจกรรม', href: 'events.html', match: ['events.html'] },
+      { icon: 'news', label: 'ข่าว', href: 'news.html', match: ['news.html'] },
+      { icon: 'knowledge', label: 'คลังความรู้', href: 'knowledge.html', match: ['knowledge.html'] },
+      { icon: 'report', label: 'รายงาน & Export', href: 'report.html', match: ['report.html'] }
     ]},
     { section: 'PUBLIC', items: [
-      { icon: '🌐', label: 'Public View', href: 'public/public-landing.html', match: ['public-landing.html'] }
+      { icon: 'public', label: 'Public View', href: 'public/public-landing.html', match: ['public-landing.html'] }
     ]},
     { section: 'ECOSYSTEM', items: [
-      { icon: '🧭', label: 'Workspace', href: '../index.html', match: [] },
-      { icon: '💼', label: 'Workload Portfolio', href: '../peach-workload-portfolio/frontend/index.html', match: [] }
+      { icon: 'workspace', label: 'Workspace', href: '../index.html', match: [] },
+      { icon: 'portfolio', label: 'Workload Portfolio', href: '../peach-workload-portfolio/frontend/index.html', match: [] }
     ]}
   ];
 
@@ -44,7 +58,7 @@
           <div class="ir-final-section">${g.section}</div>
           ${g.items.map(i => `
             <a class="ir-final-link ${active(i) ? 'active' : ''}" href="${i.href}">
-              <span class="ir-final-icon">${i.icon}</span>
+              <span class="ir-final-icon">${ICONS[i.icon] || i.icon}</span>
               <span>${i.label}</span>
             </a>
           `).join('')}
@@ -98,6 +112,7 @@
       .ir-final-link:hover{background:#F1F7FD;color:#1A6DB5!important;transform:translateX(1px)}
       .ir-final-link.active{background:linear-gradient(135deg,rgba(26,109,181,.14),rgba(123,90,232,.12));color:#0f2d5a!important;box-shadow:none}
       .ir-final-icon{font-size:17px;width:34px;height:34px;border-radius:11px;display:inline-grid;place-items:center;text-align:center;flex:0 0 34px;background:#fff;border:1px solid #e6edf6;box-shadow:0 2px 8px rgba(15,45,90,.04)}
+      .ir-final-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
       .ir-final-link.active .ir-final-icon{background:linear-gradient(135deg,#1a6db5,#0f4f8e);color:#fff;border-color:transparent}
       .ir-final-user{margin-top:auto;padding:16px;border-top:1px solid #E6EDF6;display:flex;align-items:center;gap:10px;flex-shrink:0}
       .ir-final-avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#4BBDE8,#1A6DB5);display:grid;place-items:center;color:#fff;font-weight:900}

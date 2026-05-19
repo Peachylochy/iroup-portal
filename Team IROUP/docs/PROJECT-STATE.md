@@ -3230,3 +3230,16 @@ Follow-up adjustment:
 - Kept Globy and the current layout in place for now to avoid a larger
   structural rewrite.
 - No backend, API, DTO, auth, or dashboard data-flow changes were made.
+
+Icon follow-up:
+
+- Replaced the visible dashboard shell icons with a small inline SVG icon set:
+  - shared dashboard sidebar navigation
+  - dashboard top action buttons
+  - KPI cards
+  - ecosystem quick-link cards
+- Kept emoji usage inside lower content labels/titles for now where it is not
+  part of the primary navigation/KPI icon system.
+- Browser DOM verification confirmed the active sidebar renders 12 SVG icons,
+  KPI cards render 6 SVG icons, top actions render 3 SVG icons, and ecosystem
+  quick links render 3 SVG icons.
