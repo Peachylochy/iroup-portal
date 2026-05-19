@@ -3156,3 +3156,34 @@ Current next discussion:
     redesign direction
 - Preserve V2 runtime architecture and avoid backend/API refactors during this
   handoff unless a broken route is confirmed.
+
+---
+
+## Session: 2026-05-19 - Dashboard Sidebar Navigation Stabilization
+
+Completed:
+
+- Confirmed the reported old-looking navigation issue was on `dashboard.html`,
+  not the public landing page.
+- Restored `public/public-landing.html` back to its previous version after the
+  mistaken landing-page pass.
+- Updated the dashboard sidebar fallback markup and shared sidebar injector:
+  - replaced old letter badges `NW`, `KN`, `WS`, and `PW` with icon-style labels
+  - added Knowledge to the dashboard fallback sidebar
+  - fixed dashboard Public Web / Public View links to use
+    `public/public-landing.html`
+- Kept the change scoped to frontend navigation only.
+
+Verification:
+
+- `dashboard.html`, `news.html`, `knowledge.html`, and
+  `public/public-landing.html` returned HTTP 200 on the local live server.
+- Browser DOM check confirmed the active dashboard sidebar no longer renders the
+  old `NW`, `KN`, `WS`, or `PW` text badges.
+- No backend, DTO, V2 adapter, or public data route changes were made.
+
+Next recommended work:
+
+- Continue with Admin UX + Data Quality Stabilization.
+- Use the dashboard as the immediate admin-side UX stabilization target before
+  adding new public modules.

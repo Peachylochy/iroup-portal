@@ -18,16 +18,16 @@
       { icon: '✈️', label: 'การเดินทาง', href: 'travel.html', match: ['travel.html'] },
       { icon: '🎓', label: 'ทุนการศึกษา', href: 'scholarship.html', match: ['scholarship.html'] },
       { icon: '📅', label: 'กิจกรรม', href: 'events.html', match: ['events.html'] },
-      { icon: 'NW', label: 'ข่าว', href: 'news.html', match: ['news.html'] },
-      { icon: 'KN', label: 'คลังความรู้', href: 'knowledge.html', match: ['knowledge.html'] },
+      { icon: '📰', label: 'ข่าว', href: 'news.html', match: ['news.html'] },
+      { icon: '📚', label: 'คลังความรู้', href: 'knowledge.html', match: ['knowledge.html'] },
       { icon: '📤', label: 'รายงาน & Export', href: 'report.html', match: ['report.html'] }
     ]},
     { section: 'PUBLIC', items: [
-      { icon: '🌐', label: 'Public View', href: 'public-landing.html', match: ['public-landing.html'] }
+      { icon: '🌐', label: 'Public View', href: 'public/public-landing.html', match: ['public-landing.html'] }
     ]},
     { section: 'ECOSYSTEM', items: [
-      { icon: 'WS', label: 'Workspace', href: '../index.html', match: [] },
-      { icon: 'PW', label: 'Workload Portfolio', href: '../peach-workload-portfolio/frontend/index.html', match: [] }
+      { icon: '🧭', label: 'Workspace', href: '../index.html', match: [] },
+      { icon: '💼', label: 'Workload Portfolio', href: '../peach-workload-portfolio/frontend/index.html', match: [] }
     ]}
   ];
 

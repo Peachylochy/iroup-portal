@@ -3282,3 +3282,35 @@ Implementation notes:
 Lesson learned:
 - Public pages that use V2 routes must keep the endpoint config script before the V2 API adapter.
 - For Thai-heavy pages, verify rendered Thai text after automated edits, not only JavaScript syntax.
+
+---
+
+## Dashboard Sidebar Navigation Stabilization (2026-05-19)
+
+The navigation issue originally sounded like a public landing problem, but visual
+review showed the live problem was the admin `dashboard.html` sidebar and its
+shared sidebar injector.
+
+Implementation notes:
+- Restored `public/public-landing.html` to avoid carrying the mistaken landing
+  page pass forward.
+- Updated `dashboard.html` fallback sidebar markup so News, Knowledge, Workspace,
+  and Workload Portfolio no longer appear as plain letter badges.
+- Updated `js/iroup-sidebar.js`, which is the active sidebar path after page load,
+  with the same icon-style labels.
+- Fixed dashboard Public Web / Public View links to point to
+  `public/public-landing.html` from the dashboard root.
+- Added Knowledge to the fallback dashboard sidebar so the pre-injection state
+  matches the active shared sidebar more closely.
+
+Verification:
+- Local live-server checks returned HTTP 200 for dashboard, news, knowledge, and
+  public landing.
+- Browser DOM inspection confirmed the active dashboard sidebar no longer
+  renders `NW`, `KN`, `WS`, or `PW`.
+- No backend, API adapter, DTO, auth, or data model changes were made.
+
+Lesson learned:
+- Dashboard sidebar issues should be checked in both static fallback markup and
+  the injected shared sidebar path. The rendered page may not be using the first
+  template that appears in the HTML.
