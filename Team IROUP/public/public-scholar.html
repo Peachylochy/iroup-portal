@@ -191,7 +191,8 @@ async function loadScholarships(){
   try{
     var response = await IROUP_V2.public.scholarshipList();
     if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public scholarship API error');
-    allScholarships = normalizeList(response).map(normalizeScholarship).filter(function(item){ return item.id; }).sort(sortScholarships);
+    var rawList = normalizeList(response);
+    allScholarships = rawList.map(normalizeScholarship).filter(function(item){ return item.id; }).sort(sortScholarships);
     populateFilters();
     updateKpis();
     renderScholarships();
@@ -219,8 +220,8 @@ function normalizeScholarship(row){
     country: countryName(row.country),
     country_name_en: countryName(row.country, 'EN'),
     country_name_th: countryName(row.country, 'TH'),
-    country_flag: countryFlag(row.country),
     country_id: countryId(row.country) || row.country_id || '',
+    country_flag: countryFlag(row.country) || flagEmojiFromCode(countryId(row.country) || row.country_id || ''),
     scholarship_type: row.scholarship_type || '',
     funding_type: row.funding_type || '',
     target_group: row.target_group || row.level || '',
@@ -255,7 +256,8 @@ function countryId(country){
   return country.country_id || country.iso2 || country.iso3 || '';
 }
 function countryFlag(country){
-  if(!country || typeof country !== 'object') return '';
+  if(!country) return '';
+  if(typeof country === 'string') return flagEmojiFromCode(country);
   var flag = String(country.flag_emoji || '').trim();
   if(/\p{Regional_Indicator}/u.test(flag)) return flag;
   return flagEmojiFromCode(country.iso2 || country.country_id || '');
@@ -263,6 +265,11 @@ function countryFlag(country){
 function displayCountry(item){
   var name = currentLang === 'EN' ? (item.country_name_en || item.country) : (item.country_name_th || item.country_name_en || item.country);
   return [item.country_flag, name].filter(Boolean).join(' ');
+}
+function renderCountry(item){
+  var name = currentLang === 'EN' ? (item.country_name_en || item.country) : (item.country_name_th || item.country_name_en || item.country);
+  if(!item.country_flag && !name) return '';
+  return (item.country_flag ? '<span class="country-flag">' + esc(item.country_flag) + '</span>' : '') + esc(name || '');
 }
 function countryKey(item){
   return item.country_id || item.country_name_en || item.country_name_th || item.country || '';
@@ -407,7 +414,7 @@ function renderCard(item){
       '<div class="card-main">' +
         '<div class="card-text">' +
           '<h3><a href="' + escAttr(detailHref) + '">' + esc(title || '-') + '</a></h3>' +
-          '<div class="meta-line">' + (item.country_flag ? '<span class="country-flag">' + esc(item.country_flag) + '</span>' : '') + esc(item.institution || '-') + ' · ' + esc(displayCountry(item) || '-') + '</div>' +
+          '<div class="meta-line">' + esc(item.institution || '-') + ' · ' + (renderCountry(item) || '-') + '</div>' +
         '</div>' +
         '<span class="status ' + escAttr(status.status) + '">' + esc(status.label) + '</span>' +
       '</div>' +
