@@ -3640,3 +3640,60 @@ Next live user check:
 - Confirm add/edit modal opens above the sidebar and scrolls correctly.
 - Confirm detail hydration, save/update/delete, poster upload, attachment upload,
   and public visibility behavior remain unchanged.
+
+---
+
+## Session: 2026-05-20 - News/Knowledge Admin Pagination Pass
+
+Completed:
+
+- Continued the Admin UX + Data Quality stabilization pass with `news.html` and
+  `knowledge.html`.
+- Added 10-record pagination to both card and list views:
+  - pager is hidden for 10 or fewer filtered rows
+  - page resets to 1 when changing filters, search, or view mode
+  - list row numbers continue from the real filtered offset
+- Updated both admin modal shells to match the newer stabilized admin pattern:
+  - viewport-centered modal panel
+  - independent modal body scrolling
+  - page scroll lock while the modal is open
+  - max-height constrained panel so footer actions remain reachable
+- Follow-up visual stabilization after user review showed News still looked like
+  the old admin UI:
+  - added the Prompt/Sarabun font import
+  - applied the same glass admin surface direction used by Scholarship/Travel
+    to News and Knowledge
+  - refreshed topbar, KPI cards, toolbar, cards, tables, pagers, buttons,
+    inputs, file chips, and modal form sections
+  - kept the shared `js/iroup-sidebar.js` sidebar and active state behavior
+    intact
+- Kept existing V2 list/detail/create/update/delete and file upload/retry logic
+  unchanged.
+
+Verification:
+
+- `git diff --check -- "Team IROUP/news.html" "Team IROUP/knowledge.html"` passed
+  with Windows CRLF warnings only.
+- Inline script syntax passed for `news.html`.
+- Inline script syntax passed for `knowledge.html`.
+- Local HTTP smoke returned 200 for `news.html`.
+- Local HTTP smoke returned 200 for `knowledge.html`.
+- Re-ran inline script syntax and local HTTP smoke after the News/Knowledge
+  visual pass; both pages still passed.
+
+Next live user check:
+
+- Hard refresh `news.html` and `knowledge.html` in the authenticated browser.
+- Confirm V2 rows load.
+- Confirm card/list pagination appears when rows exceed 10.
+- Confirm search/filter changes reset to page 1.
+- Confirm the refreshed glass admin design matches the already-approved
+  Scholarship/Travel direction.
+- Confirm add/edit modal uses the refreshed shell, opens above the sidebar, and
+  scrolls correctly.
+- Confirm existing save/update/delete/upload behavior remains unchanged.
+
+Carry-forward note:
+
+- `Team IROUP/assets/IROUP_LOGO.webp` is currently untracked and was not touched
+  by this pass; decide separately whether it should be added or ignored.

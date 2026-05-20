@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>คลังความรู้ - IROUP V2</title>
   <link rel="stylesheet" href="css/iroup-theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="js/iroup-config.js"></script>
   <script src="js/iroup-v2-endpoint.js"></script>
   <script src="js/iroup-v2-api.js"></script>
@@ -56,14 +57,19 @@
     th{font-size:13px;color:var(--navy);background:#f8fbff;font-weight:900}
     td{font-size:14px}.title-cell{font-weight:900;color:var(--navy)}
     .empty,.loading{background:#fff;border:1px dashed #cbd8e7;border-radius:18px;padding:32px;text-align:center;color:var(--muted);font-weight:900}
+    .pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 10px 24px rgba(21,36,59,.07)}
+    .pager-info{color:var(--muted);font-weight:900;font-size:13px}
+    .pager-actions{display:flex;gap:8px;align-items:center}
+    .pager-actions .btn{min-height:36px;padding:8px 12px}
     .spinner{width:24px;height:24px;border-radius:999px;border:3px solid #d9e8f4;border-top-color:var(--blue);display:inline-block;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .notice{margin:16px 0;padding:12px 14px;border-radius:14px;display:none;font-weight:800}.notice.error{display:block;background:#fff1f0;color:#b42318;border:1px solid #ffc9c4}.notice.ok{display:block;background:#ecfdf3;color:#027a48;border:1px solid #abefc6}
-    .modal{position:fixed;inset:0;background:rgba(9,24,45,.56);z-index:100000;display:none;align-items:flex-start;justify-content:center;padding:26px;overflow:auto}
-    .modal.open{display:flex}.modal-panel{width:min(1120px,100%);background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}
+    body.modal-open{overflow:hidden}
+    .modal{position:fixed;inset:0;background:rgba(9,24,45,.56);z-index:100000;display:none;align-items:center;justify-content:center;padding:26px;overflow:hidden}
+    .modal.open{display:flex}.modal-panel{width:min(1120px,100%);max-height:calc(100vh - 52px);background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden;display:flex;flex-direction:column}
     .modal-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
     .modal-head h2{margin:0;color:var(--navy);font-size:24px}.modal-head p{margin:6px 0 0;color:var(--muted);font-weight:700}
-    .modal-body{padding:22px;max-height:calc(100vh - 210px);overflow:auto}
+    .modal-body{padding:22px;overflow:auto;flex:1}
     .form-section{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
     .form-section h3{margin:0 0 14px;color:var(--navy);font-size:18px}
     .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
@@ -110,6 +116,69 @@
     .modal-panel{border-radius:22px}
     .modal-head{background:#fff}
     @media(max-width:960px){.layout{display:block}.main{margin-left:0;width:100%;padding:16px}.topbar{align-items:flex-start;flex-direction:column}.toolbar{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.modal{padding:10px}.modal-body{max-height:calc(100vh - 180px)}}
+
+    /* Knowledge admin stabilization pass. V2 save/upload behavior stays intact. */
+    body{
+      font-family:'Prompt',"Noto Sans Thai","Inter",Arial,sans-serif;
+      background:
+        radial-gradient(80% 60% at 0% 0%, rgba(187,196,255,.42) 0%, transparent 60%),
+        radial-gradient(60% 60% at 100% 0%, rgba(192,168,255,.32) 0%, transparent 65%),
+        linear-gradient(135deg,#EEF2FF 0%,#E8F0FE 38%,#F1EAFB 100%);
+      background-attachment:fixed;
+    }
+    .layout{display:block;min-height:100vh}
+    .main{margin-left:256px;width:calc(100% - 256px);min-height:100vh;padding:28px 36px 40px;background:transparent}
+    .topbar{align-items:center;gap:14px;min-height:92px;overflow:visible;background:rgba(255,255,255,.66);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.72);border-radius:26px;box-shadow:0 20px 50px rgba(15,45,90,.12);padding:22px 24px;margin-bottom:22px;color:#10233f}
+    .topbar h1{font-size:32px;line-height:1.08;letter-spacing:0;margin:0 0 6px;color:#0F2D5A}
+    .subtitle,.topbar .subtitle{font-size:15px;line-height:1.45;margin:0;color:#6B7F96!important;font-weight:700}
+    .top-actions{gap:10px}
+    .btn{border-color:#E6EDF6;border-radius:14px;background:rgba(255,255,255,.84);box-shadow:0 2px 10px rgba(15,45,90,.05);color:#26364E;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s,border-color .15s,background .15s}
+    .btn:hover{border-color:#4BBDE8;box-shadow:0 10px 30px rgba(15,45,90,.08);transform:translateY(-1px)}
+    .btn.primary{background:linear-gradient(135deg,#1A6DB5,#0F4F8E);border-color:transparent;box-shadow:0 12px 28px rgba(26,109,181,.28)}
+    .btn.danger{background:#FFF7F6;border-color:#F5C4C0;color:#C2410C}
+    .btn.ghost{background:rgba(255,255,255,.7);border-color:#E6EDF6;color:#26364E}
+    .segmented{background:rgba(255,255,255,.74);border:1px solid #E6EDF6;border-radius:16px;box-shadow:0 2px 10px rgba(15,45,90,.04);padding:3px}
+    .segmented .btn{border:0;background:transparent;border-radius:12px;box-shadow:none;min-height:36px;padding:7px 12px;color:#52647a}
+    .segmented .btn:hover{transform:none;box-shadow:none}
+    .segmented .btn.active{background:linear-gradient(135deg,#1A6DB5,#0F4F8E);box-shadow:0 4px 10px rgba(26,109,181,.24);color:#fff}
+    .kpis{gap:18px;margin:0 0 22px}
+    .kpi{border:1px solid rgba(230,237,246,.92);border-radius:22px;padding:24px 26px;min-height:116px;display:flex;align-items:center;gap:18px;background:rgba(255,255,255,.82);box-shadow:0 14px 34px rgba(15,45,90,.08)}
+    .kpi-value{font-size:40px;color:#0F2D5A}
+    .kpi-label{margin-top:0;color:#52647a}
+    .toolbar{grid-template-columns:minmax(260px,1.6fr) repeat(2,minmax(130px,.7fr)) auto;background:rgba(255,255,255,.9);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08);padding:14px 16px;margin-bottom:18px}
+    .input,.select,.textarea{border-color:#E6EDF6;background:#F8FBFE;border-radius:14px;min-height:44px;transition:border-color .15s,box-shadow .15s,background .15s;color:#10233f}
+    .textarea{font-family:'Sarabun','Prompt',sans-serif}
+    .input:hover,.select:hover,.textarea:hover{background:#fff}
+    .input:focus,.select:focus,.textarea:focus{border-color:#1A6DB5;background:#fff;box-shadow:0 0 0 4px rgba(26,109,181,.12);outline:none}
+    .notice{border-radius:18px;border-color:#BBD7EF;background:rgba(241,248,254,.92)}
+    .cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+    .knowledge-card{background:rgba(255,255,255,.92);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08);transition:transform .2s,box-shadow .2s,border-color .2s}
+    .knowledge-card:hover{transform:translateY(-2px);border-color:#4BBDE8;box-shadow:0 20px 50px rgba(15,45,90,.12)}
+    .cover{height:164px;background:linear-gradient(135deg,#E8F4FD,#F8FBFE);font-size:34px;color:#1A6DB5}
+    .card-body{padding:16px}.card-title{color:#0F2D5A;font-size:16px}.badge{border-color:#E6EDF6;background:#fff}
+    .list-wrap{background:rgba(255,255,255,.92);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08)}
+    th{background:#FBFBFE;color:#6B7F96;text-transform:uppercase;font-size:12px;letter-spacing:.04em}td{border-bottom-color:#EEF2F8}
+    tr:hover td{background:#F5FAFF}
+    .pager{background:rgba(255,255,255,.92);border-color:#E6EDF6;border-radius:18px;box-shadow:0 10px 30px rgba(15,45,90,.08);justify-content:flex-end}
+    .pager-info{color:#52647a}.pager-actions .btn{min-height:36px}
+    .modal{display:none;position:fixed;inset:0;width:100vw;height:100vh;z-index:120000;background:rgba(9,24,45,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:0;overflow:hidden}
+    .modal.open{display:block}
+    .modal-panel{position:fixed;left:50%;top:50%;width:min(1120px,calc(100vw - 96px));height:min(820px,calc(100vh - 112px));max-width:1120px;max-height:calc(100vh - 112px);margin:0;transform:translate(-50%,-50%);border:1px solid rgba(230,237,246,.92);border-radius:26px;box-shadow:0 34px 90px rgba(15,45,90,.34);overflow:hidden;display:flex;flex-direction:column;background:#fff}
+    .modal-head{position:relative;top:auto;flex:0 0 auto;padding:22px 30px;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+    .modal-head h2{font-size:24px;color:#0F2D5A;margin:0}
+    .modal-head p{font-size:14px;line-height:1.45;margin:4px 0 0;color:#6B7F96!important;font-weight:700}
+    .modal-body{flex:1 1 auto;min-height:0;overflow:auto;padding:24px 30px;background:#FBFBFE;max-height:none}
+    .modal-foot{position:relative;bottom:auto;flex:0 0 auto;padding:16px 30px;background:#fff;border-top-color:#E6EDF6}
+    .form-section{background:rgba(255,255,255,.94);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.06);padding:18px;margin-bottom:16px;min-width:0}
+    .form-section h3{font-size:13px;color:#0F2D5A;text-transform:uppercase;letter-spacing:.06em;margin:0 0 14px;font-weight:900}
+    .form-grid{gap:16px;grid-template-columns:repeat(2,minmax(260px,1fr))}
+    .field,.input,.select,.textarea{min-width:0}.label{color:#52647a;font-size:12px;display:flex;justify-content:space-between;gap:8px}
+    .modal .input,.modal .select,.modal .textarea{background:#F8FBFE !important;color:#10233f !important;border-color:#DCE7F2;box-shadow:inset 0 1px 0 rgba(255,255,255,.72);caret-color:#1A6DB5}
+    .modal .input:hover,.modal .select:hover,.modal .textarea:hover{background:#fff !important;border-color:#C8D9E8}
+    .modal .input:focus,.modal .select:focus,.modal .textarea:focus{background:#fff !important;border-color:#1A6DB5;box-shadow:0 0 0 4px rgba(26,109,181,.12)}
+    .cover-preview,.file-chip{border-color:#D7E1EA;background:#F5F8FC}
+    @media(max-width:1180px){.modal-panel{width:calc(100vw - 64px);height:calc(100vh - 96px);max-height:calc(100vh - 96px)}.form-grid{grid-template-columns:1fr}}
+    @media(max-width:900px){.main{margin-left:0;width:100%;padding:16px}.topbar{padding:18px}.modal-panel{width:calc(100vw - 24px);height:calc(100vh - 32px);max-height:calc(100vh - 32px);border-radius:18px}.modal-head,.modal-body,.modal-foot{padding-left:16px;padding-right:16px}}
   </style>
 </head>
 <body>
@@ -141,9 +210,9 @@
       </section>
 
       <section class="toolbar">
-        <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อบทความ หรือหมวดหมู่" oninput="renderKnowledge()">
-        <select id="categoryFilter" class="select" onchange="renderKnowledge()"><option value="">ทุกหมวดหมู่</option></select>
-        <select id="fileTypeFilter" class="select" onchange="renderKnowledge()">
+        <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อบทความ หรือหมวดหมู่" oninput="resetKnowledgePage()">
+        <select id="categoryFilter" class="select" onchange="resetKnowledgePage()"><option value="">ทุกหมวดหมู่</option></select>
+        <select id="fileTypeFilter" class="select" onchange="resetKnowledgePage()">
           <option value="">ทุกประเภทไฟล์</option>
           <option value="pdf">PDF</option>
           <option value="image">รูป</option>
@@ -154,6 +223,7 @@
 
       <div id="notice" class="notice"></div>
       <section id="knowledgeContent" class="cards"></section>
+      <nav id="knowledgePager" class="pager" aria-label="Knowledge pagination" hidden></nav>
     </main>
   </div>
 
@@ -296,6 +366,8 @@
       rows: [],
       lang: 'th',
       viewMode: 'card',
+      page: 1,
+      perPage: 10,
       editingId: '',
       pendingCover: null,
       existingCoverUrl: '',
@@ -327,6 +399,7 @@
     async function loadKnowledge(force) {
       showNotice('', '');
       $('#knowledgeContent').className = 'cards';
+      $('#knowledgePager').hidden = true;
       $('#knowledgeContent').innerHTML = '<div class="loading"><span class="spinner"></span>กำลังโหลดข้อมูล...</div>';
       try {
         const res = await requestKnowledge('v2.admin.knowledge.list', force ? { _: Date.now() } : {});
@@ -382,15 +455,22 @@
       if (!rows.length) {
         $('#knowledgeContent').className = 'cards';
         $('#knowledgeContent').innerHTML = '<div class="empty">ยังไม่มีบทความที่ตรงกับเงื่อนไข</div>';
+        renderPager(0, 0, 0);
         return;
       }
+      var totalPages = Math.max(1, Math.ceil(rows.length / state.perPage));
+      if (state.page > totalPages) state.page = totalPages;
+      var start = (state.page - 1) * state.perPage;
+      var pageRows = rows.slice(start, start + state.perPage);
       if (state.viewMode === 'list') {
         $('#knowledgeContent').className = 'list-wrap';
-        $('#knowledgeContent').innerHTML = renderList(rows);
+        $('#knowledgeContent').innerHTML = renderList(pageRows, start);
+        renderPager(rows.length, start + 1, Math.min(start + state.perPage, rows.length));
         return;
       }
       $('#knowledgeContent').className = 'cards';
-      $('#knowledgeContent').innerHTML = rows.map(renderCard).join('');
+      $('#knowledgeContent').innerHTML = pageRows.map(renderCard).join('');
+      renderPager(rows.length, start + 1, Math.min(start + state.perPage, rows.length));
     }
 
     function filteredRows() {
@@ -439,7 +519,7 @@
       '</article>';
     }
 
-    function renderList(rows) {
+    function renderList(rows, offset) {
       var body = rows.map(function(row, index) {
         var fileBadges = '';
         if (row._hasImage) fileBadges += '<span class="badge image">รูป</span>';
@@ -447,7 +527,7 @@
         if (row._hasYouTube) fileBadges += '<span class="badge youtube">YouTube</span>';
         if (!fileBadges) fileBadges = '<span style="color:var(--muted)">-</span>';
         return '<tr>' +
-          '<td>' + (index + 1) + '</td>' +
+          '<td>' + ((offset || 0) + index + 1) + '</td>' +
           '<td class="title-cell">' + esc(displayTitle(row) || '-') + '</td>' +
           '<td>' + esc(row.category || '-') + '</td>' +
           '<td><div class="badge-row">' + fileBadges + '</div></td>' +
@@ -461,6 +541,29 @@
       return '<table><thead><tr>' +
         '<th>#</th><th>ชื่อ</th><th>หมวดหมู่</th><th>ประเภทไฟล์</th><th>เผยแพร่</th><th>จัดการ</th>' +
         '</tr></thead><tbody>' + body + '</tbody></table>';
+    }
+
+    function renderPager(total, start, end) {
+      var pager = $('#knowledgePager');
+      if (!pager || total <= state.perPage) {
+        if (pager) pager.hidden = true;
+        return;
+      }
+      var totalPages = Math.max(1, Math.ceil(total / state.perPage));
+      pager.hidden = false;
+      pager.innerHTML =
+        '<div class="pager-info">Showing ' + start + '-' + end + ' of ' + total + ' · Page ' + state.page + '/' + totalPages + '</div>' +
+        '<div class="pager-actions">' +
+          '<button class="btn" type="button" onclick="changeKnowledgePage(-1)" ' + (state.page <= 1 ? 'disabled' : '') + '>‹</button>' +
+          '<button class="btn" type="button" onclick="changeKnowledgePage(1)" ' + (state.page >= totalPages ? 'disabled' : '') + '>›</button>' +
+        '</div>';
+    }
+
+    function changeKnowledgePage(delta) {
+      var total = filteredRows().length;
+      var totalPages = Math.max(1, Math.ceil(total / state.perPage));
+      state.page = Math.min(totalPages, Math.max(1, state.page + delta));
+      renderKnowledge();
     }
 
     function renderKpis() {
@@ -498,6 +601,7 @@
       renderPdfFile();
       setFileStatus('', false);
       $('#knowledgeModal').classList.add('open');
+      document.body.classList.add('modal-open');
     }
 
     async function openEditModal(knowledgeId) {
@@ -516,6 +620,7 @@
       renderPdfFile();
       setFileStatus('', false);
       $('#knowledgeModal').classList.add('open');
+      document.body.classList.add('modal-open');
       try {
         var res = await requestKnowledge('v2.admin.knowledge.detail', { knowledge_id: knowledgeId });
         if (!res || !res.success) throw new Error(res && res.error ? res.error : 'โหลดข้อมูลไม่สำเร็จ');
@@ -533,6 +638,7 @@
 
     function closeModal() {
       $('#knowledgeModal').classList.remove('open');
+      document.body.classList.remove('modal-open');
     }
 
     function fillForm(row) {
@@ -888,6 +994,7 @@
 
     function setViewMode(mode) {
       state.viewMode = mode === 'list' ? 'list' : 'card';
+      state.page = 1;
       $('#cardViewBtn').classList.toggle('active', state.viewMode === 'card');
       $('#listViewBtn').classList.toggle('active', state.viewMode === 'list');
       renderKnowledge();
@@ -897,6 +1004,12 @@
       $('#searchInput').value = '';
       $('#categoryFilter').value = '';
       $('#fileTypeFilter').value = '';
+      state.page = 1;
+      renderKnowledge();
+    }
+
+    function resetKnowledgePage() {
+      state.page = 1;
       renderKnowledge();
     }
 
