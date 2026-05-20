@@ -37,7 +37,7 @@ body{min-height:100vh;background:
 a{color:inherit;text-decoration:none}button,input,select{font:inherit}
 .topbar{position:sticky;top:0;z-index:50;height:64px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;gap:22px;background:rgba(7,17,31,.8);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
 :root[data-theme="light"] .topbar{background:rgba(255,255,255,.86)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{height:32px;width:auto;display:block}.brand-fallback{display:none;color:var(--text);font-weight:900}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{height:44px;max-width:132px;width:auto;object-fit:contain;display:block}.brand-fallback{display:none;color:var(--text);font-weight:900}
 .nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .nav a,.theme-toggle,.lang-btn{border:1px solid transparent;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;color:var(--soft);background:transparent;cursor:pointer}
 .nav a:hover,.nav a.active{background:rgba(35,135,255,.14);border-color:rgba(35,135,255,.28);color:var(--text)}
@@ -73,7 +73,7 @@ footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="public-landing.html"><img src="../assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="brand-fallback">iROUP</span></a>
+  <a class="brand" href="public-landing.html"><img src="../assets/IROUP_LOGO.webp" alt="iROUP" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="brand-fallback">iROUP</span></a>
   <nav class="nav" aria-label="Public navigation">
     <a href="public-news.html" data-i18n="navNews">ข่าวสาร</a>
     <a class="active" href="public-knowledge.html" data-i18n="navKnowledge">คลังความรู้</a>

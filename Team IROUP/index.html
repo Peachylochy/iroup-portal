@@ -107,46 +107,6 @@ body{
   min-height:calc(100vh - 2*var(--s7));
   overflow:hidden;
 }
-.brand-mascot{
-  position:absolute;
-  right:clamp(2px,2.2vw,30px);
-  bottom:calc(var(--s8) + 8px);
-  width:clamp(128px,14vw,178px);
-  height:auto;
-  opacity:.42;
-  filter:saturate(1.14) contrast(1.08) drop-shadow(0 18px 30px rgba(15,45,90,0.20)) drop-shadow(0 0 20px rgba(255,255,255,0.34)) drop-shadow(0 0 18px rgba(75,189,232,0.12));
-  transform:rotate(-2deg);
-  pointer-events:none;
-  user-select:none;
-  z-index:0;
-}
-
-.brand-top{
-  display:flex;align-items:center;gap:var(--s3);
-  position:relative;z-index:1;
-}
-.brand-mark{
-  width:42px;height:42px;border-radius:11px;
-  background:linear-gradient(135deg,#1A6DB5,#4BBDE8 55%,#7C3AED);
-  display:grid;place-items:center;
-  font-weight:900;font-size:17px;color:#fff;letter-spacing:.3px;
-  flex:0 0 42px;
-  box-shadow:
-    0 6px 20px -4px rgba(26,109,181,0.4),
-    0 2px 6px rgba(124,58,237,0.18),
-    inset 0 1px 0 rgba(255,255,255,.45);
-}
-.brand-mark span{pointer-events:none;user-select:none}
-.brand-wordmark{
-  font-weight:700;font-size:14.5px;color:var(--ink);
-  letter-spacing:-.15px;line-height:1.2;
-}
-.brand-wordmark small{
-  color:var(--ink-2);font-weight:500;font-size:11.5px;
-  display:block;margin-top:3px;
-  font-family:'Sarabun',sans-serif;letter-spacing:0;
-}
-
 /* globe illustration — pure inline SVG, no external asset */
 .globe-wrap{
   position:absolute;
@@ -431,7 +391,6 @@ body{
     gap:var(--s7);padding:var(--s7) var(--s6);
   }
   .globe-wrap{width:280px;height:280px;right:-60px;opacity:.32}
-  .brand-mascot{width:128px;right:2px;bottom:var(--s8);opacity:.34}
 }
 
 /* ── 768px: collapse to single column ───────────────────── */
@@ -445,7 +404,6 @@ body{
     width:100%;
   }
   .brand{min-height:auto;padding:var(--s4) 0 0}
-  .brand-mascot{display:none}
   .brand-hero{margin:var(--s5) 0 var(--s4);max-width:none;padding:0}
   .features{display:none}
   .globe-wrap{display:none}
@@ -496,9 +454,6 @@ body{
     min-width:0;width:100%;
   }
   .brand{padding:var(--s2) 0;gap:var(--s2)}
-  .brand-mark{width:34px;height:34px;font-size:13px;flex:0 0 34px}
-  .brand-wordmark{font-size:13px}
-  .brand-wordmark small{font-size:10.5px}
   .brand-hero{display:none}
   .login-card{
     border-radius:18px;
@@ -560,8 +515,6 @@ body{
 
   <!-- ── LEFT: BRAND PANEL ─────────────────────────────── -->
   <section class="brand" aria-label="iROUP brand panel">
-    <img class="brand-mascot" src="assets/Globy_IROUP.png" alt="" aria-hidden="true">
-
     <!-- Rotating globe — pure inline SVG, no external asset required -->
     <div class="globe-wrap" aria-hidden="true">
       <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -597,15 +550,6 @@ body{
         <path d="M284,166 Q260,240 222,278" stroke="#1A6DB5" stroke-opacity=".22" stroke-width="1" fill="none" stroke-dasharray="4 3"/>
         <path d="M136,118 Q140,200 168,242" stroke="#4BBDE8" stroke-opacity=".18" stroke-width="1" fill="none" stroke-dasharray="4 3"/>
       </svg>
-    </div>
-
-    <!-- wordmark -->
-    <div class="brand-top">
-      <div class="brand-mark"><span>iR</span></div>
-      <div class="brand-wordmark">
-        iROUP Workspace
-        <small>International Relations · University of Phayao</small>
-      </div>
     </div>
 
     <!-- hero copy -->

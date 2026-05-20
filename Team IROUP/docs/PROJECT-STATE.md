@@ -3693,3 +3693,41 @@ Carry-forward note:
 
 - `Team IROUP/assets/IROUP_LOGO.webp` is currently untracked and was not touched
   by this pass; decide separately whether it should be added or ignored.
+
+---
+
+## Session: 2026-05-20 - Production Logo Replacement
+
+Completed:
+
+- Adopted `Team IROUP/assets/IROUP_LOGO.webp` as the production IROUP logo asset.
+- Replaced the old logo/IR brand mark in production-facing admin and public
+  module surfaces.
+- Follow-up user review removed the new logo again from `index.html` and
+  `public/public-landing.html` because those two screens looked cleaner without
+  it.
+- Updated the shared admin sidebar logo shell so the new logo image stands alone
+  without duplicated `iROUP / International Relations Office` text.
+- Updated public nav/logo areas to use the new asset while keeping fallback text
+  behavior where it already existed.
+- Left `Team IROUP/Web design` prototype/mockup files untouched.
+- Did not change backend, API, data loading, save/update/delete, or upload logic.
+
+Verification:
+
+- Static search found no remaining old logo path or production `IR/iR` logo mark
+  outside the intentionally untouched `Team IROUP/Web design` prototype files.
+- `git diff --check` passed with Windows CRLF warning only.
+- Local HTTP smoke returned 200 for:
+  - `index.html`
+  - `dashboard.html`
+  - `public/public-landing.html`
+  - `public/public-news.html`
+  - `public/public-mobility.html`
+  - `public/public-mou.html`
+- Browser checks confirmed the new logo renders on sampled admin/public/login
+  pages at desktop and mobile widths.
+- Fixed a mobile overflow issue on `public/public-landing.html` top navigation
+  during the logo verification pass.
+- Added D3 pan/zoom controls to the `public/public-landing.html` partner atlas
+  map so it behaves more like the admin/public MOU map.

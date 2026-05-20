@@ -33,18 +33,11 @@
     /* ── TOPBAR ── */
     .topbar{
       position:sticky;top:0;z-index:100;
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      display:flex;align-items:center;justify-content:flex-end;gap:16px;
       height:62px;padding:0 clamp(16px,5vw,80px);
       background:rgba(6,15,30,.9);border-bottom:1px solid var(--border);
       backdrop-filter:blur(20px);
     }
-    .brand{display:flex;align-items:center;gap:11px;color:#fff;font-weight:800;letter-spacing:-.02em}
-    .brand-mark{
-      width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--cyan),var(--blue));
-      color:#fff;font-size:11px;font-weight:800;flex-shrink:0;
-    }
-    .brand small{display:block;color:var(--text-muted);font-weight:500;font-size:10.5px;line-height:1.25;letter-spacing:0}
     .nav{display:flex;align-items:center;gap:1px}
     .nav a,.lang-btn,.admin-btn{
       border:none;background:none;color:var(--text-muted);
@@ -188,6 +181,10 @@
     #svgMouMap{display:block;width:100%;height:100%}
     #mouMapTooltip{position:absolute;background:rgba(7,24,40,.94);color:#fff;padding:9px 12px;border-radius:10px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(75,189,232,.35);font-family:Prompt,sans-serif;z-index:50;white-space:nowrap;box-shadow:0 12px 34px rgba(0,0,0,.35)}
     body.theme-light #mouMapTooltip{background:rgba(15,45,90,.94);border-color:rgba(26,109,181,.32)}
+    .map-controls{position:absolute;right:12px;top:12px;z-index:5;display:flex;gap:6px}
+    .map-ctrl{width:34px;height:34px;border:1px solid var(--border);border-radius:10px;background:rgba(2,8,23,.72);color:var(--text);font-weight:900;font-family:"Prompt",sans-serif;cursor:pointer}
+    .map-ctrl:hover{background:rgba(37,99,235,.92);color:#fff}
+    body.theme-light .map-ctrl{background:rgba(255,255,255,.9);color:#10233f}
     .map-legend{
       padding:10px 20px;border-top:1px solid var(--border);
       display:flex;align-items:center;gap:18px;flex-wrap:wrap;
@@ -311,7 +308,6 @@
       background:var(--bg2);border-top:1px solid var(--border);
       display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
     }
-    .foot-brand{display:flex;align-items:center;gap:10px}
     .foot-links{display:flex;gap:18px;flex-wrap:wrap}
     .foot-links a{font-size:12px;color:var(--text-muted);transition:color .15s}
     .foot-links a:hover{color:#fff}
@@ -321,16 +317,12 @@
     /* ── RESPONSIVE ── */
     @media(max-width:1200px){.atlas-wrap{grid-template-columns:1fr}.bottom-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}.stats-row .stat-item:nth-child(2){border-right:none}}
-    @media(max-width:640px){.topbar{height:auto;padding:10px 16px;flex-wrap:wrap}.bottom-grid{grid-template-columns:1fr}.mob-countries-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.topbar{height:auto;padding:10px 16px;flex-wrap:wrap}.nav{width:100%;overflow-x:auto;justify-content:flex-start}.bottom-grid{grid-template-columns:1fr}.mob-countries-grid{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
 <body>
 
 <header class="topbar">
-  <a class="brand" href="public-landing.html" aria-label="iROUP public portal">
-    <span class="brand-mark">IR</span>
-    <span>iROUP<br><small>International Relations Office</small></span>
-  </a>
   <nav class="nav">
     <a href="public-news.html" data-i18n="navNews">ข่าวสาร</a>
     <a href="public-knowledge.html" data-i18n="navKnowledge">คลังความรู้</a>
@@ -426,6 +418,11 @@
       <div class="map-wrap">
         <div id="mouMapDiv">
           <div id="mouMapMsg">กำลังโหลด live MOU atlas...</div>
+          <div class="map-controls" aria-label="Map controls">
+            <button class="map-ctrl" type="button" data-map-zoom="in">+</button>
+            <button class="map-ctrl" type="button" data-map-zoom="out">−</button>
+            <button class="map-ctrl" type="button" data-map-zoom="reset">↺</button>
+          </div>
           <svg id="svgMouMap" aria-label="Live MOU partner atlas"></svg>
           <div id="mouMapTooltip"></div>
         </div>
@@ -540,13 +537,6 @@
 </main>
 
 <footer>
-  <div class="foot-brand">
-    <span class="brand-mark" style="width:34px;height:34px;font-size:10px">IR</span>
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#fff">iROUP</div>
-      <div style="font-size:11px;color:var(--text-muted)">International Relations Office · University of Phayao</div>
-    </div>
-  </div>
   <div class="foot-links">
     <a href="public-news.html">ข่าวประชาสัมพันธ์</a>
     <a href="public-knowledge.html">คลังความรู้</a>
@@ -573,6 +563,9 @@ const state = {
   news: [], knowledge: [], scholarships: [], events: [], mous: [], mouMap: [], mobility: [],
   errors: {}
 };
+let landingMouMapSvg = null;
+let landingMouMapZoom = null;
+let landingMouMapLayer = null;
 
 /* ── FLAG MAP ── */
 const FLAGS = {
@@ -988,6 +981,27 @@ function renderLiveMouAtlas() {
   grad.append('stop').attr('offset','0%').attr('stop-color', isLight ? '#dff3ff' : '#14345A');
   grad.append('stop').attr('offset','100%').attr('stop-color', isLight ? '#f8fbfe' : '#020817');
   svg.append('rect').attr('width',w).attr('height',h).attr('fill','url(#landingMouMapGrad)');
+  landingMouMapLayer = svg.append('g').attr('class', 'landing-map-zoom-layer');
+  landingMouMapSvg = svg;
+  landingMouMapZoom = d3.zoom()
+    .scaleExtent([1, 8])
+    .translateExtent([[-w * 0.5, -h * 0.5], [w * 1.5, h * 1.5]])
+    .on('zoom', function(ev) {
+      landingMouMapLayer.attr('transform', ev.transform);
+      const tip = document.getElementById('mouMapTooltip');
+      if (tip) tip.style.opacity = '0';
+    });
+  svg.call(landingMouMapZoom).on('dblclick.zoom', null);
+  window.zoomLandingMouMap = zoomLandingMouMap;
+  window.resetLandingMouMap = resetLandingMouMap;
+  document.querySelectorAll('[data-map-zoom]').forEach(function(btn) {
+    btn.onclick = function() {
+      const action = btn.getAttribute('data-map-zoom');
+      if (action === 'in') zoomLandingMouMap(1.25);
+      else if (action === 'out') zoomLandingMouMap(0.8);
+      else resetLandingMouMap();
+    };
+  });
 
   const projection = d3.geoNaturalEarth1().scale(w / 5.9).translate([w / 2, h / 2 + 20]);
   const path = d3.geoPath().projection(projection);
@@ -1010,8 +1024,8 @@ function renderLiveMouAtlas() {
 
   const drawNodes = function() {
     const home = projection([100.9, 15.9]);
-    const lineGroup = svg.append('g').attr('opacity', 0.48);
-    const nodeGroup = svg.append('g');
+    const lineGroup = landingMouMapLayer.append('g').attr('opacity', 0.48);
+    const nodeGroup = landingMouMapLayer.append('g');
     Object.entries(mapData).forEach(function(entry) {
       const country = entry[0];
       const count = entry[1];
@@ -1042,7 +1056,7 @@ function renderLiveMouAtlas() {
     .then(function(r){ return r.json(); })
     .then(function(world) {
       const countries = topojson.feature(world, world.objects.countries);
-      svg.append('g').selectAll('path').data(countries.features).join('path')
+      landingMouMapLayer.append('g').selectAll('path').data(countries.features).join('path')
         .attr('d',path)
         .attr('fill',function(d){ const c = mapData[cNames[+d.id] || ''] || 0; return c ? colorScale(c) : baseFill; })
         .attr('stroke',baseStroke).attr('stroke-width',0.45)
@@ -1064,6 +1078,18 @@ function renderLiveMouAtlas() {
     })
     .catch(drawNodes);
 }
+
+function zoomLandingMouMap(factor) {
+  if (!landingMouMapSvg || !landingMouMapZoom) return;
+  landingMouMapSvg.transition().duration(220).call(landingMouMapZoom.scaleBy, factor);
+}
+
+function resetLandingMouMap() {
+  if (!landingMouMapSvg || !landingMouMapZoom) return;
+  landingMouMapSvg.transition().duration(260).call(landingMouMapZoom.transform, d3.zoomIdentity);
+}
+window.zoomLandingMouMap = zoomLandingMouMap;
+window.resetLandingMouMap = resetLandingMouMap;
 
 /* ── MOBILITY FLOW ── */
 function renderMobilityFlow() {

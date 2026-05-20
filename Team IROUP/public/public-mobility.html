@@ -37,9 +37,8 @@ body{min-height:100vh;background:
 a{color:inherit;text-decoration:none}
 .topbar{position:sticky;top:0;z-index:50;height:64px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;gap:24px;background:rgba(7,17,31,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
 :root[data-theme="light"] .topbar{background:rgba(255,255,255,.84)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.2px}
-.brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:grid;place-items:center;color:#fff;font-weight:900}
-.brand small{display:block;font-size:10px;color:var(--muted);font-family:'Sarabun',sans-serif;margin-top:-2px}
+.brand{display:flex;align-items:center;font-weight:900;letter-spacing:.2px}
+.brand-logo{height:48px;max-width:144px;width:auto;object-fit:contain;display:block}
 .nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .nav a,.theme-toggle,.lang-btn{border:1px solid transparent;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;color:var(--soft);background:transparent;cursor:pointer;font-family:'Prompt',sans-serif}
 .nav a:hover,.nav a.active{background:rgba(35,135,255,.14);border-color:rgba(35,135,255,.28);color:var(--text)}
@@ -82,7 +81,7 @@ footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="public-landing.html"><span class="brand-mark">IR</span><span>iROUP<small>International Relations Office</small></span></a>
+  <a class="brand" href="public-landing.html"><img class="brand-logo" src="../assets/IROUP_LOGO.webp" alt="iROUP International Relations Office University of Phayao"></a>
   <nav class="nav" aria-label="Public navigation">
     <a href="public-news.html">ข่าวสาร</a>
     <a href="public-knowledge.html">คลังความรู้</a>

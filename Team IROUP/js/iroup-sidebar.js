@@ -50,8 +50,7 @@
   function html(){
     return `
       <div class="ir-final-brand">
-        <img src="assets/iroup-logo.png" alt="iROUP" onerror="this.style.display='none'">
-        <div class="ir-final-brand-title"><b>iROUP</b><br>International<br>Relations Office</div>
+        <img src="assets/IROUP_LOGO.webp" alt="iROUP" onerror="this.style.display='none'">
       </div>
       <nav class="ir-final-nav">
         ${MENU.map(g => `
@@ -102,10 +101,8 @@
       .page{padding-left:20px!important;padding-right:20px!important}
       .main .content,.main-layout .content{max-width:none!important}
 
-      .ir-final-brand{min-height:82px;display:flex;align-items:center;gap:12px;padding:18px 18px 14px;border-bottom:0;flex-shrink:0}
-      .ir-final-brand img{width:68px;height:auto;object-fit:contain;display:block}
-      .ir-final-brand-title{font-size:12px;color:#66758a;line-height:1.25}
-      .ir-final-brand-title b{color:#0F2D5A;font-weight:900}
+      .ir-final-brand{min-height:142px;display:flex;align-items:center;justify-content:center;padding:16px 18px 10px;border-bottom:0;flex-shrink:0}
+      .ir-final-brand img{width:142px;max-width:100%;max-height:118px;height:auto;object-fit:contain;display:block}
       .ir-final-nav{padding:8px 14px 18px;overflow:auto;flex:1}
       .ir-final-section{font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;margin:18px 10px 8px;letter-spacing:.12em}
       .ir-final-link{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;color:#26364e!important;font-weight:800;font-size:14px;cursor:pointer;font-family:'Prompt',sans-serif;transition:.18s;text-decoration:none!important;margin-bottom:4px;background:transparent;border:0}
@@ -123,6 +120,7 @@
         .sidebar{position:relative!important;width:100%!important;min-width:100%!important;max-width:100%!important;height:auto!important}
         .main,.main-layout,.page{margin-left:0!important;width:100%!important}
         .ir-final-brand{height:auto;padding:14px 16px}
+        .ir-final-brand img{width:104px;max-height:82px}
         .ir-final-nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px}
         .ir-final-section{display:none}
         .ir-final-link{width:auto;white-space:nowrap;margin-bottom:0}
