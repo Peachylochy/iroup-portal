@@ -3580,3 +3580,63 @@ Next recommended work:
 - Continue Admin UX + Data Quality stabilization with the next module, likely
   Scholarship or News/Knowledge follow-up depending on which live page feels most
   inconsistent after Travel.
+
+---
+
+## Session: 2026-05-20 - Scholarship Admin Stabilization Kickoff
+
+Completed:
+
+- Began Scholarship admin stabilization using the current Dashboard/MOU/Mobility/
+  Events/Travel admin shell direction.
+- Kept Scholarship runtime data/write/upload logic on the existing V2 admin
+  adapters:
+  - `IROUP_V2.admin.scholarshipList()`
+  - `IROUP_V2.admin.scholarshipDetail()`
+  - `IROUP_V2.admin.scholarshipCreate()`
+  - `IROUP_V2.admin.scholarshipUpdate()`
+  - `IROUP_V2.admin.scholarshipDelete()` / `v2.admin.scholarship.delete`
+  - `IROUP_V2.admin.fileUpload()`
+- Connected `scholarship.html` to the shared `js/iroup-sidebar.js` sidebar so
+  admin navigation includes the current News/Knowledge/Ecosystem entries.
+- Added 10-record pagination for both card and list views.
+- Updated the Scholarship modal shell to match the newer Mobility/Events/Travel
+  pattern:
+  - fixed viewport-centered panel
+  - modal body scrolls independently
+  - page scroll locks while modal is open
+  - form controls use light surfaces across normal/hover/focus states
+- Applied a small CSS-only visual alignment pass:
+  - softer admin background
+  - glassy topbar and toolbar
+  - cleaner cards/table/pager/modal/file surfaces
+- Public Scholarship flag/name follow-up:
+  - Removed flag rendering from `public/public-scholar.html` and
+    `public/public-scholar-detail.html` after browser review showed flag fallback
+    rendering as visible `US`/`MY` text badges.
+  - Country display now strips leading ISO/code prefixes such as `MY มาเลเซีย`.
+
+Verification:
+
+- Inline script syntax passed for `scholarship.html`.
+- Inline script syntax passed for `public/public-scholar.html`.
+- Inline script syntax passed for `public/public-scholar-detail.html`.
+- `git diff --check -- "Team IROUP/scholarship.html"` passed with Windows CRLF
+  warning only.
+- `git diff --check -- "Team IROUP/public/public-scholar.html"` passed with Windows
+  CRLF warning only.
+- `git diff --check -- "Team IROUP/public/public-scholar-detail.html"` passed with
+  Windows CRLF warning only.
+- Local HTTP smoke returned 200 for `scholarship.html`.
+- Local HTTP smoke returned 200 for `public/public-scholar.html`.
+- Local HTTP smoke returned 200 for `public/public-scholar-detail.html`.
+- User-confirmed Public Scholarship list/detail after removing flag rendering.
+
+Next live user check:
+
+- Hard refresh `scholarship.html` in the authenticated browser.
+- Confirm V2 Scholarship rows load.
+- Confirm card/list pagination appears when rows exceed 10.
+- Confirm add/edit modal opens above the sidebar and scrolls correctly.
+- Confirm detail hydration, save/update/delete, poster upload, attachment upload,
+  and public visibility behavior remain unchanged.
