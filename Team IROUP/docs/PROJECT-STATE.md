@@ -3731,3 +3731,39 @@ Verification:
   during the logo verification pass.
 - Added D3 pan/zoom controls to the `public/public-landing.html` partner atlas
   map so it behaves more like the admin/public MOU map.
+
+---
+
+## Session: 2026-05-20 - Public Landing Cardview Refresh
+
+Completed:
+
+- Refreshed only the lower public landing content area from `อัปเดต & โอกาส`
+  downward; kept the existing hero, partner atlas map, and mobility flow sections
+  unchanged.
+- Replaced KPI emoji markers on `public/public-landing.html` with inline SVG
+  icon marks matching the new cardview direction.
+- Reworked the lower public landing layout using the local
+  `assets/Redesign  final/Landing - Cardview.html` reference as a design source,
+  without adding the untracked mockup folder to git.
+- Added:
+  - wide latest-news feature card with three mini news cards
+  - featured knowledge rail
+  - scholarship/event cards with countdown rings based on deadline/start dates
+  - horizontal Quick Links strip with live V2 counts
+- Corrected the public landing footer contact information to:
+  `054-466-666 ต่อ 1024 · inter@up.ac.th`
+
+Verification:
+
+- Inline script syntax passed for `public/public-landing.html`.
+- `git diff --check -- "Team IROUP/public/public-landing.html"` passed.
+- Local HTTP smoke returned 200 for `public/public-landing.html`.
+- Browser smoke confirmed live V2 render:
+  - 4 KPI SVG icons
+  - news cardview rendered
+  - 4 opportunity cards rendered
+  - 6 quick links rendered
+  - corrected contact text rendered
+  - no desktop horizontal overflow
+  - no browser console errors
