@@ -1,5 +1,5 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-17 | Session: Public NEWS & Knowledge V2 Activation + UX Alignment**
+**Last updated: 2026-05-20 | Session: Scholarship + News/Knowledge Admin Live Confirmation**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
@@ -3632,14 +3632,13 @@ Verification:
 - Local HTTP smoke returned 200 for `public/public-scholar-detail.html`.
 - User-confirmed Public Scholarship list/detail after removing flag rendering.
 
-Next live user check:
+Live user confirmation:
 
-- Hard refresh `scholarship.html` in the authenticated browser.
-- Confirm V2 Scholarship rows load.
-- Confirm card/list pagination appears when rows exceed 10.
-- Confirm add/edit modal opens above the sidebar and scrolls correctly.
-- Confirm detail hydration, save/update/delete, poster upload, attachment upload,
-  and public visibility behavior remain unchanged.
+- User hard-refreshed `scholarship.html` in the authenticated browser and
+  confirmed the page is acceptable after the stabilization pass.
+- V2 Scholarship rows, card/list pagination, add/edit modal layering/scrolling,
+  detail hydration, save/update/delete behavior, poster upload, attachment upload,
+  and public visibility behavior are considered live-checked.
 
 ---
 
@@ -3681,17 +3680,14 @@ Verification:
 - Re-ran inline script syntax and local HTTP smoke after the News/Knowledge
   visual pass; both pages still passed.
 
-Next live user check:
+Live user confirmation:
 
-- Hard refresh `news.html` and `knowledge.html` in the authenticated browser.
-- Confirm V2 rows load.
-- Confirm card/list pagination appears when rows exceed 10.
-- Confirm search/filter changes reset to page 1.
-- Confirm the refreshed glass admin design matches the already-approved
-  Scholarship/Travel direction.
-- Confirm add/edit modal uses the refreshed shell, opens above the sidebar, and
-  scrolls correctly.
-- Confirm existing save/update/delete/upload behavior remains unchanged.
+- User hard-refreshed `news.html` and `knowledge.html` in the authenticated
+  browser and confirmed both pages are acceptable after the pagination/modal/
+  visual stabilization pass.
+- V2 rows, card/list pagination, search/filter/view page reset, refreshed glass
+  admin design, add/edit modal layering/scrolling, and existing save/update/
+  delete/upload behavior are considered live-checked.
 
 Carry-forward note:
 
