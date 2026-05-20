@@ -3528,3 +3528,55 @@ Next recommended work:
 - Continue Admin UX + Data Quality stabilization with the next module, likely
   Travel, using the same sequence: data parity, edit hydration, files/relations,
   table/list ergonomics, then visual layout.
+
+---
+
+## Session: 2026-05-20 - Travel Admin Stabilization Kickoff
+
+Completed:
+
+- Began Travel admin stabilization using the current Dashboard/MOU/Mobility/Events
+  admin shell direction.
+- Kept Travel runtime data/write logic on the existing V2 admin routes:
+  - `v2.admin.travel.list`
+  - `v2.admin.travel.detail`
+  - `v2.admin.travel.create`
+  - `v2.admin.travel.update`
+  - `v2.admin.travel.delete`
+  - `v2.admin.travel.budget.get`
+  - `v2.admin.travel.budget.save`
+  - `v2.admin.travel.participant.list`
+  - `v2.admin.travel.participant.add`
+  - `v2.admin.travel.participant.delete`
+- Connected `travel.html` to the shared `js/iroup-sidebar.js` sidebar so admin
+  navigation includes the current News/Knowledge/Ecosystem entries.
+- Added 10-record pagination for both card and list views.
+- Updated the Travel modal shell to match the newer Mobility/Events pattern:
+  - fixed viewport-centered panel
+  - modal body scrolls independently
+  - page scroll locks while modal is open
+  - form controls use light surfaces across normal/hover/focus states
+- Removed leftover debug console logs from Travel edit hydration.
+- Applied a small CSS-only visual alignment pass:
+  - softer admin background
+  - glassy topbar, KPI cards, toolbar, cards/table/pager/modal surfaces
+  - tighter participant rows for long names/units/roles
+
+Verification:
+
+- Inline script syntax passed for `travel.html`.
+- `git diff --check -- "Team IROUP/travel.html"` passed with Windows CRLF warning
+  only.
+- Local HTTP smoke returned 200 for `travel.html`.
+- User-confirmed live authenticated Travel page after hard refresh:
+  - V2 Travel rows load.
+  - Card/list pagination works.
+  - Add/edit modal opens above the sidebar and scrolls correctly.
+  - Budget and participant behavior remains acceptable after the stabilization pass.
+
+Next recommended work:
+
+- Commit the Travel admin stabilization pass.
+- Continue Admin UX + Data Quality stabilization with the next module, likely
+  Scholarship or News/Knowledge follow-up depending on which live page feels most
+  inconsistent after Travel.
