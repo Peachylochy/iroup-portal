@@ -3469,3 +3469,45 @@ Next recommended work:
 - Proceed to the next Admin UX + Data Quality module, likely Events, using the
   same data-safe sequence: data parity, edit hydration, file behavior, table/list
   ergonomics, then visual layout.
+
+---
+
+## Session: 2026-05-20 - Events Admin Stabilization Kickoff
+
+Completed:
+
+- Began Events admin stabilization using the current Dashboard/MOU/Mobility admin
+  shell direction.
+- Kept Events runtime data/write logic on the existing V2 admin adapters:
+  - `IROUP_V2.admin.eventList()`
+  - `IROUP_V2.admin.eventCreate()`
+  - `IROUP_V2.admin.eventUpdate()`
+  - `IROUP_V2.admin.eventDelete()`
+  - `IROUP_V2.admin.fileUpload()`
+- Connected `events.html` to the shared `js/iroup-sidebar.js` sidebar so admin
+  navigation includes the current News/Knowledge/Ecosystem entries.
+- Added 10-record pagination for both card and list views.
+- Updated the Events modal shell to match the newer Mobility pattern:
+  - fixed viewport-centered panel
+  - modal body scrolls independently
+  - page scroll locks while modal is open
+  - form controls use light surfaces across normal/hover/focus states
+- Applied a small CSS-only visual alignment pass:
+  - softer admin background
+  - glassy topbar and toolbar
+  - cleaner cards/table/pager/modal surfaces
+
+Verification:
+
+- Inline script syntax passed for `events.html`.
+- `git diff --check -- "Team IROUP/events.html"` passed with Windows CRLF warning
+  only.
+- Local HTTP smoke returned 200 for `events.html`.
+- User-confirmed live authenticated Events page after hard refresh.
+
+Next recommended work:
+
+- Commit the Events admin stabilization pass.
+- Continue Admin UX + Data Quality stabilization with the next module, likely
+  Travel, using the same sequence: data parity, edit hydration, files/relations,
+  table/list ergonomics, then visual layout.

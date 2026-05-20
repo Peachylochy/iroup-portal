@@ -40,12 +40,55 @@ button,input,select,textarea{font:inherit}
 .badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.active{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.draft{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.cancelled{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.pin{color:#6D43BA;background:#F6F0FF;border-color:#D8C8FF}.badge.mode{color:#174B7A;background:#F1F8FE;border-color:#BBD7EF}.badge.days-green{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.days-yellow{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.days-red{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.done{color:#56657A;background:#F3F6FA;border-color:#D7E1EA}
 .card-actions{margin-top:auto;display:flex;justify-content:flex-end;gap:8px}.empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}
 .list-wrap{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:auto;box-shadow:0 6px 20px rgba(15,45,90,.06)}.event-table{width:100%;border-collapse:collapse;min-width:920px}.event-table th,.event-table td{padding:12px 14px;border-bottom:1px solid #EDF3F8;text-align:left;vertical-align:middle;font-size:13px}.event-table th{background:#F8FBFE;color:#344761;font-weight:900}.event-table tr:last-child td{border-bottom:0}.event-title-cell{font-weight:900;color:var(--navy)}
+.table-pager{grid-column:1/-1;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 14px;border-top:1px solid #EDF3F8;background:#fff}.pager-btn{height:36px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:#F8FBFE;color:var(--navy);font-weight:900;cursor:pointer}.pager-btn:disabled{opacity:.45;cursor:not-allowed}.pager-info{font-size:12px;color:var(--muted);font-weight:900}
 .file-picker-row{display:flex;gap:10px;flex-wrap:wrap}.file-list{display:grid;gap:8px;margin-top:8px}.file-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);background:#F8FBFE;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:800;color:var(--muted)}.file-chip button{min-height:30px;padding:5px 9px}
 .modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1080px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.checks{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding-top:22px}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}
 .loading{display:grid;place-items:center;padding:36px;color:var(--muted);font-weight:800}.spinner{width:28px;height:28px;border:3px solid #D8E7F4;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:auto auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{justify-content:center}}
 @media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:16px}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.topbar{align-items:flex-start;flex-wrap:wrap}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}}
+
+/* Events admin stabilization pass. CSS-only visual alignment with the newer admin shell. */
+body{
+  background:
+    radial-gradient(80% 60% at 0% 0%, rgba(187,196,255,.42) 0%, transparent 60%),
+    radial-gradient(60% 60% at 100% 0%, rgba(192,168,255,.32) 0%, transparent 65%),
+    linear-gradient(135deg,#EEF2FF 0%,#E8F0FE 38%,#F1EAFB 100%);
+  background-attachment:fixed;
+}
+body.modal-open{overflow:hidden}
+.main{padding:28px 36px 40px}
+.topbar{align-items:center;gap:14px;min-height:92px;overflow:visible;background:rgba(255,255,255,.66);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.72);border-radius:26px;box-shadow:0 20px 50px rgba(15,45,90,.12);padding:22px 24px;margin-bottom:22px}
+.title{font-size:32px;line-height:1.08;letter-spacing:0;margin:0 0 6px;color:#0F2D5A}
+.subtitle{font-size:15px;line-height:1.45;margin:0;color:#6B7F96}
+.btn{border-color:#E6EDF6;border-radius:14px;background:rgba(255,255,255,.84);box-shadow:0 2px 10px rgba(15,45,90,.05);color:#26364E}
+.btn:hover{border-color:#4BBDE8;box-shadow:0 10px 30px rgba(15,45,90,.08);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,#1A6DB5,#0F4F8E);border-color:transparent;box-shadow:0 12px 28px rgba(26,109,181,.28)}
+.btn.danger{background:#FFF7F6;border-color:#F5C4C0;color:#C2410C}
+.lang-toggle,.view-toggle{background:rgba(255,255,255,.74);border-color:#E6EDF6;border-radius:16px;box-shadow:0 2px 10px rgba(15,45,90,.04)}
+.lang-toggle button,.view-toggle button{border-radius:12px}
+.lang-toggle button.active,.view-toggle button.active{background:linear-gradient(135deg,#1A6DB5,#0F4F8E);box-shadow:0 4px 10px rgba(26,109,181,.24)}
+.toolbar{grid-template-columns:minmax(260px,1.6fr) repeat(3,minmax(130px,.7fr)) auto;background:rgba(255,255,255,.9);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08);padding:14px 16px;margin-bottom:18px}
+.input,.select,.textarea{border-color:#E6EDF6;background:#F8FBFE;border-radius:14px;min-height:44px;transition:border-color .15s,box-shadow .15s,background .15s;color:#10233f}
+.input:hover,.select:hover,.textarea:hover{background:#fff}
+.input:focus,.select:focus,.textarea:focus{border-color:#1A6DB5;background:#fff;box-shadow:0 0 0 4px rgba(26,109,181,.12)}
+.notice{border-radius:18px;border-color:#BBD7EF;background:rgba(241,248,254,.92)}
+.list-wrap,.event-card{background:rgba(255,255,255,.92);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08)}
+.event-table th{background:#FBFBFE;color:#6B7F96;text-transform:uppercase;font-size:12px;letter-spacing:.04em}.event-table td{border-bottom-color:#EEF2F8}.event-table tr:hover td{background:#F5FAFF}
+.cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}.event-card{padding:20px;transition:transform .2s,box-shadow .2s,border-color .2s}.event-card:hover{transform:translateY(-2px);border-color:#4BBDE8;box-shadow:0 20px 50px rgba(15,45,90,.12)}.card-title{color:#0F2D5A}.badge{border-color:#E6EDF6;background:#fff}
+.table-pager{background:rgba(255,255,255,.92);border-top-color:#EEF2F8;border-radius:0 0 22px 22px}.cards .table-pager{border:1px solid #E6EDF6;border-radius:18px;box-shadow:0 10px 30px rgba(15,45,90,.08)}.pager-btn{border-color:#E6EDF6;border-radius:14px;background:#F5F8FC}
+.modal{display:none;position:fixed;inset:0;width:100vw;height:100vh;z-index:120000;background:rgba(9,24,45,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:0;overflow:hidden}
+.modal.open{display:block}
+.modal-panel{position:fixed;left:50%;top:50%;width:min(1120px,calc(100vw - 96px));height:min(820px,calc(100vh - 112px));max-width:1120px;max-height:calc(100vh - 112px);margin:0;transform:translate(-50%,-50%);border:1px solid rgba(230,237,246,.92);border-radius:26px;box-shadow:0 34px 90px rgba(15,45,90,.34);overflow:hidden;display:flex;flex-direction:column;background:#fff}
+.modal-panel form{height:100%;min-height:0;display:flex;flex-direction:column}
+.modal-head{position:relative;top:auto;flex:0 0 auto;padding:22px 30px;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.modal-title{font-size:24px;color:#0F2D5A}.modal-body{flex:1 1 auto;min-height:0;overflow:auto;padding:24px 30px;background:#FBFBFE}.modal-foot{position:relative;bottom:auto;flex:0 0 auto;padding:16px 30px;background:#fff}
+.form-grid{gap:16px;grid-template-columns:repeat(2,minmax(260px,1fr))}.field,.input,.select,.textarea{min-width:0}.label{color:#52647a}
+.modal .input,.modal .select,.modal .textarea{background:#F8FBFE !important;color:#10233f !important;border-color:#DCE7F2;box-shadow:inset 0 1px 0 rgba(255,255,255,.72);caret-color:#1A6DB5}
+.modal .input:hover,.modal .select:hover,.modal .textarea:hover{background:#fff !important;border-color:#C8D9E8}
+.modal .input:focus,.modal .select:focus,.modal .textarea:focus{background:#fff !important;border-color:#1A6DB5;box-shadow:0 0 0 4px rgba(26,109,181,.12)}
+@media(max-width:1180px){.modal-panel{width:calc(100vw - 64px);height:calc(100vh - 96px);max-height:calc(100vh - 96px)}.form-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.main{padding:16px}.topbar{padding:18px}.modal-panel{width:calc(100vw - 24px);height:calc(100vh - 32px);max-height:calc(100vh - 32px);border-radius:18px}.modal-head,.modal-body,.modal-foot{padding-left:16px;padding-right:16px}}
 </style>
 </head>
 <body>
@@ -251,7 +294,10 @@ const state = {
   editingId: '',
   viewMode: 'card',
   pendingFiles: [],
-  loading: false
+  loading: false,
+  page: 1,
+  pageSize: 10,
+  lastFilterKey: ''
 };
 
 const $ = selector => document.querySelector(selector);
@@ -332,6 +378,11 @@ function renderEvents() {
   const typeId = $('#typeFilter').value;
   const status = $('#statusFilter').value;
   const year = $('#yearFilter').value;
+  const filterKey = [q, typeId, status, year, state.viewMode].join('|');
+  if (filterKey !== state.lastFilterKey) {
+    state.page = 1;
+    state.lastFilterKey = filterKey;
+  }
   const rows = state.events.filter(event => {
     const haystack = [
       event.title_th, event.title_en, event.event_type, event.event_type_id,
@@ -350,14 +401,19 @@ function renderEvents() {
     return;
   }
 
+  const maxPage = Math.max(1, Math.ceil(rows.length / state.pageSize));
+  state.page = Math.min(Math.max(1, state.page), maxPage);
+  const start = (state.page - 1) * state.pageSize;
+  const pageRows = rows.slice(start, start + state.pageSize);
+
   if (state.viewMode === 'list') {
     $('#eventCards').className = 'list-wrap';
-    $('#eventCards').innerHTML = renderList(rows);
+    $('#eventCards').innerHTML = renderList(pageRows, rows.length);
     return;
   }
 
   $('#eventCards').className = 'cards';
-  $('#eventCards').innerHTML = rows.map(renderCard).join('');
+  $('#eventCards').innerHTML = pageRows.map(renderCard).join('') + renderPager(rows.length);
 }
 
 function renderCard(event) {
@@ -398,7 +454,7 @@ function renderCard(event) {
   `;
 }
 
-function renderList(rows) {
+function renderList(rows, totalRows) {
   const body = rows.map(event => {
     const type = findEventType(event.event_type_id, event.event_type);
     const status = event.status || 'draft';
@@ -434,7 +490,25 @@ function renderList(rows) {
       </thead>
       <tbody>${body}</tbody>
     </table>
+    ${renderPager(totalRows)}
   `;
+}
+
+function renderPager(totalRows) {
+  if (totalRows <= state.pageSize) return '';
+  const maxPage = Math.max(1, Math.ceil(totalRows / state.pageSize));
+  return `
+    <div class="table-pager">
+      <button class="pager-btn" type="button" onclick="changeEventPage(-1)" ${state.page <= 1 ? 'disabled' : ''}>Prev</button>
+      <span class="pager-info">${esc(state.page)} / ${esc(maxPage)} · ${esc(totalRows)} records</span>
+      <button class="pager-btn" type="button" onclick="changeEventPage(1)" ${state.page >= maxPage ? 'disabled' : ''}>Next</button>
+    </div>
+  `;
+}
+
+function changeEventPage(delta) {
+  state.page = Math.max(1, state.page + delta);
+  renderEvents();
 }
 
 function openCreateModal() {
@@ -451,6 +525,7 @@ function openCreateModal() {
   updateEventModeFields();
   renderSelectedFiles();
   $('#eventModal').classList.add('open');
+  document.body.classList.add('modal-open');
 }
 
 function openEditModal(eventId) {
@@ -488,10 +563,12 @@ function openEditModal(eventId) {
   updateEventModeFields();
   renderSelectedFiles();
   $('#eventModal').classList.add('open');
+  document.body.classList.add('modal-open');
 }
 
 function closeModal() {
   $('#eventModal').classList.remove('open');
+  document.body.classList.remove('modal-open');
 }
 
 async function saveEvent(evt) {
@@ -831,5 +908,6 @@ function escAttr(value) {
   return esc(value).replace(/`/g, '&#96;');
 }
 </script>
+<script src="js/iroup-sidebar.js"></script>
 </body>
 </html>
