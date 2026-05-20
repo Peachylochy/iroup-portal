@@ -100,7 +100,7 @@ button,input,select,textarea{font:inherit}
 .pill.expire-soon{background:var(--gold-pale);color:#C07000;border-color:var(--gold)}
 .pill.expired{background:var(--red-pale);color:var(--red);border-color:var(--red)}
 
-.map-chart-row{display:grid;grid-template-columns:1fr 340px;gap:16px}
+.map-chart-row{display:grid;grid-template-columns:1fr;gap:16px}
 .map-card{background:var(--navy-dark);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);position:relative}
 .map-header{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between}
 .map-title{font-size:14px;font-weight:700;color:#fff}
@@ -108,10 +108,13 @@ button,input,select,textarea{font:inherit}
 .map-legend{display:flex;gap:14px;margin-top:10px;padding:0 20px}
 .legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,0.55);font-family:'Inter',sans-serif}
 .legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-#world-map{width:100%;height:340px;display:block}
+#world-map{width:100%;height:430px;display:block}
 .map-tooltip{position:absolute;background:rgba(10,20,40,0.92);color:#fff;padding:8px 12px;border-radius:8px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(75,189,232,0.3);min-width:140px;z-index:50;font-family:'Prompt',sans-serif}
 .map-tooltip .tt-country{font-weight:700;font-size:13px;color:var(--blue-light);margin-bottom:4px}
 .map-tooltip .tt-row{display:flex;justify-content:space-between;gap:16px;font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px}
+.map-controls{position:absolute;right:14px;top:14px;z-index:60;display:flex;gap:6px}
+.map-ctrl{width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,.18);background:rgba(8,20,38,.76);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.map-ctrl:hover{background:rgba(26,109,181,.9)}
 .map-popup{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:20px;min-width:320px;max-width:420px;display:none;z-index:200;border:1.5px solid var(--blue-light)}
 .map-popup.show{display:block}
 .popup-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -126,7 +129,7 @@ button,input,select,textarea{font:inherit}
 .chart-card{background:var(--white);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);display:flex;flex-direction:column}
 .chart-title{font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:4px}
 .chart-sub{font-size:11px;color:var(--gray-600);margin-bottom:14px;font-family:'Inter',sans-serif}
-.chart-wrap{flex:1;position:relative;min-height:280px}
+.chart-wrap{flex:1;position:relative;min-height:360px}
 
 .table-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);overflow:hidden}
 .table-header{padding:14px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
@@ -136,6 +139,10 @@ button,input,select,textarea{font:inherit}
 .tbl-btn{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'Prompt',sans-serif;display:flex;align-items:center;gap:5px;transition:all .2s}
 .tbl-btn-export{background:var(--green-pale);color:var(--green)}
 .table-wrap{overflow-x:auto}
+.table-pager{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 18px;border-top:1px solid var(--gray-200);background:var(--white)}
+.pager-btn{padding:7px 13px;border-radius:8px;border:1px solid var(--gray-300);background:var(--white);color:var(--navy);font-weight:800;font-size:12px;cursor:pointer}
+.pager-btn:disabled{opacity:.45;cursor:not-allowed}
+.pager-info{font-size:12px;color:var(--gray-600);font-weight:700}
 table{width:100%;border-collapse:collapse;font-size:12px}
 thead{background:var(--gray-100);position:sticky;top:0}
 th{padding:10px 14px;text-align:left;font-weight:600;color:var(--gray-600);font-size:11px;white-space:nowrap;border-bottom:1px solid var(--gray-200);font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:0.3px}
@@ -187,7 +194,9 @@ tr:hover td{background:var(--blue-pale)}
 .file-pick-btn{padding:9px 14px;border-radius:8px;border:none;background:var(--blue-pale);color:var(--blue);font-weight:700;cursor:pointer;font-family:'Prompt',sans-serif}
 .file-list{display:grid;gap:8px;margin-top:8px}
 .file-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--gray-300);background:#F8FBFE;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:700;color:var(--gray-600)}
+.file-chip a{color:var(--blue);font-weight:800;text-decoration:none}
 .file-chip button{width:28px;height:28px;border-radius:7px;border:none;background:var(--red-pale);color:var(--red);cursor:pointer;font-weight:800}
+.file-chip .file-open{width:auto;height:auto;padding:6px 10px;border-radius:7px;border:1px solid var(--blue-pale);background:var(--blue-pale);color:var(--blue)}
 .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-200)}
 .modal-btn{padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Prompt',sans-serif;transition:all .2s}
 .modal-save{background:linear-gradient(135deg,var(--blue),var(--blue-light));color:#fff}
@@ -303,6 +312,11 @@ tr:hover td{background:var(--blue-pale)}
           <div class="legend-item"><div class="legend-dot" style="background:#1A6DB5"></div>4–7 MOU</div>
           <div class="legend-item"><div class="legend-dot" style="background:#F5A623"></div>8+ MOU</div>
           <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.08)"></div>ไม่มี MOU</div>
+        </div>
+        <div class="map-controls" aria-label="Map controls">
+          <button class="map-ctrl" type="button" onclick="zoomMouMap(1.25)">+</button>
+          <button class="map-ctrl" type="button" onclick="zoomMouMap(0.8)">−</button>
+          <button class="map-ctrl" type="button" onclick="resetMouMap()">↺</button>
         </div>
         <svg id="world-map"></svg>
         <div class="map-tooltip" id="mapTooltip"></div>
@@ -457,6 +471,8 @@ const EXPIRING_DAYS = 90;
 const state = {
   lang: 'th',
   currentStatus: 'all',
+  currentPage: 1,
+  pageSize: 10,
   rows: [],
   countries: [],
   units: [],
@@ -469,6 +485,10 @@ let countryCounts = {};
 let deptChart = null;
 let mapCountryPaths = null;
 let mapCountryNames = {};
+let mapSvg = null;
+let mapProjection = null;
+let mapZoom = null;
+let mapLayer = null;
 
 const $ = selector => document.querySelector(selector);
 
@@ -488,6 +508,7 @@ function unwrapList(response){
 }
 
 function normalizeMou(row){
+  row = row || {};
   const country = row.country || {};
   const unit = row.up_unit || {};
   return {
@@ -500,6 +521,7 @@ function normalizeMou(row){
     country_id: country.country_id || row.country_id || '',
     country_name_th: country.country_name_th || '',
     country_name_en: country.country_name_en || '',
+    country_iso2: country.iso2 || row.country_iso2 || '',
     continent_th: country.continent_th || '',
     continent_en: country.continent_en || '',
     continent: row.continent || '',
@@ -534,11 +556,46 @@ function unitDisplay(row){
     : row.up_unit_name_th || row.up_unit_name_en || row.up_unit_id || '-';
 }
 
+function unitShortLabel(value){
+  const text = String(value || '').trim();
+  const map = {
+    'คณะศิลปศาสตร์':'ศิลปฯ',
+    'มหาวิทยาลัยพะเยา':'UP',
+    'คณะเกษตรศาสตร์':'เกษตรฯ',
+    'คณะบริหารธุรกิจและนิเทศศาสตร์':'บริหารฯ',
+    'คณะเทคโนโลยีสารสนเทศและการสื่อสาร':'ICT',
+    'สถาบันนวัตกรรมและถ่ายทอดเทคโนโลยี มหาวิทยาลัยพะเยา':'UPITI',
+    'คณะทันตแพทยศาสตร์':'ทันตฯ',
+    'คณะพยาบาลศาสตร์':'พยาบาลฯ',
+    'กองกิจการนิสิต':'กิจการนิสิต',
+    'คณะเภสัชศาสตร์':'เภสัชฯ',
+    'คณะสาธารณสุขศาสตร์':'สาธารณสุขฯ',
+    'คณะวิทยาศาสตร์การแพทย์':'วิทย์แพทย์',
+    'คณะนิติศาสตร์':'นิติฯ',
+    'คณะวิทยาศาสตร์':'วิทย์ฯ',
+    'คณะพลังงานและสิ่งแวดล้อม':'พลังงานฯ',
+    'วิทยาลัยการศึกษา':'การศึกษา'
+  };
+  if (map[text]) return map[text];
+  if (text.length <= 12) return text;
+  return text.replace(/^คณะ/, '').replace(/^วิทยาลัย/, 'ว.').replace(/^สถาบัน/, 'ส.').slice(0, 14) + '…';
+}
+
 function countryDisplay(row){
   const name = state.lang === 'en'
     ? row.country_name_en || row.country_name_th
     : row.country_name_th || row.country_name_en;
-  return [row.flag_emoji, name || row.country_id].filter(Boolean).join(' ');
+  return name || row.country_id || '-';
+}
+
+function isoToFlag(iso2){
+  const code = String(iso2 || '').trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(code)) return '';
+  return code.replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt(0)));
+}
+
+function countryFlag(row){
+  return row.flag_emoji || isoToFlag(row.country_iso2) || '';
 }
 
 function countryMapName(row){
@@ -628,19 +685,26 @@ function getVisibleMouRows(){
 function renderTable(rows){
   const tbody = $('#mouBody');
   if (!tbody) return;
+  const totalRows = rows.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / state.pageSize));
+  if (state.currentPage > totalPages) state.currentPage = totalPages;
+  const startIndex = (state.currentPage - 1) * state.pageSize;
+  const pageRows = rows.slice(startIndex, startIndex + state.pageSize);
   if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--gray-500);padding:28px">ไม่พบข้อมูล</td></tr>';
     $('#tableCount').textContent = 'แสดง 0 รายการ';
+    renderPagination(0, 1);
     return;
   }
-  tbody.innerHTML = rows.map((row, index) => {
+  tbody.innerHTML = pageRows.map((row, index) => {
     const status = rowStatus(row);
     const fileCell = renderFileCell(row);
+    const itemNumber = startIndex + index + 1;
     return `<tr>
-      <td style="color:var(--gray-400);font-size:11px;font-family:'Inter',sans-serif">${String(index + 1).padStart(2, '0')}</td>
+      <td style="color:var(--gray-400);font-size:11px;font-family:'Inter',sans-serif">${String(itemNumber).padStart(2, '0')}</td>
       <td><div class="td-uni">${esc(unitDisplay(row))}</div></td>
       <td><div class="td-uni" style="font-size:12px">${esc(partnerTitle(row))}</div></td>
-      <td><div class="country-flag"><span class="flag-emoji">${esc(row.flag_emoji || '')}</span><span class="country-name">${esc(countryDisplay(row))}</span></div></td>
+      <td><div class="country-flag"><span class="flag-emoji">${esc(countryFlag(row))}</span><span class="country-name">${esc(countryDisplay(row))}</span></div></td>
       <td><span class="badge-type">${esc(row.mou_type || '-')}</span></td>
       <td><div class="date-range">${formatDate(row.start_date)} – ${formatDate(row.end_date)}</div></td>
       <td><span class="date-year">${esc(row.fiscal_year || '-')}</span></td>
@@ -653,7 +717,34 @@ function renderTable(rows){
       </div></td>
     </tr>`;
   }).join('');
-  $('#tableCount').textContent = `แสดง ${rows.length} รายการ`;
+  $('#tableCount').textContent = `แสดง ${startIndex + 1}-${startIndex + pageRows.length} จาก ${totalRows} รายการ`;
+  renderPagination(totalRows, totalPages);
+}
+
+function renderPagination(totalRows, totalPages){
+  let pager = $('#mouPager');
+  const tableCard = document.querySelector('.table-card');
+  if (!pager && tableCard) {
+    pager = document.createElement('div');
+    pager.id = 'mouPager';
+    pager.className = 'table-pager';
+    tableCard.appendChild(pager);
+  }
+  if (!pager) return;
+  if (!totalRows || totalPages <= 1) {
+    pager.innerHTML = '';
+    return;
+  }
+  pager.innerHTML = `
+    <button type="button" class="pager-btn" ${state.currentPage <= 1 ? 'disabled' : ''} onclick="goMouPage(${state.currentPage - 1})">ก่อนหน้า</button>
+    <span class="pager-info">หน้า ${state.currentPage} / ${totalPages}</span>
+    <button type="button" class="pager-btn" ${state.currentPage >= totalPages ? 'disabled' : ''} onclick="goMouPage(${state.currentPage + 1})">ถัดไป</button>
+  `;
+}
+
+function goMouPage(page){
+  state.currentPage = Math.max(1, Number(page) || 1);
+  renderTable(getVisibleMouRows());
 }
 
 function renderFileCell(row){
@@ -662,15 +753,64 @@ function renderFileCell(row){
   return '<span class="file-empty">-</span>';
 }
 
-function openMouFile(mouId){
+async function openMouFile(mouId){
   const row = state.rows.map(normalizeMou).find(item => item.mou_id === mouId);
-  const files = flattenFiles(row?.files);
-  const first = files.find(file => file.file_url);
-  if (first) {
-    window.open(first.file_url, '_blank', 'noopener');
+  let files = flattenFiles(row?.files);
+  if (!files.length && row?.file_summary?.total > 0) notifyMou('กำลังตรวจสอบไฟล์แนบจากรายละเอียด...', 'info');
+  if (!files.length && row?.file_summary?.total > 0) {
+    try {
+      const detail = await IROUP_V2.admin.mouDetail(mouId);
+      if (detail && detail.success !== false) {
+        files = flattenFiles(normalizeMou(detail.data || {}).files);
+      }
+    } catch (error) {
+      console.warn('[V2 MOU] file detail load failed', error);
+    }
+  }
+  const first = files.find(file => fileUrl(file));
+  if (!first) {
+    notifyMou('ยังไม่พบ URL ไฟล์แนบสำหรับ MOU รายการนี้ กรุณาตรวจสอบสิทธิ์ไฟล์หรือข้อมูล FILES relation', 'info');
+    return;
+  }
+  const url = fileUrl(first);
+  if (url) {
+    window.open(url, '_blank', 'noopener');
     return;
   }
   alert('รายการนี้มีข้อมูลสรุปไฟล์จาก V2 list แต่ยังไม่มี URL ใน list response กรุณาเปิดหน้าแก้ไขเพื่อดูไฟล์จาก detail');
+}
+
+function fileUrl(file){
+  if (!file) return '';
+  const direct = file.file_url || file.public_file_url || file.url || file.drive_url || file.web_view_link || file.webViewLink || '';
+  if (direct) return direct;
+  const driveId = file.drive_file_id || file.file_id_drive || file.google_drive_id || '';
+  return driveId ? `https://drive.google.com/file/d/${encodeURIComponent(driveId)}/view` : '';
+}
+
+function notifyMou(message, type){
+  const modalOpen = $('#modalOverlay')?.classList.contains('show');
+  if (modalOpen && $('#saveStatus')) {
+    setSaveStatus(type || '', message || '');
+    return;
+  }
+  let toast = $('#mouToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'mouToast';
+    toast.className = 'notice';
+    toast.style.position = 'fixed';
+    toast.style.right = '24px';
+    toast.style.bottom = '24px';
+    toast.style.zIndex = '1200';
+    toast.style.maxWidth = '420px';
+    document.body.appendChild(toast);
+  }
+  toast.className = 'notice' + (type ? ' ' + type : '');
+  toast.textContent = message || '';
+  if (message) setTimeout(() => {
+    if (toast.textContent === message) toast.className = 'notice';
+  }, 3600);
 }
 
 function flattenFiles(files){
@@ -680,6 +820,7 @@ function flattenFiles(files){
 }
 
 function filterTable(){
+  state.currentPage = 1;
   renderTable(getVisibleMouRows());
 }
 
@@ -697,10 +838,12 @@ function setStatus(status, el){
 }
 
 function updateDeptChart(rows){
-  const entries = Object.entries(buildDeptCounts(rows)).sort((a,b) => b[1] - a[1]).slice(0,10);
-  deptChart.data.labels = entries.map(([label]) => label);
+  const entries = Object.entries(buildDeptCounts(rows)).sort((a,b) => b[1] - a[1]);
+  const wrap = document.querySelector('.chart-wrap');
+  if (wrap) wrap.style.minHeight = '360px';
+  deptChart.data.labels = entries.map(([label]) => unitShortLabel(label));
   deptChart.data.datasets[0].data = entries.map(([,value]) => value);
-  deptChart.data.datasets[0].backgroundColor = entries.map((_,i) => i === 0 ? '#1A6DB5' : i < 3 ? '#4BBDE8' : '#A8D8F0');
+  deptChart.data.datasets[0].fullLabels = entries.map(([label]) => label);
   deptChart.update();
 }
 
@@ -881,11 +1024,15 @@ function setLang(lang){
 async function loadPageData(){
   showTableLoading();
   try {
-    const [countriesRes, unitsRes, mouRes] = await Promise.all([
+    const [countriesResult, unitsResult, mouResult] = await Promise.allSettled([
       IROUP_V2.lookup.countries(),
       IROUP_V2.lookup.units(),
       IROUP_V2.admin.mouList({ includeArchived: false, _: Date.now() })
     ]);
+    const countriesRes = countriesResult.status === 'fulfilled' ? countriesResult.value : null;
+    const unitsRes = unitsResult.status === 'fulfilled' ? unitsResult.value : null;
+    const mouRes = mouResult.status === 'fulfilled' ? mouResult.value : null;
+    if (!mouRes || mouRes.success === false) throw new Error(mouRes?.error || 'MOU list API failed');
     state.countries = unwrapList(countriesRes);
     state.units = unwrapList(unitsRes);
     state.rows = enrichMouRowsWithCountryNames(unwrapList(mouRes));
@@ -927,6 +1074,11 @@ async function openEditModal(mouId){
   $('#mouId').value = mouId || '';
   $('#modalOverlay').classList.add('show');
   setSaveStatus('info', 'กำลังโหลดรายละเอียด...');
+  const fallback = state.rows.map(normalizeMou).find(item => item.mou_id === mouId);
+  if (fallback) {
+    state.currentDetail = fallback;
+    fillForm(fallback);
+  }
   try {
     const res = await IROUP_V2.admin.mouDetail(mouId);
     if (!res || res.success === false) throw new Error(res?.error || 'โหลดรายละเอียดไม่สำเร็จ');
@@ -935,7 +1087,7 @@ async function openEditModal(mouId){
     fillForm(item);
     setSaveStatus('', '');
   } catch (error) {
-    setSaveStatus('error', error.message || String(error));
+    setSaveStatus(fallback ? 'info' : 'error', fallback ? 'โหลดรายละเอียดเต็มไม่ได้ แต่ใส่ข้อมูลจากรายการหลักให้แก้ไขก่อนแล้ว' : (error.message || String(error)));
   }
 }
 
@@ -996,7 +1148,15 @@ function renderAttachmentList(existingFiles){
   const files = existingFiles || [];
   const parts = [];
   files.forEach(file => {
-    parts.push(`<div class="file-chip"><span>📎 ${esc(file.file_name || file.filename || 'ไฟล์แนบ')}</span><button type="button" onclick="alert('ไฟล์เดิมถูกจัดการใน FILES relation แล้ว')">×</button></div>`);
+    const url = fileUrl(file);
+    const name = file.file_name || file.filename || 'ไฟล์แนบ';
+    const label = url
+      ? `<a href="${escAttr(url)}" target="_blank" rel="noopener">📎 ${esc(name)}</a>`
+      : `<span>📎 ${esc(name)}</span>`;
+    const action = url
+      ? `<a class="file-open" href="${escAttr(url)}" target="_blank" rel="noopener">เปิด</a>`
+      : '<button type="button" disabled title="ยังไม่มี URL">-</button>';
+    parts.push(`<div class="file-chip">${label}${action}</div>`);
   });
   if (state.pendingAttachment) {
     parts.push(`<div class="file-chip"><span>📎 ${esc(state.pendingAttachment.name)}</span><button type="button" onclick="clearAttachment()">×</button></div>`);
@@ -1187,38 +1347,67 @@ function initChart(){
   const ctx = $('#deptChart').getContext('2d');
   deptChart = new Chart(ctx, {
     type:'bar',
-    data:{ labels:[], datasets:[{ label:'MOU Active', data:[], backgroundColor:[], borderRadius:6, borderSkipped:false }] },
+    data:{ labels:[], datasets:[{ label:'MOU Active', data:[], backgroundColor:chartGradient, borderRadius:9, borderSkipped:false }] },
     options:{
-      indexAxis:'y',
       responsive:true,
       maintainAspectRatio:false,
-      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:ctx => `${ctx.raw} MOU` } } },
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ title:items => items.length ? (items[0].dataset.fullLabels?.[items[0].dataIndex] || items[0].label) : '', label:ctx => `${ctx.raw} MOU` } } },
       scales:{
         x:{ grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ font:{ size:10, family:"'Inter',sans-serif" }, color:'#6B7A8D' } },
-        y:{ grid:{ display:false }, ticks:{ font:{ size:10, family:"'Prompt',sans-serif" }, color:'#2D3748' } }
+        y:{ beginAtZero:true, grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ precision:0, font:{ size:10, family:"'Inter',sans-serif" }, color:'#6B7A8D' } }
       }
     }
   });
 }
 
+function chartGradient(context){
+  const chart = context.chart;
+  const area = chart.chartArea;
+  if (!area) return '#4BBDE8';
+  const index = Number.isFinite(context.dataIndex) ? context.dataIndex : 0;
+  const gradients = [
+    ['#22d3ee', '#1e88ff', '#7c3aed'],
+    ['#7BC842', '#22d3ee', '#1A6DB5'],
+    ['#F5A623', '#fb7185', '#7c3aed'],
+    ['#38bdf8', '#06b6d4', '#5BAD3E']
+  ];
+  const stops = gradients[index % gradients.length];
+  const gradient = chart.ctx.createLinearGradient(area.left, 0, area.right, 0);
+  gradient.addColorStop(0, stops[0]);
+  gradient.addColorStop(.55, stops[1]);
+  gradient.addColorStop(1, stops[2]);
+  return gradient;
+}
+
 function initWorldMap(){
   const w = $('#world-map').getBoundingClientRect().width || 700;
-  const h = 340;
+  const h = 430;
   const svg = d3.select('#world-map').attr('viewBox', `0 0 ${w} ${h}`).attr('preserveAspectRatio', 'xMidYMid meet');
-  const projection = d3.geoNaturalEarth1().scale(w / 6.3).translate([w / 2, h / 2 + 10]);
+  const projection = d3.geoNaturalEarth1().scale(w / 7.15).translate([w / 2, h / 2 + 12]);
   const path = d3.geoPath().projection(projection);
+  mapSvg = svg;
+  mapProjection = projection;
   const defs = svg.append('defs');
   const grad = defs.append('radialGradient').attr('id','mapBg').attr('cx','50%').attr('cy','40%');
   grad.append('stop').attr('offset','0%').attr('stop-color','#162845');
   grad.append('stop').attr('offset','100%').attr('stop-color','#0A1525');
   svg.append('rect').attr('width',w).attr('height',h).attr('fill','url(#mapBg)');
+  mapLayer = svg.append('g').attr('class','map-zoom-layer');
+  mapZoom = d3.zoom()
+    .scaleExtent([1, 8])
+    .translateExtent([[-w * 0.5, -h * 0.5], [w * 1.5, h * 1.5]])
+    .on('zoom', event => {
+      mapLayer.attr('transform', event.transform);
+      $('#mapTooltip').style.opacity = '0';
+    });
+  svg.call(mapZoom).on('dblclick.zoom', null);
 
   fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
     .then(response => response.json())
     .then(world => {
       const countries = topojson.feature(world, world.objects.countries);
       mapCountryNames = {4:"Afghanistan",8:"Albania",12:"Algeria",24:"Angola",32:"Argentina",36:"Australia",40:"Austria",50:"Bangladesh",56:"Belgium",68:"Bolivia",76:"Brazil",100:"Bulgaria",104:"Myanmar",116:"Cambodia",120:"Cameroon",124:"Canada",144:"Sri Lanka",152:"Chile",156:"China",170:"Colombia",180:"DR Congo",188:"Costa Rica",191:"Croatia",196:"Cyprus",203:"Czech Republic",208:"Denmark",214:"Dominican Republic",218:"Ecuador",818:"Egypt",222:"El Salvador",231:"Ethiopia",246:"Finland",250:"France",276:"Germany",288:"Ghana",300:"Greece",320:"Guatemala",332:"Haiti",340:"Honduras",348:"Hungary",356:"India",360:"Indonesia",364:"Iran",368:"Iraq",372:"Ireland",376:"Israel",380:"Italy",388:"Jamaica",392:"Japan",400:"Jordan",398:"Kazakhstan",404:"Kenya",410:"South Korea",414:"Kuwait",418:"Laos",422:"Lebanon",430:"Liberia",440:"Lithuania",442:"Luxembourg",454:"Malawi",458:"Malaysia",484:"Mexico",504:"Morocco",508:"Mozambique",516:"Namibia",524:"Nepal",528:"Netherlands",554:"New Zealand",558:"Nicaragua",566:"Nigeria",578:"Norway",586:"Pakistan",591:"Panama",598:"Papua New Guinea",604:"Peru",608:"Philippines",616:"Poland",620:"Portugal",630:"Puerto Rico",634:"Qatar",642:"Romania",643:"Russia",682:"Saudi Arabia",686:"Senegal",694:"Sierra Leone",703:"Slovakia",706:"Somalia",710:"South Africa",724:"Spain",736:"Sudan",752:"Sweden",756:"Switzerland",760:"Syria",764:"Thailand",788:"Tunisia",792:"Turkey",800:"Uganda",804:"Ukraine",784:"United Arab Emirates",826:"United Kingdom",840:"USA",858:"Uruguay",862:"Venezuela",704:"Vietnam",887:"Yemen",894:"Zambia",716:"Zimbabwe",158:"Taiwan"};
-      mapCountryPaths = svg.selectAll('.country')
+      mapCountryPaths = mapLayer.selectAll('.country')
         .data(countries.features)
         .join('path')
         .attr('class','country')
@@ -1269,6 +1458,16 @@ function mapFill(name){
   return '#4BBDE8';
 }
 
+function zoomMouMap(factor){
+  if (!mapSvg || !mapZoom) return;
+  mapSvg.transition().duration(220).call(mapZoom.scaleBy, factor);
+}
+
+function resetMouMap(){
+  if (!mapSvg || !mapZoom) return;
+  mapSvg.transition().duration(260).call(mapZoom.transform, d3.zoomIdentity);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initChart();
   initWorldMap();
@@ -1278,5 +1477,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+<script src="js/iroup-sidebar.js"></script>
 </body>
 </html>

@@ -244,6 +244,7 @@ function validateModuleRecordLinkV2_(module, recordId) {
     module: module,
     record_id: id,
     sheetName: target.sheetName,
-    idField: target.idField
+    idField: target.idField,
+    row: fk.details ? fk.details.row : null
   });
 }

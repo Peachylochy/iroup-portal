@@ -390,12 +390,52 @@ async function hydrateDashboardScholarshipsFromV2(report){
   return report;
 }
 
+async function hydrateDashboardMouFromV2(report){
+  // Keep the legacy report for other modules, but use the same V2 admin
+  // MOU source as mou.html so dashboard counts/lists match real MOU rows.
+  if(!report || !report.data || !window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.mouList){
+    return report;
+  }
+  try{
+    const res=await IROUP_V2.admin.mouList({includeArchived:false,_:Date.now()});
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 MOU list failed');
+    const rows=normalizeV2DashboardList(res).map(v2MouToDashboardRow);
+    report.data.mou=rows;
+    report.total=report.total || {};
+    report.total.mou=rows.length;
+    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.all=Object.values(report.data).flat().length;
+    report.summary=makeSummary(report.data);
+    console.info('[Dashboard] MOU data hydrated from V2 admin list', {count:rows.length});
+  }catch(err){
+    console.warn('[Dashboard] V2 MOU hydration failed; keeping report MOU data.', err);
+  }
+  return report;
+}
+
 function normalizeV2DashboardList(res){
   const data=res && res.data;
   if(Array.isArray(data)) return data;
   if(data && Array.isArray(data.items)) return data.items;
   if(data && Array.isArray(data.rows)) return data.rows;
   return [];
+}
+
+function v2MouToDashboardRow(item){
+  const country=item.country || {};
+  const unit=item.up_unit || {};
+  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
+  const unitName=unit.unit_name_th || unit.unit_name_en || item.up_unit_name_th || item.up_unit_name_en || item.up_unit_id || '';
+  return {
+    'หน่วยงาน_UP': unitName,
+    'องค์กร_ตปท': item.partner_org_name || item.partner_org_name_en || item.partner_org || item.mou_id || '-',
+    'ประเทศ': countryName,
+    'ประเภท': item.mou_type || item.type || 'MOU',
+    'วันที่เริ่ม': item.start_date || '',
+    'วันที่สิ้นสุด': item.end_date || '',
+    'ปีงบ': item.fiscal_year || fiscalYearFromDate(item.start_date || item.end_date),
+    'สถานะ': item.status || ''
+  };
 }
 
 function v2ScholarshipToDashboardRow(item){
@@ -508,6 +548,7 @@ async function reloadData(force=false){
         const c=JSON.parse(cached);
         if(Date.now()-c.ts<5*60*1000){
           state.raw=c.data;
+          await hydrateDashboardMouFromV2(state.raw);
           await hydrateDashboardScholarshipsFromV2(state.raw);
           buildYearOptions();
           render();
@@ -517,6 +558,7 @@ async function reloadData(force=false){
       }
     }
     const data=await fetchReport(state.year);
+    await hydrateDashboardMouFromV2(data);
     await hydrateDashboardScholarshipsFromV2(data);
     state.raw=data;
     localStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),data}));

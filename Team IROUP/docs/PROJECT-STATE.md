@@ -3256,3 +3256,96 @@ Data parity follow-up:
   but scholarship count/table/insights are based on the same V2 admin source as
   the Scholarship module page.
 - Inline dashboard script syntax check passed.
+
+---
+
+## Session: 2026-05-20 - MOU V2 Admin/Public Stabilization Pass
+
+Completed:
+
+- Fixed the admin MOU detail route dependency by updating
+  `validateModuleRecordLinkV2_()` in `IROUP_V2_VALIDATION.gs` to return the
+  matched parent row. This restored `v2.admin.mou.detail` hydration for MOU
+  edit modals and related FILES data.
+- Confirmed live `FILES.record_id` values already match full `MOU.mou_id`
+  values; no repair helper is required for MOU file IDs.
+- Improved admin MOU file attachment handling:
+  - removed the blocking alert flow from the table file button
+  - fetches detail before opening files when the list DTO only has
+    `file_summary`
+  - accepts `file_url`, `public_file_url`, `url`, `drive_url`,
+    `web_view_link`, `webViewLink`, and fallback `drive_file_id`
+  - renders existing modal attachments as clickable `เปิด` links when a URL or
+    Drive ID is available
+- Updated the executive dashboard to hydrate MOU rows from
+  `IROUP_V2.admin.mouList()` so dashboard MOU counts/lists align with the MOU
+  admin page instead of legacy report aggregate data.
+- Stabilized admin MOU table UX:
+  - shows 10 rows per page
+  - adds previous/next pagination
+  - keeps row numbering aligned across pages
+  - shows country flags using `flag_emoji` or ISO2 fallback
+- Added the shared `iroup-sidebar.js` sidebar bridge to `mou.html` so admin
+  navigation can include the newer News/Knowledge/Ecosystem-style entries.
+- Reworked MOU admin/public layout:
+  - map is full-width
+  - chart is a separate full-width panel
+  - public MOU content width is expanded for data-heavy display
+- Changed `MOU Active แยกตามหน่วยงาน` chart behavior:
+  - switched to a vertical bar chart
+  - uses shortened unit labels with full labels in tooltips
+  - uses gradient colors instead of flat blue
+  - includes all active units rather than slicing to a small subset
+- Updated admin and public MOU maps:
+  - active countries remain color-filled by MOU count
+  - route/dashed-line overlay was removed after review
+  - maps now support D3 SVG pan/zoom
+  - added `+`, `−`, and reset controls
+
+Verification:
+
+- Inline script syntax checks passed for:
+  - `mou.html`
+  - `public/public-mou.html`
+- Local HTTP smoke test returned 200 for:
+  - `Team IROUP/mou.html`
+  - `Team IROUP/public/public-mou.html`
+- `git diff --check` passed with Windows CRLF warnings only.
+
+Important operational note:
+
+- The Apps Script project must include the updated
+  `IROUP_V2_VALIDATION.gs`; otherwise `v2.admin.mou.detail` will keep failing
+  on the deployed backend even though the local source is fixed.
+
+Current uncommitted files:
+
+- `Team IROUP/backend/database-v2/IROUP_V2_VALIDATION.gs`
+- `Team IROUP/dashboard.html`
+- `Team IROUP/mou.html`
+- `Team IROUP/public/public-mou.html`
+
+Recommended next work:
+
+- Browser-check admin `mou.html` after a hard refresh to confirm live
+  authenticated data loads after the `chartGradient` fix.
+- Continue MOU admin visual polish only after data load is confirmed stable.
+- Then proceed to the next Admin UX + Data Quality module, likely Mobility or
+  Events, using the same sequence: data parity, edit hydration, files, table
+  pagination, visual layout.
+
+Follow-up:
+
+- Admin MOU was user-confirmed live after hard refresh:
+  - MOU data loads.
+  - `chartGradient` / `dataIndex` console error is resolved.
+- Added a fixed public MOU map reference marker for University of Phayao:
+  - label: `UP, Phayao`
+  - approximate coordinate: Phayao / University of Phayao
+  - marker zooms/pans with the D3 SVG map layer
+  - route/dashed-line overlay remains removed.
+- Verification:
+  - inline script syntax passed for `public/public-mou.html`
+  - `git diff --check -- "Team IROUP/public/public-mou.html"` passed
+  - browser smoke confirmed `.up-map-pin` renders and no `stroke-dasharray`
+    route/dashed-line element is present.
