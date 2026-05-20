@@ -70,6 +70,13 @@ a{color:inherit}
 .section-title{font-size:15px;font-weight:900;display:flex;gap:9px;align-items:center}
 .section-count{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:12px;font-weight:700}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.pager{grid-column:1/-1;display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:2px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 12px 34px rgba(0,0,0,.1)}
+.pager-btn{height:36px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--soft);font-family:'Prompt',sans-serif;font-size:12px;font-weight:900;padding:0 14px;cursor:pointer}
+.pager-btn:hover{border-color:var(--line-strong);color:var(--text)}
+.pager-btn:disabled{opacity:.45;cursor:not-allowed}
+.pager-info{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:12px;font-weight:700}
+:root[data-theme="light"] .pager{background:#fff;box-shadow:0 12px 34px rgba(31,84,142,.08)}
+:root[data-theme="light"] .pager-btn{background:#f7fbff;color:var(--soft)}
 .card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,25,44,.9));box-shadow:0 18px 52px rgba(0,0,0,.16);transition:transform .2s,box-shadow .2s,border-color .2s}
 :root[data-theme="light"] .card{background:#fff;box-shadow:0 14px 42px rgba(31,84,142,.12)}
 .card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
@@ -179,6 +186,10 @@ footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:
 var allEvents = [];
 var currentLang = normalizeLang(localStorage.getItem('iroup_public_lang') || 'TH');
 var currentStatus = '';
+var pageSize = 10;
+var activePage = 1;
+var donePage = 1;
+var lastFilterKey = '';
 
 var I18N = {
   TH: {
@@ -407,12 +418,52 @@ function filteredEvents(){
 
 function renderEvents(){
   var rows = filteredEvents();
+  var filterKey = [
+    document.getElementById('searchInput').value.trim().toLowerCase(),
+    document.getElementById('countryFilter').value,
+    document.getElementById('typeFilter').value,
+    currentStatus
+  ].join('|');
+  if(filterKey !== lastFilterKey){
+    activePage = 1;
+    donePage = 1;
+    lastFilterKey = filterKey;
+  }
   var activeRows = rows.filter(function(item){ var s = eventStatus(item).status; return s === 'ongoing' || s === 'upcoming'; });
   var doneRows = rows.filter(function(item){ return eventStatus(item).status === 'done'; });
-  document.getElementById('activeCards').innerHTML = activeRows.length ? activeRows.map(renderCard).join('') : '<div class="state">' + esc(t('noActive')) + '</div>';
-  document.getElementById('allCards').innerHTML = doneRows.length ? doneRows.map(renderCard).join('') : '<div class="state">' + esc(t('noData')) + '</div>';
+  document.getElementById('activeCards').innerHTML = renderPagedSection(activeRows, 'active');
+  document.getElementById('allCards').innerHTML = renderPagedSection(doneRows, 'done');
   document.getElementById('activeCount').textContent = activeRows.length + ' ' + t('items');
   document.getElementById('resultCount').textContent = rows.length + ' ' + t('items');
+}
+
+function renderPagedSection(rows, section){
+  if(!rows.length) return '<div class="state">' + esc(section === 'active' ? t('noActive') : t('noData')) + '</div>';
+  var page = section === 'active' ? activePage : donePage;
+  var maxPage = Math.max(1, Math.ceil(rows.length / pageSize));
+  page = Math.min(Math.max(1, page), maxPage);
+  if(section === 'active') activePage = page;
+  else donePage = page;
+  var start = (page - 1) * pageSize;
+  var pageRows = rows.slice(start, start + pageSize);
+  return pageRows.map(renderCard).join('') + renderPager(section, rows.length, page, maxPage);
+}
+
+function renderPager(section, totalRows, page, maxPage){
+  if(totalRows <= pageSize) return '';
+  var prevLabel = currentLang === 'EN' ? 'Prev' : 'ก่อนหน้า';
+  var nextLabel = currentLang === 'EN' ? 'Next' : 'ถัดไป';
+  return '<div class="pager">' +
+    '<button class="pager-btn" type="button" onclick="changePublicEventPage(\'' + escAttr(section) + '\',-1)" ' + (page <= 1 ? 'disabled' : '') + '>' + esc(prevLabel) + '</button>' +
+    '<span class="pager-info">' + esc(page) + ' / ' + esc(maxPage) + ' · ' + esc(totalRows) + ' ' + esc(t('items')) + '</span>' +
+    '<button class="pager-btn" type="button" onclick="changePublicEventPage(\'' + escAttr(section) + '\',1)" ' + (page >= maxPage ? 'disabled' : '') + '>' + esc(nextLabel) + '</button>' +
+  '</div>';
+}
+
+function changePublicEventPage(section, delta){
+  if(section === 'active') activePage = Math.max(1, activePage + delta);
+  else donePage = Math.max(1, donePage + delta);
+  renderEvents();
 }
 
 function renderCard(item){

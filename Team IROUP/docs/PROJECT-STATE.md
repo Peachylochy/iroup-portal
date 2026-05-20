@@ -3496,12 +3496,20 @@ Completed:
   - softer admin background
   - glassy topbar and toolbar
   - cleaner cards/table/pager/modal surfaces
+- Follow-up public Events pagination:
+  - `public/public-events.html` now limits each event section to 10 cards per page.
+  - Ongoing/upcoming and past/all sections each have independent previous/next
+    pagination.
+  - Pagination resets when search, country, type, or status filters change.
 
 Verification:
 
 - Inline script syntax passed for `events.html`.
+- Inline script syntax passed for `public/public-events.html`.
 - `git diff --check -- "Team IROUP/events.html"` passed with Windows CRLF warning
   only.
+- `git diff --check -- "Team IROUP/public/public-events.html"` passed with Windows
+  CRLF warning only.
 - Local HTTP smoke returned 200 for `events.html`.
 - User-confirmed live authenticated Events page after hard refresh.
 
