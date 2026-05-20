@@ -413,12 +413,64 @@ async function hydrateDashboardMouFromV2(report){
   return report;
 }
 
+async function hydrateDashboardMobilityFromV2(report){
+  // Keep the legacy report for other modules, but use the same V2 admin
+  // Mobility source as mobility.html so dashboard Mobility counts match.
+  if(!report || !report.data || !window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.mobilityList){
+    return report;
+  }
+  try{
+    const res=await IROUP_V2.admin.mobilityList({includeArchived:false,_:Date.now()});
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 Mobility list failed');
+    const rows=normalizeV2DashboardList(res).map(v2MobilityToDashboardRow);
+    report.data.inbound=rows.filter(row=>row.direction==='inbound').map(row=>row.dashboardRow);
+    report.data.outbound=rows.filter(row=>row.direction==='outbound').map(row=>row.dashboardRow);
+    report.total=report.total || {};
+    report.total.inbound=report.data.inbound.length;
+    report.total.outbound=report.data.outbound.length;
+    report.total.mobility=report.total.inbound+report.total.outbound;
+    report.total.all=Object.values(report.data).flat().length;
+    report.summary=makeSummary(report.data);
+    console.info('[Dashboard] Mobility data hydrated from V2 admin list', {count:rows.length});
+  }catch(err){
+    console.warn('[Dashboard] V2 Mobility hydration failed; keeping report Mobility data.', err);
+  }
+  return report;
+}
+
 function normalizeV2DashboardList(res){
   const data=res && res.data;
   if(Array.isArray(data)) return data;
   if(data && Array.isArray(data.items)) return data.items;
   if(data && Array.isArray(data.rows)) return data.rows;
   return [];
+}
+
+function v2MobilityToDashboardRow(item){
+  const country=item.country || {};
+  const unit=item.up_unit || {};
+  const direction=String(item.direction || '').toLowerCase()==='outbound' ? 'outbound' : 'inbound';
+  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
+  const unitName=unit.unit_name_th || unit.unit_name_en || item.up_unit_name_th || item.up_unit_name_en || item.up_unit_id || '';
+  const participantCount=Number(item.participant_count_cached || item.participant_count || item.aggregate_counts?.participant_count_cached || 0) || 0;
+  const row={
+    'ชื่อโครงการ': item.project_name || item.project_name_en || item.mobility_id || '-',
+    'สถาบัน': item.institution_name || '-',
+    'ประเทศ': countryName,
+    'เมือง': item.city || '',
+    'หน่วยงาน_UP': unitName,
+    'คณะ': unitName,
+    'วัตถุประสงค์': item.purpose || '',
+    'ระดับ': item.level || '',
+    'กลุ่มผู้เข้าร่วม': item.participant_group || '',
+    'จำนวนคน': participantCount,
+    'วันเริ่ม': item.start_date || '',
+    'วันสิ้นสุด': item.end_date || '',
+    'ปีงบ': item.fiscal_year || fiscalYearFromDate(item.start_date || item.end_date),
+    'สถานะ': item.status || '',
+    'จำนวนเงิน': 0
+  };
+  return {direction,dashboardRow:row};
 }
 
 function v2MouToDashboardRow(item){
@@ -549,6 +601,7 @@ async function reloadData(force=false){
         if(Date.now()-c.ts<5*60*1000){
           state.raw=c.data;
           await hydrateDashboardMouFromV2(state.raw);
+          await hydrateDashboardMobilityFromV2(state.raw);
           await hydrateDashboardScholarshipsFromV2(state.raw);
           buildYearOptions();
           render();
@@ -559,6 +612,7 @@ async function reloadData(force=false){
     }
     const data=await fetchReport(state.year);
     await hydrateDashboardMouFromV2(data);
+    await hydrateDashboardMobilityFromV2(data);
     await hydrateDashboardScholarshipsFromV2(data);
     state.raw=data;
     localStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),data}));

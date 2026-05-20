@@ -3366,3 +3366,88 @@ Admin visual polish follow-up:
   - `git diff --check -- "Team IROUP/mou.html"` passed
   - local browser smoke confirmed no horizontal overflow at the tested desktop
     viewport.
+
+---
+
+## Session: 2026-05-20 - Mobility Admin Stabilization Kickoff
+
+Completed:
+
+- Began Mobility admin stabilization using the MOU admin page as the current
+  baseline for data-safe UX work.
+- Updated `mobility.html` list/card rendering:
+  - added 10-row pagination for list view
+  - added matching pagination for card view
+  - keeps row numbering aligned across pages
+- Hardened Mobility initial data load:
+  - lookup/list calls now use `Promise.allSettled`
+  - Mobility list failure still fails the page clearly
+  - country/unit lookup hiccups no longer fail before the list response can be
+    inspected
+- Cleaned Mobility edit hydration:
+  - uses `IROUP_V2.admin.mobilityDetail()` adapter wrapper
+  - removed temporary debug console logs from edit open flow
+- Updated dashboard Mobility parity:
+  - dashboard now hydrates Mobility rows from
+    `IROUP_V2.admin.mobilityList()` after the legacy report loads
+  - inbound/outbound dashboard counts now align with the Mobility admin source
+    when V2 admin auth is available
+
+Verification:
+
+- Inline script syntax checks passed for:
+  - `mobility.html`
+  - `dashboard.html`
+- `git diff --check` passed with Windows CRLF warnings only.
+- Local browser smoke opened `mobility.html` without horizontal overflow.
+
+Current caveat:
+
+- Local Codex browser cannot validate authenticated Mobility live data because it
+  does not have Peach's Google/admin session; it shows `Google token missing`.
+- Next live user check should hard refresh `mobility.html` in the authenticated
+  browser and confirm:
+  - V2 Mobility rows load
+  - pagination appears when rows exceed 10
+  - edit modal detail hydration works
+  - participant list loads in edit mode
+
+---
+
+## Session: 2026-05-20 - Mobility Admin/Public Redesign Pass
+
+Completed:
+
+- Applied a small, data-safe Admin Mobility visual refresh based on the
+  `Team IROUP/Web design` direction:
+  - aurora admin background
+  - glassy topbar and panels
+  - cleaner KPI, toolbar, table/card, pager, and modal surfaces
+  - more stable add/edit modal spacing for participant rows and long forms
+- Follow-up fix after live screenshot review:
+  - Mobility add/edit modal now sits above the shared admin sidebar
+  - modal height is clamped to the viewport
+  - only the modal body scrolls
+  - form fields are constrained to prevent horizontal overflow
+  - modal centering now uses fixed viewport positioning instead of shell flex
+    alignment so it stays centered even with the shared sidebar loaded
+  - Admin Mobility page title is anchored inside the topbar instead of floating
+    above the header surface
+- Connected `mobility.html` to the shared `js/iroup-sidebar.js` sidebar so the
+  admin navigation set matches the current admin shell.
+- Kept Admin Mobility runtime data/write logic on the V2 admin adapters.
+- Public Mobility remains linked to current V2 public data routes:
+  - `IROUP_V2.public.mobilityList()`
+  - `IROUP_V2.public.travelList()`
+- Expanded Public Mobility map country normalization so active countries from
+  the current Mobility/Travel data are more reliably highlighted on the D3 map.
+- Updated Public Mobility Chart.js charts to use generated gradients for:
+  - summary doughnut
+  - inbound/outbound bar chart
+  - trend area fill
+
+Verification target:
+
+- Re-run syntax checks for `mobility.html`, `dashboard.html`, and
+  `public/public-mobility.html`.
+- Re-run local smoke checks for Admin Mobility and Public Mobility.

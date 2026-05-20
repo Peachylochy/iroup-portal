@@ -38,13 +38,89 @@ button,input,select,textarea{font:inherit}
 .loading{display:grid;place-items:center;padding:36px;color:var(--muted);font-weight:800}.spinner{width:28px;height:28px;border:3px solid #D8E7F4;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:auto auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.mobility-card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 20px rgba(15,45,90,.06);padding:16px;display:flex;flex-direction:column;gap:12px;min-height:220px}.card-title{font-size:16px;font-weight:900;line-height:1.35}.card-sub{font-size:12px;color:var(--muted);line-height:1.5}.card-actions{margin-top:auto;display:flex;justify-content:flex-end;gap:8px}
 .list-wrap{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:auto;box-shadow:0 6px 20px rgba(15,45,90,.06)}.mobility-table{width:100%;border-collapse:collapse;min-width:1060px}.mobility-table th,.mobility-table td{padding:12px 14px;border-bottom:1px solid #EDF3F8;text-align:left;vertical-align:middle;font-size:13px}.mobility-table th{background:#F8FBFE;color:#344761;font-weight:900}.mobility-table tr:last-child td{border-bottom:0}.title-cell{font-weight:900;color:var(--navy)}
+.table-pager{grid-column:1/-1;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 14px;border-top:1px solid #EDF3F8;background:#fff}.pager-btn{height:36px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:#F8FBFE;color:var(--navy);font-weight:900;cursor:pointer}.pager-btn:disabled{opacity:.45;cursor:not-allowed}.pager-info{font-size:12px;color:var(--muted);font-weight:900}
 .badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.inbound{color:#174B7A;background:#F1F8FE;border-color:#BBD7EF}.badge.outbound{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.active{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.completed{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.cancelled{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.draft{color:#56657A;background:#F3F6FA;border-color:#D7E1EA}
 .empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}.muted{color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;white-space:nowrap}
 .modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1040px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
 .form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}
 .participant-tools{display:grid;gap:12px}.participant-search{position:relative}.suggestions{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(15,45,90,.14);max-height:260px;overflow:auto}.suggestions.open{display:block}.suggestion{width:100%;border:0;background:#fff;text-align:left;padding:10px 12px;cursor:pointer;border-bottom:1px solid #EDF3F8;color:var(--text)}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#F8FBFE}.suggestion-name{font-weight:900}.suggestion-meta{font-size:12px;color:var(--muted);margin-top:2px}.selected-person{display:none;border:1px solid #BBD7EF;background:#F1F8FE;border-radius:14px;padding:10px 12px;align-items:center;gap:10px;justify-content:space-between}.selected-person.show{display:flex}.manual-form{display:none;border:1px dashed #BFD0E0;border-radius:14px;padding:12px;background:#F8FBFE}.manual-form.show{display:block}.participant-list{display:grid;gap:8px}.participant-row{display:grid;grid-template-columns:1.4fr 1fr auto auto;gap:10px;align-items:center;border:1px solid #EDF3F8;border-radius:14px;padding:10px 12px;background:#fff}.participant-name{font-weight:900}.participant-unit{color:var(--muted);font-size:12px}.participant-empty{padding:14px;border:1px dashed #BFD0E0;border-radius:14px;color:var(--muted);text-align:center;font-weight:800}
-@media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{justify-content:center}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:16px}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.topbar{align-items:flex-start;flex-wrap:wrap}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}}
+
+/* Web design aligned Mobility admin refresh. CSS-only; V2 data/write flows stay intact. */
+body{
+  background:
+    radial-gradient(80% 60% at 0% 0%, rgba(187,196,255,.45) 0%, transparent 60%),
+    radial-gradient(60% 60% at 100% 0%, rgba(192,168,255,.36) 0%, transparent 65%),
+    radial-gradient(70% 50% at 100% 100%, rgba(168,210,255,.32) 0%, transparent 60%),
+    linear-gradient(135deg,#EEF2FF 0%,#E8F0FE 35%,#ECE6FF 70%,#F0E5F9 100%);
+  background-attachment:fixed;
+}
+body.modal-open{overflow:hidden}
+.main{padding:28px 36px 40px}
+.topbar{align-items:flex-end;background:rgba(255,255,255,.64);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.68);border-radius:26px;box-shadow:0 20px 50px rgba(15,45,90,.12);padding:22px 24px;margin-bottom:22px}
+.topbar>div:first-child:before{content:"● V2 Admin Mobility";display:inline-flex;margin-bottom:10px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.78);color:#6B7F96;font-size:12px;font-weight:700}
+.title{font-size:36px;letter-spacing:-.03em;color:#0F2D5A}
+.subtitle{font-size:15px;color:#6B7F96}
+.btn{border-color:#E6EDF6;border-radius:14px;background:rgba(255,255,255,.82);box-shadow:0 2px 10px rgba(15,45,90,.05);color:#26364E}
+.btn:hover{border-color:#4BBDE8;box-shadow:0 10px 30px rgba(15,45,90,.08);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,#1A6DB5,#0F4F8E);border-color:transparent;box-shadow:0 12px 28px rgba(26,109,181,.28)}
+.btn.danger{background:#FFF7F6;border-color:#F5C4C0;color:#C2410C}
+.lang-toggle,.view-toggle{background:rgba(255,255,255,.72);border-color:#E6EDF6;border-radius:16px;box-shadow:0 2px 10px rgba(15,45,90,.04)}
+.lang-toggle button,.view-toggle button{border-radius:12px}
+.lang-toggle button.active,.view-toggle button.active{background:linear-gradient(135deg,#1A6DB5,#0F4F8E);box-shadow:0 4px 10px rgba(26,109,181,.24)}
+.kpis{gap:16px;margin-bottom:18px}.kpi{background:rgba(255,255,255,.9);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08);padding:18px 20px;min-height:108px}.kpi-num{font-size:34px;letter-spacing:-.04em}.kpi-label{color:#6B7F96}
+.toolbar{grid-template-columns:minmax(260px,1.6fr) repeat(3,minmax(130px,.7fr)) auto;background:rgba(255,255,255,.88);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08);padding:14px 16px;margin-bottom:18px}
+.input,.select{border-color:#E6EDF6;background:#F5F8FC;border-radius:14px;min-height:44px;transition:border-color .15s,box-shadow .15s,background .15s}.input:hover,.select:hover{background:#fff}.input:focus,.select:focus{border-color:#1A6DB5;background:#fff;box-shadow:0 0 0 4px rgba(26,109,181,.12)}
+.notice{border-radius:18px;border-color:#BBD7EF;background:rgba(241,248,254,.92)}
+.list-wrap,.mobility-card,.form-section{background:rgba(255,255,255,.92);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.08)}
+.mobility-table th{background:#FBFBFE;color:#6B7F96;text-transform:uppercase;font-size:12px;letter-spacing:.04em}.mobility-table td{border-bottom-color:#EEF2F8}.mobility-table tr:hover td{background:#F5FAFF}
+.cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}.mobility-card{padding:20px;transition:transform .2s,box-shadow .2s,border-color .2s}.mobility-card:hover{transform:translateY(-2px);border-color:#4BBDE8;box-shadow:0 20px 50px rgba(15,45,90,.12)}.card-title{color:#0F2D5A}.badge{border-color:#E6EDF6;background:#fff}
+.table-pager{background:rgba(255,255,255,.92);border-top-color:#EEF2F8;border-radius:0 0 22px 22px}.pager-btn{border-color:#E6EDF6;border-radius:14px;background:#F5F8FC}
+.modal{z-index:120000;background:rgba(9,24,45,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;overflow:hidden;padding:24px}
+.modal.open{display:flex}
+.modal-panel{width:min(1120px,calc(100vw - 48px));height:min(860px,calc(100vh - 96px));max-height:calc(100vh - 96px);margin:0;border:1px solid rgba(230,237,246,.92);border-radius:26px;box-shadow:0 34px 90px rgba(15,45,90,.34);overflow:hidden;display:flex;flex-direction:column;background:#fff}
+.modal-panel form{height:100%;min-height:0;display:flex;flex-direction:column}
+.modal-head{position:relative;top:auto;flex:0 0 auto;padding:20px 26px;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.modal-title{font-size:24px;color:#0F2D5A}.modal-body{flex:1 1 auto;min-height:0;overflow:auto;padding:22px 26px;background:#FBFBFE}.modal-foot{position:relative;bottom:auto;flex:0 0 auto;padding:16px 26px;background:#fff}
+.form-section{padding:18px;margin-bottom:16px;min-width:0}.section-title{font-size:13px;color:#0F2D5A;text-transform:uppercase;letter-spacing:.06em}.form-grid{gap:16px;grid-template-columns:repeat(2,minmax(220px,1fr))}.field,.input,.select,textarea{min-width:0}.label{color:#52647a}.participant-tools,.participant-list,.manual-form{min-width:0}.participant-row{grid-template-columns:minmax(180px,1.4fr) minmax(140px,1fr) auto auto;border-color:#E6EDF6;border-radius:16px;background:#fff;min-width:0}.participant-empty,.manual-form{border-color:#D7E1EA;background:#F5F8FC}.selected-person{border-color:#BBD7EF;background:#F1F8FE;min-width:0;flex-wrap:wrap}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{justify-content:center}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid{grid-template-columns:1fr}.participant-row{grid-template-columns:1fr}}
+@media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:16px}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.topbar{align-items:flex-start;flex-wrap:wrap;padding:18px}.cards{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.modal{padding:10px}.modal-panel{width:calc(100vw - 20px);height:calc(100vh - 40px);max-height:calc(100vh - 40px);border-radius:20px}.modal-head,.modal-body,.modal-foot{padding-left:16px;padding-right:16px}.modal-head{align-items:flex-start;flex-wrap:wrap}}
+
+/* Mobility page usability override: center the form modal and keep the title anchored. */
+.main{padding-top:28px}
+.topbar{align-items:center;gap:14px;min-height:92px;overflow:visible}
+.topbar>div:first-child:before{display:none}
+.title{font-size:32px;line-height:1.08;letter-spacing:0;margin:0 0 6px}
+.subtitle{line-height:1.45;margin:0}
+.modal{display:none;position:fixed;inset:0;width:100vw;height:100vh;padding:0;overflow:hidden}
+.modal.open{display:block}
+.modal-panel{
+  position:fixed;
+  left:50%;
+  top:50%;
+  width:min(1120px,calc(100vw - 96px));
+  height:min(820px,calc(100vh - 112px));
+  max-width:1120px;
+  max-height:calc(100vh - 112px);
+  margin:0;
+  transform:translate(-50%,-50%);
+}
+.modal-head{padding:22px 30px}
+.modal-body{padding:24px 30px}
+.modal-foot{padding:16px 30px}
+.form-grid{grid-template-columns:repeat(2,minmax(260px,1fr))}
+.input,.select{background:#F5F8FC;color:#10233f}
+.input:required:invalid,.select:required:invalid{background:#F5F8FC;color:#10233f}
+@media(max-width:1180px){
+  .modal-panel{width:calc(100vw - 64px);height:calc(100vh - 96px);max-height:calc(100vh - 96px)}
+  .form-grid{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  .main{padding-top:16px}
+  .topbar{min-height:auto}
+  .title{font-size:28px}
+  .modal-panel{width:calc(100vw - 24px);height:calc(100vh - 32px);max-height:calc(100vh - 32px);border-radius:18px}
+  .modal-head,.modal-body,.modal-foot{padding-left:16px;padding-right:16px}
+}
 </style>
 </head>
 <body>
@@ -338,6 +414,8 @@ const state = {
   lang: 'th',
   loading: false,
   saving: false,
+  currentPage: 1,
+  pageSize: 10,
   renderedRows: [],
   participants: [],
   students: [],
@@ -539,7 +617,8 @@ function renderDatalists(){
   $('#purposeOptions').innerHTML = purposes.map(value => `<option value="${escAttr(value)}"></option>`).join('');
 }
 
-function renderMobility(){
+function renderMobility(resetPage){
+  if (resetPage !== false) state.currentPage = 1;
   renderKpis();
   const rows = filteredRows();
   state.renderedRows = rows;
@@ -554,6 +633,11 @@ function renderMobility(){
 }
 
 function renderListView(rows){
+  const totalRows = rows.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / state.pageSize));
+  if (state.currentPage > totalPages) state.currentPage = totalPages;
+  const startIndex = (state.currentPage - 1) * state.pageSize;
+  const pageRows = rows.slice(startIndex, startIndex + state.pageSize);
   $('#mobilityView').className = 'list-wrap';
   $('#mobilityView').innerHTML = `
     <table class="mobility-table">
@@ -572,9 +656,9 @@ function renderListView(rows){
         </tr>
       </thead>
       <tbody>
-        ${rows.map((row, index) => `
+        ${pageRows.map((row, index) => `
           <tr>
-            <td>${index + 1}</td>
+            <td>${startIndex + index + 1}</td>
             <td class="title-cell">${esc(displayTitle(row))}</td>
             <td>${esc(row.institution_name || '-')}</td>
             <td>${esc(displayCountry(row))}</td>
@@ -590,12 +674,18 @@ function renderListView(rows){
           </tr>
         `).join('')}
       </tbody>
-    </table>`;
+    </table>
+    ${renderPager(totalRows, totalPages)}`;
 }
 
 function renderCardView(rows){
+  const totalRows = rows.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / state.pageSize));
+  if (state.currentPage > totalPages) state.currentPage = totalPages;
+  const startIndex = (state.currentPage - 1) * state.pageSize;
+  const pageRows = rows.slice(startIndex, startIndex + state.pageSize);
   $('#mobilityView').className = 'cards';
-  $('#mobilityView').innerHTML = rows.map(row => `
+  $('#mobilityView').innerHTML = pageRows.map(row => `
     <article class="mobility-card">
       <div>
         <div class="card-title">${esc(displayTitle(row))}</div>
@@ -613,7 +703,23 @@ function renderCardView(rows){
         <button class="btn danger" type="button" onclick="deleteV2Mobility('${escAttr(row.mobility_id)}')">ลบ</button>
       </div>
     </article>
-  `).join('');
+  `).join('') + renderPager(totalRows, totalPages);
+}
+
+function renderPager(totalRows, totalPages){
+  if (!totalRows || totalPages <= 1) return '';
+  return `
+    <div class="table-pager">
+      <button class="pager-btn" type="button" ${state.currentPage <= 1 ? 'disabled' : ''} onclick="goMobilityPage(${state.currentPage - 1})">ก่อนหน้า</button>
+      <span class="pager-info">หน้า ${state.currentPage} / ${totalPages}</span>
+      <button class="pager-btn" type="button" ${state.currentPage >= totalPages ? 'disabled' : ''} onclick="goMobilityPage(${state.currentPage + 1})">ถัดไป</button>
+    </div>
+  `;
+}
+
+function goMobilityPage(page){
+  state.currentPage = Math.max(1, Number(page) || 1);
+  renderMobility(false);
 }
 
 function setViewMode(mode){
@@ -660,14 +766,17 @@ async function loadPageData(force){
   showNotice('');
   setLoading();
   try {
-    const [countriesRes, unitsRes, mobilityRes] = await Promise.all([
+    const [countriesResult, unitsResult, mobilityResult] = await Promise.allSettled([
       IROUP_V2.lookup.countries(),
       IROUP_V2.lookup.units(),
       IROUP_V2.admin.mobilityList({ includeArchived: true, _: force ? Date.now() : '' })
     ]);
+    const countriesRes = countriesResult.status === 'fulfilled' ? countriesResult.value : null;
+    const unitsRes = unitsResult.status === 'fulfilled' ? unitsResult.value : null;
+    const mobilityRes = mobilityResult.status === 'fulfilled' ? mobilityResult.value : null;
     if (countriesRes && countriesRes.success === false) throw new Error(countriesRes.error || 'โหลดประเทศไม่สำเร็จ');
     if (unitsRes && unitsRes.success === false) throw new Error(unitsRes.error || 'โหลดหน่วยงานไม่สำเร็จ');
-    if (mobilityRes && mobilityRes.success === false) throw new Error(mobilityRes.error || 'โหลด Mobility ไม่สำเร็จ');
+    if (!mobilityRes || mobilityRes.success === false) throw new Error(mobilityRes?.error || 'โหลด Mobility ไม่สำเร็จ');
 
     state.countries = unwrapList(countriesRes);
     state.units = unwrapList(unitsRes);
@@ -693,6 +802,7 @@ function openCreateModal(){
   $('#modalSub').textContent = 'V2-native MOBILITY_PROJECT metadata';
   $('#deleteBtn').style.display = 'none';
   showParticipantSection();
+  document.body.classList.add('modal-open');
   $('#mobilityModal').classList.add('open');
 }
 
@@ -715,17 +825,12 @@ async function openEditModal(mobilityRow){
     : state.rows.find(row => String(row.mobility_id || '') === String(mobilityRow || ''));
   const mobilityId = sourceRow && sourceRow.mobility_id ? sourceRow.mobility_id : String(mobilityRow || '').trim();
   if (!mobilityId) return alert('ไม่พบ mobility_id');
-  console.log('[debug] edit clicked, id:', mobilityId);
   resetForm();
   $('#modalTitle').textContent = 'แก้ไข Mobility';
   $('#modalSub').textContent = mobilityId;
   $('#deleteBtn').style.display = '';
   try {
-    const res = await IROUP_V2.request('v2.admin.mobility.detail', { mobility_id: mobilityId }, {
-      auth: true,
-      timeoutMs: 30000
-    });
-    console.log('[debug] detail response:', res);
+    const res = await IROUP_V2.admin.mobilityDetail(mobilityId);
     if (!res || res.success === false) throw new Error(res?.error || 'โหลดรายละเอียดไม่สำเร็จ');
     const detailData = unwrapMobilityDetail(res);
     if (!detailData || typeof detailData !== 'object') throw new Error('โหลดรายละเอียดไม่สำเร็จ');
@@ -737,6 +842,7 @@ async function openEditModal(mobilityRow){
     fillForm(detailRow);
     $('#modalSub').textContent = confirmedMobilityId;
     showParticipantSection(confirmedMobilityId);
+    document.body.classList.add('modal-open');
     $('#mobilityModal').classList.add('open');
     await Promise.all([loadPersonLookupsOnce(), loadParticipants(confirmedMobilityId)]);
   } catch (error) {
@@ -747,6 +853,7 @@ async function openEditModal(mobilityRow){
 
 function closeModal(){
   $('#mobilityModal').classList.remove('open');
+  document.body.classList.remove('modal-open');
 }
 
 function resetForm(){
@@ -1227,5 +1334,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadPageData();
 });
 </script>
+<script src="js/iroup-sidebar.js"></script>
 </body>
 </html>
