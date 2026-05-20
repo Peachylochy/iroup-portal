@@ -77,6 +77,35 @@ a{color:inherit}
 .pager-info{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:12px;font-weight:700}
 :root[data-theme="light"] .pager{background:#fff;box-shadow:0 12px 34px rgba(31,84,142,.08)}
 :root[data-theme="light"] .pager-btn{background:#f7fbff;color:var(--soft)}
+.calendar-panel{margin:0 0 28px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow);padding:16px}
+:root[data-theme="light"] .calendar-panel{background:#fff}
+.calendar-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.calendar-title{font-size:15px;font-weight:900;color:var(--text)}
+.calendar-month{font-family:'Sarabun',sans-serif;color:var(--soft);font-size:14px;font-weight:800}
+.calendar-nav{display:flex;align-items:center;gap:8px}
+.calendar-btn{height:36px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--soft);font-family:'Prompt',sans-serif;font-size:12px;font-weight:900;padding:0 13px;cursor:pointer}
+.calendar-btn:hover{border-color:var(--line-strong);color:var(--text)}
+:root[data-theme="light"] .calendar-btn{background:#f7fbff}
+.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.calendar-weekday{font-size:11px;font-weight:900;color:var(--muted);text-align:center;text-transform:uppercase}
+.calendar-day{min-height:82px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035);color:var(--text);padding:8px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:border-color .18s,background .18s,transform .18s}
+.calendar-day:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.calendar-day.other-month{opacity:.42}
+.calendar-day.has-events{background:rgba(35,135,255,.12);border-color:rgba(35,135,255,.34)}
+.calendar-day.selected{outline:2px solid var(--cyan);outline-offset:2px}
+:root[data-theme="light"] .calendar-day{background:#f7fbff}
+:root[data-theme="light"] .calendar-day.has-events{background:#eef7ff}
+.calendar-date{font-size:13px;font-weight:900}
+.calendar-dots{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto}
+.calendar-dot{width:7px;height:7px;border-radius:999px;background:var(--blue)}
+.calendar-dot.ongoing{background:var(--green)}.calendar-dot.upcoming{background:var(--cyan)}.calendar-dot.done{background:var(--muted)}
+.calendar-more{font-size:10px;color:var(--muted);font-weight:900}
+.calendar-list{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;display:grid;gap:8px}
+.calendar-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);padding:10px 12px;text-decoration:none}
+.calendar-item:hover{border-color:var(--line-strong)}
+:root[data-theme="light"] .calendar-item{background:#f7fbff}
+.calendar-item-title{font-size:13px;font-weight:900;color:var(--text)}
+.calendar-item-meta{font-family:'Sarabun',sans-serif;font-size:12px;color:var(--muted);margin-top:2px}
 .card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,25,44,.9));box-shadow:0 18px 52px rgba(0,0,0,.16);transition:transform .2s,box-shadow .2s,border-color .2s}
 :root[data-theme="light"] .card{background:#fff;box-shadow:0 14px 42px rgba(31,84,142,.12)}
 .card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
@@ -112,8 +141,8 @@ a{color:inherit}
 .spinner{width:30px;height:30px;border-radius:50%;border:4px solid rgba(35,135,255,.16);border-top-color:var(--blue);animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:var(--dim);font-family:'Sarabun',sans-serif;font-size:12px}
-@media(max-width:980px){.topbar{height:auto;min-height:64px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.nav{max-width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start}.filter-bar{grid-template-columns:1fr}.hero-inner,.shell{width:92%}.hero-kpis{gap:28px}.section-head{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:1fr}}
-@media(max-width:640px){.hero{padding:34px 4%;min-height:280px}.poster{height:172px}.nav{width:100%}.card-main{flex-direction:column}.status{align-self:flex-start}.card-foot{align-items:flex-start;flex-direction:column}}
+@media(max-width:980px){.topbar{height:auto;min-height:64px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.nav{max-width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start}.filter-bar{grid-template-columns:1fr}.hero-inner,.shell{width:92%}.hero-kpis{gap:28px}.section-head{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:1fr}.calendar-top{align-items:flex-start;flex-direction:column}.calendar-day{min-height:70px}}
+@media(max-width:640px){.hero{padding:34px 4%;min-height:280px}.poster{height:172px}.nav{width:100%}.card-main{flex-direction:column}.status{align-self:flex-start}.card-foot{align-items:flex-start;flex-direction:column}.calendar-weekdays,.calendar-grid{gap:5px}.calendar-day{min-height:58px;padding:6px;border-radius:10px}.calendar-item{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -160,6 +189,23 @@ footer{border-top:1px solid var(--line);padding:24px 5%;text-align:center;color:
     </div>
   </section>
 
+  <section class="calendar-panel" aria-label="Event calendar">
+    <div class="calendar-top">
+      <div>
+        <div class="calendar-title" id="calendarTitle">Event Calendar</div>
+        <div class="calendar-month" id="calendarMonth"></div>
+      </div>
+      <div class="calendar-nav">
+        <button class="calendar-btn" type="button" onclick="changeCalendarMonth(-1)">Prev</button>
+        <button class="calendar-btn" type="button" onclick="goToCurrentCalendarMonth()">Today</button>
+        <button class="calendar-btn" type="button" onclick="changeCalendarMonth(1)">Next</button>
+      </div>
+    </div>
+    <div class="calendar-weekdays" id="calendarWeekdays"></div>
+    <div class="calendar-grid" id="eventCalendar"></div>
+    <div class="calendar-list" id="calendarEventList"></div>
+  </section>
+
   <section class="section" id="activeSection">
     <div class="section-head">
       <h2 class="section-title"><span aria-hidden="true">📅</span><span data-i18n="activeSection">กำลังดำเนินการและกำลังจะมาถึง</span></h2>
@@ -190,6 +236,8 @@ var pageSize = 10;
 var activePage = 1;
 var donePage = 1;
 var lastFilterKey = '';
+var calendarCursor = startOfMonth(new Date());
+var selectedCalendarDate = dateKey(new Date());
 
 var I18N = {
   TH: {
@@ -367,6 +415,13 @@ function parseDate(value){
   return startOfDay(d);
 }
 function startOfDay(date){ return new Date(date.getFullYear(), date.getMonth(), date.getDate()); }
+function startOfMonth(date){ return new Date(date.getFullYear(), date.getMonth(), 1); }
+function dateKey(date){
+  var d = startOfDay(date);
+  var month = String(d.getMonth() + 1).padStart(2, '0');
+  var day = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + month + '-' + day;
+}
 
 function sortEvents(a, b){
   if(a.pin && !b.pin) return -1;
@@ -431,10 +486,109 @@ function renderEvents(){
   }
   var activeRows = rows.filter(function(item){ var s = eventStatus(item).status; return s === 'ongoing' || s === 'upcoming'; });
   var doneRows = rows.filter(function(item){ return eventStatus(item).status === 'done'; });
+  renderCalendar(rows);
   document.getElementById('activeCards').innerHTML = renderPagedSection(activeRows, 'active');
   document.getElementById('allCards').innerHTML = renderPagedSection(doneRows, 'done');
   document.getElementById('activeCount').textContent = activeRows.length + ' ' + t('items');
   document.getElementById('resultCount').textContent = rows.length + ' ' + t('items');
+}
+
+function renderCalendar(rows){
+  var title = document.getElementById('calendarTitle');
+  var month = document.getElementById('calendarMonth');
+  var weekdays = document.getElementById('calendarWeekdays');
+  var grid = document.getElementById('eventCalendar');
+  var list = document.getElementById('calendarEventList');
+  if(!title || !month || !weekdays || !grid || !list) return;
+  title.textContent = currentLang === 'EN' ? 'Event Calendar' : 'ปฏิทินกิจกรรม';
+  month.textContent = calendarCursor.toLocaleDateString(currentLang === 'EN' ? 'en-US' : 'th-TH', { month:'long', year:'numeric' });
+  var dayLabels = currentLang === 'EN'
+    ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    : ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  weekdays.innerHTML = dayLabels.map(function(day){ return '<div class="calendar-weekday">' + esc(day) + '</div>'; }).join('');
+
+  var first = startOfMonth(calendarCursor);
+  var cursor = new Date(first);
+  cursor.setDate(cursor.getDate() - cursor.getDay());
+  var cells = [];
+  for(var i = 0; i < 42; i++){
+    var day = new Date(cursor);
+    var key = dateKey(day);
+    var dayEvents = eventsForDate(rows, day);
+    var statusDots = dayEvents.slice(0, 3).map(function(item){
+      return '<span class="calendar-dot ' + escAttr(eventStatus(item).status) + '"></span>';
+    }).join('');
+    var more = dayEvents.length > 3 ? '<span class="calendar-more">+' + esc(dayEvents.length - 3) + '</span>' : '';
+    var classes = [
+      'calendar-day',
+      day.getMonth() === calendarCursor.getMonth() ? '' : 'other-month',
+      dayEvents.length ? 'has-events' : '',
+      key === selectedCalendarDate ? 'selected' : ''
+    ].filter(Boolean).join(' ');
+    cells.push(
+      '<button class="' + escAttr(classes) + '" type="button" onclick="selectCalendarDate(\'' + escAttr(key) + '\')" aria-label="' + escAttr(key) + '">' +
+        '<span class="calendar-date">' + esc(day.getDate()) + '</span>' +
+        '<span class="calendar-dots">' + statusDots + more + '</span>' +
+      '</button>'
+    );
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  grid.innerHTML = cells.join('');
+  renderCalendarEventList(rows);
+}
+
+function renderCalendarEventList(rows){
+  var list = document.getElementById('calendarEventList');
+  if(!list) return;
+  var selected = parseDate(selectedCalendarDate);
+  var dayRows = selected ? eventsForDate(rows, selected) : [];
+  var dateLabel = selected
+    ? selected.toLocaleDateString(currentLang === 'EN' ? 'en-US' : 'th-TH', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+    : '';
+  if(!dayRows.length){
+    list.innerHTML = '<div class="state">' + esc(dateLabel) + '<br>' + esc(currentLang === 'EN' ? 'No events on this date.' : 'ไม่มีรายการกิจกรรมในวันนี้') + '</div>';
+    return;
+  }
+  list.innerHTML = '<div class="section-count">' + esc(dateLabel) + ' · ' + esc(dayRows.length) + ' ' + esc(t('items')) + '</div>' +
+    dayRows.map(renderCalendarEventItem).join('');
+}
+
+function renderCalendarEventItem(item){
+  var title = currentLang === 'EN' ? (item.title_en || item.title_th) : (item.title_th || item.title_en);
+  var detailHref = 'public-events-detail.html?id=' + encodeURIComponent(item.id);
+  return '<a class="calendar-item" href="' + escAttr(detailHref) + '">' +
+    '<span><span class="calendar-item-title">' + esc(title || '-') + '</span>' +
+    '<span class="calendar-item-meta">' + esc(formatDateRange(item.start_date, item.end_date)) + (item.event_type ? ' · ' + esc(item.event_type) : '') + '</span></span>' +
+    '<span class="status ' + escAttr(eventStatus(item).status) + '">' + esc(eventStatus(item).label) + '</span>' +
+  '</a>';
+}
+
+function eventsForDate(rows, date){
+  var day = startOfDay(date);
+  return rows.filter(function(item){
+    var start = parseDate(item.start_date);
+    var end = parseDate(item.end_date) || start;
+    if(!start || !end) return false;
+    return day >= start && day <= end;
+  });
+}
+
+function selectCalendarDate(key){
+  selectedCalendarDate = key;
+  renderEvents();
+}
+
+function changeCalendarMonth(delta){
+  calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
+  selectedCalendarDate = dateKey(calendarCursor);
+  renderEvents();
+}
+
+function goToCurrentCalendarMonth(){
+  var today = new Date();
+  calendarCursor = startOfMonth(today);
+  selectedCalendarDate = dateKey(today);
+  renderEvents();
 }
 
 function renderPagedSection(rows, section){

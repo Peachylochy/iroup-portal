@@ -3501,6 +3501,13 @@ Completed:
   - Ongoing/upcoming and past/all sections each have independent previous/next
     pagination.
   - Pagination resets when search, country, type, or status filters change.
+- Follow-up public Events calendar:
+  - Added a month-view calendar to `public/public-events.html`.
+  - Calendar highlights days that contain Events from the currently filtered result
+    set.
+  - Multi-day Events are shown on every date within their start/end range.
+  - Users can move between months, jump back to today, and click a date to see
+    the Events on that day.
 
 Verification:
 
@@ -3511,6 +3518,7 @@ Verification:
 - `git diff --check -- "Team IROUP/public/public-events.html"` passed with Windows
   CRLF warning only.
 - Local HTTP smoke returned 200 for `events.html`.
+- Local HTTP smoke returned 200 for `public/public-events.html`.
 - User-confirmed live authenticated Events page after hard refresh.
 
 Next recommended work:
