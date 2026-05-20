@@ -110,6 +110,47 @@ body.modal-open{overflow:hidden}
 .form-grid{grid-template-columns:repeat(2,minmax(260px,1fr))}
 .input,.select{background:#F5F8FC;color:#10233f}
 .input:required:invalid,.select:required:invalid{background:#F5F8FC;color:#10233f}
+.modal .input,
+.modal .select,
+.modal textarea{
+  background:#F8FBFE !important;
+  color:#10233f !important;
+  border-color:#DCE7F2;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
+  caret-color:#1A6DB5;
+}
+.modal .input:hover,
+.modal .select:hover,
+.modal textarea:hover{
+  background:#fff !important;
+  border-color:#C8D9E8;
+}
+.modal .input:focus,
+.modal .select:focus,
+.modal textarea:focus{
+  background:#fff !important;
+  border-color:#1A6DB5;
+  box-shadow:0 0 0 4px rgba(26,109,181,.12);
+}
+.modal .input:required:invalid,
+.modal .select:required:invalid,
+.modal textarea:required:invalid{
+  background:#F8FBFE !important;
+  color:#10233f !important;
+}
+.modal input:-webkit-autofill,
+.modal input:-webkit-autofill:hover,
+.modal input:-webkit-autofill:focus,
+.modal textarea:-webkit-autofill,
+.modal textarea:-webkit-autofill:hover,
+.modal textarea:-webkit-autofill:focus,
+.modal select:-webkit-autofill,
+.modal select:-webkit-autofill:hover,
+.modal select:-webkit-autofill:focus{
+  -webkit-text-fill-color:#10233f;
+  box-shadow:0 0 0 1000px #F8FBFE inset;
+  border-color:#DCE7F2;
+}
 @media(max-width:1180px){
   .modal-panel{width:calc(100vw - 64px);height:calc(100vh - 96px);max-height:calc(100vh - 96px)}
   .form-grid{grid-template-columns:1fr}

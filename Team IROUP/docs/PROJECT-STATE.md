@@ -3446,8 +3446,26 @@ Completed:
   - inbound/outbound bar chart
   - trend area fill
 
-Verification target:
+Verification:
 
-- Re-run syntax checks for `mobility.html`, `dashboard.html`, and
-  `public/public-mobility.html`.
-- Re-run local smoke checks for Admin Mobility and Public Mobility.
+- User-confirmed live Admin Mobility after hard refresh:
+  - V2 Mobility rows load.
+  - Add/edit modal opens correctly.
+  - Edit/detail hydration works.
+  - Participant list behavior is acceptable in the authenticated browser.
+- User-confirmed Public Mobility is acceptable after the redesign pass.
+- Follow-up visual fix:
+  - changed Mobility modal form controls from dark navy fills to white/light
+    blue surfaces across normal, hover, focus, invalid, and autofill states.
+  - kept the change scoped to CSS only in `mobility.html`.
+- Validation:
+  - inline script syntax passed for `mobility.html`
+  - `git diff --check -- "Team IROUP/mobility.html"` passed with Windows CRLF
+    warning only.
+
+Next recommended work:
+
+- Commit the Mobility verification/color fix.
+- Proceed to the next Admin UX + Data Quality module, likely Events, using the
+  same data-safe sequence: data parity, edit hydration, file behavior, table/list
+  ergonomics, then visual layout.
