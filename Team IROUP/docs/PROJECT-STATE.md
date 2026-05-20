@@ -3349,3 +3349,20 @@ Follow-up:
   - `git diff --check -- "Team IROUP/public/public-mou.html"` passed
   - browser smoke confirmed `.up-map-pin` renders and no `stroke-dasharray`
     route/dashed-line element is present.
+
+Admin visual polish follow-up:
+
+- Applied a small, CSS-only MOU admin polish pass to `mou.html`.
+- Scope was intentionally limited to visual surface alignment:
+  - softer dashboard-like page background
+  - rounded/glassier topbar
+  - refined sidebar active state
+  - softer KPI/filter/chart/table panel radius and shadows
+  - cleaner input, pill, pager, modal, and table hover styling
+- No backend, API adapter, auth/session, MOU list/detail/write/delete, file, map
+  data, or chart data logic was changed.
+- Verification:
+  - inline script syntax passed for `mou.html`
+  - `git diff --check -- "Team IROUP/mou.html"` passed
+  - local browser smoke confirmed no horizontal overflow at the tested desktop
+    viewport.
