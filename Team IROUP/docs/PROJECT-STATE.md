@@ -3520,6 +3520,7 @@ Verification:
 - Local HTTP smoke returned 200 for `events.html`.
 - Local HTTP smoke returned 200 for `public/public-events.html`.
 - User-confirmed live authenticated Events page after hard refresh.
+- User-confirmed Public Events pagination and calendar behavior after review.
 
 Next recommended work:
 
