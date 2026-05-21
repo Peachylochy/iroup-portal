@@ -4093,3 +4093,22 @@ Verification:
 - Public scan found no remaining public `Admin` link to direct admin module pages.
 - `iroup-admin-guard.js` is loaded by Dashboard, MOU, Mobility, Travel,
   Scholarship, Events, News, Knowledge, and Report.
+
+Index responsive follow-up:
+
+- Tightened `index.html` login/admin entry responsive layout for iPad, tablet,
+  and phone widths.
+- Tablet landscape keeps a two-column login composition with smaller copy and
+  tighter feature spacing.
+- Tablet portrait and phones use a compact login-first layout while preserving a
+  small brand signal above the login card.
+- Phone widths reduce card padding, hide secondary divider copy, and suppress the
+  fixed version label on very small screens to prevent crowding.
+- Fixed the public link on `index.html` from the missing root
+  `public-landing.html` path to `public/public-landing.html`.
+
+Verification:
+
+- `git diff --check -- "Team IROUP/index.html"` passed with Windows CRLF warning
+  only.
+- Inline script syntax passed for `index.html`.

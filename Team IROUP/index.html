@@ -393,25 +393,45 @@ body{
   .globe-wrap{width:280px;height:280px;right:-60px;opacity:.32}
 }
 
+@media(max-width:1180px) and (min-width:881px){
+  .shell{
+    max-width:1120px;
+    grid-template-columns:minmax(0,.9fr) minmax(390px,420px);
+    gap:var(--s6);
+    padding:var(--s6);
+  }
+  .brand{padding:var(--s6) var(--s4);min-height:calc(100vh - 2*var(--s6))}
+  .headline{font-size:34px;line-height:1.12}
+  .subhead{font-size:14px;line-height:1.65;max-width:390px}
+  .features{gap:var(--s4);margin-top:var(--s6)}
+  .feat-ic{width:34px;height:34px;flex-basis:34px}
+  .feat-tx h4{font-size:13px}
+  .feat-tx p{font-size:12px;line-height:1.5}
+  .login-card{max-width:420px;padding:var(--s7) var(--s6) var(--s6)}
+}
+
 /* ── 768px: collapse to single column ───────────────────── */
 /* Added breakpoint between old 880 and 520 for tablet portrait */
 @media(max-width:880px){
   .shell{
     grid-template-columns:1fr;
-    padding:var(--s6) var(--s5);gap:var(--s5);
-    max-width:560px;
+    padding:var(--s6) var(--s5) var(--s8);gap:var(--s4);
+    max-width:620px;
     /* prevent shell from overflowing its own container */
     width:100%;
   }
-  .brand{min-height:auto;padding:var(--s4) 0 0}
-  .brand-hero{margin:var(--s5) 0 var(--s4);max-width:none;padding:0}
+  .brand{min-height:auto;padding:var(--s3) 0 0}
+  .brand-hero{margin:0;max-width:none;padding:0;text-align:center}
+  .eyebrow{font-size:10px;padding:6px 10px}
+  .headline{font-size:28px;margin-top:var(--s4);letter-spacing:-.4px}
+  .subhead{font-size:13px;line-height:1.6;margin:var(--s3) auto 0;max-width:520px}
   .features{display:none}
   .globe-wrap{display:none}
   .brand-foot{display:none}
-  .auth-col{padding:0 0 var(--s9)}
+  .auth-col{padding:0 0 var(--s6)}
   .auth-col::before{width:360px;height:360px}
   /* card stretches to column width on tablet */
-  .login-card{padding:var(--s7) var(--s6) var(--s6);max-width:none}
+  .login-card{padding:var(--s7) var(--s6) var(--s6);max-width:520px}
 }
 
 /* ── 768px refinement: compact brand bar ─────────────────── */
@@ -428,11 +448,13 @@ body{
     justify-content:flex-start;
     min-height:auto;
   }
-  .brand-hero{display:none}
+  .brand-hero{display:block}
+  .headline{font-size:25px}
+  .subhead{display:none}
   /* card: full width with comfortable side padding */
   .login-card{
     padding:var(--s7) var(--s6) var(--s6);
-    max-width:none;
+    max-width:520px;
     width:100%;
   }
   .auth-col{
@@ -453,26 +475,40 @@ body{
     /* ensure full viewport width without causing overflow */
     min-width:0;width:100%;
   }
-  .brand{padding:var(--s2) 0;gap:var(--s2)}
-  .brand-hero{display:none}
+  .brand{padding:var(--s1) 0;gap:var(--s2)}
+  .brand-hero{display:block}
+  .eyebrow{display:none}
+  .headline{font-size:21px;line-height:1.18;margin-top:0}
   .login-card{
     border-radius:18px;
-    padding:var(--s6) var(--s5) var(--s5);
+    padding:var(--s5) var(--s4) var(--s4);
     /* belt-and-suspenders: never exceed viewport */
     max-width:100%;
     width:100%;
   }
-  .card-head{margin-bottom:var(--s5)}
+  .card-head{margin-bottom:var(--s4)}
   .card-head h1{font-size:20px}
   .card-head .sub{font-size:12px}
   .lock-icon{width:48px;height:48px;border-radius:14px}
   .lock-icon svg{width:21px;height:21px}
-  .role-chip{padding:9px var(--s3);gap:var(--s2)}
+  .role-chip{padding:9px var(--s3);gap:var(--s2);margin-bottom:var(--s4)}
   .role-chip span{font-size:11.5px}
   .google-btn{padding:12px var(--s3);font-size:13px;gap:var(--s2)}
-  .div-or{margin:var(--s4) 0 var(--s2)}
-  .card-foot{margin-top:var(--s5);padding-top:var(--s4)}
+  .div-or{display:none}
+  .tiny{font-size:10.5px;margin-top:var(--s2)}
+  .card-foot{margin-top:var(--s4);padding-top:var(--s3)}
   .version{font-size:9.5px;bottom:8px}
+}
+
+@media(max-width:430px){
+  .shell{padding:var(--s3) var(--s3) var(--s6)}
+  .headline{font-size:19px}
+  .login-card{box-shadow:0 18px 42px -24px rgba(26,109,181,.28)}
+  .card-head{margin-bottom:var(--s3)}
+  .lock-icon{margin-bottom:var(--s3)}
+  .role-chip .pill{padding:3px 8px}
+  .public-link{display:flex;justify-content:center;line-height:1.35}
+  .version{display:none}
 }
 
 /* ── 380px: very small phones ────────────────────────────── */
@@ -688,7 +724,7 @@ body{
       </div>
 
       <div class="card-foot">
-        <a href="public-landing.html" class="public-link">
+        <a href="public/public-landing.html" class="public-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
