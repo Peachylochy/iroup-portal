@@ -293,7 +293,7 @@ body{
       <div class="hero">
         <div class="hero-card">
           <div class="hero-title">ภาพรวมความเป็นนานาชาติของมหาวิทยาลัยพะเยา</div>
-          <div class="hero-sub">หน้านี้อ่านข้อมูลจาก API เดียวคือ <b>getReport</b> แล้วสรุปเป็น KPI, insight, ranking, งบประมาณ และรายการล่าสุด เพื่อใช้เป็นหน้าเสนอผู้บริหารหรือ monitor งานประจำวัน</div>
+          <div class="hero-sub">หน้านี้อ่านข้อมูลจาก V2 admin lists แล้วสรุปเป็น KPI, insight, ranking, งบประมาณ และรายการล่าสุด เพื่อใช้เป็นหน้าเสนอผู้บริหารหรือ monitor งานประจำวัน</div>
           <div class="hero-meta">
             <span class="hero-chip" id="lastUpdated">กำลังโหลดข้อมูล...</span>
             <span class="hero-chip" id="yearChip">ทุกปีงบประมาณ</span>
@@ -360,10 +360,67 @@ function iconSvg(name){
   return icons[name] || icons.globe;
 }
 
+function unwrapV2List(res){
+  const data=res && res.data;
+  if(Array.isArray(data)) return data;
+  if(data && Array.isArray(data.items)) return data.items;
+  if(data && Array.isArray(data.rows)) return data.rows;
+  return [];
+}
+
+function displayValue(value){
+  if(value===undefined || value===null) return '';
+  if(typeof value==='object'){
+    return displayValue(value.display_name || value.label || value.name_th || value.name_en || value.name || value.country_name_th || value.country_name_en || value.unit_name_th || value.unit_name_en || value.country_id || value.unit_id || value.id);
+  }
+  const text=String(value).trim();
+  return text && text!=='-' && text.toLowerCase()!=='undefined' ? text : '';
+}
+function firstValue(...values){for(const value of values){const text=displayValue(value); if(text) return text;} return ''}
+function toNumber(value){const n=Number(String(value??'').replace(/,/g,'')); return Number.isFinite(n)?n:0}
+function countryDisplay(item){const c=item?.country||{}; return firstValue(item.country_display,item.country_name_th,item.country_name_en,c.country_name_th,c.country_name_en,c.name_th,c.name_en,item.country_id,c.country_id,item.country)}
+function unitDisplay(item){const u=item?.up_unit||item?.organizer||item?.organizer_unit||item?.unit||{}; return firstValue(item.unit_display,item.up_unit_name_th,item.up_unit_name_en,item.organizer_unit_name_th,item.organizer_unit_name_en,u.unit_name_th,u.unit_name_en,u.name_th,u.name_en,item.organizer,item.up_unit_id,item.organizer_unit_id,u.unit_id)}
+function fiscalYearFromDate(value){const d=toDate(value); if(!d) return ''; return String(d.getFullYear()+543+(d.getMonth()>=9?1:0))}
+function participantTotal(item){return toNumber(item.participant_count_cached ?? item.participant_count ?? item.participants_count ?? item.aggregate_counts?.participant_count_cached ?? item.participant_summary?.total)}
+function budgetTotal(item){return toNumber(item.amount ?? item.budget_amount ?? item.funding_amount ?? item.budget_total ?? item.total_budget)}
+function hasTravelReportContent(item){return !!firstValue(item.project_name,item.project_title,item.purpose,countryDisplay(item),unitDisplay(item),item.start_date,item.end_date,item.departure_date,item.return_date)}
+
 async function fetchReport(year=''){
-  const json = await IROUP.getReport(year);
-  if(!json.success) throw new Error(json.error || 'API error');
-  return json;
+  if(!window.IROUP_V2 || !IROUP_V2.admin) throw new Error('IROUP_V2 admin adapter is not available');
+  const admin=IROUP_V2.admin;
+  const [mouRes,mobilityRes,travelRes,scholarRes,eventRes]=await Promise.all([
+    admin.mouList({includeArchived:false,_:Date.now()}),
+    admin.mobilityList({includeArchived:false,_:Date.now()}),
+    admin.travelList({includeArchived:false,_:Date.now()}),
+    admin.scholarshipList({includeArchived:false,_:Date.now()}),
+    admin.eventList({includeArchived:false,_:Date.now()})
+  ]);
+  const failed=[['MOU',mouRes],['Mobility',mobilityRes],['Travel',travelRes],['Scholarship',scholarRes],['Event',eventRes]].filter(([,res])=>!res||!res.success);
+  if(failed.length) throw new Error(failed.map(([name,res])=>`${name}: ${(res&&res.error)||'request failed'}`).join(' / '));
+  const mobility=unwrapV2List(mobilityRes);
+  const travelItems=unwrapV2List(travelRes).filter(hasTravelReportContent);
+  const data={
+    mou: unwrapV2List(mouRes).map(v2MouToDashboardRow),
+    inbound: mobility.filter(item=>String(item.direction||'').toLowerCase()!=='outbound').map(item=>v2MobilityToDashboardRow(item).dashboardRow),
+    outbound: mobility.filter(item=>String(item.direction||'').toLowerCase()==='outbound').map(item=>v2MobilityToDashboardRow(item).dashboardRow),
+    travel: travelItems.map(v2TravelToDashboardRow),
+    scholar: unwrapV2List(scholarRes).map(v2ScholarshipToDashboardRow),
+    event: unwrapV2List(eventRes).map(v2EventToDashboardRow)
+  };
+  if(year){
+    Object.keys(data).forEach(key=>{data[key]=data[key].filter(row=>String(row['ปีงบ']||'')===String(year));});
+  }
+  const total={
+    mou:data.mou.length,
+    scholar:data.scholar.length,
+    event:data.event.length,
+    travel:data.travel.length,
+    inbound:data.inbound.length,
+    outbound:data.outbound.length,
+    mobility:data.inbound.length+data.outbound.length,
+    all:Object.values(data).flat().length
+  };
+  return {success:true,generatedAt:new Date().toISOString(),data,total,summary:makeSummary(data)};
 }
 
 async function hydrateDashboardScholarshipsFromV2(report){
@@ -476,12 +533,10 @@ function normalizeV2DashboardList(res){
 }
 
 function v2MobilityToDashboardRow(item){
-  const country=item.country || {};
-  const unit=item.up_unit || {};
   const direction=String(item.direction || '').toLowerCase()==='outbound' ? 'outbound' : 'inbound';
-  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
-  const unitName=unit.unit_name_th || unit.unit_name_en || item.up_unit_name_th || item.up_unit_name_en || item.up_unit_id || '';
-  const participantCount=Number(item.participant_count_cached || item.participant_count || item.aggregate_counts?.participant_count_cached || 0) || 0;
+  const countryName=countryDisplay(item);
+  const unitName=unitDisplay(item);
+  const participantCount=participantTotal(item);
   const row={
     'ชื่อโครงการ': item.project_name || item.project_name_en || item.mobility_id || '-',
     'สถาบัน': item.institution_name || '-',
@@ -503,10 +558,8 @@ function v2MobilityToDashboardRow(item){
 }
 
 function v2MouToDashboardRow(item){
-  const country=item.country || {};
-  const unit=item.up_unit || {};
-  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
-  const unitName=unit.unit_name_th || unit.unit_name_en || item.up_unit_name_th || item.up_unit_name_en || item.up_unit_id || '';
+  const countryName=countryDisplay(item);
+  const unitName=unitDisplay(item);
   return {
     'หน่วยงาน_UP': unitName,
     'องค์กร_ตปท': item.partner_org_name || item.partner_org_name_en || item.partner_org || item.mou_id || '-',
@@ -520,10 +573,8 @@ function v2MouToDashboardRow(item){
 }
 
 function v2EventToDashboardRow(item){
-  const country=item.country || {};
-  const unit=item.organizer || item.organizer_unit || item.unit || {};
-  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
-  const unitName=unit.unit_name_th || unit.unit_name_en || item.organizer_unit_name_th || item.organizer_unit_name_en || item.organizer || item.organizer_unit_id || '';
+  const countryName=countryDisplay(item);
+  const unitName=unitDisplay(item);
   return {
     'ชื่อกิจกรรม': item.title_th || item.title_en || item.event_id || '-',
     'ประเภท': item.event_type || item.type || item.event_type_id || '-',
@@ -535,15 +586,14 @@ function v2EventToDashboardRow(item){
     'วันสิ้นสุด': item.end_date || item.start_date || '',
     'ปีงบ': item.fiscal_year || fiscalYearFromDate(item.start_date || item.end_date),
     'สถานะ': item.status || '',
-    'จำนวนเงิน': item.amount || item.budget_amount || 0
+    'จำนวนเงิน': budgetTotal(item)
   };
 }
 
 function v2ScholarshipToDashboardRow(item){
-  const country=item.country || {};
-  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
+  const countryName=countryDisplay(item);
   const level=item.scholarship_level || item.level || item.degree_level || item.target_group || '';
-  const amount=item.amount || item.budget_amount || item.funding_amount || item['จำนวนเงิน'] || 0;
+  const amount=budgetTotal(item);
   return {
     'ชื่อทุน': item.title_th || item.title_en || item.scholarship_id || '-',
     'สถาบัน': item.institution_name || item.institution_name_th || item.institution_name_en || '-',
@@ -553,6 +603,23 @@ function v2ScholarshipToDashboardRow(item){
     'วันปิดรับ': item.close_date || '',
     'ปีงบ': fiscalYearFromDate(item.close_date || item.open_date),
     'จำนวนเงิน': amount
+  };
+}
+
+function v2TravelToDashboardRow(item){
+  return {
+    'ชื่อผู้เดินทาง': firstValue(item.project_name,item.project_title,item.purpose,'-'),
+    'ชื่อโครงการ': firstValue(item.project_name,item.project_title,item.purpose,'-'),
+    'ประเทศ': countryDisplay(item),
+    'หน่วยงาน_UP': unitDisplay(item),
+    'คณะ': unitDisplay(item),
+    'วันเริ่ม': item.start_date || item.departure_date || '',
+    'วันสิ้นสุด': item.end_date || item.return_date || '',
+    'ปีงบ': item.fiscal_year || fiscalYearFromDate(item.start_date || item.end_date),
+    'จำนวนคน': participantTotal(item),
+    'จำนวนเงิน': budgetTotal(item),
+    'ประเภท': firstValue(item.travel_type,item.staff_type,item.category),
+    'สถานะ': item.status || ''
   };
 }
 
@@ -640,19 +707,16 @@ async function reloadData(force=false){
   if(state.loading) return;
   state.loading=true;
   $('#notice').style.display='none';
-  $('#appContent').innerHTML='<div class="loading"><div><div class="spinner"></div><div>กำลังโหลดข้อมูลจาก Google Sheet...</div></div></div>';
+  $('#appContent').innerHTML='<div class="loading"><div><div class="spinner"></div><div>กำลังโหลดข้อมูล Dashboard จาก V2...</div></div></div>';
   try{
-    const cacheKey='iroup_dashboard_full_'+(state.year||'all');
+    const cacheKey='iroup_dashboard_v2_full_'+(state.year||'all');
+    try{localStorage.removeItem('iroup_dashboard_full_'+(state.year||'all'));}catch(_){}
     if(!force){
       const cached=localStorage.getItem(cacheKey);
       if(cached){
         const c=JSON.parse(cached);
         if(Date.now()-c.ts<5*60*1000){
           state.raw=c.data;
-          await hydrateDashboardMouFromV2(state.raw);
-          await hydrateDashboardMobilityFromV2(state.raw);
-          await hydrateDashboardScholarshipsFromV2(state.raw);
-          await hydrateDashboardEventsFromV2(state.raw);
           buildYearOptions();
           render();
           state.loading=false;
@@ -661,10 +725,6 @@ async function reloadData(force=false){
       }
     }
     const data=await fetchReport(state.year);
-    await hydrateDashboardMouFromV2(data);
-    await hydrateDashboardMobilityFromV2(data);
-    await hydrateDashboardScholarshipsFromV2(data);
-    await hydrateDashboardEventsFromV2(data);
     state.raw=data;
     localStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),data}));
     buildYearOptions();
@@ -819,7 +879,7 @@ function generateInsights(report){
   insights.push({icon:'🎓',title:openScholar.length?`ขณะนี้มีทุนที่ยังเปิดรับ/ใกล้ปิดรับ ${IU.num(openScholar.length)} ทุน`:'ขณะนี้ยังไม่มีทุนที่เปิดรับสมัครในข้อมูลชุดนี้',sub:'ดูจากวันเปิดรับและวันปิดรับ'});
   const upcoming=data.event.filter(r=>{const d=IU.toDate(r['วันเริ่ม']); if(!d)return false; const diff=daysBetween(d,startDay(new Date())); return diff>=0 && diff<=30});
   if(upcoming.length) insights.push({icon:'📅',title:`มีกิจกรรมที่กำลังจะเกิดขึ้นใน 30 วัน ${IU.num(upcoming.length)} รายการ`,sub:'เหมาะสำหรับติดตามงานประจำเดือน'});
-  if(summary.budget.all>0) insights.push({icon:'💰',title:`งบประมาณรวมที่บันทึกในระบบ ${IU.money(summary.budget.all)+' บาท'}`,sub:'รวมทุน กิจกรรม เดินทาง Inbound และ Outbound'});
+  if(summary.budget.all>0) insights.push({icon:'💰',title:`งบประมาณรวมที่บันทึกในระบบ ${IU.money(summary.budget.all)+' บาท'}`,sub:'รวมเฉพาะหมวดที่มี field งบประมาณจาก V2'});
   const soonMou=data.mou.filter(r=>IU.statusMou(r)==='soon');
   if(soonMou.length) insights.push({icon:'⏰',title:`มี MOU ใกล้หมดอายุ ${IU.num(soonMou.length)} รายการ`,sub:'ควรตรวจสอบเพื่อต่ออายุหรือประเมินความร่วมมือ'});
   return insights.slice(0,6);
@@ -848,6 +908,9 @@ function render(){
   const upcomingEvent=data.event.filter(r=>IU.statusEvent(r)==='upcoming').length;
   const activeMou=data.mou.filter(r=>IU.statusMou(r)==='active').length;
   const activeTravel=data.travel.filter(r=>IU.statusEvent({'วันเริ่ม':r['วันเริ่ม'],'วันสิ้นสุด':r['วันสิ้นสุด']})==='active').length;
+  const budgetContent=summary.budget.all>0
+    ? `<div class="budget-total"><div class="n">${IU.money(summary.budget.all)+' บาท'}</div><div class="l">งบประมาณรวมที่บันทึก</div></div>${barList({'ทุนการศึกษา':summary.budget.scholar,'กิจกรรม':summary.budget.event,'การเดินทาง':summary.budget.travel},3)}`
+    : '<div class="empty">ยังไม่มีข้อมูลงบประมาณจาก V2 list สำหรับสรุปผล</div>';
 
   $('#appContent').innerHTML=`
     <div class="grid-kpi">
@@ -856,7 +919,7 @@ function render(){
       ${kpi('calendar',IU.num(total.event),'กิจกรรม',`${IU.num(upcomingEvent)} upcoming`,'purple')}
       ${kpi('globe',IU.num(total.mobility),'Mobility',`Inbound ${IU.num(total.inbound)} · Outbound ${IU.num(total.outbound)}`,'teal')}
       ${kpi('plane',IU.num(total.travel),'การเดินทาง',`${IU.num(activeTravel)} กำลังเดินทาง`,'green')}
-      ${kpi('budget',summary.budget.all?IU.money(summary.budget.all)+' บาท':'0 บาท','งบประมาณรวม','จากข้อมูลจำนวนเงิน','red')}
+      ${kpi('budget',summary.budget.all?IU.money(summary.budget.all)+' บาท':'ไม่มีข้อมูล','งบประมาณรวม','จาก field งบประมาณใน V2','red')}
     </div>
 
     <div class="layout-main">
@@ -866,16 +929,7 @@ function render(){
       </div>
       <div class="panel">
         <div class="panel-head"><div><div class="panel-title">💰 Budget Snapshot</div><div class="panel-sub">สรุปงบประมาณตามหมวดข้อมูล</div></div></div>
-        <div class="panel-body">
-          <div class="budget-total"><div class="n">${IU.money(summary.budget.all)+' บาท'}</div><div class="l">งบประมาณรวมที่บันทึก</div></div>
-          ${barList({
-            'ทุนการศึกษา':summary.budget.scholar,
-            'กิจกรรม':summary.budget.event,
-            'การเดินทาง':summary.budget.travel,
-            'Inbound':summary.budget.inbound,
-            'Outbound':summary.budget.outbound
-          },5)}
-        </div>
+        <div class="panel-body">${budgetContent}</div>
       </div>
     </div>
 

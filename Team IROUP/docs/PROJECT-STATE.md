@@ -3824,3 +3824,47 @@ Verification:
   - 3 knowledge items rendered
   - country list scroll activates when 14 countries are present
   - no desktop horizontal overflow
+
+---
+
+## Session: 2026-05-21 - Dashboard And Report V2 Source Cleanup
+
+Completed:
+
+- Reworked `dashboard.html` so the Executive Dashboard no longer starts from
+  legacy `IROUP.getReport()` data.
+- Built the dashboard source directly from V2 admin list endpoints:
+  - `mouList`
+  - `mobilityList`
+  - `travelList`
+  - `scholarshipList`
+  - `eventList`
+- Changed dashboard cache to `iroup_dashboard_v2_full_*` and clear the legacy
+  `iroup_dashboard_full_*` cache key during load so stale V1 report snapshots do
+  not reappear.
+- Added Travel row filtering before KPI calculations so the dashboard does not
+  count raw/empty V2 travel rows as real staff travel records.
+- Updated dashboard budget behavior:
+  - budget KPIs no longer use legacy Inbound/Outbound/Mobility values
+  - when V2 list rows do not expose reliable budget fields, the dashboard shows
+    that budget data is unavailable instead of showing misleading `0 บาท`
+- Reworked `report.html` so Report & Export uses V2 admin lists instead of
+  legacy `IROUP.getReport()` / `IROUP.getAll(...)`.
+- Added V2-safe report mappers for nested country/unit objects so values like
+  `[object Object]` do not render in report rows.
+- Added report blank-row filtering to remove rows without reportable content.
+- Added report table pagination:
+  - shows 50 rows per page
+  - keeps filtered CSV export complete across all matching rows
+
+Verification:
+
+- `dashboard.html` local HTTP smoke returned 200.
+- `report.html` local HTTP smoke returned 200.
+- Confirmed `dashboard.html` and `report.html` no longer contain
+  `IROUP.getReport`.
+- Confirmed `report.html` includes table pagination and V2 report loading.
+- Inline script syntax passed for:
+  - `dashboard.html`
+  - `report.html`
+- `git diff --check` passed for changed files with Windows CRLF warnings only.
