@@ -199,13 +199,13 @@ function getV2RouteDispatch_() {
       }
     },
     'v2.schema': {
-      access: 'public',
+      access: 'admin',
       handler: function () {
         return getV2SchemaSummary_();
       }
     },
     'v2.debug.admintokenmap': {
-      access: 'public',
+      access: 'admin',
       handler: function (request) {
         return debugV2AdminTokenMap_(request);
       }
@@ -504,6 +504,18 @@ function getV2RouteDispatch_() {
         return getV2AdminReportSummary_(request.params.fiscal_year || request.params.year || '');
       }
     },
+    'v2.admin.person.search': {
+      access: 'admin',
+      handler: function (request) {
+        return searchV2AdminPeople_(request);
+      }
+    },
+    'v2.admin.person.create': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminPerson_(request);
+      }
+    },
     'v2.lookup.countries': {
       access: 'public',
       handler: function () {
@@ -517,13 +529,13 @@ function getV2RouteDispatch_() {
       }
     },
     'v2.lookup.students': {
-      access: 'public',
+      access: 'admin',
       handler: function () {
         return listV2LookupStudents_();
       }
     },
     'v2.lookup.staff': {
-      access: 'public',
+      access: 'admin',
       handler: function () {
         return listV2LookupStaff_();
       }

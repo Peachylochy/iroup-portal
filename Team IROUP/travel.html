@@ -43,7 +43,7 @@ button,input,select,textarea{font:inherit}
 .empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}.muted{color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;white-space:nowrap}
 .modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1040px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
 .form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}.radio-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.radio-row label{display:flex;gap:8px;align-items:center;font-weight:800}
-.participant-tools{display:grid;gap:12px}.participant-search{position:relative}.suggestions{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(15,45,90,.14);max-height:260px;overflow:auto}.suggestions.open{display:block}.suggestion{width:100%;border:0;background:#fff;text-align:left;padding:10px 12px;cursor:pointer;border-bottom:1px solid #EDF3F8;color:var(--text)}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#F8FBFE}.suggestion-name{font-weight:900}.suggestion-meta{font-size:12px;color:var(--muted);margin-top:2px}.selected-person{display:none;border:1px solid #BBD7EF;background:#F1F8FE;border-radius:14px;padding:10px 12px;align-items:center;gap:10px;justify-content:space-between}.selected-person.show{display:flex}.manual-form{display:none;border:1px dashed #BFD0E0;border-radius:14px;padding:12px;background:#F8FBFE}.manual-form.show{display:block}.participant-list{display:grid;gap:8px}.participant-row{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;align-items:center;border:1px solid #EDF3F8;border-radius:14px;padding:10px 12px;background:#fff}.participant-name{font-weight:900}.participant-unit{color:var(--muted);font-size:12px}.participant-empty{padding:14px;border:1px dashed #BFD0E0;border-radius:14px;color:var(--muted);text-align:center;font-weight:800}
+.participant-tools{display:grid;gap:12px}.participant-search{position:relative}.suggestions{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(15,45,90,.14);max-height:260px;overflow:auto}.suggestions.open{display:block}.suggestion{width:100%;border:0;background:#fff;text-align:left;padding:10px 12px;cursor:pointer;border-bottom:1px solid #EDF3F8;color:var(--text)}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#F8FBFE}.suggestion-name{font-weight:900}.suggestion-meta{font-size:12px;color:var(--muted);margin-top:2px}.suggestion-action{margin-top:10px}.suggestion-action .btn{width:100%;justify-content:center}.selected-person{display:none;border:1px solid #BBD7EF;background:#F1F8FE;border-radius:14px;padding:10px 12px;align-items:center;gap:10px;justify-content:space-between}.selected-person.show{display:flex}.manual-form{display:none;border:1px dashed #BFD0E0;border-radius:14px;padding:12px;background:#F8FBFE}.manual-form.show{display:block}.participant-list{display:grid;gap:8px}.participant-row{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;align-items:center;border:1px solid #EDF3F8;border-radius:14px;padding:10px 12px;background:#fff}.participant-name{font-weight:900}.participant-unit{color:var(--muted);font-size:12px}.participant-empty{padding:14px;border:1px dashed #BFD0E0;border-radius:14px;color:var(--muted);text-align:center;font-weight:800}
 @media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{justify-content:center}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:16px}.nav{display:flex;gap:6px;overflow-x:auto}.nav-section,.userbox{display:none}.nav-link{white-space:nowrap}.topbar{align-items:flex-start;flex-wrap:wrap}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.participant-row{grid-template-columns:1fr}.participant-row .btn{justify-content:center}}
 
@@ -191,7 +191,27 @@ body.modal-open{overflow:hidden}
             <div id="manualParticipantForm" class="manual-form">
               <div class="form-grid">
                 <div class="field">
-                  <label class="label" for="manualFullNameInput">ชื่อ-สกุล <span class="req">*</span></label>
+                  <label class="label" for="manualPrefixThInput">คำนำหน้า</label>
+                  <input id="manualPrefixThInput" class="input" type="text">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualFirstNameThInput">ชื่อไทย <span class="req">*</span></label>
+                  <input id="manualFirstNameThInput" class="input" type="text">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualLastNameThInput">สกุลไทย <span class="req">*</span></label>
+                  <input id="manualLastNameThInput" class="input" type="text">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualFirstNameEnInput">First name</label>
+                  <input id="manualFirstNameEnInput" class="input" type="text">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualLastNameEnInput">Last name</label>
+                  <input id="manualLastNameEnInput" class="input" type="text">
+                </div>
+                <div class="field">
+                  <label class="label" for="manualFullNameInput">ชื่อเต็ม</label>
                   <input id="manualFullNameInput" class="input" type="text">
                 </div>
                 <div class="field">
@@ -204,7 +224,14 @@ body.modal-open{overflow:hidden}
                   <input id="manualPositionInput" class="input" type="text">
                 </div>
                 <div class="field">
-                  <label class="label" for="manualRoleInput">บทบาท</label>
+                  <label class="label" for="manualStaffTypeInput">ประเภทบุคลากร</label>
+                  <select id="manualStaffTypeInput" class="select">
+                    <option value="support">สนับสนุน</option>
+                    <option value="academic">วิชาการ</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="label" for="manualRoleInput">บทบาทในโครงการ</label>
                   <input id="manualRoleInput" class="input" type="text">
                 </div>
               </div>
@@ -332,6 +359,8 @@ const state = {
   participants: [],
   selectedPerson: null,
   staffLoaded: false,
+  personSearchTimer: null,
+  personSearchSeq: 0,
   saving: false,
   page: 1,
   pageSize: 10,
@@ -986,40 +1015,49 @@ function resetParticipantUi(){
   renderParticipantList();
 }
 
-async function loadStaffLookupOnce(){
-  if (state.staffLoaded) return;
-  const res = await IROUP_V2.request('v2.lookup.staff');
-  if (!res || res.success === false) throw new Error(res?.error || 'โหลดรายชื่อบุคลากรไม่สำเร็จ');
-  state.staff = unwrapList(res).map(row => ({
-    source: 'PERSON_STAFF',
-    person_id: row.staff_id || '',
-    full_name_snapshot: row.full_name_th || row.full_name_en || '',
-    unit_id_snapshot: row.unit_id || '',
-    position_snapshot: row.position || row.staff_type || ''
-  }));
-  state.staffLoaded = true;
-}
-
 async function searchParticipants(value){
-  await loadStaffLookupOnce();
   const q = String(value || '').trim().toLowerCase();
   state.selectedPerson = null;
   $('#selectedPersonBox').className = 'selected-person';
-  if (!q) {
+  if (state.personSearchTimer) clearTimeout(state.personSearchTimer);
+  if (q.length < 2) {
     $('#participantSuggestions').className = 'suggestions';
     $('#participantSuggestions').innerHTML = '';
     $('#manualAddBtn').style.display = 'none';
     return;
   }
-  const people = state.staff.filter(person => {
-    return [person.full_name_snapshot, unitNameById(person.unit_id_snapshot), person.position_snapshot]
-      .join(' ')
-      .toLowerCase()
-      .includes(q);
-  }).slice(0, 10);
+  const seq = ++state.personSearchSeq;
+  $('#participantSuggestions').className = 'suggestions open';
+  $('#participantSuggestions').innerHTML = '<div class="suggestion"><div class="suggestion-name">กำลังค้นหา...</div></div>';
+  state.personSearchTimer = setTimeout(async () => {
+    try {
+      const res = await IROUP_V2.admin.personSearch({ q, type: 'staff', limit: 10 });
+      if (seq !== state.personSearchSeq) return;
+      if (!res || res.success === false) throw new Error(res?.error || 'ค้นหารายชื่อบุคลากรไม่สำเร็จ');
+      renderStaffSearchResults(unwrapList(res).map(mapStaffSearchResult));
+    } catch (error) {
+      if (seq !== state.personSearchSeq) return;
+      $('#participantSuggestions').className = 'suggestions open';
+      $('#participantSuggestions').innerHTML = '<div class="suggestion"><div class="suggestion-name">ค้นหารายชื่อไม่สำเร็จ</div><div class="suggestion-meta">' + esc(error.message || String(error)) + '</div><div class="suggestion-action"><button class="btn primary" type="button" onclick="showManualParticipantForm()">+ เพิ่มด้วยตนเอง</button></div></div>';
+      $('#manualAddBtn').style.display = '';
+    }
+  }, 300);
+}
+
+function mapStaffSearchResult(row){
+  return {
+    source: row.source || 'PERSON_STAFF',
+    person_id: row.person_id || '',
+    full_name_snapshot: row.full_name_th || row.full_name_en || '',
+    unit_id_snapshot: row.unit_id || '',
+    position_snapshot: row.program_or_position || ''
+  };
+}
+
+function renderStaffSearchResults(people){
   if (!people.length) {
     $('#participantSuggestions').className = 'suggestions open';
-    $('#participantSuggestions').innerHTML = '<div class="suggestion"><div class="suggestion-name">ไม่พบรายชื่อ</div><div class="suggestion-meta">กดปุ่ม + เพิ่มด้วยตนเอง เพื่อกรอกข้อมูลใหม่</div></div>';
+    $('#participantSuggestions').innerHTML = '<div class="suggestion"><div class="suggestion-name">ไม่พบรายชื่อ</div><div class="suggestion-meta">กรอกข้อมูลใหม่ด้วยตนเองได้ทันที</div><div class="suggestion-action"><button class="btn primary" type="button" onclick="showManualParticipantForm()">+ เพิ่มด้วยตนเอง</button></div></div>';
     $('#manualAddBtn').style.display = '';
     return;
   }
@@ -1070,31 +1108,62 @@ async function addSelectedParticipant(){
 function showManualParticipantForm(){
   state.selectedPerson = null;
   $('#selectedPersonBox').className = 'selected-person';
+  $('#participantSuggestions').className = 'suggestions';
+  $('#participantSuggestions').innerHTML = '';
+  $('#manualAddBtn').style.display = 'none';
   $('#manualParticipantForm').className = 'manual-form show';
-  $('#manualFullNameInput').focus();
+  $('#manualPrefixThInput').focus();
 }
 
 function hideManualParticipantForm(){
   if (!$('#manualParticipantForm')) return;
   $('#manualParticipantForm').className = 'manual-form';
+  $('#manualPrefixThInput').value = '';
+  $('#manualFirstNameThInput').value = '';
+  $('#manualLastNameThInput').value = '';
+  $('#manualFirstNameEnInput').value = '';
+  $('#manualLastNameEnInput').value = '';
   $('#manualFullNameInput').value = '';
   $('#manualUnitInput').value = '';
   $('#manualUnitIdInput').value = '';
   $('#manualPositionInput').value = '';
+  $('#manualStaffTypeInput').value = 'support';
   $('#manualRoleInput').value = '';
+}
+
+function buildManualFullName(){
+  const prefix = $('#manualPrefixThInput').value.trim();
+  const first = $('#manualFirstNameThInput').value.trim();
+  const last = $('#manualLastNameThInput').value.trim();
+  return $('#manualFullNameInput').value.trim() || [prefix + first, last].filter(Boolean).join(' ').trim();
 }
 
 async function addManualParticipant(){
   syncManualUnitIdFromInput();
-  const fullName = $('#manualFullNameInput').value.trim();
-  if (!fullName) return alert('กรุณากรอกชื่อ-สกุล');
+  const fullName = buildManualFullName();
+  if (!$('#manualFirstNameThInput').value.trim() || !$('#manualLastNameThInput').value.trim()) return alert('กรุณากรอกชื่อและสกุลภาษาไทย');
+  const personRes = await IROUP_V2.admin.personCreate({
+    person_type: 'staff',
+    prefix_th: $('#manualPrefixThInput').value.trim(),
+    first_name_th: $('#manualFirstNameThInput').value.trim(),
+    last_name_th: $('#manualLastNameThInput').value.trim(),
+    full_name_th: fullName,
+    first_name_en: $('#manualFirstNameEnInput').value.trim(),
+    last_name_en: $('#manualLastNameEnInput').value.trim(),
+    unit_id: $('#manualUnitIdInput').value,
+    position: $('#manualPositionInput').value.trim(),
+    staff_type: $('#manualStaffTypeInput').value,
+    source_note: 'travel_manual_participant'
+  });
+  if (!personRes || personRes.success === false) return alert(personRes?.error || 'สร้างข้อมูลบุคลากรไม่สำเร็จ');
+  const person = (personRes.data || {});
   await addParticipantPayload({
     travel_id: $('#travelId').value,
-    person_source: 'manual',
-    person_id: '',
-    full_name_snapshot: fullName,
-    unit_id_snapshot: $('#manualUnitIdInput').value,
-    position_snapshot: $('#manualPositionInput').value.trim(),
+    person_source: person.source || 'PERSON_STAFF',
+    person_id: person.person_id || '',
+    full_name_snapshot: person.full_name_th || person.full_name_en || fullName,
+    unit_id_snapshot: person.unit_id || $('#manualUnitIdInput').value,
+    position_snapshot: person.program_or_position || $('#manualPositionInput').value.trim(),
     role: $('#manualRoleInput').value.trim()
   });
   hideManualParticipantForm();

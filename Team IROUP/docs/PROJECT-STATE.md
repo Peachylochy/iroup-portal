@@ -1,5 +1,5 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-20 | Session: Scholarship + News/Knowledge Admin Live Confirmation**
+**Last updated: 2026-05-21 | Session: Student/Staff Data Security Readiness**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
@@ -3868,3 +3868,134 @@ Verification:
   - `dashboard.html`
   - `report.html`
 - `git diff --check` passed for changed files with Windows CRLF warnings only.
+
+Live user confirmation:
+
+- User confirmed `dashboard.html` passed live QA after the V2 source cleanup.
+- User confirmed `report.html` passed live QA after the V2 source cleanup.
+- Dashboard and Report are considered ready to use as the current V2 admin
+  reporting baseline.
+
+---
+
+## Session: 2026-05-21 - Student/Staff Data Security Readiness
+
+Context:
+
+- Real University of Phayao student and staff data is expected soon.
+- Security/privacy review is now the next priority before importing or broadly
+  using person-level data.
+
+Completed:
+
+- Added `docs/SECURITY-READINESS.md` as the pre-intake checklist for student and
+  staff data.
+- Hardened V2 person lookup routes:
+  - changed `v2.lookup.students` from public to admin-only
+  - changed `v2.lookup.staff` from public to admin-only
+- Hardened V2 diagnostic routes:
+  - changed `v2.schema` from public to admin-only
+  - changed `v2.debug.admintokenmap` from public to admin-only
+- Updated Admin Mobility and Admin Travel person lookup calls so they send V2
+  admin auth when loading student/staff lookup data.
+- Added authenticated `IROUP_V2.lookup.students()` and `IROUP_V2.lookup.staff()`
+  adapter helpers for safer future frontend use.
+- Changed Dashboard and Report admin-data caches from persistent `localStorage`
+  to browser-session-only `sessionStorage`, and clears old persistent cache keys.
+- Changed Report per-module CSV buttons to export the sanitized report row shape
+  instead of all raw admin DTO fields.
+
+Security notes:
+
+- Public routes must never expose student IDs, staff IDs, person IDs,
+  participant names, row-level gender, participant snapshots, budgets, audit
+  fields, internal notes, or private file URLs.
+- Report CSV export remains admin-only and should be treated as a sensitive data
+  export surface.
+- `v2.schema` and `v2.debug.admintokenmap` are now admin-only controlled
+  diagnostics.
+
+Verification:
+
+- `git diff --check` passed for changed files with Windows CRLF warnings only.
+- Inline script syntax passed for:
+  - `mobility.html`
+  - `travel.html`
+  - `js/iroup-v2-api.js`
+
+Next:
+
+- After real data import, run direct endpoint checks:
+  - unauthenticated `v2.lookup.students` must fail
+  - unauthenticated `v2.lookup.staff` must fail
+  - public Mobility/Travel responses must not contain row-level person data
+- Review whether `gender` is still necessary for Mobility participant snapshots.
+
+---
+
+## Session: 2026-05-21 - Person Search Performance Pass
+
+Completed:
+
+- Added `v2.admin.person.search` as an admin-only server-side person search route.
+- Search supports:
+  - `q` / `query` / `search` / `term`
+  - `type = all | student | staff`
+  - `limit`, capped at 20 rows
+  - active, non-deleted PERSON_STUDENT and PERSON_STAFF rows only
+- Added `IROUP_V2.admin.personSearch(params)` frontend adapter helper.
+- Updated `mobility.html` participant picker:
+  - no longer preloads all students and staff
+  - debounces search by 300 ms
+  - returns up to 10 matching students/staff per search
+- Updated `travel.html` participant picker:
+  - no longer preloads all staff
+  - debounces search by 300 ms
+  - returns up to 10 matching staff per search
+
+Performance/security impact:
+
+- Large student/staff sheets no longer need to be sent to the browser when the
+  participant section opens.
+- Person lookup is now both admin-authenticated and demand-loaded.
+- Browser memory and first-open modal latency should be much lower after real
+  student/staff data is imported.
+
+Next:
+
+- Deploy Apps Script changes before live testing.
+- After deployment, verify in authenticated admin pages:
+  - Mobility participant search returns matching students/staff.
+  - Travel participant search returns matching staff only.
+  - Manual participant add still works when no search result is found.
+  - Unauthenticated `v2.admin.person.search` fails.
+
+Follow-up completed:
+
+- Added `v2.admin.person.create` for admin-only person creation from participant
+  manual-add flows.
+- Staff manual creation now auto-generates `staff_id`; staff users do not need to
+  provide an external staff code.
+- Student manual creation now requires the real `student_id`.
+- Mobility manual participant form now separates:
+  - student ID
+  - Thai prefix/first name/last name
+  - gender
+  - unit
+  - student program or staff position
+  - staff type (`support` / `academic`) when participant type is staff
+  - project role, now labeled `บทบาทในโครงการ`
+- Travel manual participant form now creates a PERSON_STAFF row first, with
+  auto-generated `staff_id`, Thai/English name fields, position, staff type, and
+  project role.
+- Manual participant add now links to `PERSON_STUDENT` / `PERSON_STAFF` instead
+  of storing only a loose `manual` participant snapshot.
+
+Live QA follow-up:
+
+- Mobility manual-add now puts participant type first and focuses it first, so
+  student/staff-specific fields are visible before data entry.
+- Dashboard and Report budget totals now read V2 `budget_summary.total_amount_thb`
+  as well as direct amount fields.
+- Public landing and public mobility country normalization now recognize
+  `TR` / Turkey / Turkiye variants for flag and map matching.

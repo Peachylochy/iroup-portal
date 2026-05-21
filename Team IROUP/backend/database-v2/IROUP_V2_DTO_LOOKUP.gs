@@ -20,6 +20,37 @@ function listV2LookupStaff_() {
   return listV2PersonLookupSheet_(IROUP_V2_SHEETS.PERSON_STAFF, mapV2LookupStaffDto_);
 }
 
+function searchV2AdminPeople_(request) {
+  const params = request && request.params ? request.params : {};
+  const query = normalizeV2PersonSearchText_(params.q || params.query || params.search || params.term || '');
+  const type = String(params.type || params.person_type || 'all').trim().toLowerCase();
+  const limit = clampV2PersonSearchLimit_(params.limit || params.page_size || 10);
+
+  if (query.length < 2) {
+    return publicResponseV2_(true, [], 0, '');
+  }
+
+  const results = [];
+  if (type !== 'staff') {
+    appendV2PersonSearchResults_(results, IROUP_V2_SHEETS.PERSON_STUDENT, mapV2PersonSearchStudentDto_, query);
+  }
+  if (type !== 'student') {
+    appendV2PersonSearchResults_(results, IROUP_V2_SHEETS.PERSON_STAFF, mapV2PersonSearchStaffDto_, query);
+  }
+
+  results.sort(function (a, b) {
+    if (a._score !== b._score) return a._score - b._score;
+    return String(a.full_name_th || a.full_name_en || '').localeCompare(String(b.full_name_th || b.full_name_en || ''));
+  });
+
+  const dtos = results.slice(0, limit).map(function (row) {
+    delete row._score;
+    return row;
+  });
+
+  return publicResponseV2_(true, dtos, dtos.length, '');
+}
+
 function listV2LookupFileRoles_() {
   return listV2LookupSheet_(IROUP_V2_SHEETS.FILE_ROLE_MASTER, mapV2LookupFileRoleDto_);
 }
@@ -146,6 +177,83 @@ function mapV2LookupStaffDto_(row) {
     position: row.position || '',
     staff_type: row.staff_type || ''
   };
+}
+
+function appendV2PersonSearchResults_(results, sheetName, mapper, query) {
+  const read = readV2Sheet_(sheetName);
+  if (!read.success) return;
+
+  (read.data || []).forEach(function (row) {
+    if (isSoftDeletedV2_(row)) return;
+    if (typeof row.active !== 'undefined' && row.active !== '' && !isTruthyV2_(row.active)) return;
+
+    const dto = mapper(row);
+    const haystack = normalizeV2PersonSearchText_([
+      dto.person_id,
+      dto.full_name_th,
+      dto.full_name_en,
+      dto.unit_id,
+      dto.program_or_position,
+      dto.degree_level,
+      dto.status
+    ].join(' '));
+
+    if (haystack.indexOf(query) < 0) return;
+    dto._score = getV2PersonSearchScore_(dto, query);
+    results.push(dto);
+  });
+}
+
+function mapV2PersonSearchStudentDto_(row) {
+  return {
+    source: 'PERSON_STUDENT',
+    participant_type: 'student',
+    person_id: row.student_id || '',
+    full_name_th: row.full_name_th || '',
+    full_name_en: '',
+    gender: row.gender || '',
+    unit_id: row.unit_id || '',
+    program_or_position: row.program_th || row.degree_level || '',
+    degree_level: row.degree_level || '',
+    status: row.student_status || '',
+    type_label: 'นิสิต'
+  };
+}
+
+function mapV2PersonSearchStaffDto_(row) {
+  return {
+    source: 'PERSON_STAFF',
+    participant_type: 'staff',
+    person_id: row.staff_id || '',
+    full_name_th: row.full_name_th || '',
+    full_name_en: row.full_name_en || '',
+    gender: row.gender || '',
+    unit_id: row.unit_id || '',
+    program_or_position: row.position || row.staff_type || '',
+    degree_level: '',
+    status: row.staff_type || '',
+    type_label: 'บุคลากร'
+  };
+}
+
+function normalizeV2PersonSearchText_(value) {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function clampV2PersonSearchLimit_(value) {
+  const limit = Number(value || 10);
+  if (!Number.isFinite(limit) || limit <= 0) return 10;
+  return Math.min(20, Math.max(1, Math.floor(limit)));
+}
+
+function getV2PersonSearchScore_(dto, query) {
+  const id = normalizeV2PersonSearchText_(dto.person_id);
+  const th = normalizeV2PersonSearchText_(dto.full_name_th);
+  const en = normalizeV2PersonSearchText_(dto.full_name_en);
+  if (id === query || th === query || en === query) return 0;
+  if (id.indexOf(query) === 0 || th.indexOf(query) === 0 || en.indexOf(query) === 0) return 1;
+  if (th.indexOf(query) >= 0 || en.indexOf(query) >= 0) return 2;
+  return 3;
 }
 
 function mapV2LookupFileRoleDto_(row) {

@@ -428,6 +428,16 @@
       },
       reportSummary: function (fiscalYear) {
         return request('v2.admin.report.summary', fiscalYear ? { fiscal_year: fiscalYear } : {}, { auth: true, timeoutMs: ADMIN_SUMMARY_TIMEOUT_MS });
+      },
+      personSearch: function (params) {
+        return request('v2.admin.person.search', params || {}, { auth: true });
+      },
+      personCreate: function (payload) {
+        return request('v2.admin.person.create', { payload: payload || {} }, {
+          auth: true,
+          method: 'POST',
+          timeoutMs: ADMIN_EVENT_WRITE_TIMEOUT_MS
+        });
       }
     },
 
@@ -437,6 +447,12 @@
       },
       units: function () {
         return request('v2.lookup.units');
+      },
+      students: function () {
+        return request('v2.lookup.students', {}, { auth: true });
+      },
+      staff: function () {
+        return request('v2.lookup.staff', {}, { auth: true });
       },
       fileRoles: function () {
         return request('v2.lookup.fileRoles');

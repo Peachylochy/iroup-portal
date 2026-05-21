@@ -382,7 +382,21 @@ function countryDisplay(item){const c=item?.country||{}; return firstValue(item.
 function unitDisplay(item){const u=item?.up_unit||item?.organizer||item?.organizer_unit||item?.unit||{}; return firstValue(item.unit_display,item.up_unit_name_th,item.up_unit_name_en,item.organizer_unit_name_th,item.organizer_unit_name_en,u.unit_name_th,u.unit_name_en,u.name_th,u.name_en,item.organizer,item.up_unit_id,item.organizer_unit_id,u.unit_id)}
 function fiscalYearFromDate(value){const d=toDate(value); if(!d) return ''; return String(d.getFullYear()+543+(d.getMonth()>=9?1:0))}
 function participantTotal(item){return toNumber(item.participant_count_cached ?? item.participant_count ?? item.participants_count ?? item.aggregate_counts?.participant_count_cached ?? item.participant_summary?.total)}
-function budgetTotal(item){return toNumber(item.amount ?? item.budget_amount ?? item.funding_amount ?? item.budget_total ?? item.total_budget)}
+function budgetTotal(item){
+  const summary=item?.budget_summary || item?.budgetSummary || {};
+  return toNumber(
+    item?.amount ??
+    item?.amount_thb ??
+    item?.budget_amount ??
+    item?.funding_amount ??
+    item?.budget_total ??
+    item?.total_budget ??
+    summary.total_amount_thb ??
+    summary.amount_thb ??
+    summary.total_amount ??
+    summary.total
+  );
+}
 function hasTravelReportContent(item){return !!firstValue(item.project_name,item.project_title,item.purpose,countryDisplay(item),unitDisplay(item),item.start_date,item.end_date,item.departure_date,item.return_date)}
 
 async function fetchReport(year=''){
@@ -711,8 +725,9 @@ async function reloadData(force=false){
   try{
     const cacheKey='iroup_dashboard_v2_full_'+(state.year||'all');
     try{localStorage.removeItem('iroup_dashboard_full_'+(state.year||'all'));}catch(_){}
+    try{localStorage.removeItem(cacheKey);}catch(_){}
     if(!force){
-      const cached=localStorage.getItem(cacheKey);
+      const cached=sessionStorage.getItem(cacheKey);
       if(cached){
         const c=JSON.parse(cached);
         if(Date.now()-c.ts<5*60*1000){
@@ -726,7 +741,7 @@ async function reloadData(force=false){
     }
     const data=await fetchReport(state.year);
     state.raw=data;
-    localStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),data}));
+    sessionStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),data}));
     buildYearOptions();
     render();
   }catch(err){

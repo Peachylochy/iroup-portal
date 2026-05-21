@@ -954,7 +954,13 @@ function normalizeMapCountryName(country) {
     germany: 'Germany',
     'czech republic': 'Czechia',
     czechia: 'Czechia',
-    russia: 'Russia'
+    russia: 'Russia',
+    tr: 'Turkey',
+    tur: 'Turkey',
+    turkey: 'Turkey',
+    turkiye: 'Turkey',
+    'türkiye': 'Turkey',
+    'republic of turkey': 'Turkey'
   };
   return aliases[key] || cleaned;
 }
@@ -975,7 +981,9 @@ function normalizeCountryCode(value) {
     THA: 'TH',
     TWN: 'TW',
     RUS: 'RU',
-    CZE: 'CZ'
+    CZE: 'CZ',
+    TUR: 'TR',
+    TR: 'TR'
   };
   return aliases[raw] || raw;
 }
@@ -997,7 +1005,8 @@ function countryCodeFromName(name) {
     'south korea': 'KR',
     taiwan: 'TW',
     russia: 'RU',
-    czechia: 'CZ'
+    czechia: 'CZ',
+    turkey: 'TR'
   };
   return names[key] || '';
 }

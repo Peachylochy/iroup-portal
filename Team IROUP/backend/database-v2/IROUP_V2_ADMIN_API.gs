@@ -196,6 +196,52 @@ function writeV2PersonSampleRows_(sheetName, idField, rows) {
   return adminResponseV2_(true, { ids: writtenIds }, writtenIds.length, '');
 }
 
+function createV2AdminPerson_(request) {
+  const actor = requireV2Admin_(request);
+  if (!actor.success) return adminResponseV2_(false, null, 0, actor.error);
+
+  const payload = extractV2PersonWritePayload_(request);
+  const normalized = normalizeV2PersonWritePayload_(payload);
+  if (!normalized.success) return adminResponseV2_(false, normalized.data, 0, normalized.error);
+
+  const person = normalized.data.person;
+  const type = normalized.data.person_type;
+  const now = new Date().toISOString();
+  const sheetName = type === 'student' ? IROUP_V2_SHEETS.PERSON_STUDENT : IROUP_V2_SHEETS.PERSON_STAFF;
+  const idField = type === 'student' ? 'student_id' : 'staff_id';
+  const personId = person[idField];
+
+  const existing = findV2RowById_(sheetName, idField, personId);
+  if (existing.success && existing.data && !isSoftDeletedV2_(existing.data)) {
+    return adminResponseV2_(false, { person_id: personId, person_type: type }, 0, idField + ' already exists.');
+  }
+
+  person.active = true;
+  person.source_system = 'APP_FORM';
+  person.updated_at = now;
+
+  const requiredFields = type === 'student'
+    ? ['student_id', 'full_name_th', 'active']
+    : ['staff_id', 'full_name_th', 'active'];
+  const persisted = appendV2Row_(sheetName, person, {
+    idField: idField,
+    requiredFields: requiredFields
+  });
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      person_id: personId,
+      diagnostics: persisted.diagnostics || null
+    }, 0, persisted.error || 'Person create failed.');
+  }
+
+  const dto = type === 'student'
+    ? mapV2PersonSearchStudentDto_(persisted.data)
+    : mapV2PersonSearchStaffDto_(persisted.data);
+
+  return adminResponseV2_(true, dto, 1, '');
+}
+
 function getV2AdminMobilityProject_(requestOrMobilityId) {
   const mobilityId = extractV2MobilityDetailId_(requestOrMobilityId);
   if (!mobilityId) {
@@ -2578,6 +2624,24 @@ function extractV2TravelParticipantPayload_(request) {
   return params;
 }
 
+function extractV2PersonWritePayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.person || params.payload || params.person || null;
+
+  if (candidate && typeof candidate === 'object') return candidate;
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
 function extractV2ScholarshipWritePayload_(request) {
   const params = request && request.params ? request.params : {};
   const body = request && request.body ? request.body : {};
@@ -3087,6 +3151,80 @@ function normalizeV2TravelParticipantPayload_(payload) {
       role: normalized.role
     }
   };
+}
+
+function normalizeV2PersonWritePayload_(payload) {
+  const source = payload || {};
+  const errors = [];
+  const type = String(source.person_type || source.type || source.participant_type || '').trim().toLowerCase();
+  const prefixTh = cleanV2EventText_(source.prefix_th || source.prefix || '');
+  const firstNameTh = cleanV2EventText_(source.first_name_th || '');
+  const lastNameTh = cleanV2EventText_(source.last_name_th || '');
+  const fullNameTh = cleanV2EventText_(source.full_name_th || [prefixTh + firstNameTh, lastNameTh].filter(function (value) { return !!value; }).join(' '));
+  const unitId = cleanV2EventText_(source.unit_id || source.unit_id_snapshot || '');
+
+  if (source.payload_parse_error) errors.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  if (['student', 'staff'].indexOf(type) < 0) {
+    errors.push({ field: 'person_type', code: 'PERSON_TYPE_INVALID', message: 'person_type must be student or staff.' });
+  }
+  if (!fullNameTh) errors.push({ field: 'full_name_th', code: 'FULL_NAME_REQUIRED', message: 'full_name_th is required.' });
+
+  let person = null;
+  if (type === 'student') {
+    const studentId = cleanV2EventText_(source.student_id || source.person_id || '');
+    if (!studentId) errors.push({ field: 'student_id', code: 'STUDENT_ID_REQUIRED', message: 'student_id is required for student records.' });
+    person = {
+      student_id: studentId,
+      prefix_th: prefixTh,
+      first_name_th: firstNameTh,
+      last_name_th: lastNameTh,
+      full_name_th: fullNameTh,
+      gender: cleanV2EventText_(source.gender || ''),
+      unit_id: unitId,
+      program_th: cleanV2EventText_(source.program_th || source.program_or_position || ''),
+      degree_level: cleanV2EventText_(source.degree_level || ''),
+      student_status: cleanV2EventText_(source.student_status || 'active')
+    };
+  }
+
+  if (type === 'staff') {
+    const firstNameEn = cleanV2EventText_(source.first_name_en || '');
+    const lastNameEn = cleanV2EventText_(source.last_name_en || '');
+    const fullNameEn = cleanV2EventText_(source.full_name_en || [firstNameEn, lastNameEn].filter(function (value) { return !!value; }).join(' '));
+    person = {
+      staff_id: cleanV2EventText_(source.staff_id || source.person_id || '') || generateV2Id_(IROUP_V2_ID_PREFIXES.PERSON_STAFF || 'STF'),
+      prefix_th: prefixTh,
+      first_name_th: firstNameTh,
+      last_name_th: lastNameTh,
+      full_name_th: fullNameTh,
+      first_name_en: firstNameEn,
+      last_name_en: lastNameEn,
+      full_name_en: fullNameEn,
+      gender: cleanV2EventText_(source.gender || ''),
+      unit_id: unitId,
+      position: cleanV2EventText_(source.position || source.program_or_position || ''),
+      staff_type: normalizeV2StaffType_(source.staff_type || '')
+    };
+  }
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'Person payload validation failed.' : '',
+    data: {
+      valid: errors.length === 0,
+      errors: errors,
+      person_type: type,
+      person: person
+    }
+  };
+}
+
+function normalizeV2StaffType_(value) {
+  const raw = String(value || '').trim();
+  const lower = raw.toLowerCase();
+  if (lower === 'academic' || raw === 'วิชาการ') return 'academic';
+  if (lower === 'support' || raw === 'สนับสนุน') return 'support';
+  return raw;
 }
 
 function normalizeV2TravelBudgetPayload_(payload) {
