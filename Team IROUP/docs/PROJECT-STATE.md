@@ -3767,3 +3767,60 @@ Verification:
   - corrected contact text rendered
   - no desktop horizontal overflow
   - no browser console errors
+
+---
+
+## Session: 2026-05-21 - Public Landing Pagination + Event/Dashboard Fixes
+
+Completed:
+
+- Restored the IROUP logo link on `public/public-landing.html` top navigation so
+  users can click the logo to return to the public landing page.
+- Standardized public scholarship/event cover displays to 16:9 with
+  `object-fit: contain` so poster/banner text is not cropped:
+  - `public/public-landing.html`
+  - `public/public-scholar.html`
+  - `public/public-events.html`
+  - `public/public-scholar-detail.html`
+  - `public/public-events-detail.html`
+- Refined the public landing lower sections:
+  - latest news stays at 4 cards per page and now paginates when more records
+    exist
+  - scholarship/event highlights stay at 4 cards per tab and now paginate when
+    more records exist
+  - featured knowledge stays at 3 records plus the full knowledge link
+  - Mobility In-Out country rows show all countries and scroll internally after
+    10 countries
+  - Partner Atlas country/institution list shows all countries and scrolls
+    internally after 12 countries
+- Fixed admin Events create/update payload mode:
+  - UI still displays `ออนไซต์`
+  - frontend now submits V2-compatible `event_mode = offline`
+  - legacy `onsite` values normalize to `offline`
+  - public event list/detail display `offline` as onsite
+- Added an `อื่น ๆ / ระบุเอง` option to the Events admin type selector so staff
+  can enter a custom event type without waiting for a master-data update.
+- Updated `dashboard.html` to hydrate Events from `IROUP_V2.admin.eventList()`
+  instead of relying on stale `getReport` event rows.
+- Changed dashboard MOU summary/list emphasis from all/near-expiry MOU to active
+  MOU.
+
+Verification:
+
+- `git diff --check` passed for changed files with Windows CRLF warnings only.
+- Inline script syntax passed for:
+  - `dashboard.html`
+  - `events.html`
+  - `public/public-landing.html`
+  - `public/public-events.html`
+  - `public/public-events-detail.html`
+  - `public/public-scholar.html`
+  - `public/public-scholar-detail.html`
+- Local HTTP smoke returned 200 for:
+  - `dashboard.html`
+  - `public/public-landing.html`
+- Browser DOM check on `public/public-landing.html` confirmed:
+  - 4 news cards rendered
+  - 3 knowledge items rendered
+  - country list scroll activates when 14 countries are present
+  - no desktop horizontal overflow

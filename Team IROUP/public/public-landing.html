@@ -33,11 +33,13 @@
     /* ── TOPBAR ── */
     .topbar{
       position:sticky;top:0;z-index:100;
-      display:flex;align-items:center;justify-content:flex-end;gap:16px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
       height:62px;padding:0 clamp(16px,5vw,80px);
       background:rgba(6,15,30,.9);border-bottom:1px solid var(--border);
       backdrop-filter:blur(20px);
     }
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .brand img{height:42px;width:auto;max-width:126px;object-fit:contain;display:block}
     .nav{display:flex;align-items:center;gap:1px}
     .nav a,.lang-btn,.admin-btn{
       border:none;background:none;color:var(--text-muted);
@@ -208,6 +210,8 @@
     .ctry-name{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
     .ctry-name .ctry-flag{font-size:18px}
     .ctry-inst{font-size:10.5px;color:var(--text-muted);margin-top:2px}
+    #countryTable.is-scroll{max-height:492px;overflow-y:auto;overscroll-behavior:contain}
+    #countryTable.is-scroll .ctry-row{padding-right:14px}
     .mou-badge{
       background:rgba(37,99,235,.13);color:var(--blue-lt);
       border:1px solid rgba(37,99,235,.22);border-radius:20px;
@@ -229,6 +233,7 @@
     .mob-num.in{color:var(--cyan)}.mob-num.out{color:var(--gold)}
     .mob-lbl{font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
     .mobility-chart{display:grid;gap:13px;padding:18px 20px;background:var(--bg2)}
+    .mobility-chart.is-scroll{max-height:520px;overflow-y:auto;overscroll-behavior:contain;padding-right:14px}
     .mobility-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--text-muted);padding-bottom:2px}
     .mobility-legend span{display:inline-flex;align-items:center;gap:6px}
     .mobility-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
@@ -313,6 +318,12 @@
     .feed-head h3{margin:0;color:#fff;font-size:26px;line-height:1.15;letter-spacing:-.025em}
     .feed-note{margin-top:5px;color:var(--text-muted);font-size:12.5px}
     .feed-link{color:var(--cyan);font-size:12px;font-weight:800;white-space:nowrap}
+    .landing-pager{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
+    .landing-pager.op-pager{grid-column:1/-1;margin-top:0}
+    .landing-page-info{color:var(--text-muted);font-size:11px;font-weight:800;min-width:54px;text-align:center}
+    .landing-page-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.055);color:var(--text);font:900 15px Prompt,sans-serif;cursor:pointer}
+    .landing-page-btn:hover:not(:disabled){border-color:rgba(75,189,232,.42);color:var(--cyan)}
+    .landing-page-btn:disabled{opacity:.38;cursor:not-allowed}
     .news-cardview{display:grid;grid-template-columns:1.35fr 1fr;border:1px solid var(--border);background:linear-gradient(135deg,rgba(30,64,175,.38),rgba(15,23,42,.86));border-radius:18px;overflow:hidden;min-height:280px;box-shadow:0 22px 70px rgba(0,0,0,.2)}
     .news-cardview:hover,.mini-news:hover,.knowledge-rail-item:hover,.op-card:hover,.quick-strip a:hover{border-color:rgba(75,189,232,.42);transform:translateY(-1px)}
     .feed-photo{position:relative;min-height:220px;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.18),transparent 30%),linear-gradient(135deg,rgba(59,130,246,.24),rgba(34,211,238,.2) 52%,rgba(2,6,23,.12));overflow:hidden}
@@ -377,12 +388,13 @@
         radial-gradient(circle at 90% 4%,rgba(56,189,248,.14),transparent 28%),
         linear-gradient(145deg,rgba(7,54,63,.94) 0%,rgba(14,40,78,.92) 58%,rgba(30,41,95,.96) 100%);
     }
-    .op-cover{position:relative;z-index:1;height:112px;margin:-4px -4px 16px;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 24% 24%,rgba(96,165,250,.2),transparent 32%),linear-gradient(135deg,rgba(30,64,175,.24),rgba(15,23,42,.58));border:1px solid rgba(255,255,255,.075)}
-    .op-cover img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.08) contrast(1.04)}
+    .op-cover{position:relative;z-index:1;aspect-ratio:16/9;margin:-4px -4px 16px;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 24% 24%,rgba(96,165,250,.2),transparent 32%),linear-gradient(135deg,rgba(30,64,175,.24),rgba(15,23,42,.58));border:1px solid rgba(255,255,255,.075)}
+    .op-cover img{width:100%;height:100%;object-fit:contain;display:block;filter:saturate(1.08) contrast(1.04)}
     .op-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,7,18,.02),rgba(3,7,18,.4)),radial-gradient(circle at 82% 18%,rgba(34,211,238,.16),transparent 34%)}
     .op-cover-placeholder{position:absolute;inset:0;display:grid;place-items:center;color:color-mix(in srgb,var(--ring-color) 74%,#fff);opacity:.62}
     .op-cover-placeholder svg{width:44px;height:44px;stroke-width:1.5}
     .op-top{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}
+    .op-count-row{position:relative;z-index:1;display:grid;grid-template-columns:76px minmax(0,1fr);gap:14px;align-items:center;margin-bottom:14px}
     .count-ring{
       width:76px;height:76px;border-radius:50%;display:grid;place-items:center;
       background:conic-gradient(var(--ring-color) var(--ring-pct),rgba(148,163,184,.2) 0);
@@ -393,7 +405,7 @@
     .count-ring span{position:relative;z-index:1;color:#fff;font-size:21px;font-weight:900;line-height:1;text-align:center;letter-spacing:-.035em}
     .count-ring small{display:block;margin-top:4px;font-size:9px;color:var(--text-muted);font-weight:800;letter-spacing:0}
     .op-status{position:absolute;top:19px;right:19px;z-index:2;border-radius:8px;padding:5px 9px;background:color-mix(in srgb,var(--ring-color) 15%,transparent);border:1px solid color-mix(in srgb,var(--ring-color) 34%,transparent);color:var(--ring-color);font-size:9.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-    .op-type{position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;align-self:flex-start;margin-bottom:9px;border-radius:999px;padding:4px 9px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);color:var(--text-muted);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+    .op-type{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;align-self:flex-start;width:max-content;max-width:100%;border-radius:999px;padding:7px 11px;background:color-mix(in srgb,var(--ring-color) 16%,rgba(255,255,255,.055));border:1px solid color-mix(in srgb,var(--ring-color) 34%,rgba(255,255,255,.09));color:#e0f2fe;font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 10px 24px color-mix(in srgb,var(--ring-color) 16%,transparent)}
     .op-type svg{width:13px;height:13px}
     .op-context{position:relative;z-index:1;display:flex;align-items:center;gap:8px;margin-bottom:9px;min-height:24px}
     .op-country{min-width:0;color:#bfdbfe;font-size:12px;font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -434,12 +446,15 @@
     /* ── RESPONSIVE ── */
     @media(max-width:1200px){.atlas-wrap{grid-template-columns:1fr}.activity-grid{grid-template-columns:1fr}.op-grid{grid-template-columns:repeat(2,1fr)}.quick-strip{grid-template-columns:repeat(3,minmax(0,1fr))}.quick-title{border-right:0;grid-column:1/-1}}
     @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}.stats-row .stat-item:nth-child(2){border-right:none}}
-    @media(max-width:640px){.topbar{height:auto;padding:10px 16px;flex-wrap:wrap}.nav{width:100%;overflow-x:auto;justify-content:flex-start}.bottom-grid{grid-template-columns:1fr}.mob-countries-grid{grid-template-columns:repeat(2,1fr)}.activity-head-inner,.feed-head,.op-toolbar{display:block}.activity-status{margin-top:12px}.news-cardview,.mini-news-grid,.op-grid,.quick-strip{grid-template-columns:1fr}.news-feature-body{padding:20px}.quick-title{min-width:0}.feed-head h3{font-size:22px}}
+    @media(max-width:640px){.topbar{height:auto;padding:10px 16px;flex-wrap:wrap}.brand img{height:38px;max-width:116px}.nav{width:100%;overflow-x:auto;justify-content:flex-start}.bottom-grid{grid-template-columns:1fr}.mob-countries-grid{grid-template-columns:repeat(2,1fr)}.activity-head-inner,.feed-head,.op-toolbar{display:block}.activity-status{margin-top:12px}.news-cardview,.mini-news-grid,.op-grid,.quick-strip{grid-template-columns:1fr}.news-feature-body{padding:20px}.quick-title{min-width:0}.feed-head h3{font-size:22px}}
   </style>
 </head>
 <body>
 
 <header class="topbar">
+  <a class="brand" href="public-landing.html" aria-label="International Relations Office home">
+    <img src="../assets/IROUP_LOGO.webp" alt="International Relations Office">
+  </a>
   <nav class="nav">
     <a href="public-news.html" data-i18n="navNews">ข่าวสาร</a>
     <a href="public-knowledge.html" data-i18n="navKnowledge">คลังความรู้</a>
@@ -670,6 +685,8 @@ const state = {
   theme: localStorage.getItem('iroup_public_theme') || 'dark',
   news: [], knowledge: [], scholarships: [], events: [], mous: [], mouMap: [], mobility: [],
   opportunityKind: 'scholarship',
+  newsPage: 0,
+  opportunityPage: 0,
   errors: {}
 };
 let landingMouMapSvg = null;
@@ -879,6 +896,7 @@ function bindOpportunityTabs() {
   document.querySelectorAll('[data-op-kind]').forEach(function(btn) {
     btn.addEventListener('click', function() {
       state.opportunityKind = btn.dataset.opKind || 'scholarship';
+      state.opportunityPage = 0;
       renderOpportunities();
     });
   });
@@ -1060,7 +1078,8 @@ function renderCountryTable() {
     return;
   }
 
-  table.innerHTML = rows.slice(0, 8).map(function(r) {
+  table.classList.toggle('is-scroll', rows.length > 12);
+  table.innerHTML = rows.map(function(r) {
     const flag = FLAGS[r.code] || '🌐';
     const name = state.lang === 'EN' ? (r.nameEN || r.nameTH || r.display) : (r.nameTH || r.nameEN || r.display);
     const displayFlag = countryFlagHtml(r.code, name, 'ctry-flag-img');
@@ -1240,7 +1259,7 @@ function renderMobilityFlow() {
     return (b.inbound + b.outbound) - (a.inbound + a.outbound);
   });
 
-  grid.className = 'mobility-chart';
+  grid.className = 'mobility-chart' + (rows.length > 10 ? ' is-scroll' : '');
   if (!rows.length) {
     grid.innerHTML = '<div class="empty-s" style="grid-column:1/-1">?????????????? Mobility</div>';
     return;
@@ -1253,7 +1272,7 @@ function renderMobilityFlow() {
   grid.innerHTML = '<div class="mobility-legend">' +
     '<span><i class="in"></i>Inbound</span>' +
     '<span><i class="out"></i>Outbound</span>' +
-  '</div>' + rows.slice(0, 8).map(function(r) {
+  '</div>' + rows.map(function(r) {
     const flag = countryFlagHtml(r.code, r.name, 'mobility-flag-img');
     const inWidth = Math.max(3, Math.round((r.inbound / maxValue) * 100));
     const outWidth = Math.max(3, Math.round((r.outbound / maxValue) * 100));
@@ -1271,7 +1290,11 @@ function renderMobilityFlow() {
 function renderNews() {
   const grid = document.getElementById('newsGrid');
   const d = TEXT[state.lang] || TEXT.TH;
-  const rows = sortByDate(state.news, 'publish_date').slice(0, 4);
+  const allRows = sortByDate(state.news, 'publish_date');
+  const pageSize = 4;
+  const maxPage = Math.max(0, Math.ceil(allRows.length / pageSize) - 1);
+  state.newsPage = Math.min(Math.max(0, state.newsPage || 0), maxPage);
+  const rows = allRows.slice(state.newsPage * pageSize, state.newsPage * pageSize + pageSize);
   if (!rows.length) { grid.innerHTML = '<div class="empty-s">' + esc(d.noNews) + '</div>'; return; }
   const feature = rows[0];
   const featureId = clean(feature.news_id || feature.id);
@@ -1316,14 +1339,14 @@ function renderNews() {
     '</a>';
   }).join('');
 
-  grid.innerHTML = hero + (mini ? '<div class="mini-news-grid">' + mini + '</div>' : '');
+  grid.innerHTML = hero + (mini ? '<div class="mini-news-grid">' + mini + '</div>' : '') + renderPager('news', state.newsPage, maxPage);
 }
 
 /* ── KNOWLEDGE ── */
 function renderKnowledge() {
   const grid = document.getElementById('knowledgeGrid');
   const d = TEXT[state.lang] || TEXT.TH;
-  const rows = sortByDate(state.knowledge, 'publish_date').slice(0, 4);
+  const rows = sortByDate(state.knowledge, 'publish_date').slice(0, 3);
   if (!rows.length) { grid.innerHTML = '<div class="empty-s">' + esc(d.noKnowledge) + '</div>'; return; }
   grid.innerHTML = rows.map(function(row, i) {
     const id = clean(row.knowledge_id || row.id);
@@ -1392,10 +1415,14 @@ function renderOpportunities() {
       const av = a.days === null ? 99999 : Math.max(a.days, -9999);
       const bv = b.days === null ? 99999 : Math.max(b.days, -9999);
       return av - bv;
-    })
-    .slice(0, 4);
+    });
 
-  grid.innerHTML = upcoming.length ? upcoming.map(renderOpportunityCard).join('') : '<div class="empty-s">' + esc(d.noOpportunities) + '</div>';
+  const pageSize = 4;
+  const maxPage = Math.max(0, Math.ceil(upcoming.length / pageSize) - 1);
+  state.opportunityPage = Math.min(Math.max(0, state.opportunityPage || 0), maxPage);
+  const pageRows = upcoming.slice(state.opportunityPage * pageSize, state.opportunityPage * pageSize + pageSize);
+
+  grid.innerHTML = pageRows.length ? pageRows.map(renderOpportunityCard).join('') + renderPager('opportunity', state.opportunityPage, maxPage) : '<div class="empty-s">' + esc(d.noOpportunities) + '</div>';
 }
 
 function renderOpportunityCard(item) {
@@ -1413,13 +1440,38 @@ function renderOpportunityCard(item) {
   return '<a class="op-card ' + item.kind + '" href="' + escAttr(item.href) + '" style="--ring-color:' + color + ';--ring-pct:' + pct + '%">' +
     coverHtml +
     '<span class="op-status">' + esc(status) + '</span>' +
-    '<span class="count-ring"><span>' + esc(dayText) + (days === null ? '' : '<small>' + esc(dayUnit) + '</small>') + '</span></span>' +
-    '<span class="op-type">' + iconSvg(item.icon) + esc(item.label) + '</span>' +
+    '<span class="op-count-row">' +
+      '<span class="count-ring"><span>' + esc(dayText) + (days === null ? '' : '<small>' + esc(dayUnit) + '</small>') + '</span></span>' +
+      '<span class="op-type">' + iconSvg(item.icon) + esc(item.label) + '</span>' +
+    '</span>' +
     '<span class="op-title">' + esc(item.title) + '</span>' +
     '<span class="op-meta">' + esc(item.meta || (item.date ? formatDate(item.date) : '')) + '</span>' +
     '<span class="deadline-bar"><span class="deadline-fill"></span></span>' +
     '<span class="op-foot"><span>' + (item.date ? iconSvg('calendar') + ' ' + esc(formatDate(item.date)) : '') + '</span><strong class="feed-link">เปิดอ่าน →</strong></span>' +
   '</a>';
+}
+
+function renderPager(scope, page, maxPage) {
+  if (maxPage <= 0) return '';
+  const cls = scope === 'opportunity' ? ' op-pager' : '';
+  return '<div class="landing-pager' + cls + '">' +
+    '<button class="landing-page-btn" type="button" onclick="changeLandingPage(\'' + scope + '\',-1)" ' + (page <= 0 ? 'disabled' : '') + ' aria-label="Previous">‹</button>' +
+    '<span class="landing-page-info">' + (page + 1) + ' / ' + (maxPage + 1) + '</span>' +
+    '<button class="landing-page-btn" type="button" onclick="changeLandingPage(\'' + scope + '\',1)" ' + (page >= maxPage ? 'disabled' : '') + ' aria-label="Next">›</button>' +
+  '</div>';
+}
+
+function changeLandingPage(scope, delta) {
+  if (scope === 'news') {
+    const maxPage = Math.max(0, Math.ceil(sortByDate(state.news, 'publish_date').length / 4) - 1);
+    state.newsPage = Math.min(Math.max(0, (state.newsPage || 0) + delta), maxPage);
+    renderNews();
+    return;
+  }
+  if (scope === 'opportunity') {
+    state.opportunityPage = Math.max(0, (state.opportunityPage || 0) + delta);
+    renderOpportunities();
+  }
 }
 
 function renderQuickLinks() {

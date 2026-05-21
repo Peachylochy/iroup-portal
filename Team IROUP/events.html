@@ -177,7 +177,11 @@ body.modal-open{overflow:hidden}
           </div>
           <div class="field">
             <label class="label" for="eventTypeSelect">ประเภทกิจกรรม <span class="req">*</span></label>
-            <select id="eventTypeSelect" class="select" name="event_type_id" required></select>
+            <select id="eventTypeSelect" class="select" name="event_type_id" required onchange="updateEventTypeFields()"></select>
+          </div>
+          <div class="field" id="customEventTypeField" style="display:none">
+            <label class="label" for="customEventType">ประเภทกิจกรรมใหม่ <span class="req">*</span></label>
+            <input id="customEventType" class="input" name="event_type_custom" placeholder="เช่น ภาพยนตร์และวัฒนธรรม">
           </div>
           <div class="field">
             <label class="label" for="unitInput">หน่วยงาน <span class="req">*</span><span class="hint">พิมพ์เพื่อค้นหาได้</span></label>
@@ -200,7 +204,7 @@ body.modal-open{overflow:hidden}
           <div class="field">
             <label class="label" for="eventModeSelect">รูปแบบกิจกรรม</label>
             <select id="eventModeSelect" class="select" name="event_mode" onchange="updateEventModeFields()">
-              <option value="onsite">ออนไซต์</option>
+              <option value="offline">ออนไซต์</option>
               <option value="online">ออนไลน์</option>
               <option value="hybrid">ไฮบริด</option>
             </select>
@@ -351,7 +355,7 @@ function populateMasterControls() {
     const label = typeLabel(type);
     return `<option value="${esc(type.event_type_id || '')}">${esc((type.icon ? type.icon + ' ' : '') + label)}</option>`;
   }).join('');
-  $('#eventTypeSelect').innerHTML = '<option value="">เลือกประเภทกิจกรรม</option>' + typeOptions;
+  $('#eventTypeSelect').innerHTML = '<option value="">เลือกประเภทกิจกรรม</option>' + typeOptions + '<option value="__custom__">➕ อื่น ๆ / ระบุเอง</option>';
   $('#typeFilter').innerHTML = '<option value="">ทุกประเภท</option>' + typeOptions;
 
   $('#unitOptions').innerHTML = state.units.map(unit => {
@@ -519,8 +523,10 @@ function openCreateModal() {
   $('#modalSub').textContent = 'V2-native EVENT metadata';
   $('#deleteBtn').style.display = 'none';
   $('#statusSelect').value = 'draft';
-  $('#eventModeSelect').value = 'onsite';
+  $('#customEventType').value = '';
+  $('#eventModeSelect').value = 'offline';
   updateFiscalPreview();
+  updateEventTypeFields();
   updateEventModeFields();
   renderSelectedFiles();
   $('#eventModal').classList.add('open');
@@ -536,11 +542,20 @@ function openEditModal(eventId) {
   $('#eventId').value = event.event_id || '';
   $('#titleTh').value = event.title_th || '';
   $('#titleEn').value = event.title_en || '';
-  $('#eventTypeSelect').value = event.event_type_id || '';
+  if (event.event_type_id) {
+    $('#eventTypeSelect').value = event.event_type_id;
+    $('#customEventType').value = '';
+  } else if (event.event_type) {
+    $('#eventTypeSelect').value = '__custom__';
+    $('#customEventType').value = event.event_type || '';
+  } else {
+    $('#eventTypeSelect').value = '';
+    $('#customEventType').value = '';
+  }
   $('#unitInput').value = unitDisplay(event) || '';
   $('#countryInput').value = countryDisplay(event) || '';
   $('#statusSelect').value = event.status || 'draft';
-  $('#eventModeSelect').value = event.event_mode || 'onsite';
+  $('#eventModeSelect').value = normalizeEventModeValue(event.event_mode);
   $('#startDate').value = event.start_date || '';
   $('#endDate').value = event.end_date || '';
   $('#startTime').value = event.start_time || '';
@@ -559,6 +574,7 @@ function openEditModal(eventId) {
   $('#modalSub').textContent = event.event_id || '';
   $('#deleteBtn').style.display = '';
   updateFiscalPreview();
+  updateEventTypeFields();
   updateEventModeFields();
   renderSelectedFiles();
   $('#eventModal').classList.add('open');
@@ -695,16 +711,19 @@ function extractSavedEventId(res) {
 }
 
 function buildPayloadFromForm() {
-  const type = findEventType($('#eventTypeSelect').value, '');
+  const selectedTypeId = $('#eventTypeSelect').value.trim();
+  const isCustomType = selectedTypeId === '__custom__';
+  const type = isCustomType ? null : findEventType(selectedTypeId, '');
+  const customEventType = $('#customEventType').value.trim();
   const unit = findUnitByLabel($('#unitInput').value);
   const country = findCountryByLabel($('#countryInput').value);
   const payload = {
     event_id: $('#eventId').value.trim(),
     title_th: $('#titleTh').value.trim(),
     title_en: $('#titleEn').value.trim(),
-    event_type_id: $('#eventTypeSelect').value.trim(),
-    event_type: typeLabel(type) || $('#eventTypeSelect').value.trim(),
-    event_mode: $('#eventModeSelect').value,
+    event_type_id: isCustomType ? '' : selectedTypeId,
+    event_type: isCustomType ? customEventType : (typeLabel(type) || selectedTypeId),
+    event_mode: normalizeEventModeValue($('#eventModeSelect').value),
     organizer_unit_id: unit?.unit_id || '',
     organizer: $('#unitInput').value.trim(),
     country_id: country?.country_id || '',
@@ -733,7 +752,7 @@ function validatePayload(payload) {
   const missing = [];
   if (!payload.title_th) missing.push('ชื่อกิจกรรม (TH)');
   if (!payload.title_en) missing.push('ชื่อกิจกรรม (EN)');
-  if (!payload.event_type_id) missing.push('ประเภทกิจกรรม');
+  if (!payload.event_type_id && !payload.event_type) missing.push('ประเภทกิจกรรม');
   if (!payload.organizer_unit_id && !payload.organizer) missing.push('หน่วยงาน');
   if (!payload.start_date) missing.push('วันที่เริ่ม');
   if (payload.end_date && payload.start_date && payload.end_date < payload.start_date) missing.push('วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม');
@@ -802,10 +821,30 @@ function countryDisplay(event) {
 }
 
 function eventModeBadge(mode) {
-  const normalized = String(mode || 'onsite').trim().toLowerCase();
+  const normalized = normalizeEventModeValue(mode);
   if (normalized === 'online') return { value: 'online', label: '💻 ออนไลน์' };
   if (normalized === 'hybrid') return { value: 'hybrid', label: '🔀 ไฮบริด' };
-  return { value: 'onsite', label: '🏢 ออนไซต์' };
+  return { value: 'offline', label: '🏢 ออนไซต์' };
+}
+
+function normalizeEventModeValue(mode) {
+  const normalized = String(mode || 'offline').trim().toLowerCase();
+  if (normalized === 'onsite' || normalized === 'on-site' || normalized === 'in_person' || normalized === 'in-person') return 'offline';
+  if (normalized === 'online') return 'online';
+  if (normalized === 'hybrid') return 'hybrid';
+  return 'offline';
+}
+
+function updateEventTypeFields() {
+  const select = $('#eventTypeSelect');
+  const field = $('#customEventTypeField');
+  const input = $('#customEventType');
+  const isCustom = select && select.value === '__custom__';
+  if (field) field.style.display = isCustom ? '' : 'none';
+  if (input) {
+    input.required = !!isCustom;
+    if (!isCustom) input.value = '';
+  }
 }
 
 function daysBadge(dateText) {
@@ -846,8 +885,8 @@ function updateFiscalPreview() {
 }
 
 function updateEventModeFields() {
-  const mode = $('#eventModeSelect') ? $('#eventModeSelect').value : 'onsite';
-  const showLocation = mode === 'onsite' || mode === 'hybrid';
+  const mode = normalizeEventModeValue($('#eventModeSelect') ? $('#eventModeSelect').value : 'offline');
+  const showLocation = mode === 'offline' || mode === 'hybrid';
   const showMeetingUrl = mode === 'online' || mode === 'hybrid';
   const locationField = $('#locationField');
   const meetingUrlField = $('#meetingUrlField');

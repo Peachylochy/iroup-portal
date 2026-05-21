@@ -412,6 +412,36 @@ async function hydrateDashboardMouFromV2(report){
   return report;
 }
 
+async function hydrateDashboardEventsFromV2(report){
+  // Events must match events.html exactly. Do not keep stale getReport event
+  // rows when the V2 event list is available, because deleted events linger in
+  // the legacy report aggregate.
+  if(!report || !report.data || !window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.eventList){
+    return report;
+  }
+  try{
+    const res=await IROUP_V2.admin.eventList({includeArchived:false,_:Date.now()});
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 Event list failed');
+    const rows=normalizeV2DashboardList(res).map(v2EventToDashboardRow);
+    report.data.event=rows;
+    report.total=report.total || {};
+    report.total.event=rows.length;
+    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.all=Object.values(report.data).flat().length;
+    report.summary=makeSummary(report.data);
+    console.info('[Dashboard] Event data hydrated from V2 admin list', {count:rows.length});
+  }catch(err){
+    console.warn('[Dashboard] V2 Event hydration failed; clearing legacy report event rows to avoid stale dashboard data.', err);
+    report.data.event=[];
+    report.total=report.total || {};
+    report.total.event=0;
+    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.all=Object.values(report.data).flat().length;
+    report.summary=makeSummary(report.data);
+  }
+  return report;
+}
+
 async function hydrateDashboardMobilityFromV2(report){
   // Keep the legacy report for other modules, but use the same V2 admin
   // Mobility source as mobility.html so dashboard Mobility counts match.
@@ -486,6 +516,26 @@ function v2MouToDashboardRow(item){
     'วันที่สิ้นสุด': item.end_date || '',
     'ปีงบ': item.fiscal_year || fiscalYearFromDate(item.start_date || item.end_date),
     'สถานะ': item.status || ''
+  };
+}
+
+function v2EventToDashboardRow(item){
+  const country=item.country || {};
+  const unit=item.organizer || item.organizer_unit || item.unit || {};
+  const countryName=country.country_name_th || country.country_name_en || item.country_name_th || item.country_name_en || item.country || item.country_id || '';
+  const unitName=unit.unit_name_th || unit.unit_name_en || item.organizer_unit_name_th || item.organizer_unit_name_en || item.organizer || item.organizer_unit_id || '';
+  return {
+    'ชื่อกิจกรรม': item.title_th || item.title_en || item.event_id || '-',
+    'ประเภท': item.event_type || item.type || item.event_type_id || '-',
+    'รูปแบบ': item.event_mode || '',
+    'หน่วยงาน': unitName,
+    'ประเทศ': countryName,
+    'สถานที่': item.location || '',
+    'วันเริ่ม': item.start_date || '',
+    'วันสิ้นสุด': item.end_date || item.start_date || '',
+    'ปีงบ': item.fiscal_year || fiscalYearFromDate(item.start_date || item.end_date),
+    'สถานะ': item.status || '',
+    'จำนวนเงิน': item.amount || item.budget_amount || 0
   };
 }
 
@@ -602,6 +652,7 @@ async function reloadData(force=false){
           await hydrateDashboardMouFromV2(state.raw);
           await hydrateDashboardMobilityFromV2(state.raw);
           await hydrateDashboardScholarshipsFromV2(state.raw);
+          await hydrateDashboardEventsFromV2(state.raw);
           buildYearOptions();
           render();
           state.loading=false;
@@ -613,6 +664,7 @@ async function reloadData(force=false){
     await hydrateDashboardMouFromV2(data);
     await hydrateDashboardMobilityFromV2(data);
     await hydrateDashboardScholarshipsFromV2(data);
+    await hydrateDashboardEventsFromV2(data);
     state.raw=data;
     localStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),data}));
     buildYearOptions();
@@ -799,7 +851,7 @@ function render(){
 
   $('#appContent').innerHTML=`
     <div class="grid-kpi">
-      ${kpi('mou',IU.num(total.mou),'MOU ทั้งหมด',`${IU.num(activeMou)} active`,'blue')}
+      ${kpi('mou',IU.num(activeMou),'MOU active',`${IU.num(total.mou)} ทั้งหมด`,'blue')}
       ${kpi('scholar',IU.num(total.scholar),'ทุนการศึกษา',`${IU.num(openScholar)} เปิดรับ/ใกล้ปิด`,'gold')}
       ${kpi('calendar',IU.num(total.event),'กิจกรรม',`${IU.num(upcomingEvent)} upcoming`,'purple')}
       ${kpi('globe',IU.num(total.mobility),'Mobility',`Inbound ${IU.num(total.inbound)} · Outbound ${IU.num(total.outbound)}`,'teal')}
@@ -831,7 +883,7 @@ function render(){
       <div class="panel"><div class="panel-head"><div><div class="panel-title">🌍 Top ประเทศ</div><div class="panel-sub">รวมทุกหมวดข้อมูล</div></div></div><div class="panel-body">${barList(summary.byCountry,8)}</div></div>
       <div class="panel"><div class="panel-head"><div><div class="panel-title">🏫 Top หน่วยงาน/คณะ</div><div class="panel-sub">จาก MOU, Event, Mobility, Travel</div></div></div><div class="panel-body">${barList(summary.byFaculty,8)}</div></div>
       <div class="panel"><div class="panel-head"><div><div class="panel-title">📊 Mix ข้อมูล</div><div class="panel-sub">ภาพรวมจำนวนรายการ</div></div></div><div class="panel-body"><div class="chart-mini">
-        <div class="mini"><div class="n" style="color:var(--blue)">${IU.num(total.mou)}</div><div class="l">MOU</div></div>
+        <div class="mini"><div class="n" style="color:var(--blue)">${IU.num(activeMou)}</div><div class="l">MOU active</div></div>
         <div class="mini"><div class="n" style="color:var(--gold)">${IU.num(total.scholar)}</div><div class="l">ทุน</div></div>
         <div class="mini"><div class="n" style="color:var(--purple)">${IU.num(total.event)}</div><div class="l">กิจกรรม</div></div>
         <div class="mini"><div class="n" style="color:var(--teal)">${IU.num(total.mobility)}</div><div class="l">Mobility</div></div>
@@ -850,7 +902,7 @@ function render(){
     </div>
 
     <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">⏰ MOU ใกล้หมดอายุ</div><div class="panel-sub">รายการที่ควรตรวจสอบหรือต่ออายุ</div></div><a class="btn" href="mou.html">จัดการ MOU</a></div>
+      <div class="panel-head"><div><div class="panel-title">🤝 MOU active</div><div class="panel-sub">รายการความร่วมมือที่กำลังดำเนินการ</div></div><a class="btn" href="mou.html">จัดการ MOU</a></div>
       <div class="table-wrap">${mouTable(data.mou)}</div>
     </div>
   `;
@@ -868,9 +920,9 @@ function eventTable(rows){
   return `<table class="data-table"><thead><tr><th>กิจกรรม</th><th>ประเภท</th><th>วันที่</th><th>สถานที่</th></tr></thead><tbody>${upcoming.map(r=>`<tr><td><b>${IU.esc(r['ชื่อกิจกรรม']||'-')}</b><br><span style="color:var(--muted);font-size:11px">${IU.esc(r['หน่วยงาน']||'')}</span></td><td>${IU.esc(r['ประเภท']||'-')}</td><td>${IU.fmtDate(r['วันเริ่ม'])}</td><td>${IU.esc(r['สถานที่']||'-')}</td></tr>`).join('')}</tbody></table>`
 }
 function mouTable(rows){
-  const soon=rows.filter(r=>IU.statusMou(r)==='soon').sort((a,b)=>IU.toDate(a['วันสิ้นสุด'])-IU.toDate(b['วันสิ้นสุด'])).slice(0,10);
-  if(!soon.length)return '<div class="empty">ยังไม่มี MOU ใกล้หมดอายุในข้อมูลชุดนี้</div>';
-  return `<table class="data-table"><thead><tr><th>หน่วยงาน ม.พะเยา</th><th>องค์กรต่างประเทศ</th><th>ประเทศ</th><th>สิ้นสุด</th><th>สถานะ</th></tr></thead><tbody>${soon.map(r=>`<tr><td>${IU.esc(r['หน่วยงาน_UP']||'-')}</td><td><b>${IU.esc(r['องค์กร_ตปท']||'-')}</b></td><td>${IU.esc(r['ประเทศ']||'-')}</td><td>${IU.fmtDate(r['วันสิ้นสุด'])}</td><td><span class="status soon">${statusText('soon')}</span></td></tr>`).join('')}</tbody></table>`
+  const active=rows.filter(r=>IU.statusMou(r)==='active').sort((a,b)=>(IU.toDate(a['วันสิ้นสุด'])||new Date(9999,0,1))-(IU.toDate(b['วันสิ้นสุด'])||new Date(9999,0,1))).slice(0,10);
+  if(!active.length)return '<div class="empty">ยังไม่มี MOU active ในข้อมูลชุดนี้</div>';
+  return `<table class="data-table"><thead><tr><th>หน่วยงาน ม.พะเยา</th><th>องค์กรต่างประเทศ</th><th>ประเทศ</th><th>สิ้นสุด</th><th>สถานะ</th></tr></thead><tbody>${active.map(r=>`<tr><td>${IU.esc(r['หน่วยงาน_UP']||'-')}</td><td><b>${IU.esc(r['องค์กร_ตปท']||'-')}</b></td><td>${IU.esc(r['ประเทศ']||'-')}</td><td>${IU.fmtDate(r['วันสิ้นสุด'])}</td><td><span class="status active">${statusText('active')}</span></td></tr>`).join('')}</tbody></table>`
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
