@@ -1,0 +1,356 @@
+/* Admin tablet/mobile responsive pass.
+   Keep this file layout-only: no runtime visibility, data, or save logic. */
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.main,
+.main-layout,
+.page,
+.content,
+.topbar,
+.toolbar,
+.filter-bar,
+.panel,
+.list-wrap,
+.table-wrap,
+.cards,
+.kpis,
+.grid-kpi,
+.kpi-row,
+.modal-panel,
+.form-section {
+  min-width: 0;
+}
+
+.list-wrap,
+.table-wrap {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+@media (max-width: 1180px) {
+  body {
+    min-width: 0 !important;
+  }
+
+  .app,
+  .layout {
+    display: block !important;
+    min-width: 0 !important;
+  }
+
+  .main,
+  .main-layout,
+  .page {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .main,
+  .content,
+  .page {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .main-layout {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  .topbar,
+  .head {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
+
+  .top-actions,
+  .topbar-right,
+  .quick-grid {
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+
+  .toolbar,
+  .filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+  }
+
+  .toolbar > *,
+  .filter-bar > * {
+    min-width: 0 !important;
+  }
+
+  .toolbar .btn,
+  .filter-bar .btn,
+  .topbar-btn {
+    justify-content: center;
+  }
+
+  .cards {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+  }
+
+  .kpis,
+  .grid-kpi,
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .layout-main,
+  .layout-2,
+  .layout-3,
+  .hero,
+  .map-chart-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-grid,
+  .sdg-grid,
+  .participant-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-full,
+  .field.full {
+    grid-column: 1 / -1 !important;
+  }
+
+  .modal {
+    padding: 12px !important;
+  }
+
+  .modal-panel {
+    width: calc(100vw - 24px) !important;
+    height: calc(100dvh - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    border-radius: 20px !important;
+  }
+
+  .modal-panel form {
+    min-height: 0 !important;
+  }
+
+  .modal-head,
+  .modal-body,
+  .modal-foot {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .modal-body {
+    min-height: 0 !important;
+    overflow: auto !important;
+  }
+
+  .modal-foot,
+  .modal-foot .right,
+  .card-actions,
+  .pager,
+  .table-pager {
+    flex-wrap: wrap !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .main,
+  .content,
+  .page {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .topbar {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .title,
+  .topbar h1 {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+  }
+
+  .subtitle,
+  .sub,
+  .panel-sub {
+    font-size: 12px !important;
+  }
+
+  .toolbar,
+  .filter-bar {
+    grid-template-columns: 1fr !important;
+    padding: 12px !important;
+  }
+
+  .kpis,
+  .grid-kpi,
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .kpi,
+  .kpi-card {
+    min-height: 92px !important;
+    padding: 14px !important;
+  }
+
+  .kpi-value,
+  .kpi .num,
+  .kpi-number {
+    font-size: 28px !important;
+  }
+
+  .kpi-label,
+  .kpi .label {
+    font-size: 11px !important;
+  }
+
+  .cards {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .news-card,
+  .knowledge-card,
+  .event-card,
+  .scholar-card,
+  .mobility-card,
+  .travel-card {
+    min-height: 0 !important;
+    border-radius: 18px !important;
+  }
+
+  .cover,
+  .card-cover {
+    max-height: 170px !important;
+  }
+
+  .list-wrap,
+  .table-wrap {
+    margin-left: -14px !important;
+    margin-right: -14px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    border-radius: 0 !important;
+  }
+
+  .data-table,
+  .event-table,
+  .scholar-table,
+  .mobility-table,
+  .travel-table,
+  .mou-table,
+  table {
+    min-width: 760px;
+  }
+
+  th,
+  td,
+  .event-table th,
+  .event-table td,
+  .scholar-table th,
+  .scholar-table td,
+  .mobility-table th,
+  .mobility-table td,
+  .travel-table th,
+  .travel-table td {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .modal {
+    padding: 0 !important;
+  }
+
+  .modal-panel {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+
+  .modal-head,
+  .modal-body,
+  .modal-foot {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .modal-title,
+  .modal-head h2 {
+    font-size: 20px !important;
+  }
+
+  .modal-foot,
+  .modal-foot .right {
+    justify-content: stretch !important;
+  }
+
+  .modal-foot .btn,
+  .modal-foot button,
+  .card-actions .btn,
+  .pager-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .chart-box,
+  .chart-wrap {
+    min-height: 240px !important;
+    height: 260px !important;
+  }
+
+  #world-map {
+    height: 300px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .main,
+  .content,
+  .page {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .kpis,
+  .grid-kpi,
+  .kpi-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .kpi,
+  .kpi-card {
+    padding: 12px !important;
+  }
+
+  .kpi-value,
+  .kpi .num,
+  .kpi-number {
+    font-size: 25px !important;
+  }
+
+  .btn,
+  .topbar-btn,
+  .pager-btn {
+    min-height: 40px;
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+  }
+
+  .segmented {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}

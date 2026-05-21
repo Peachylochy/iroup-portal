@@ -4019,3 +4019,77 @@ Live QA follow-up:
   - mobility KPI cards stay two-up on phones and project cards are shorter
   - events calendar now scrolls inside the calendar panel instead of widening
     the whole page
+
+Admin responsive follow-up:
+
+- Added a shared admin responsive stylesheet:
+  `css/iroup-admin-responsive.css`.
+- Linked the shared stylesheet into current admin pages:
+  - `dashboard.html`
+  - `mou.html`
+  - `mobility.html`
+  - `travel.html`
+  - `scholarship.html`
+  - `events.html`
+  - `news.html`
+  - `knowledge.html`
+  - `report.html`
+- Expanded the shared admin sidebar collapse breakpoint from `900px` to `1180px`
+  so iPad/tablet widths use a horizontal top navigation instead of a cramped
+  fixed left sidebar.
+- Added shared tablet/mobile layout rules for:
+  - page width and horizontal overflow control
+  - topbar/action wrapping
+  - KPI grids
+  - filter/toolbar grids
+  - card grids
+  - table scroll containers
+  - full-height mobile modals
+- Kept runtime data, V2 adapters, save/update/delete, upload, and report export
+  logic unchanged.
+
+Verification:
+
+- `git diff --check` passed with Windows CRLF warnings only.
+- Inline script syntax passed for:
+  - `dashboard.html`
+  - `events.html`
+  - `scholarship.html`
+  - `mobility.html`
+  - `travel.html`
+  - `mou.html`
+  - `news.html`
+  - `knowledge.html`
+  - `report.html`
+  - `js/iroup-sidebar.js`
+- Local HTTP smoke returned 200 for:
+  - `dashboard.html`
+  - `mou.html`
+  - `mobility.html`
+  - `travel.html`
+  - `scholarship.html`
+  - `events.html`
+  - `news.html`
+  - `knowledge.html`
+  - `report.html`
+- Codex in-app browser localhost verification was blocked by browser policy
+  (`ERR_BLOCKED_BY_CLIENT`), so visual device QA still needs a real browser hard
+  refresh on phone/tablet/iPad.
+
+Admin entry hardening follow-up:
+
+- Changed public `Admin` links to route to `../index.html` instead of opening
+  admin module pages directly.
+- Fixed public Mobility/MOU `Admin` link relative paths so they also point to the
+  root login page from inside the `public/` folder.
+- Added `js/iroup-admin-guard.js` and linked it into current admin pages.
+- The guard redirects direct admin page loads back to `index.html` when no
+  `sessionStorage` admin session is present.
+- This is a frontend UX/access gate only; V2 backend admin auth remains the
+  source of truth for sensitive data access.
+
+Verification:
+
+- Public scan found no remaining public `Admin` link to direct admin module pages.
+- `iroup-admin-guard.js` is loaded by Dashboard, MOU, Mobility, Travel,
+  Scholarship, Events, News, Knowledge, and Report.

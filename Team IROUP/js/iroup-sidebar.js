@@ -116,7 +116,7 @@
       .ir-final-user-name{font-size:12px;font-weight:900;color:#10233f}
       .ir-final-user-sub{font-size:11px;color:#66758a}
 
-      @media(max-width:900px){
+      @media(max-width:1180px){
         .sidebar{position:relative!important;width:100%!important;min-width:100%!important;max-width:100%!important;height:auto!important}
         .main,.main-layout,.page{margin-left:0!important;width:100%!important}
         .ir-final-brand{height:auto;padding:14px 16px}
