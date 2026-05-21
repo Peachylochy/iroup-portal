@@ -4130,3 +4130,24 @@ Verification:
 
 - `git diff --check` passed with Windows CRLF warning only.
 - `js/iroup-sidebar.js` syntax passed.
+
+MOU-only mobile follow-up:
+
+- Hardened shared mobile sidebar rules further so the generated nav container and
+  active nav links have fixed compact heights on mobile/tablet.
+- Added MOU-specific responsive overrides after the shared responsive stylesheet
+  because `mou.html` still has older page-level `html/body`, fixed-height shell,
+  map, and table rules that differ from the newer admin pages.
+- MOU mobile overrides now force:
+  - document/body to scroll normally
+  - `.main-layout` to use auto height instead of fixed viewport height
+  - filter/search to use a stable grid
+  - KPI cards to stay two-up on phones
+  - map/chart heights to compress on phones
+  - table content to stay inside horizontal scroll
+
+Verification:
+
+- `git diff --check -- "Team IROUP/js/iroup-sidebar.js" "Team IROUP/mou.html"`
+  passed.
+- Inline script syntax passed for `js/iroup-sidebar.js` and `mou.html`.

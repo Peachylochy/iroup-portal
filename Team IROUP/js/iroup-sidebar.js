@@ -117,21 +117,29 @@
       .ir-final-user-sub{font-size:11px;color:#66758a}
 
       @media(max-width:1180px){
-        .sidebar{position:relative!important;width:100%!important;min-width:100%!important;max-width:100%!important;height:auto!important}
+        .sidebar{
+          position:relative!important;width:100%!important;min-width:100%!important;max-width:100%!important;
+          height:auto!important;min-height:0!important;display:block!important;overflow:hidden!important;
+          flex:0 0 auto!important;
+        }
         .main,.main-layout,.page{margin-left:0!important;width:100%!important}
-        .ir-final-brand{height:auto;padding:14px 16px}
+        .ir-final-brand{height:auto!important;min-height:82px!important;padding:14px 16px!important;flex:0 0 auto!important}
         .ir-final-brand img{width:104px;max-height:82px}
         .ir-final-nav{
           display:flex;gap:6px;overflow-x:auto;padding:10px 12px;
-          flex:0 0 auto!important;align-items:center!important;min-height:0!important;
+          flex:0 0 auto!important;align-items:center!important;min-height:0!important;max-height:72px!important;
           scroll-snap-type:x proximity;
         }
         .ir-final-section{display:none}
         .ir-final-link{
-          width:auto;white-space:nowrap;margin-bottom:0;flex:0 0 auto!important;
-          align-self:center!important;min-height:44px!important;height:auto!important;
+          width:auto!important;white-space:nowrap!important;margin-bottom:0!important;flex:0 0 auto!important;
+          align-self:center!important;min-height:44px!important;height:44px!important;max-height:44px!important;
+          padding:8px 12px!important;overflow:hidden!important;
           scroll-snap-align:start;
         }
+        .ir-final-link.active{min-height:44px!important;height:44px!important;max-height:44px!important}
+        .ir-final-link:hover{transform:none!important}
+        .ir-final-icon{width:32px!important;height:32px!important;flex:0 0 32px!important}
         .ir-final-user{display:none}
       }
     `;
