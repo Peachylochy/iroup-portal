@@ -3999,3 +3999,23 @@ Live QA follow-up:
   as well as direct amount fields.
 - Public landing and public mobility country normalization now recognize
   `TR` / Turkey / Turkiye variants for flag and map matching.
+- Public language state now normalizes across landing, mobility, and MOU pages,
+  so switching TH/EN on one public page carries correctly to the others.
+- Public landing opportunity cards now localize status/read-more text in EN.
+- Public MOU now localizes nav labels, section titles, filters, table headers,
+  pagination labels, footer text, and browser title.
+- Public landing now localizes remaining stat labels, mobility summary text,
+  opportunity tabs, activity status, and quick-link descriptions.
+- Public responsive pass added tablet/mobile breakpoints for landing, mobility,
+  MOU, events, and scholarships:
+  - nav becomes horizontal scroll instead of wrapping awkwardly
+  - hero, KPI, map, chart, filter, card, table, and calendar layouts compress
+    for iPad and phone widths
+  - event calendar keeps a readable horizontal layout on small screens
+- Mobile QA follow-up tightened landing and mobility above-the-fold height:
+  - landing KPI cards stay two-up on phones and hide secondary microcopy
+  - landing long country/mobility lists have shorter mobile scroll areas
+  - landing hides secondary mini-news cards on phone widths
+  - mobility KPI cards stay two-up on phones and project cards are shorter
+  - events calendar now scrolls inside the calendar panel instead of widening
+    the whole page

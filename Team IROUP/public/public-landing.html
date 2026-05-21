@@ -444,9 +444,9 @@
     .foot-copy{width:100%;border-top:1px solid var(--border);margin-top:12px;padding-top:14px;text-align:center;font-size:10.5px;color:var(--text-dim)}
 
     /* ── RESPONSIVE ── */
-    @media(max-width:1200px){.atlas-wrap{grid-template-columns:1fr}.activity-grid{grid-template-columns:1fr}.op-grid{grid-template-columns:repeat(2,1fr)}.quick-strip{grid-template-columns:repeat(3,minmax(0,1fr))}.quick-title{border-right:0;grid-column:1/-1}}
-    @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}.stats-row .stat-item:nth-child(2){border-right:none}}
-    @media(max-width:640px){.topbar{height:auto;padding:10px 16px;flex-wrap:wrap}.brand img{height:38px;max-width:116px}.nav{width:100%;overflow-x:auto;justify-content:flex-start}.bottom-grid{grid-template-columns:1fr}.mob-countries-grid{grid-template-columns:repeat(2,1fr)}.activity-head-inner,.feed-head,.op-toolbar{display:block}.activity-status{margin-top:12px}.news-cardview,.mini-news-grid,.op-grid,.quick-strip{grid-template-columns:1fr}.news-feature-body{padding:20px}.quick-title{min-width:0}.feed-head h3{font-size:22px}}
+    @media(max-width:1200px){.atlas-wrap{grid-template-columns:1fr}.activity-grid{grid-template-columns:1fr}.op-grid{grid-template-columns:repeat(2,1fr)}.quick-strip{grid-template-columns:repeat(3,minmax(0,1fr))}.quick-title{border-right:0;grid-column:1/-1}.map-wrap{height:460px;min-height:380px}}
+    @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);margin-left:24px;margin-right:24px}.stats-row .stat-item:nth-child(2){border-right:none}.hero{min-height:310px;background-position:60% center}.hero-copy{max-width:560px}.sec,.atlas-wrap{padding-left:24px;padding-right:24px}.bottom-grid{grid-template-columns:repeat(2,1fr)}.mobility-bar-row{grid-template-columns:minmax(86px,120px) 1fr 48px}.quick-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:640px){html,body{max-width:100%;overflow-x:hidden}.topbar{height:auto;padding:10px 14px;flex-wrap:wrap;gap:8px}.brand img{height:34px;max-width:108px}.nav{width:100%;overflow-x:auto;justify-content:flex-start;gap:4px;padding-bottom:3px;scrollbar-width:thin}.nav a,.lang-btn,.admin-btn{white-space:nowrap;padding:7px 10px;font-size:12px}.lang-switch{margin-left:0}.hero{min-height:280px;padding:42px 18px 54px;background-position:63% center}.hero::before{background-size:42px 42px}.hero-actions .btn{flex:1;justify-content:center;min-width:136px}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr));margin:-26px 16px 0}.stat-item{border-bottom:1px solid var(--border);padding:.85rem .9rem;gap:.7rem}.stat-item:nth-child(2n){border-right:0}.stat-item:nth-last-child(-n+2){border-bottom:0}.stat-ico{width:38px;height:38px;border-radius:12px}.stat-num{font-size:1.45rem}.stat-lbl{font-size:12px}.stat-sub,.stat-trend{display:none}.sec,.atlas-wrap{padding-left:16px;padding-right:16px}.sec-head{align-items:flex-start;flex-direction:column}.bottom-grid{grid-template-columns:1fr}.map-wrap{height:320px;min-height:300px}.mob-countries-grid{grid-template-columns:1fr}#countryTable.is-scroll{max-height:340px}.mobility-chart.is-scroll{max-height:360px}.mobility-bar-row{grid-template-columns:1fr;gap:6px}.mobility-bars{grid-column:auto}.mobility-count{justify-self:start}.activity-head-inner,.feed-head,.op-toolbar{display:block}.activity-status{margin-top:12px}.news-cardview,.op-grid,.quick-strip{grid-template-columns:1fr}.mini-news-grid{display:none}.news-cardview{min-height:0}.feed-photo{min-height:190px}.news-feature-body{padding:20px}.quick-title{min-width:0}.feed-head h3{font-size:22px}.op-count-row{grid-template-columns:64px minmax(0,1fr)}.count-ring{width:58px;height:58px}.op-card{min-height:0}}
   </style>
 </head>
 <body>
@@ -502,7 +502,7 @@
       <div class="stat-ico ico-cyan" data-stat-icon="mou"></div>
       <div>
         <div class="stat-num" id="statMous">–</div>
-        <div class="stat-lbl">MOU ทั้งหมด</div>
+        <div class="stat-lbl" id="statMousLabel">MOU ทั้งหมด</div>
         <div class="stat-sub">Total MOU Agreements</div>
         <div class="stat-trend trend-up" id="statMousTrend"></div>
       </div>
@@ -512,7 +512,7 @@
       <div>
         <div class="stat-num" id="statInbound">–</div>
         <div class="stat-lbl" data-i18n="statInLbl">ผู้แลกเปลี่ยนเข้า</div>
-        <div class="stat-sub">Inbound · 12 เดือนล่าสุด</div>
+        <div class="stat-sub" id="statInboundSub">Inbound · 12 เดือนล่าสุด</div>
         <div class="stat-trend trend-up" id="statInTrend"></div>
       </div>
     </div>
@@ -521,7 +521,7 @@
       <div>
         <div class="stat-num" id="statOutbound">–</div>
         <div class="stat-lbl" data-i18n="statOutLbl">ออกสู่ต่างประเทศ</div>
-        <div class="stat-sub">Outbound · 12 เดือนล่าสุด</div>
+        <div class="stat-sub" id="statOutboundSub">Outbound · 12 เดือนล่าสุด</div>
         <div class="stat-trend" id="statOutTrend"></div>
       </div>
     </div>
@@ -582,7 +582,7 @@
       <div>
         <div class="sec-kicker" data-i18n="mobilityKicker">Mobility Flow · 12 เดือนล่าสุด</div>
         <h2 data-i18n="mobilityTitle">การเดินทาง In – Out</h2>
-        <p class="sec-note">ผู้แลกเปลี่ยนเข้ามา <span id="mobInTotal" style="color:var(--cyan);font-weight:700">–</span> คน &nbsp;·&nbsp; ออกสู่ต่างประเทศ <span id="mobOutTotal" style="color:var(--gold);font-weight:700">–</span> คน</p>
+        <p class="sec-note" id="mobilitySummaryNote">ผู้แลกเปลี่ยนเข้ามา <span id="mobInTotal" style="color:var(--cyan);font-weight:700">–</span> คน &nbsp;·&nbsp; ออกสู่ต่างประเทศ <span id="mobOutTotal" style="color:var(--gold);font-weight:700">–</span> คน</p>
       </div>
       <a class="btn teal" href="public-mobility.html" data-i18n="viewMobility">Open Mobility →</a>
     </div>
@@ -605,10 +605,10 @@
     <div class="activity-head-inner">
       <div class="activity-title">
         <div class="sec-kicker">Activity Feed · Cardview</div>
-        <h2>อัปเดต &amp; โอกาส</h2>
+        <h2 id="activityTitle">อัปเดต &amp; โอกาส</h2>
         <div class="activity-note">ข่าวสาร คลังความรู้ ทุน และเข้าถึงระบบ ครบในมุมมองเดียว</div>
       </div>
-      <div class="activity-status"><i></i><span>อัปเดตล่าสุดจาก V2</span></div>
+      <div class="activity-status"><i></i><span id="activityStatusText">อัปเดตล่าสุดจาก V2</span></div>
     </div>
   </section>
 
@@ -646,8 +646,8 @@
           <div class="sec-note" data-i18n="opportunityNote">รายการเด่นจากระบบทุนและกิจกรรมสาธารณะ เรียงตามวันปิดรับ</div>
         </div>
         <div class="op-tabs" aria-label="Opportunity filters">
-          <button class="op-tab active" type="button" data-op-kind="scholarship">ทุนการศึกษา</button>
-          <button class="op-tab" type="button" data-op-kind="event">กิจกรรม</button>
+          <button class="op-tab active" type="button" data-op-kind="scholarship" id="opScholarTab">ทุนการศึกษา</button>
+          <button class="op-tab" type="button" data-op-kind="event" id="opEventTab">กิจกรรม</button>
           <a class="op-tab" id="opportunityAllLink" href="public-scholar.html">ดูทั้งหมด →</a>
         </div>
       </div>
@@ -681,7 +681,7 @@
 <script>
 /* ── STATE ── */
 const state = {
-  lang: localStorage.getItem('iroup_public_lang') || 'TH',
+  lang: normalizeLandingLang(localStorage.getItem('iroup_public_lang') || 'TH'),
   theme: localStorage.getItem('iroup_public_theme') || 'dark',
   news: [], knowledge: [], scholarships: [], events: [], mous: [], mouMap: [], mobility: [],
   opportunityKind: 'scholarship',
@@ -709,12 +709,15 @@ const TEXT = {
     heroTitle:'เชื่อมโยงมหาวิทยาลัยพะเยาสู่เครือข่ายระดับโลก',
     heroLead:'ศูนย์กลางข้อมูลความร่วมมือสากล การแลกเปลี่ยน และโอกาสระดับนานาชาติ เพื่อขับเคลื่อนมหาวิทยาลัยพะเยาสู่อนาคต',
     mouCta:'ดูเครือข่าย MOU',newsCta:'ข่าวสารล่าสุด',
-    statCountriesLbl:'ประเทศ',statInLbl:'ผู้แลกเปลี่ยนเข้า',statOutLbl:'ออกสู่ต่างประเทศ',
+    statCountriesLbl:'ประเทศ',statMousLbl:'MOU ทั้งหมด',statInLbl:'ผู้แลกเปลี่ยนเข้า',statOutLbl:'ออกสู่ต่างประเทศ',
+    statInboundSub:'Inbound · 12 เดือนล่าสุด',statOutboundSub:'Outbound · 12 เดือนล่าสุด',
     networkKicker:'Partner Atlas',networkTitle:'เครือข่ายความร่วมมือ',
     networkNote:'สรุปข้อมูล MOU และ Mobility จาก V2 public routes',
     viewAllMou:'ดูทั้งหมด →',
     mobilityKicker:'Mobility Flow · 12 เดือนล่าสุด',mobilityTitle:'การเดินทาง In – Out',
     mobilityNote:'International movement and exchange activity from V2 public routes',
+    mobilitySummary:'ผู้แลกเปลี่ยนเข้ามา {inbound} คน · ออกสู่ต่างประเทศ {outbound} คน',
+    activityTitle:'อัปเดต & โอกาส',activityStatus:'อัปเดตล่าสุดจาก V2',
     viewMobility:'Open Mobility →',
     newsKicker:'Latest News',newsTitle:'ข่าวสารล่าสุด',newsNote:'ข่าวที่เผยแพร่จากระบบ NEWS V2',
     viewAllNews:'ดูข่าวทั้งหมด →',
@@ -722,6 +725,7 @@ const TEXT = {
     knowledgeNote:'บทความ เอกสาร วิดีโอ และสื่อการเรียนรู้',viewAllKnowledge:'ดูคลังความรู้ทั้งหมด →',
     opportunityKicker:'Opportunities & Events',opportunityTitle:'ทุนการศึกษาและกิจกรรมเด่น',
     opportunityNote:'รายการเด่นจากระบบทุนและกิจกรรมสาธารณะ',
+    opScholar:'ทุนการศึกษา',opEvent:'กิจกรรม',viewAll:'ดูทั้งหมด →',
     moduleKicker:'Quick Links',moduleTitle:'เลือกดูข้อมูลตามระบบ',moduleNote:'เชื่อมต่อฐานข้อมูล V2 public route โดยตรง',
     navNews:'ข่าวสาร',navKnowledge:'คลังความรู้',navScholar:'ทุนการศึกษา',
     navEvents:'กิจกรรม',navMou:'เครือข่ายความร่วมมือ',navMobility:'การแลกเปลี่ยน',
@@ -735,12 +739,15 @@ const TEXT = {
     heroTitle:'University of Phayao – Global Network Hub',
     heroLead:'Central hub for international partnerships, exchanges, and opportunities driving the University of Phayao forward.',
     mouCta:'Browse MOU Network',newsCta:'Latest News',
-    statCountriesLbl:'Countries',statInLbl:'Inbound Exchange',statOutLbl:'Outbound Travel',
+    statCountriesLbl:'Countries',statMousLbl:'Total MOU Agreements',statInLbl:'Inbound Exchange',statOutLbl:'Outbound Travel',
+    statInboundSub:'Inbound · Last 12 months',statOutboundSub:'Outbound · Last 12 months',
     networkKicker:'Partner Atlas',networkTitle:'Partnership Network',
     networkNote:'MOU and Mobility summary from V2 public routes',
     viewAllMou:'View all →',
     mobilityKicker:'Mobility Flow · Last 12 months',mobilityTitle:'Inbound – Outbound Flow',
     mobilityNote:'International movement and exchange activity from V2 public routes',
+    mobilitySummary:'Inbound {inbound} people · Outbound {outbound} people',
+    activityTitle:'Updates & Opportunities',activityStatus:'Latest updates from V2',
     viewMobility:'Open Mobility →',
     newsKicker:'Latest News',newsTitle:'Latest News',newsNote:'Published stories from the NEWS V2 system.',
     viewAllNews:'View all news →',
@@ -748,6 +755,7 @@ const TEXT = {
     knowledgeNote:'Articles, documents, videos, and learning media.',viewAllKnowledge:'View knowledge hub →',
     opportunityKicker:'Opportunities & Events',opportunityTitle:'Scholarship & Event Highlights',
     opportunityNote:'Selected public records from scholarship and event systems.',
+    opScholar:'Scholarships',opEvent:'Events',viewAll:'View all →',
     moduleKicker:'Quick Links',moduleTitle:'Browse by system',moduleNote:'Each link opens a V2 public route page.',
     navNews:'News',navKnowledge:'Knowledge',navScholar:'Scholarships',
     navEvents:'Events',navMou:'Partnership network',navMobility:'Mobility',
@@ -774,7 +782,7 @@ async function initLanding() {
 function bindLanguage() {
   document.querySelectorAll('.lang-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      state.lang = btn.dataset.lang || 'TH';
+      state.lang = normalizeLandingLang(btn.dataset.lang || 'TH');
       localStorage.setItem('iroup_public_lang', state.lang);
       applyLanguage();
       renderAll();
@@ -809,6 +817,14 @@ function applyLanguage() {
     const k = node.dataset.i18n;
     if (d[k] !== undefined) node.textContent = d[k];
   });
+  setText('statMousLabel', d.statMousLbl || 'MOU');
+  setText('statInboundSub', d.statInboundSub || '');
+  setText('statOutboundSub', d.statOutboundSub || '');
+  setText('activityTitle', d.activityTitle || '');
+  setText('activityStatusText', d.activityStatus || '');
+  setText('opScholarTab', d.opScholar || '');
+  setText('opEventTab', d.opEvent || '');
+  setText('opportunityAllLink', d.viewAll || '');
   // Hero title with span
   const heroTitle = document.getElementById('heroTitle');
   if (heroTitle) {
@@ -861,6 +877,10 @@ function renderAll() {
   renderQuickLinks();
 }
 
+function normalizeLandingLang(lang) {
+  return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH';
+}
+
 /* ── STATS ROW ── */
 function renderStatsRow() {
   const mapRows = buildMouCountryRows();
@@ -886,7 +906,13 @@ function renderStatsRow() {
   setText('statOutbound', outbound || '–');
   setText('mobInTotal', inbound || '–');
   setText('mobOutTotal', outbound || '–');
-  setText('atlasCounts', countries ? countries + ' ประเทศ · ' + totalMou + ' MOU' : '');
+  const d = TEXT[state.lang] || TEXT.TH;
+  setText('atlasCounts', countries ? countries + ' ' + (state.lang === 'EN' ? 'countries' : 'ประเทศ') + ' · ' + totalMou + ' MOU' : '');
+  const mobilitySummary = (d.mobilitySummary || '')
+    .replace('{inbound}', inbound || '–')
+    .replace('{outbound}', outbound || '–');
+  const summary = document.getElementById('mobilitySummaryNote');
+  if (summary) summary.textContent = mobilitySummary;
   document.querySelectorAll('[data-stat-icon]').forEach(function(node) {
     node.innerHTML = iconSvg(node.dataset.statIcon || 'globe');
   });
@@ -1440,9 +1466,12 @@ function renderOpportunityCard(item) {
   const urgent = days !== null && days <= 21 && days >= 0;
   const color = closed ? '#64748b' : urgent ? '#fb7185' : item.kind === 'event' ? '#34d399' : '#38bdf8';
   const pct = days === null ? 72 : Math.max(10, Math.min(100, Math.round(((60 - Math.min(Math.max(days, 0), 60)) / 60) * 100)));
-  const status = closed ? 'Closed' : urgent ? 'Urgent' : 'Open';
+  const status = state.lang === 'EN'
+    ? (closed ? 'Closed' : urgent ? 'Urgent' : 'Open')
+    : (closed ? 'ปิดแล้ว' : urgent ? 'ใกล้ปิดรับ' : 'เปิดรับ');
   const dayText = days === null ? 'Open' : closed ? '0' : String(days);
   const dayUnit = state.lang === 'EN' ? 'days' : 'วัน';
+  const readText = state.lang === 'EN' ? 'Open details →' : 'เปิดอ่าน →';
   const coverHtml = '<span class="op-cover">' +
     (item.cover ? '<img src="' + escAttr(item.cover) + '" alt="' + escAttr(item.title) + '" loading="lazy">' : '<span class="op-cover-placeholder">' + iconSvg(item.icon) + '</span>') +
     '</span>';
@@ -1456,7 +1485,7 @@ function renderOpportunityCard(item) {
     '<span class="op-title">' + esc(item.title) + '</span>' +
     '<span class="op-meta">' + esc(item.meta || (item.date ? formatDate(item.date) : '')) + '</span>' +
     '<span class="deadline-bar"><span class="deadline-fill"></span></span>' +
-    '<span class="op-foot"><span>' + (item.date ? iconSvg('calendar') + ' ' + esc(formatDate(item.date)) : '') + '</span><strong class="feed-link">เปิดอ่าน →</strong></span>' +
+    '<span class="op-foot"><span>' + (item.date ? iconSvg('calendar') + ' ' + esc(formatDate(item.date)) : '') + '</span><strong class="feed-link">' + esc(readText) + '</strong></span>' +
   '</a>';
 }
 
@@ -1488,15 +1517,16 @@ function renderQuickLinks() {
   if (!strip) return;
   const rows = buildMouCountryRows();
   const mobilityTotal = state.mobility.length;
+  const en = state.lang === 'EN';
   const links = [
-    { href:'public-news.html', name:'News', desc:'ข่าวสาร', count:state.news.length, icon:'news', cls:'qi-news' },
-    { href:'public-knowledge.html', name:'Knowledge', desc:'คลังความรู้', count:state.knowledge.length, icon:'book', cls:'qi-knowledge' },
-    { href:'public-scholar.html', name:'Scholarship', desc:'ทุนการศึกษา', count:state.scholarships.length, icon:'cap', cls:'qi-scholar' },
-    { href:'public-events.html', name:'Events', desc:'กิจกรรม', count:state.events.length, icon:'event', cls:'qi-events' },
-    { href:'public-mou.html', name:'MOU', desc:'เครือข่าย', count:state.mous.length || rows.reduce(function(sum, row) { return sum + Number(row.count || 0); }, 0), icon:'mou', cls:'qi-mou' },
-    { href:'public-mobility.html', name:'Mobility', desc:'แลกเปลี่ยน', count:mobilityTotal, icon:'plane', cls:'qi-mobility' }
+    { href:'public-news.html', name:'News', desc:en ? 'news' : 'ข่าวสาร', count:state.news.length, icon:'news', cls:'qi-news' },
+    { href:'public-knowledge.html', name:'Knowledge', desc:en ? 'knowledge' : 'คลังความรู้', count:state.knowledge.length, icon:'book', cls:'qi-knowledge' },
+    { href:'public-scholar.html', name:'Scholarship', desc:en ? 'scholarships' : 'ทุนการศึกษา', count:state.scholarships.length, icon:'cap', cls:'qi-scholar' },
+    { href:'public-events.html', name:'Events', desc:en ? 'events' : 'กิจกรรม', count:state.events.length, icon:'event', cls:'qi-events' },
+    { href:'public-mou.html', name:'MOU', desc:en ? 'agreements' : 'เครือข่าย', count:state.mous.length || rows.reduce(function(sum, row) { return sum + Number(row.count || 0); }, 0), icon:'mou', cls:'qi-mou' },
+    { href:'public-mobility.html', name:'Mobility', desc:en ? 'mobility' : 'แลกเปลี่ยน', count:mobilityTotal, icon:'plane', cls:'qi-mobility' }
   ];
-  strip.innerHTML = '<div class="quick-title"><div class="sec-kicker">Quick Links</div><strong>เข้าถึงระบบ</strong></div>' +
+  strip.innerHTML = '<div class="quick-title"><div class="sec-kicker">Quick Links</div><strong>' + esc(en ? 'Browse systems' : 'เข้าถึงระบบ') + '</strong></div>' +
     links.map(function(link) {
       return '<a href="' + link.href + '">' +
         '<span class="quick-icon ' + link.cls + '">' + iconSvg(link.icon) + '</span>' +

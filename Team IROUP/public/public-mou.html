@@ -36,6 +36,8 @@ html[data-theme="light"] .map-ctrl{background:rgba(255,255,255,.86);color:#07182
 html[data-theme="light"] .up-map-pin text{stroke:rgba(255,255,255,.9)}
 .brand img{height:48px;max-width:144px;width:auto;object-fit:contain}
 @media(max-width:980px){#mouMapDiv{height:360px}.chart-wrap{height:340px}}
+@media(max-width:760px){.topbar{align-items:flex-start}.brand img{height:38px}.nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin}.nav-link{white-space:nowrap;padding:10px}.nav-tools{margin-left:auto}.hero{min-height:280px;padding:38px 18px 34px;background-position:60% center}.hero-kpi{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none}.content{padding-left:14px;padding-right:14px}.panel-head{align-items:flex-start;flex-direction:column}.filter-bar{grid-template-columns:1fr}.pills{justify-content:flex-start}.pill{height:38px;padding:0 13px}.mou-table{min-width:760px}#mouMapDiv{height:300px}.chart-wrap{height:300px}.table-pager{justify-content:flex-start;flex-wrap:wrap}}
+@media(max-width:480px){.topbar{padding:10px 14px}.nav-tools{width:100%;justify-content:flex-start}.hero h1{font-size:32px}.hero-kpi{grid-template-columns:1fr}.hkpi{padding:14px 16px}.map-legend{gap:10px;padding:12px 14px 0}.map-controls{right:10px;top:10px}.map-ctrl{width:30px;height:30px}#mouMapDiv{height:250px}.chart-wrap{height:250px;padding:10px}.mou-table{min-width:700px}.mou-table th,.mou-table td{padding:11px 12px}.footer{padding:18px 14px}}
 </style>
 </head>
 <body>
@@ -101,12 +103,36 @@ let mouChart = null;
 let publicMapSvg = null;
 let publicMapZoom = null;
 let publicMapLayer = null;
-let currentLang = 'TH';
+let currentLang = normalizeLang(localStorage.getItem('iroup_public_lang') || 'TH');
 let currentPage = 1;
 const pageSize = 10;
 const TEXT = {
-  TH: {hero:'MOU ต่างประเทศ', sub:'ข้อมูลความร่วมมือทางวิชาการกับสถาบันทั่วโลก - International Academic Cooperation', total:'MOU ทั้งหมด', soon:'ใกล้หมดอายุ', country:'ประเทศ', rows:'รายการ', noData:'ไม่พบข้อมูล', loadFail:'ไม่สามารถโหลดข้อมูลได้'},
-  EN: {hero:'International MOUs', sub:'International academic cooperation with partner institutions worldwide', total:'Total MOUs', soon:'Expiring Soon', country:'Countries', rows:'items', noData:'No MOU data found', loadFail:'Unable to load data'}
+  TH: {
+    navNews:'ข่าวสาร',navKnowledge:'คลังความรู้',navScholar:'ทุนการศึกษา',navEvents:'กิจกรรม',
+    hero:'MOU ต่างประเทศ', sub:'ข้อมูลความร่วมมือทางวิชาการกับสถาบันทั่วโลก - International Academic Cooperation',
+    total:'MOU ทั้งหมด', soon:'ใกล้หมดอายุ', country:'ประเทศ', rows:'รายการ', noData:'ไม่พบข้อมูล', loadFail:'ไม่สามารถโหลดข้อมูลได้',
+    mapTitle:'แผนที่ความร่วมมือทางนานาชาติ', mapSub:'Hover เพื่อดูรายละเอียด',
+    chartTitle:'MOU Active แยกตามหน่วยงาน', chartSub:'Active MOU by UP unit',
+    searchPlaceholder:'ค้นหาชื่อสถาบัน ประเทศ หรือหน่วยงาน...', allContinents:'ทุกทวีป',
+    asia:'เอเชีย', europe:'ยุโรป', america:'อเมริกา', oceania:'โอเชียเนีย', africa:'แอฟริกา',
+    all:'ทั้งหมด', active:'Active', expiredSoon:'ใกล้หมดอายุ', expired:'หมดอายุ',
+    tableTitle:'รายการ MOU ทั้งหมด', loading:'กำลังโหลดข้อมูล...',
+    thUnit:'หน่วยงาน ม.พะเยา', thPartner:'องค์กรต่างประเทศ', thCountry:'ประเทศ', thType:'ประเภท', thPeriod:'ช่วงความร่วมมือ', thStatus:'สถานะ',
+    footer:'(c) 2569 International Relations Office - University of Phayao - ข้อมูลอัปเดตเมื่อวันที่ 19 พฤษภาคม 2569'
+  },
+  EN: {
+    navNews:'News',navKnowledge:'Knowledge',navScholar:'Scholarships',navEvents:'Events',
+    hero:'International MOUs', sub:'International academic cooperation with partner institutions worldwide',
+    total:'Total MOUs', soon:'Expiring Soon', country:'Countries', rows:'items', noData:'No MOU data found', loadFail:'Unable to load data',
+    mapTitle:'International Partnership Map', mapSub:'Hover for details',
+    chartTitle:'Active MOU by Unit', chartSub:'Active MOU by UP unit',
+    searchPlaceholder:'Search institution, country, or unit...', allContinents:'All continents',
+    asia:'Asia', europe:'Europe', america:'Americas', oceania:'Oceania', africa:'Africa',
+    all:'All', active:'Active', expiredSoon:'Expiring Soon', expired:'Expired',
+    tableTitle:'All MOU Records', loading:'Loading data...',
+    thUnit:'UP Unit', thPartner:'International Partner', thCountry:'Country', thType:'Type', thPeriod:'Partnership Period', thStatus:'Status',
+    footer:'(c) 2026 International Relations Office - University of Phayao - Data updated on May 19, 2026'
+  }
 };
 const COUNTRY_CODE = {USA:'us','United States':'us','China':'cn','Japan':'jp','South Korea':'kr','Germany':'de','France':'fr','United Kingdom':'gb','Australia':'au','Canada':'ca','Malaysia':'my','Singapore':'sg','Thailand':'th','Taiwan':'tw','Vietnam':'vn','Myanmar':'mm','Indonesia':'id','Philippines':'ph','India':'in','Netherlands':'nl','Sweden':'se','Norway':'no','New Zealand':'nz'};
 const MAP_IDS = {36:'Australia',56:'Belgium',76:'Brazil',104:'Myanmar',116:'Cambodia',124:'Canada',156:'China',208:'Denmark',276:'Germany',356:'India',360:'Indonesia',372:'Ireland',380:'Italy',392:'Japan',410:'South Korea',458:'Malaysia',528:'Netherlands',554:'New Zealand',578:'Norway',608:'Philippines',616:'Poland',620:'Portugal',643:'Russia',724:'Spain',752:'Sweden',756:'Switzerland',764:'Thailand',826:'United Kingdom',840:'USA',704:'Vietnam',158:'Taiwan',250:'France'};
@@ -126,7 +152,7 @@ function formatDate(v){ if (!v) return '-'; if (window.IROUP && typeof IROUP.for
 async function loadData(){ try { const res = await IROUP_V2.public.mouList(); if (!res.success) throw new Error(res.error || 'V2 MOU API error'); allMou = (res.data || []).filter(r => clean(r.mou_id || r.id)).map(normalizeMou); updateKPI(allMou); renderTable(allMou); renderChart(allMou); renderMap(allMou); } catch(e) { document.getElementById('mouTableBody').innerHTML = '<tr><td colspan="7" class="loading">' + TEXT[currentLang].loadFail + '</td></tr>'; console.error(e); } }
 function updateKPI(data){ const active = data.filter(m => getStatus(m).status === 'active').length; const soon = data.filter(m => getStatus(m).status === 'soon').length; const countries = new Set(data.map(m => m.country).filter(Boolean)).size; document.getElementById('kpi-total').textContent = data.length; document.getElementById('kpi-active').textContent = active; document.getElementById('kpi-soon').textContent = soon; document.getElementById('kpi-country').textContent = countries; }
 function renderTable(data){ const tbody = document.getElementById('mouTableBody'); const totalRows = data.length; const totalPages = Math.max(1, Math.ceil(totalRows / pageSize)); if (currentPage > totalPages) currentPage = totalPages; const startIndex = (currentPage - 1) * pageSize; const pageRows = data.slice(startIndex, startIndex + pageSize); if (!data.length){ tbody.innerHTML = '<tr><td colspan="7" class="loading">' + TEXT[currentLang].noData + '</td></tr>'; document.getElementById('tableCount').textContent = '0 ' + TEXT[currentLang].rows; renderPager(0, 1); return; } tbody.innerHTML = pageRows.map(function(m,i){ const st = getStatus(m); const cls = st.status === 'active' ? 'b-active' : st.status === 'soon' ? 'b-soon' : 'b-expired'; return '<tr><td class="muted">' + (startIndex+i+1) + '</td><td><div class="strong">' + esc(m.unit || '-') + '</div></td><td><div class="strong">' + esc(m.partner || '-') + '</div></td><td><div class="flag-cell">' + flagHtml(m) + '<span>' + esc(m.country || '-') + '</span></div></td><td><span class="type-tag">' + esc(m.type || 'MOU') + '</span></td><td class="muted">' + esc(formatDate(m.start)) + ' - ' + esc(formatDate(m.end)) + '</td><td><span class="badge ' + cls + '">' + esc(st.label || st.status) + '</span></td></tr>'; }).join(''); document.getElementById('tableCount').textContent = (startIndex + 1) + '-' + (startIndex + pageRows.length) + ' / ' + totalRows + ' ' + TEXT[currentLang].rows; renderPager(totalRows, totalPages); }
-function renderPager(totalRows, totalPages){ let pager = document.getElementById('mouPager'); const panel = document.querySelector('.mou-table')?.closest('.panel'); if (!pager && panel) { pager = document.createElement('div'); pager.id = 'mouPager'; pager.className = 'table-pager'; panel.appendChild(pager); } if (!pager) return; if (!totalRows || totalPages <= 1) { pager.innerHTML = ''; return; } pager.innerHTML = '<button class="pager-btn" type="button" ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="goMouPage(' + (currentPage - 1) + ')">ก่อนหน้า</button><span class="pager-info">หน้า ' + currentPage + ' / ' + totalPages + '</span><button class="pager-btn" type="button" ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="goMouPage(' + (currentPage + 1) + ')">ถัดไป</button>'; }
+function renderPager(totalRows, totalPages){ let pager = document.getElementById('mouPager'); const panel = document.querySelector('.mou-table')?.closest('.panel'); if (!pager && panel) { pager = document.createElement('div'); pager.id = 'mouPager'; pager.className = 'table-pager'; panel.appendChild(pager); } if (!pager) return; if (!totalRows || totalPages <= 1) { pager.innerHTML = ''; return; } const prev = currentLang === 'EN' ? 'Previous' : 'ก่อนหน้า'; const next = currentLang === 'EN' ? 'Next' : 'ถัดไป'; const page = currentLang === 'EN' ? 'Page' : 'หน้า'; pager.innerHTML = '<button class="pager-btn" type="button" ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="goMouPage(' + (currentPage - 1) + ')">' + prev + '</button><span class="pager-info">' + page + ' ' + currentPage + ' / ' + totalPages + '</span><button class="pager-btn" type="button" ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="goMouPage(' + (currentPage + 1) + ')">' + next + '</button>'; }
 function goMouPage(page){ currentPage = Math.max(1, Number(page) || 1); filterTable(false); }
 function searchable(m){ return [m.partner,m.country,m.continent,m.unit,m.type,m.statusRaw,'mou cooperation agreement'].join(' ').toLowerCase(); }
 function matchContinent(m, key){ if (!key) return true; const v = (m.continent || '').toLowerCase(); const map = {asia:['asia','เอเชีย'],europe:['europe','ยุโรป'],america:['america','americas','อเมริกา'],oceania:['oceania','โอเชียเนีย','australia'],africa:['africa','แอฟริกา']}; return (map[key] || [key]).some(x => v.includes(x.toLowerCase())); }
@@ -137,13 +163,59 @@ function renderMap(data){ const msg = document.getElementById('mouMapMsg'); if (
 function drawUPPhayaoMarker(projection,dark,show,hide){ if (!publicMapLayer || !projection) return; const p = projection([99.9,19.03]); if (!p) return; const marker = publicMapLayer.append('g').attr('class','up-map-pin').attr('transform','translate('+p[0]+','+p[1]+')').style('cursor','default').on('mousemove',ev=>show('<strong>UP, Phayao</strong><br>University of Phayao',ev.offsetX,ev.offsetY)).on('mouseleave',hide); marker.append('circle').attr('r',14).attr('fill','rgba(245,166,35,.18)').attr('stroke','#F5A623').attr('stroke-width',1.6); marker.append('circle').attr('r',6).attr('fill','#F5A623').attr('stroke','#fff').attr('stroke-width',2).style('filter','drop-shadow(0 0 12px #F5A623)'); marker.append('path').attr('d','M0,-23 C8,-23 14,-17 14,-9 C14,2 0,16 0,16 C0,16 -14,2 -14,-9 C-14,-17 -8,-23 0,-23 Z').attr('fill',dark?'rgba(245,166,35,.95)':'#F5A623').attr('stroke','#fff').attr('stroke-width',1.3).attr('transform','translate(0,-12) scale(.72)'); marker.append('circle').attr('r',3.2).attr('cy',-18.5).attr('fill','#fff'); marker.append('text').attr('x',15).attr('y',-16).attr('fill','#fff').attr('font-size',12).attr('font-weight',900).text('UP, Phayao'); }
 function zoomPublicMouMap(factor){ if (!publicMapSvg || !publicMapZoom) return; publicMapSvg.transition().duration(220).call(publicMapZoom.scaleBy, factor); }
 function resetPublicMouMap(){ if (!publicMapSvg || !publicMapZoom) return; publicMapSvg.transition().duration(260).call(publicMapZoom.transform, d3.zoomIdentity); }
-function setLang(lang){ currentLang = lang; document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang)); const t = TEXT[lang]; document.getElementById('heroTitle').textContent = t.hero; document.getElementById('heroSub').textContent = t.sub; document.getElementById('labelTotal').textContent = t.total; document.getElementById('labelSoon').textContent = t.soon; document.getElementById('labelCountry').textContent = t.country; renderTable(allMou); }
+function normalizeLang(lang){ return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH'; }
+function setLang(lang){
+  currentLang = normalizeLang(lang);
+  localStorage.setItem('iroup_public_lang', currentLang);
+  document.documentElement.lang = currentLang === 'EN' ? 'en' : 'th';
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === currentLang));
+  const t = TEXT[currentLang];
+  const nav = document.querySelectorAll('.nav-link');
+  if (nav[0]) nav[0].textContent = t.navNews;
+  if (nav[1]) nav[1].textContent = t.navKnowledge;
+  if (nav[2]) nav[2].textContent = t.navScholar;
+  if (nav[3]) nav[3].textContent = t.navEvents;
+  document.title = (currentLang === 'EN' ? 'International MOUs' : 'ระบบ MOU ต่างประเทศ') + ' - iROUP';
+  document.getElementById('heroTitle').textContent = t.hero;
+  document.getElementById('heroSub').textContent = t.sub;
+  document.getElementById('labelTotal').textContent = t.total;
+  document.getElementById('labelSoon').textContent = t.soon;
+  document.getElementById('labelCountry').textContent = t.country;
+  const titles = document.querySelectorAll('.panel-title');
+  if (titles[0]) titles[0].textContent = t.mapTitle;
+  if (titles[1]) titles[1].textContent = t.chartTitle;
+  if (titles[2]) titles[2].textContent = t.tableTitle;
+  const subs = document.querySelectorAll('.panel-sub');
+  if (subs[0]) subs[0].textContent = t.mapSub;
+  if (subs[1]) subs[1].textContent = t.chartSub;
+  const search = document.getElementById('searchInput');
+  if (search) search.placeholder = t.searchPlaceholder;
+  const continent = document.getElementById('continentFilter');
+  if (continent) {
+    const labels = [t.allContinents,t.asia,t.europe,t.america,t.oceania,t.africa];
+    Array.from(continent.options).forEach((opt,i) => { if (labels[i]) opt.textContent = labels[i]; });
+  }
+  const pills = document.querySelectorAll('.pill');
+  const pillLabels = [t.all,t.active,t.expiredSoon,t.expired];
+  pills.forEach((pill,i) => { if (pillLabels[i]) pill.textContent = pillLabels[i]; });
+  const ths = document.querySelectorAll('.mou-table th');
+  const headLabels = ['#',t.thUnit,t.thPartner,t.thCountry,t.thType,t.thPeriod,t.thStatus];
+  ths.forEach((th,i) => { if (headLabels[i]) th.textContent = headLabels[i]; });
+  const loading = document.querySelector('#mouTableBody .loading');
+  if (loading) loading.textContent = t.loading;
+  const msg = document.getElementById('mouMapMsg');
+  if (msg) msg.textContent = t.loading;
+  const footer = document.querySelector('.footer');
+  if (footer) footer.textContent = t.footer;
+  renderTable(allMou);
+}
 function applyTheme(){ const theme = localStorage.getItem('iroup_public_theme') || 'dark'; document.documentElement.dataset.theme = theme; document.getElementById('themeToggle').textContent = theme === 'light' ? 'Light' : 'Dark'; }
 function toggleTheme(){ const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; localStorage.setItem('iroup_public_theme', next); applyTheme(); renderChart(allMou); renderMap(allMou); }
 document.querySelectorAll('.pill').forEach(btn => btn.addEventListener('click', function(){ document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); btn.classList.add('on'); currentStatus = btn.dataset.status || ''; filterTable(); }));
 document.getElementById('searchInput').addEventListener('input', filterTable);
 document.getElementById('continentFilter').addEventListener('change', filterTable);
 applyTheme();
+setLang(currentLang);
 loadData();
 </script>
 </body>
