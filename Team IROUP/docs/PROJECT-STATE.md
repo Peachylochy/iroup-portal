@@ -24,6 +24,9 @@ Completed:
   - loads `iroup-v2-api.js`
   - calls `v2.admin.dashboard.summary` with the Google access token
 - Removed the dashboard error copy that referenced `iroup-config.js` URL setup.
+- Added root `vercel.json` with `outputDirectory: "Team IROUP"` so Vercel serves
+  the static site from the actual app folder instead of producing an empty
+  deployment.
 
 Notes:
 
