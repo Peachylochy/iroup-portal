@@ -1,4 +1,4 @@
-const IROUP_PWA_CACHE = 'iroup-static-v1';
+const IROUP_PWA_CACHE = 'iroup-static-v2';
 
 const STATIC_ASSETS = [
   '/manifest-admin.webmanifest',
@@ -17,8 +17,10 @@ const STATIC_ASSETS = [
   '/assets/IROUP_LOGO.webp',
   '/assets/iroup-logo.png',
   '/assets/Globy_IROUP.png',
+  '/assets/app-icon-admin-180.png',
   '/assets/app-icon-admin-192.png',
   '/assets/app-icon-admin-512.png',
+  '/assets/app-icon-public-180.png',
   '/assets/app-icon-public-192.png',
   '/assets/app-icon-public-512.png',
   '/assets/landing-hero-earth-dark.webp',
