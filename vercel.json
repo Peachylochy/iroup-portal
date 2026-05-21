@@ -1,4 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "outputDirectory": "Team IROUP"
+  "outputDirectory": "Team IROUP",
+  "rewrites": [
+    {
+      "source": "/Team%20IROUP/(.*)",
+      "destination": "/$1"
+    },
+    {
+      "source": "/Team IROUP/(.*)",
+      "destination": "/$1"
+    }
+  ]
 }

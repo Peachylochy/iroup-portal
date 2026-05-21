@@ -2,7 +2,14 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2563EB">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="IROUP Public">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="../manifest-public.webmanifest">
+<link rel="apple-touch-icon" href="../assets/app-icon-public-192.png">
 <title>ทุนการศึกษา | iROUP</title>
 <script>
 (function(){
@@ -507,5 +514,6 @@ function unique(list){ return Array.from(new Set(list)); }
 function esc(value){ return String(value == null ? '' : value).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
 function escAttr(value){ return esc(value).replace(/`/g,'&#96;'); }
 </script>
+<script src="../js/pwa-register.js"></script>
 </body>
 </html>

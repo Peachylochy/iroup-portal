@@ -1,0 +1,26 @@
+{
+  "name": "IROUP Public",
+  "short_name": "IROUP Public",
+  "description": "Public international relations portal for University of Phayao.",
+  "id": "/Team%20IROUP/public/public-landing.html",
+  "start_url": "/Team%20IROUP/public/public-landing.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060F1E",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "/assets/app-icon-public-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/app-icon-public-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -8,6 +8,37 @@
 
 ---
 
+## Latest Dual PWA Install Support
+
+### Session: 2026-05-22 - Admin/Public PWA Targets
+
+Completed:
+
+- Added separate install manifests for two web-first PWA targets:
+  - `IROUP Admin` starts at `/Team%20IROUP/index.html`
+  - `IROUP Public` starts at `/Team%20IROUP/public/public-landing.html`
+- Generated padded PNG app icons for Android/iOS home-screen install:
+  - admin 192/512
+  - public 192/512
+- Added a conservative service worker that only caches same-origin static assets
+  such as CSS, JS shell files, icons, logos, manifests, fonts, and static images.
+- Explicitly avoids caching navigations/documents, API-like paths, export/report
+  paths, upload paths, and requests carrying sensitive query parameters.
+- Added PWA metadata and safe service-worker registration to:
+  - admin login entry (`index.html`)
+  - public landing and public detail/list pages
+- Updated Vercel rewrites so the requested `/Team%20IROUP/...` PWA start URLs
+  resolve correctly even though Vercel serves `Team IROUP` as the static root.
+
+Notes:
+
+- PWA support remains web-first. No native app runtime was introduced.
+- Admin authentication/session flow and V2 data adapters were not changed.
+- Backend Apps Script, CRUD, upload, export/report, and sessionStorage logic were
+  left untouched.
+
+---
+
 ## Latest V1 Frontend Retirement
 
 ### Session: 2026-05-21 - Remove V1 URL From Browser Runtime

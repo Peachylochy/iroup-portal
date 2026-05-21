@@ -2,7 +2,14 @@
 <html lang="th" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2563EB">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="IROUP Public">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="../manifest-public.webmanifest">
+<link rel="apple-touch-icon" href="../assets/app-icon-public-192.png">
 <title>Mobility | iROUP</title>
 <script>
 (function(){
@@ -453,5 +460,6 @@ function setupFilters(){ document.getElementById('searchInput').addEventListener
 async function init(){ updateThemeButton(); applyLanguage(false); try{ var res=await Promise.all([IROUP_V2.public.mobilityList(),IROUP_V2.public.travelList()]); if(!res[0].success) throw new Error(res[0].error||'Mobility API error'); if(!res[1].success) throw new Error(res[1].error||'Travel API error'); state.mobility=(res[0].data||[]).map(normalizeMobility); state.travel=(res[1].data||[]).map(normalizeTravel); fillCountryFilter(); setupFilters(); applyLanguage(false); renderAll(); }catch(err){ console.error(err); document.getElementById('mobilityCards').innerHTML='<div class="empty">'+tr('loadMobilityFail')+'</div>';  document.getElementById('travelTimeline').innerHTML='<div class="empty">'+tr('loadTravelFail')+'</div>';  } }
 init();
 </script>
+<script src="../js/pwa-register.js"></script>
 </body>
 </html>
