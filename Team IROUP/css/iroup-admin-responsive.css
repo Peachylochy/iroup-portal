@@ -314,6 +314,44 @@ body {
   #world-map {
     height: 300px !important;
   }
+
+  .map-card,
+  .chart-card,
+  .table-card {
+    border-radius: 18px !important;
+  }
+
+  .map-header,
+  .table-header,
+  .panel-head {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .map-legend,
+  .status-pills,
+  .table-actions {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .map-popup {
+    min-width: 0 !important;
+    width: calc(100% - 28px) !important;
+    max-width: calc(100% - 28px) !important;
+    padding: 14px !important;
+  }
+
+  .main-layout .table-wrap {
+    background: #fff;
+  }
+
+  .main-layout .table-card table {
+    min-width: 860px !important;
+  }
 }
 
 @media (max-width: 420px) {
@@ -352,5 +390,19 @@ body {
   .segmented {
     max-width: 100%;
     overflow-x: auto;
+  }
+
+  #world-map {
+    height: 240px !important;
+  }
+
+  .map-card {
+    max-height: 360px;
+  }
+
+  .map-title,
+  .chart-title,
+  .table-title {
+    font-size: 13px !important;
   }
 }

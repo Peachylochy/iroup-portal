@@ -4112,3 +4112,21 @@ Verification:
 - `git diff --check -- "Team IROUP/index.html"` passed with Windows CRLF warning
   only.
 - Inline script syntax passed for `index.html`.
+
+Admin mobile QA follow-up from phone screenshots:
+
+- Fixed shared admin top navigation on tablet/mobile:
+  - mobile sidebar nav no longer keeps desktop `flex:1`
+  - active menu pills no longer stretch vertically into tall blocks
+  - horizontal nav items now keep stable compact height
+- Tightened MOU-specific mobile surfaces through the shared responsive stylesheet:
+  - map/table/panel headers stack cleanly
+  - map legend and status pills scroll horizontally inside their row
+  - MOU map height is reduced on small phones
+  - map popup width is constrained to the viewport
+  - MOU table stays inside its horizontal scroll container
+
+Verification:
+
+- `git diff --check` passed with Windows CRLF warning only.
+- `js/iroup-sidebar.js` syntax passed.

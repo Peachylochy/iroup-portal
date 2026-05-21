@@ -121,9 +121,17 @@
         .main,.main-layout,.page{margin-left:0!important;width:100%!important}
         .ir-final-brand{height:auto;padding:14px 16px}
         .ir-final-brand img{width:104px;max-height:82px}
-        .ir-final-nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px}
+        .ir-final-nav{
+          display:flex;gap:6px;overflow-x:auto;padding:10px 12px;
+          flex:0 0 auto!important;align-items:center!important;min-height:0!important;
+          scroll-snap-type:x proximity;
+        }
         .ir-final-section{display:none}
-        .ir-final-link{width:auto;white-space:nowrap;margin-bottom:0}
+        .ir-final-link{
+          width:auto;white-space:nowrap;margin-bottom:0;flex:0 0 auto!important;
+          align-self:center!important;min-height:44px!important;height:auto!important;
+          scroll-snap-align:start;
+        }
         .ir-final-user{display:none}
       }
     `;
