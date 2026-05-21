@@ -4217,3 +4217,39 @@ Verification:
 - `git diff --check -- "Team IROUP/js/iroup-sidebar.js" "Team IROUP/mou.html"`
   passed.
 - Inline script syntax passed for `js/iroup-sidebar.js` and `mou.html`.
+
+PWA deployment follow-up:
+
+- Added dual PWA support for the admin and public portals.
+- Public app entry:
+  - `https://iroup-portal.vercel.app/public/public-landing.html`
+- Admin app entry:
+  - `https://iroup-portal.vercel.app/index.html`
+- Added separate web manifests:
+  - `manifest-public.webmanifest`
+  - `manifest-admin.webmanifest`
+- Added `service-worker.js` and shared `js/pwa-register.js`.
+- Added PWA app icons for public/admin in 180, 192, and 512 sizes.
+- Fixed the initial icon mismatch where manifests/iOS were using fallback PNG
+  icons instead of the generated globe app icons.
+- Fixed manifest `id` and `start_url` values to match the Vercel production
+  root paths instead of the local `Team%20IROUP` folder path.
+- Bumped the service worker cache to `iroup-static-v2` so updated icons/assets
+  are picked up by installed clients.
+- User confirmed the corrected mobile Add to Home Screen icon works.
+
+Verification:
+
+- `git diff --check` passed with Windows CRLF warning only.
+- JS syntax passed for `service-worker.js` and `js/pwa-register.js`.
+- JSON syntax passed for both manifests and `vercel.json`.
+- Static smoke test returned HTTP 200 for manifests, service worker,
+  registration script, icons, and core public pages.
+- Vercel production deployment for commit `9bd6d81` reached `READY`.
+
+Next session:
+
+- Re-open on the office computer and verify the mobile-installed public PWA
+  flow once more after cache settles.
+- Optionally add a small install/help note for internal users if people ask how
+  to Add to Home Screen on iPhone/Android.
