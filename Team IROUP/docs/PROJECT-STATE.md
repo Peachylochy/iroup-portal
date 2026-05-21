@@ -27,6 +27,11 @@ Completed:
 - Added root `vercel.json` with `outputDirectory: "Team IROUP"` so Vercel serves
   the static site from the actual app folder instead of producing an empty
   deployment.
+- Hotfixed Vercel login hang:
+  - Google OAuth/userinfo still verifies the signed-in browser identity.
+  - `index.html` now gates entry with a local admin email allowlist instead of
+    waiting on heavy `v2.admin.dashboard.summary` during login.
+  - Admin page data/actions remain protected by V2 backend token checks.
 
 Notes:
 

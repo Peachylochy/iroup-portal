@@ -754,6 +754,7 @@ body{
 // GOOGLE SIGN IN
 // ============================================================
 const GOOGLE_CLIENT_ID = '691790352317-ijpbb36rh3dti6gbqmtnsa0581thk4t2.apps.googleusercontent.com';
+const ADMIN_EMAIL_ALLOWLIST = ['panpancake17@gmail.com'];
 
 function signInWithGoogle() {
   showStatus('loading');
@@ -808,24 +809,12 @@ function completeAdminLogin(email, name, adminToken, googleAccessToken) {
 }
 
 async function checkAdminAccess(email, name, googleAccessToken) {
-  try {
-    if (!window.IROUP_V2 || typeof IROUP_V2.request !== 'function') {
-      throw new Error('IROUP_V2 is not available');
-    }
-    const data = await IROUP_V2.request(
-      'v2.admin.dashboard.summary',
-      { googleAccessToken },
-      { auth: true, timeoutMs: 120000 }
-    );
-
-    if (data && data.success) {
-      completeAdminLogin(email, name, '', googleAccessToken);
-    } else {
-      showStatus('denied', email);
-    }
-  } catch(e) {
-    showStatus('error', 'ตรวจสอบสิทธิ์ผู้ดูแลผ่าน V2 ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (ADMIN_EMAIL_ALLOWLIST.includes(normalizedEmail)) {
+    completeAdminLogin(email, name, '', googleAccessToken);
+    return;
   }
+  showStatus('denied', email);
 }
 
 // ============================================================
