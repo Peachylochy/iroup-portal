@@ -747,6 +747,8 @@ body{
      PROTECTED ZONE — SCRIPTS UNTOUCHED FROM STEP 1
 ══════════════════════════════════════════════════ -->
 <script src="js/iroup-config.js"></script>
+<script src="js/iroup-v2-endpoint.js"></script>
+<script src="js/iroup-v2-api.js"></script>
 <script>
 // ============================================================
 // GOOGLE SIGN IN
@@ -775,12 +777,6 @@ async function handleGoogleResponse(response) {
     const profile = await profileRes.json();
     const email   = profile.email;
     const name    = profile.name;
-    const session = await IROUP.createAdminSession(response.access_token);
-    if (session && session.success && session.allowed && session.adminToken) {
-      completeAdminLogin(email, name, session.adminToken, response.access_token);
-      return;
-    }
-
     await checkAdminAccess(email, name, response.access_token);
   } catch(e) {
     try {
@@ -813,22 +809,22 @@ function completeAdminLogin(email, name, adminToken, googleAccessToken) {
 
 async function checkAdminAccess(email, name, googleAccessToken) {
   try {
-    const url = `${IROUP.SCRIPT_URL}?action=checkAdmin&email=${encodeURIComponent(email)}`;
-    const res  = await fetch(url);
-    const data = await res.json();
+    if (!window.IROUP_V2 || typeof IROUP_V2.request !== 'function') {
+      throw new Error('IROUP_V2 is not available');
+    }
+    const data = await IROUP_V2.request(
+      'v2.admin.dashboard.summary',
+      { googleAccessToken },
+      { auth: true, timeoutMs: 120000 }
+    );
 
-    if (data.allowed) {
+    if (data && data.success) {
       completeAdminLogin(email, name, '', googleAccessToken);
     } else {
       showStatus('denied', email);
     }
   } catch(e) {
-    const ALLOWED = ['panpancake17@gmail.com'];
-    if (ALLOWED.includes(email)) {
-      completeAdminLogin(email, name, '', googleAccessToken);
-    } else {
-      showStatus('denied', email);
-    }
+    showStatus('error', 'ตรวจสอบสิทธิ์ผู้ดูแลผ่าน V2 ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
   }
 }
 

@@ -8,6 +8,33 @@
 
 ---
 
+## Latest V1 Frontend Retirement
+
+### Session: 2026-05-21 - Remove V1 URL From Browser Runtime
+
+Completed:
+
+- Retired V1 Apps Script traffic from the frontend runtime.
+- Replaced `js/iroup-config.js` with a helper-only shim:
+  - no hardcoded V1 Apps Script deployment URL
+  - no V1 fetch/write/upload helper methods
+  - keeps session lookup, status, date, and sheet-name helpers for existing pages
+- Updated `index.html` admin login to verify access through V2:
+  - loads `iroup-v2-endpoint.js`
+  - loads `iroup-v2-api.js`
+  - calls `v2.admin.dashboard.summary` with the Google access token
+- Removed the dashboard error copy that referenced `iroup-config.js` URL setup.
+
+Notes:
+
+- V2 endpoint visibility is still a separate deployment concern. For Vercel, hide
+  the V2 Apps Script URL behind a Vercel API proxy and store the real endpoint in
+  Vercel Environment Variables.
+- The legacy `backend/Code.gs` file remains in the repo as archived source only;
+  frontend pages no longer need its V1 deployment URL.
+
+---
+
 ## Latest Public NEWS & Knowledge V2 Activation + UX Alignment
 
 ### Session: 2026-05-17 - Public NEWS & Knowledge V2 Activation + UX Alignment

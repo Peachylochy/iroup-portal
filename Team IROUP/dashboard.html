@@ -747,7 +747,7 @@ async function reloadData(force=false){
     buildYearOptions();
     render();
   }catch(err){
-    $('#appContent').innerHTML=`<div class="panel"><div class="empty">โหลดข้อมูลไม่ได้<br><b>${IU.esc(err.message)}</b><br><br>เช็กว่า Apps Script Deploy เวอร์ชันล่าสุดแล้ว และ URL ใน iroup-config.js ถูกต้อง</div></div>`;
+    $('#appContent').innerHTML=`<div class="panel"><div class="empty">โหลดข้อมูลไม่ได้<br><b>${IU.esc(err.message)}</b><br><br>เช็กว่า Apps Script Deploy เวอร์ชันล่าสุดแล้ว และ V2 endpoint ถูกต้อง</div></div>`;
   }finally{
     state.loading=false;
   }
