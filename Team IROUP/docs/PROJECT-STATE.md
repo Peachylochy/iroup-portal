@@ -1,5 +1,5 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-22 | Session: Upload Optimization + Partner Directory Planning**
+**Last updated: 2026-05-22 | Session: Student/Staff Intake Handoff**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
@@ -122,6 +122,16 @@ Unit mapping readiness:
 
 Next:
 
+- At home / next session:
+  - Upload the changed Apps Script `.gs` files if not already done.
+  - Run `cleanupV2SampleData()` to remove sample/test rows from V2 sheets.
+  - Confirm `PERSON_STUDENT` and `PERSON_STAFF` headers remain intact after
+    cleanup.
+  - Run `generateIROUPDatabaseV2()` after the header change to refresh formatting
+    and validation.
+  - Check which public/admin web pages still show old data after cleanup; any
+    remaining rows may be V1 data, non-`TEST-*` sample rows, or cached browser
+    output.
 - Create a local-only import staging/mapping workflow that produces sanitized
   `PERSON_STUDENT` and `PERSON_STAFF` rows without committing raw data.
 - Add or approve missing `UP_UNIT_MASTER` rows/aliases before live import.

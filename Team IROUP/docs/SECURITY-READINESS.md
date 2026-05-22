@@ -97,6 +97,10 @@ Phayao student and staff data is added to IROUP V2.
 
 ## Open Follow-Ups
 
+- Before live person import, remove sample/test rows with
+  `cleanupV2SampleData()` and verify no real rows are removed.
+- After cleanup, run `generateIROUPDatabaseV2()` to refresh formatting and
+  validation for the updated `PERSON_STUDENT` header.
 - Add a live endpoint smoke checklist after the real data import.
 - Review whether `gender` is still necessary for Mobility participant snapshots.
 - Confirm the official student form/source always provides `student_id`; staff

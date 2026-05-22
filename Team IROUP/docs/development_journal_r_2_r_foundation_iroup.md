@@ -3483,3 +3483,12 @@ R2R significance:
   auditable mapping over speed.
 - The workflow should prevent silent loss of organizational context by requiring
   unresolved units to be approved or added to the unit master before import.
+
+Handoff for the next work session:
+- Upload the changed Apps Script files before running sheet functions.
+- Run `cleanupV2SampleData()` to remove fake/sample V2 rows from the live
+  workbook before real person import.
+- Run `generateIROUPDatabaseV2()` after the `PERSON_STUDENT` header update so
+  formatting and validation match the new schema.
+- If web pages still show old content after cleanup, inspect whether the source
+  is V1 data, non-sample IDs, or browser/public cache before deleting anything.
