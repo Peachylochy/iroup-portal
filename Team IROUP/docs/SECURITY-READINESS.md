@@ -9,8 +9,10 @@ Phayao student and staff data is added to IROUP V2.
 - `v2.lookup.students` is admin-only.
 - `v2.lookup.staff` is admin-only.
 - Real intake files have arrived locally under
-  `docs/DATA_MASTER_ Students_Staff/`; this folder is local-only and must not be
-  committed to git.
+  `D:\DATA_MASTER_ Students_Staff\`; this folder is outside the git workspace and
+  must remain local-only.
+- Live V2 sample/test data cleanup has been performed, with MOU preserved and
+  `FILES` left untouched pending a narrow relation cleanup pass.
 - Mobility and Travel admin pages send V2 admin auth when loading person lookup
   data.
 - Mobility and Travel use admin-only server-side person search instead of loading
@@ -98,7 +100,9 @@ Phayao student and staff data is added to IROUP V2.
 ## Open Follow-Ups
 
 - Before live person import, remove sample/test rows with
-  `cleanupV2SampleData()` and verify no real rows are removed.
+  `cleanupV2SampleData()` and verify no real rows are removed. Initial cleanup
+  was run successfully on 2026-05-22; continue to inspect any remaining
+  non-`TEST-*` rows before deleting them.
 - After cleanup, run `generateIROUPDatabaseV2()` to refresh formatting and
   validation for the updated `PERSON_STUDENT` header.
 - Add a live endpoint smoke checklist after the real data import.

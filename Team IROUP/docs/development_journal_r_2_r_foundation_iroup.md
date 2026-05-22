@@ -3462,8 +3462,8 @@ for the first live person-data intake pass. The files are treated as restricted
 person-level data and were inspected only for structure and aggregate readiness.
 
 Operational findings:
-- Raw files are stored locally under `docs/DATA_MASTER_ Students_Staff/` and
-  must not be committed to git.
+- Raw files are stored locally outside the git workspace under
+  `D:\DATA_MASTER_ Students_Staff\` and must not be committed to git.
 - The source files are legacy `.xls` files and do not include header rows; row 1
   is already a real data row.
 - Student source: 22,838 rows, 12 columns, unique stable IDs, no blank IDs.
@@ -3492,3 +3492,14 @@ Handoff for the next work session:
   formatting and validation match the new schema.
 - If web pages still show old content after cleanup, inspect whether the source
   is V1 data, non-sample IDs, or browser/public cache before deleting anything.
+
+Follow-up completed at home:
+- Latest Apps Script changes were uploaded/deployed.
+- `cleanupV2SampleData()` ran successfully.
+- Remaining test rows were manually cleaned from the live V2 workbook, while MOU
+  data was preserved.
+- `PERSON_STUDENT`, `PERSON_STAFF`, and `MOBILITY_PROJECT` test data were
+  cleared in preparation for real intake.
+- `FILES` was intentionally kept for a later, narrow cleanup so MOU file
+  relations are not disturbed.
+- The user confirmed that the system remained connected after cleanup.

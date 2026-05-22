@@ -1,10 +1,61 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-22 | Session: Student/Staff Intake Handoff**
+**Last updated: 2026-05-22 | Session: Home Cleanup + Real Intake Prep**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest Home Cleanup + Real Intake Prep
+
+### Session: 2026-05-22 - V2 Test Data Cleanup Confirmed
+
+Completed:
+
+- User confirmed the latest Apps Script changes were uploaded/deployed.
+- User ran `cleanupV2SampleData()` successfully:
+  - execution started at 8:01 PM
+  - execution completed at 8:01 PM
+- User confirmed V2 headers were added/kept for `PERSON_STUDENT` and
+  `PERSON_STAFF`.
+- User moved the real student/staff master files outside the repository to:
+  - `D:\DATA_MASTER_ Students_Staff\STUDENT_MASTER _DATA.xls`
+  - `D:\DATA_MASTER_ Students_Staff\STAFF_MASTER _DATA.xls`
+  - `D:\DATA_MASTER_ Students_Staff\IMPORT_STAGING_NOTES.md`
+- User manually cleaned remaining test data from the live V2 workbook while
+  preserving MOU data.
+- `KNOWLEDGE` delete behavior was verified as V2 soft delete:
+  - admin delete sets `is_deleted = TRUE`
+  - the row may remain in the sheet as an audit trail
+  - public/admin list routes should exclude soft-deleted rows
+- User cleaned test rows from:
+  - `PERSON_STUDENT`
+  - `PERSON_STAFF`
+  - `MOBILITY_PROJECT`
+  - related test participant/budget rows where applicable
+- `FILES` was intentionally left untouched for now to avoid accidental impact on
+  MOU file relations.
+- User confirmed all remaining system connections still work after cleanup.
+
+Safety status:
+
+- Raw person-level master files remain local-only outside the git workspace.
+- Do not import real student/staff rows until `UP_UNIT_MASTER` mapping is
+  approved for all unmatched source unit names.
+- Keep MOU and shared master/lookup sheets intact.
+- Clean `FILES` later only with narrow filters by `module` and `record_id`.
+
+Next:
+
+- Prepare a reviewed unit-mapping table for the remaining unmatched student/staff
+  source unit names.
+- After unit mapping is approved, build a local-only import transformer that
+  outputs sanitized `PERSON_STUDENT` and `PERSON_STAFF` staging rows without
+  committing raw data.
+- Import into a test/staging copy first, then run authenticated person lookup
+  checks before live use.
 
 ---
 
@@ -77,13 +128,17 @@ Next:
 
 Source files received locally:
 
-- `docs/DATA_MASTER_ Students_Staff/STUDENT_MASTER _DATA.xls`
-- `docs/DATA_MASTER_ Students_Staff/STAFF_MASTER _DATA.xls`
+- `D:\DATA_MASTER_ Students_Staff\STUDENT_MASTER _DATA.xls`
+- `D:\DATA_MASTER_ Students_Staff\STAFF_MASTER _DATA.xls`
+- `D:\DATA_MASTER_ Students_Staff\IMPORT_STAGING_NOTES.md`
 
 Safety status:
 
-- Raw files are real person-level data and must stay local-only.
+- Raw files are real person-level data and must stay local-only outside the git
+  workspace.
 - Added `.gitignore` protection for `Team IROUP/docs/DATA_MASTER_ Students_Staff/`.
+- User moved the active local-only intake folder to `D:\DATA_MASTER_ Students_Staff`
+  so raw person data is no longer stored under the repository tree.
 - Files were inspected read-only for structure and aggregate readiness only; do
   not paste row-level names, IDs, or screenshots into public notes/issues.
 
