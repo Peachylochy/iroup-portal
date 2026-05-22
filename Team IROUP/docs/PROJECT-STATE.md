@@ -10,6 +10,42 @@
 
 ## Latest Home Cleanup + Real Intake Prep
 
+### Session: 2026-05-22 - Unit Mapping Review Workbook
+
+Completed:
+
+- Added local tooling to generate a unit-mapping review workbook from the real
+  student/staff master files without exporting person-level rows:
+  - `tools/extract_unit_mapping_review.ps1`
+  - `tools/build_unit_mapping_review.mjs`
+- Generated local-only aggregate review files under `D:\DATA_MASTER_ Students_Staff\`:
+  - `unit_mapping_review_data.json`
+  - `UP_UNIT_MAPPING_REVIEW_2026-05-22.xlsx`
+- The workbook contains:
+  - `Summary`
+  - `Mapping Review`
+  - `UP_UNIT_MASTER`
+  - `Needs Review`
+- Verification matched the prior intake readiness counts:
+  - Student rows: 22,838
+  - Staff rows: 3,742
+  - Student distinct units: 20, with 1 requiring review
+  - Staff distinct units: 55, with 25 requiring review
+  - Total mapping rows requiring review: 26
+
+Next:
+
+- Review the `Needs Review` sheet and approve one action for each unmatched unit:
+  - use an existing unit
+  - add an active unit
+  - add an inactive/historical unit
+  - map to a parent unit
+  - exclude/hold until confirmed
+- Do not run the real person import until every source unit has an approved
+  `unit_id`.
+
+---
+
 ### Session: 2026-05-22 - V2 Test Data Cleanup Confirmed
 
 Completed:
