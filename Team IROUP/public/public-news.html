@@ -17,6 +17,7 @@
   document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
+<script src="../js/iroup-sdg-icons.js"></script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -84,7 +85,8 @@ button,input,select{font:inherit}
 .more{position:absolute;top:12px;right:12px;width:32px;height:26px;border-radius:999px;background:rgba(7,17,31,.58);color:#fff;display:grid;place-items:center;font-weight:900;border:1px solid rgba(255,255,255,.14)}
 .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
 .badges{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:900;font-family:'Sarabun',sans-serif}
-.badge.category{background:rgba(94,227,140,.13);color:var(--green)}.badge.sdg{background:rgba(247,183,51,.13);color:var(--gold)}
+.badge.category{background:rgba(94,227,140,.13);color:var(--green)}.badge.sdg{background:color-mix(in srgb,var(--sdg-color,var(--gold)) 18%,transparent);color:#fff;border:1px solid color-mix(in srgb,var(--sdg-color,var(--gold)) 55%,transparent)}
+.sdg-badge{gap:6px;padding:3px 8px 3px 4px}.sdg-icon-img{width:24px;height:24px;border-radius:5px;object-fit:cover;display:block}.sdg-badge-label{line-height:1}
 .title{font-size:16px;font-weight:900;line-height:1.45;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .excerpt{font-family:'Sarabun',sans-serif;color:var(--muted);font-size:13.5px;line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .footer-row{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-family:'Sarabun',sans-serif;font-size:12.5px}
@@ -359,7 +361,10 @@ function displayTitle(item){ return currentLang === 'EN' ? item.title_en || item
 function displayContent(item){ return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en; }
 
 function renderSdgBadges(value){
-  return parseTags(value).slice(0,3).map(function(tag){ return '<span class="badge sdg">SDG ' + esc(tag) + '</span>'; }).join('');
+  return parseTags(value).slice(0,3).map(function(tag){
+    if(window.IROUP_SDG_ICONS) return IROUP_SDG_ICONS.renderBadge(tag, { lang: currentLang === 'EN' ? 'en' : 'th', label: 'SDG ' + tag });
+    return '<span class="badge sdg">SDG ' + esc(tag) + '</span>';
+  }).join('');
 }
 
 function renderFileChips(item){

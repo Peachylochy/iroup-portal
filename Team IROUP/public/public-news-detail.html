@@ -18,6 +18,7 @@
 })();
 </script>
 <script src="../js/iroup-rich-lite.js"></script>
+<script src="../js/iroup-sdg-icons.js"></script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -62,7 +63,8 @@ a{color:inherit;text-decoration:none}button{font:inherit}
 .hero-inner{width:min(1080px,90%);margin:0 auto;padding:12px 0 26px}
 .back-link{display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-size:13px;font-weight:900;margin-bottom:20px}
 .badges{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:11.5px;font-weight:900;font-family:'Sarabun',sans-serif}
-.badge.category{background:rgba(94,227,140,.13);color:var(--green)}.badge.sdg{background:rgba(247,183,51,.13);color:var(--gold)}
+.badge.category{background:rgba(94,227,140,.13);color:var(--green)}.badge.sdg{background:color-mix(in srgb,var(--sdg-color,var(--gold)) 18%,transparent);color:#fff;border:1px solid color-mix(in srgb,var(--sdg-color,var(--gold)) 55%,transparent)}
+.sdg-badge{gap:6px;padding:3px 8px 3px 4px}.sdg-icon-img{width:26px;height:26px;border-radius:5px;object-fit:cover;display:block}.sdg-badge-label{line-height:1}
 h1{font-size:clamp(30px,4.6vw,56px);line-height:1.18;font-weight:900;letter-spacing:0;color:var(--text);max-width:840px}
 .meta{margin-top:14px;color:var(--muted);font-size:13px;font-family:'Sarabun',sans-serif}
 .cover{width:min(1080px,90%);margin:8px auto -52px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,rgba(35,135,255,.14),rgba(43,216,255,.08)),var(--surface-3);box-shadow:var(--shadow);aspect-ratio:16/8;display:grid;place-items:center;color:var(--blue);font-size:48px;font-weight:900;border:1px solid var(--line)}
@@ -313,7 +315,7 @@ function showError(message){
 function displayTitle(item){ return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en; }
 function displayContent(item){ return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en; }
 function renderRichContent(value){ return window.IROUP_RICH_LITE ? IROUP_RICH_LITE.render(value) : esc(value); }
-function renderSdgBadges(value){ return parseTags(value).slice(0,4).map(function(tag){ return '<span class="badge sdg">SDG ' + esc(tag) + '</span>'; }).join(''); }
+function renderSdgBadges(value){ return parseTags(value).slice(0,4).map(function(tag){ return window.IROUP_SDG_ICONS ? IROUP_SDG_ICONS.renderBadge(tag, { lang: currentLang === 'EN' ? 'en' : 'th', label: 'SDG ' + tag }) : '<span class="badge sdg">SDG ' + esc(tag) + '</span>'; }).join(''); }
 
 function collectFiles(row){
   var groups = [];

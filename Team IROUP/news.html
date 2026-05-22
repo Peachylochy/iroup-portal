@@ -12,6 +12,7 @@
   <script src="js/iroup-utils.js"></script>
   <script src="js/iroup-image-helper.js"></script>
   <script src="js/iroup-rich-lite.js"></script>
+  <script src="js/iroup-sdg-icons.js"></script>
   <script src="js/iroup-admin-guard.js"></script>
   <style>
     :root{--blue:#0B74B8;--navy:#10294f;--ink:#15243b;--muted:#6b7f96;--line:#e6edf6;--soft:#eef7ff;--bg:#f5f8fc;--ok:#15803d;--warn:#b7791f;--danger:#c2410c}
@@ -49,7 +50,8 @@
     .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;background:#edf5ff;color:#075985;border:1px solid #cce7ff}
     .badge.public{background:#eaf8ee;color:var(--ok);border-color:#ccebd4}
     .badge.private{background:#f7f7f8;color:#596579;border-color:#e3e7ee}
-    .badge.sdg{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+    .badge.sdg{background:color-mix(in srgb,var(--sdg-color,#f59e0b) 12%,#fff);color:var(--sdg-color,#9a3412);border-color:color-mix(in srgb,var(--sdg-color,#f59e0b) 35%,#fff)}
+    .sdg-badge .sdg-icon-img{width:22px;height:22px;border-radius:5px;object-fit:cover;display:block}
     .card-actions{display:flex;gap:8px;margin-top:auto}
     .list-wrap{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;box-shadow:0 12px 28px rgba(21,36,59,.08)}
     table{width:100%;border-collapse:collapse;min-width:920px}
@@ -76,9 +78,12 @@
     .field.full{grid-column:1/-1}.label{display:block;font-size:13px;font-weight:900;color:var(--navy);margin-bottom:7px}.required{color:#c1121f}
     .toggle-line{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--navy)}
     .toggle-line input{width:18px;height:18px}
-    .sdg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .sdg-item{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;font-weight:800;color:#20324d;background:#fbfdff}
-    .sdg-item input{margin-top:3px}
+    .sdg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
+    .sdg-item{border:1px solid var(--line);border-radius:12px;padding:8px;display:grid;gap:8px;font-weight:800;color:#20324d;background:#fbfdff;cursor:pointer}
+    .sdg-item input{position:absolute;opacity:0;pointer-events:none}
+    .sdg-item img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;display:block;background:#eef3f8}
+    .sdg-item span{font-size:12px;line-height:1.35}
+    .sdg-item:has(input:checked){border-color:var(--sdg-color,var(--blue));box-shadow:0 0 0 3px color-mix(in srgb,var(--sdg-color,var(--blue)) 18%,transparent);background:#fff}
     .file-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .preview{width:220px;height:130px;border:1px dashed #bed2e6;border-radius:14px;background:#f8fbff;display:grid;place-items:center;color:var(--muted);font-weight:900;overflow:hidden;position:relative}
     .preview img{width:100%;height:100%;object-fit:cover;display:block}
@@ -564,8 +569,9 @@
       $('#sdgCheckboxes').innerHTML = Array.from({ length: 17 }, (_, index) => {
         const id = String(index + 1);
         return `
-          <label class="sdg-item">
+          <label class="sdg-item" style="--sdg-color:${escAttr(sdgColor(id))}">
             <input type="checkbox" name="sdgTag" value="${id}">
+            ${renderSdgIconImage(id)}
             <span>SDG-${id} ${esc(SDG_NAMES[id])}</span>
           </label>
         `;
@@ -981,7 +987,21 @@
     }
 
     function renderSdgBadges(value) {
-      return parseSdgTags(value).map(tag => `<span class="badge sdg">SDG-${esc(tag)}</span>`).join('');
+      return parseSdgTags(value).map(tag => renderSdgBadge(tag)).join('');
+    }
+
+    function renderSdgIconImage(tag) {
+      if (window.IROUP_SDG_ICONS) return IROUP_SDG_ICONS.renderIcon(tag, { lang: 'th', label: 'SDG ' + tag });
+      return '<span>SDG-' + esc(tag) + '</span>';
+    }
+
+    function renderSdgBadge(tag) {
+      if (window.IROUP_SDG_ICONS) return IROUP_SDG_ICONS.renderBadge(tag, { lang: 'th', label: 'SDG-' + tag });
+      return `<span class="badge sdg">SDG-${esc(tag)}</span>`;
+    }
+
+    function sdgColor(tag) {
+      return window.IROUP_SDG_ICONS ? IROUP_SDG_ICONS.color(tag) : '#f59e0b';
     }
 
     function displayTitle(row) {

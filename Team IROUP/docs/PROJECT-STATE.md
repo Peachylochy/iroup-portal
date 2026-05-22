@@ -4723,3 +4723,32 @@ Rich text content follow-up, 2026-05-23:
   - `public/public-scholar-detail.html ok`
   - `public/public-events.html ok`
   - `public/public-events-detail.html ok`
+
+SDG icon assets follow-up, 2026-05-23:
+
+- Added `assets/sdg/` asset structure for official SDG artwork.
+- Current source files:
+  - English icons: `assets/sdg/en/E-WEB-Goal-01.png` through
+    `E-WEB-Goal-17.png`
+  - Thai icons: `assets/sdg/th/SDG-1.png` through `SDG-17.png`
+  - Additional reference assets: SDG wheel and UN-emblem source image.
+- Added optimized WebP thumbnails for UI use:
+  - `assets/sdg/thumb/en/sdg-01.webp` through `sdg-17.webp`
+  - `assets/sdg/thumb/th/sdg-01.webp` through `sdg-17.webp`
+- Added shared helper `js/iroup-sdg-icons.js`.
+  - Maps numeric `sdg_tags` values such as `1,4,17` to the local icon assets.
+  - Uses thumbnails by default and keeps original PNGs available with
+    `size: 'full'` when needed.
+  - Includes official SDG HEX colours for badge fallback/styling.
+- News admin now displays SDG selection as icon tiles instead of plain checkbox
+  rows.
+- Public News card/detail pages now display SDG icon badges with text fallback if
+  an image is missing.
+- Thumbnail optimization reduced first-load SDG icon payload from roughly
+  545-920 KB per language source set to roughly 84-90 KB per language thumbnail
+  set.
+- Syntax check passed:
+  - `js/iroup-sdg-icons.js ok`
+  - `news.html ok`
+  - `public/public-news.html ok`
+  - `public/public-news-detail.html ok`
