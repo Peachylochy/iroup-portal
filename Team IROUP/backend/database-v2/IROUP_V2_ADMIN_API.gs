@@ -3172,6 +3172,10 @@ function normalizeV2PersonWritePayload_(payload) {
   let person = null;
   if (type === 'student') {
     const studentId = cleanV2EventText_(source.student_id || source.person_id || '');
+    const prefixEn = cleanV2EventText_(source.prefix_en || '');
+    const firstNameEn = cleanV2EventText_(source.first_name_en || '');
+    const lastNameEn = cleanV2EventText_(source.last_name_en || '');
+    const fullNameEn = cleanV2EventText_(source.full_name_en || [prefixEn, firstNameEn, lastNameEn].filter(function (value) { return !!value; }).join(' '));
     if (!studentId) errors.push({ field: 'student_id', code: 'STUDENT_ID_REQUIRED', message: 'student_id is required for student records.' });
     person = {
       student_id: studentId,
@@ -3179,6 +3183,10 @@ function normalizeV2PersonWritePayload_(payload) {
       first_name_th: firstNameTh,
       last_name_th: lastNameTh,
       full_name_th: fullNameTh,
+      prefix_en: prefixEn,
+      first_name_en: firstNameEn,
+      last_name_en: lastNameEn,
+      full_name_en: fullNameEn,
       gender: cleanV2EventText_(source.gender || ''),
       unit_id: unitId,
       program_th: cleanV2EventText_(source.program_th || source.program_or_position || ''),

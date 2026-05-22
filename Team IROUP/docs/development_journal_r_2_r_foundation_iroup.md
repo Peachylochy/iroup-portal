@@ -3436,6 +3436,15 @@ Partner directory planning:
   4. Add logo upload using the existing V2 `FILES` relation.
   5. Build a public partner-network page only from public-safe institution data.
 
+Thai naming decision:
+- Staff-facing admin module name: `เครือข่ายความร่วมมือ`.
+- `INSTITUTION` should display as `ข้อมูลสถาบัน/องค์กร`.
+- `CONTACT_PERSON` should display as `ข้อมูลผู้ประสานงาน/บุคคลติดต่อ`.
+- `CONTACT_INTERACTION` should display as `ประวัติการติดต่อ/การหารือ`.
+- Backend and sheet identifiers should stay in stable English, while admin UI
+  labels use Thai so staff can understand the workflow without needing to know
+  the technical table names.
+
 Research framing:
 - The partner directory supports institutional memory. It converts informal
   relationship artifacts such as business cards, meeting notes, and email
@@ -3443,3 +3452,34 @@ Research framing:
 - The later public logo-network visualization can communicate international
   collaboration breadth without exposing personal data or internal relationship
   notes.
+
+---
+
+## Student/Staff Master Intake Readiness (2026-05-22)
+
+Real University of Phayao student and staff master files were received locally
+for the first live person-data intake pass. The files are treated as restricted
+person-level data and were inspected only for structure and aggregate readiness.
+
+Operational findings:
+- Raw files are stored locally under `docs/DATA_MASTER_ Students_Staff/` and
+  must not be committed to git.
+- The source files are legacy `.xls` files and do not include header rows; row 1
+  is already a real data row.
+- Student source: 22,838 rows, 12 columns, unique stable IDs, no blank IDs.
+- Staff source: 3,742 rows, 13 columns, unique stable IDs, no blank IDs, and 1
+  blank full-name row requiring review.
+- Source unit names must be mapped to `UP_UNIT_MASTER.unit_id` before writing to
+  `PERSON_STUDENT` or `PERSON_STAFF`.
+- Student units are mostly ready: 19 of 20 distinct unit names already match the
+  current unit master.
+- Staff units require more review: 30 of 55 distinct unit names match; remaining
+  values include historical/closed units and administrative offices.
+
+R2R significance:
+- This is the point where the system moves from prototype/sample data toward
+  real institutional operations.
+- The import process must prioritize data minimization, admin-only access, and
+  auditable mapping over speed.
+- The workflow should prevent silent loss of organizational context by requiring
+  unresolved units to be approved or added to the unit master before import.

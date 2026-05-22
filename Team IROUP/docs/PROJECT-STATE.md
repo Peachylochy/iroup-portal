@@ -47,6 +47,13 @@ Planning outcome:
   - `INSTITUTION`
   - `CONTACT_PERSON`
   - later `CONTACT_INTERACTION`
+- Locked Thai naming for staff-facing admin UI:
+  - Admin menu/module: `เครือข่ายความร่วมมือ`
+  - `INSTITUTION`: `ข้อมูลสถาบัน/องค์กร`
+  - `CONTACT_PERSON`: `ข้อมูลผู้ประสานงาน/บุคคลติดต่อ`
+  - `CONTACT_INTERACTION`: `ประวัติการติดต่อ/การหารือ`
+- Keep backend/sheet identifiers in stable English while showing the Thai labels
+  in the admin UI.
 - Institution records should support public-safe fields and logo uploads.
 - Contact/person data, business cards, email details, and internal notes must
   remain admin-only.
@@ -57,9 +64,68 @@ Next:
 
 - Commit or otherwise preserve the upload optimization change before starting
   the new partner-directory feature.
-- Design V2 schema for `INSTITUTION` first, then add admin routes/UI.
+- Design V2 schema for `INSTITUTION` first, then add admin routes/UI under
+  `เครือข่ายความร่วมมือ`.
 - Add public network visualization only after institution/logo data is clean and
   privacy boundaries are enforced.
+
+---
+
+## Latest Student/Staff Master Intake
+
+### Session: 2026-05-22 - Real Person Master Files Received
+
+Source files received locally:
+
+- `docs/DATA_MASTER_ Students_Staff/STUDENT_MASTER _DATA.xls`
+- `docs/DATA_MASTER_ Students_Staff/STAFF_MASTER _DATA.xls`
+
+Safety status:
+
+- Raw files are real person-level data and must stay local-only.
+- Added `.gitignore` protection for `Team IROUP/docs/DATA_MASTER_ Students_Staff/`.
+- Files were inspected read-only for structure and aggregate readiness only; do
+  not paste row-level names, IDs, or screenshots into public notes/issues.
+
+Detected structure:
+
+- Student file: 22,838 rows, 12 columns, no header row.
+- Staff file: 3,742 rows, 13 columns, no header row.
+- Both files use row 1 as data, not headers.
+- Stable ID columns appear unique in both files:
+  - student: 22,838 unique IDs, 0 duplicate ID rows, 0 blank IDs
+  - staff: 3,742 unique IDs, 0 duplicate ID rows, 0 blank IDs
+- Staff file has 1 blank full-name row that should be reviewed before import.
+
+Import mapping direction:
+
+- Student source columns should map to:
+  `student_id`, `prefix_th`, `first_name_th`, `last_name_th`, `full_name_th`,
+  `prefix_en`, `first_name_en`, `last_name_en`, `full_name_en`, source unit
+  name, and `program_th`.
+- Staff source columns should map to:
+  `staff_id`, `prefix_th`, `first_name_th`, `last_name_th`, English name parts,
+  `full_name_th`, `full_name_en`, `gender`, source unit name, `position`, and
+  `staff_type`.
+- Source unit names must be converted to `UP_UNIT_MASTER.unit_id` before writing
+  to `PERSON_STUDENT` or `PERSON_STAFF`.
+- `PERSON_STUDENT` schema was updated to retain student English-name fields
+  from the source file.
+
+Unit mapping readiness:
+
+- Student source has 20 distinct unit names; 19 match current `UP_UNIT_MASTER`.
+  `วิทยาเขตเชียงราย` still needs an approved unit mapping or new master row.
+- Staff source has 55 distinct unit names; 30 match current `UP_UNIT_MASTER`.
+  25 unmatched values are mostly historical/closed units or administrative
+  offices that need approval before import.
+
+Next:
+
+- Create a local-only import staging/mapping workflow that produces sanitized
+  `PERSON_STUDENT` and `PERSON_STAFF` rows without committing raw data.
+- Add or approve missing `UP_UNIT_MASTER` rows/aliases before live import.
+- Import into a test/staging copy first, then run authenticated lookup checks.
 
 ---
 

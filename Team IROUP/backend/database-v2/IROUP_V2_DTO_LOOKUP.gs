@@ -159,6 +159,7 @@ function mapV2LookupStudentDto_(row) {
   return {
     student_id: row.student_id || '',
     full_name_th: row.full_name_th || '',
+    full_name_en: row.full_name_en || '',
     gender: row.gender || '',
     unit_id: row.unit_id || '',
     program_th: row.program_th || '',
@@ -210,7 +211,7 @@ function mapV2PersonSearchStudentDto_(row) {
     participant_type: 'student',
     person_id: row.student_id || '',
     full_name_th: row.full_name_th || '',
-    full_name_en: '',
+    full_name_en: row.full_name_en || '',
     gender: row.gender || '',
     unit_id: row.unit_id || '',
     program_or_position: row.program_th || row.degree_level || '',

@@ -1,5 +1,5 @@
 # IROUP Security Readiness
-**Last updated: 2026-05-21 | Scope: Student and staff data intake**
+**Last updated: 2026-05-22 | Scope: Student and staff data intake**
 
 This checklist is for the pre-intake security pass before real University of
 Phayao student and staff data is added to IROUP V2.
@@ -8,6 +8,9 @@ Phayao student and staff data is added to IROUP V2.
 
 - `v2.lookup.students` is admin-only.
 - `v2.lookup.staff` is admin-only.
+- Real intake files have arrived locally under
+  `docs/DATA_MASTER_ Students_Staff/`; this folder is local-only and must not be
+  committed to git.
 - Mobility and Travel admin pages send V2 admin auth when loading person lookup
   data.
 - Mobility and Travel use admin-only server-side person search instead of loading
@@ -20,6 +23,17 @@ Phayao student and staff data is added to IROUP V2.
   URLs.
 
 ## Before Importing Real Data
+
+- The received `.xls` files do not include a header row; the first row is real
+  data. Import scripts must use a fixed source-column mapping and must not treat
+  row 1 as headers.
+- Confirm and resolve all unit-name mappings before import:
+  - student source has 20 distinct unit names; 19 currently match
+    `UP_UNIT_MASTER`, with `วิทยาเขตเชียงราย` still unmatched.
+  - staff source has 55 distinct unit names; 30 currently match
+    `UP_UNIT_MASTER`, with 25 unmatched or historical/closed units.
+- Do not import rows with unresolved `unit_id` silently. Either add/approve
+  missing units in `UP_UNIT_MASTER` or route them to a reviewed fallback.
 
 - Confirm the source file contains only fields actually needed by IROUP:
   - stable student/staff identifier
