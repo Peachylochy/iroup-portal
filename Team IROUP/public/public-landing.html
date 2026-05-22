@@ -888,6 +888,30 @@ function normalizeLandingLang(lang) {
   return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH';
 }
 
+function mobilityPeopleCount(row) {
+  const direct = Number(
+    row.participant_count ||
+    row.participant_count_cached ||
+    row.people_count ||
+    row.count ||
+    0
+  );
+  if (Number.isFinite(direct) && direct > 0) return direct;
+
+  const counts = row.participant_counts || row.aggregate_counts || {};
+  const nested = Number(counts.total || counts.participant_count_actual || counts.participant_count_cached || 0);
+  if (Number.isFinite(nested) && nested > 0) return nested;
+
+  const byType = Number(counts.student || counts.student_count || counts.student_count_actual || 0) +
+    Number(counts.staff || counts.staff_count || counts.staff_count_actual || 0) +
+    Number(counts.external || counts.external_count || 0) +
+    Number(counts.guest || counts.guest_count || 0);
+  if (Number.isFinite(byType) && byType > 0) return byType;
+
+  const flat = Number(row.student_count || row.student || 0) + Number(row.staff_count || row.staff || 0);
+  return Number.isFinite(flat) && flat > 0 ? flat : 1;
+}
+
 /* ── STATS ROW ── */
 function renderStatsRow() {
   const mapRows = buildMouCountryRows();
@@ -899,8 +923,9 @@ function renderStatsRow() {
   let inbound = 0, outbound = 0;
   state.mobility.forEach(function(m) {
     const dir = clean(m.direction || m.mobility_direction || m.flow_type || m.exchange_type || m.type || '').toLowerCase();
-    if (dir.includes('in') || dir === 'in') inbound++;
-    else outbound++;
+    const count = mobilityPeopleCount(m);
+    if (dir.includes('in') || dir === 'in') inbound += count;
+    else outbound += count;
   });
   if (inbound === 0 && outbound > 0) {
     inbound = Math.round(outbound * 0.55);
@@ -1292,9 +1317,10 @@ function renderMobilityFlow() {
     const key = (state.lang === 'EN' ? nameEN || nameTH : nameTH || nameEN) || code || 'Unknown';
     if (!byCountry[key]) byCountry[key] = { code: code, name: key, inbound: 0, outbound: 0 };
     const dir = clean(m.direction || m.mobility_direction || m.flow_type || m.type || '').toLowerCase();
-    if (dir.includes('in') || dir === 'in') byCountry[key].inbound++;
-    else if (dir.includes('out') || dir === 'out') byCountry[key].outbound++;
-    else byCountry[key].outbound++;
+    const count = mobilityPeopleCount(m);
+    if (dir.includes('in') || dir === 'in') byCountry[key].inbound += count;
+    else if (dir.includes('out') || dir === 'out') byCountry[key].outbound += count;
+    else byCountry[key].outbound += count;
   });
 
   const rows = Object.values(byCountry).sort(function(a, b) {
@@ -1523,7 +1549,7 @@ function renderQuickLinks() {
   const strip = document.getElementById('quickLinksStrip');
   if (!strip) return;
   const rows = buildMouCountryRows();
-  const mobilityTotal = state.mobility.length;
+  const mobilityTotal = state.mobility.reduce(function(sum, row) { return sum + mobilityPeopleCount(row); }, 0);
   const en = state.lang === 'EN';
   const links = [
     { href:'public-news.html', name:'News', desc:en ? 'news' : 'ข่าวสาร', count:state.news.length, icon:'news', cls:'qi-news' },

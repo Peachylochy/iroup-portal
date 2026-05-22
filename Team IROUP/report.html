@@ -135,22 +135,40 @@ function toNumber(value){const n=Number(String(value??'').replace(/,/g,'')); ret
 function v2List(res){const data=res&&res.data; if(Array.isArray(data))return data; if(data&&Array.isArray(data.items))return data.items; if(data&&Array.isArray(data.rows))return data.rows; return []}
 function countryName(row){const c=row?.country||{}; return firstValue(row.country_display,row.country_name_th,row.country_name_en,c.country_name_th,c.country_name_en,c.name_th,c.name_en,row.country_id,c.country_id,row.country)}
 function continentName(row){const c=row?.country||{}; const continent=row?.continent||{}; return firstValue(row.continent_name_th,row.continent_name_en,row.continent_th,row.continent_en,continent.continent_th,continent.continent_en,c.continent_th,c.continent_en,c.continent_name_th,c.continent_name_en)}
-function unitName(row){const unit=row?.up_unit||row?.organizer||row?.organizer_unit||row?.unit||{}; return firstValue(row.unit_display,row.up_unit_name_th,row.up_unit_name_en,row.organizer_unit_name_th,row.organizer_unit_name_en,unit.unit_name_th,unit.unit_name_en,unit.name_th,unit.name_en,row.organizer,row.up_unit_id,row.organizer_unit_id,unit.unit_id)}
+function unitName(row){const unit=row?.up_unit||row?.organizer||row?.organizer_unit||row?.unit||{}; const participantUnits=(row?.participant_summary?.unit_names||[]).filter(Boolean).join(', '); return firstValue(row.unit_display,row.up_unit_name_th,row.up_unit_name_en,row.organizer_unit_name_th,row.organizer_unit_name_en,participantUnits,unit.unit_name_th,unit.unit_name_en,unit.name_th,unit.name_en,row.organizer,row.up_unit_id,row.organizer_unit_id,unit.unit_id)}
 function fiscalYearFromDate(value){const d=IU.toDate(value); if(!d)return ''; return String(d.getFullYear()+543+(d.getMonth()>=9?1:0))}
-function participantCount(row){return toNumber(row.participant_count_cached ?? row.participant_count ?? row.participants_count ?? row.aggregate_counts?.participant_count_cached ?? row.participant_summary?.total) || 1}
+function participantCount(row){
+  const counts=row?.aggregate_counts || row?.participant_counts || {};
+  const typeTotal=
+    toNumber(counts.student_count_actual ?? counts.student) +
+    toNumber(counts.staff_count_actual ?? counts.staff) +
+    toNumber(counts.external_count_actual ?? counts.external) +
+    toNumber(counts.guest_count_actual ?? counts.guest);
+  return toNumber(
+    counts.participant_count_actual ??
+    row?.participant_count ??
+    row?.people_count ??
+    row?.count ??
+    row?.participant_count_cached ??
+    row?.participants_count ??
+    counts.participant_count_cached ??
+    row?.participant_summary?.total
+  ) || typeTotal || (toNumber(row?.student_count) + toNumber(row?.staff_count)) || 1;
+}
+function mobilityPeopleFromRaw(rows){return (rows||[]).reduce((sum,row)=>sum+participantCount(row),0)}
 function budgetValue(row){
   const summary=row?.budget_summary || row?.budgetSummary || {};
   return firstValue(
+    summary.total_amount_thb,
+    summary.amount_thb,
+    summary.total_amount,
+    summary.total,
     row?.amount,
     row?.amount_thb,
     row?.budget_amount,
     row?.funding_amount,
     row?.budget_total,
     row?.total_budget,
-    summary.total_amount_thb,
-    summary.amount_thb,
-    summary.total_amount,
-    summary.total,
     0
   );
 }
@@ -254,7 +272,7 @@ async function loadAll(force=false){
     catch(e){ console.warn('getReport failed, fallback to getAll',e); raw=await getAllFallback(); }
     writeCache(); makeRows(); initFilters(); applyReport();
     setTimeout(()=>fetchV2ReportSummary($('#fyFilter').value || ''), 250);
-    $('#notice').textContent=`โหลดข้อมูลล่าสุดแล้ว: MOU ${raw.mou.length} · ทุน ${raw.scholar.length} · กิจกรรม ${raw.event.length} · Inbound ${raw.inbound.length} · Outbound ${raw.outbound.length} · Travel ${raw.travel.length}`;
+    $('#notice').textContent=`โหลดข้อมูลล่าสุดแล้ว: MOU ${raw.mou.length} · ทุน ${raw.scholar.length} · กิจกรรม ${raw.event.length} · Inbound ${mobilityPeopleFromRaw(raw.inbound)} คน · Outbound ${mobilityPeopleFromRaw(raw.outbound)} คน · Travel ${raw.travel.length}`;
   }catch(e){ console.error('Report load failed',e); const hasData=allRows.length>0; $('#notice').textContent=hasData ? `⚠️ Google Sheet ตอบช้า/โหลดไม่สำเร็จ จึงแสดงข้อมูลจาก cache ก่อน (${e.message})` : `⚠️ โหลดข้อมูลไม่สำเร็จ: ${e.message}`; }
   finally{isLoading=false;}
 }
@@ -284,7 +302,7 @@ async function loadAll(force=false){
     raw={inbound:[],outbound:[],travel:[],mou:[],scholar:[],event:[],...(await getV2ReportData())};
     writeCache(); makeRowsFromV2(); initFilters(); applyReport();
     setTimeout(()=>fetchV2ReportSummary($('#fyFilter').value || ''),250);
-    $('#notice').textContent=`โหลดข้อมูล V2 ล่าสุดแล้ว: MOU ${raw.mou.length} · ทุน ${raw.scholar.length} · กิจกรรม ${raw.event.length} · Inbound ${raw.inbound.length} · Outbound ${raw.outbound.length} · Travel ${raw.travel.length}`;
+    $('#notice').textContent=`โหลดข้อมูล V2 ล่าสุดแล้ว: MOU ${raw.mou.length} · ทุน ${raw.scholar.length} · กิจกรรม ${raw.event.length} · Inbound ${mobilityPeopleFromRaw(raw.inbound)} คน · Outbound ${mobilityPeopleFromRaw(raw.outbound)} คน · Travel ${raw.travel.length}`;
   }catch(e){console.error('Report load failed',e); const hasData=allRows.length>0; $('#notice').textContent=hasData ? `โหลดข้อมูล V2 ไม่สำเร็จ จึงแสดง cache ล่าสุดก่อน (${e.message})` : `โหลดข้อมูล V2 ไม่สำเร็จ: ${e.message}`; }
   finally{isLoading=false;}
 }

@@ -29,7 +29,7 @@ function listV2PublicMOUs_() {
 }
 
 function listV2PublicMobility_() {
-  const context = buildV2PublicContext_();
+  const context = buildV2PublicMobilityContext_();
   if (!context.success) return context;
 
   const ctx = context.data;
@@ -281,6 +281,34 @@ function buildV2PublicContext_() {
     const read = readV2Sheet_(sheetName);
     if (!read.success) {
       return publicResponseV2_(false, null, 0, read.error || 'Unable to read V2 public context', 'V2_PUBLIC_READ_FAILED');
+    }
+    tables[sheetName] = read.data || [];
+  }
+
+  return publicResponseV2_(true, {
+    tables: tables,
+    countriesById: indexV2PublicRowsById_(tables[IROUP_V2_SHEETS.COUNTRY_MASTER], 'country_id'),
+    unitsById: indexV2PublicRowsById_(tables[IROUP_V2_SHEETS.UP_UNIT_MASTER], 'unit_id'),
+    fileRolesById: indexV2PublicRowsById_(tables[IROUP_V2_SHEETS.FILE_ROLE_MASTER], 'file_role_id')
+  }, 1, '');
+}
+
+function buildV2PublicMobilityContext_() {
+  const sheetNames = [
+    IROUP_V2_SHEETS.COUNTRY_MASTER,
+    IROUP_V2_SHEETS.UP_UNIT_MASTER,
+    IROUP_V2_SHEETS.FILE_ROLE_MASTER,
+    IROUP_V2_SHEETS.MOBILITY_PROJECT,
+    IROUP_V2_SHEETS.MOBILITY_PARTICIPANT,
+    IROUP_V2_SHEETS.FILES
+  ];
+
+  const tables = {};
+  for (let i = 0; i < sheetNames.length; i++) {
+    const sheetName = sheetNames[i];
+    const read = readV2Sheet_(sheetName);
+    if (!read.success) {
+      return publicResponseV2_(false, null, 0, read.error || 'Unable to read V2 public mobility context', 'V2_PUBLIC_READ_FAILED');
     }
     tables[sheetName] = read.data || [];
   }

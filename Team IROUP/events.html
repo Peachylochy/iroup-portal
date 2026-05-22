@@ -11,6 +11,7 @@
 <script src="js/iroup-v2-api.js"></script>
 <script src="js/iroup-utils.js"></script>
 <script src="js/iroup-image-helper.js"></script>
+<script src="js/iroup-rich-lite.js"></script>
 <script src="js/iroup-admin-guard.js"></script>
 <style>
 *{box-sizing:border-box}
@@ -246,11 +247,11 @@ body.modal-open{overflow:hidden}
           </div>
           <div class="field full">
             <label class="label" for="detailTh">รายละเอียด (TH)</label>
-            <textarea id="detailTh" class="textarea" name="detail_th"></textarea>
+            <textarea id="detailTh" class="textarea" name="detail_th" data-rich-lite="true"></textarea>
           </div>
           <div class="field full">
             <label class="label" for="detailEn">รายละเอียด (EN)</label>
-            <textarea id="detailEn" class="textarea" name="detail_en"></textarea>
+            <textarea id="detailEn" class="textarea" name="detail_en" data-rich-lite="true"></textarea>
           </div>
           <div class="field">
             <label class="label" for="applyUrl">ลิงก์สมัคร</label>
@@ -270,7 +271,7 @@ body.modal-open{overflow:hidden}
               <button class="btn" type="button" onclick="chooseEventFile('attachment')">แนบไฟล์</button>
               <button class="btn" type="button" onclick="chooseEventFile('poster')">แนบรูปปก</button>
             </div>
-            <input id="attachmentFileInput" type="file" hidden onchange="handleEventFileSelected(event, 'attachment')">
+            <input id="attachmentFileInput" type="file" hidden multiple onchange="handleEventFileSelected(event, 'attachment')">
             <input id="posterFileInput" type="file" accept="image/*" hidden onchange="handleEventFileSelected(event, 'poster')">
             <div id="selectedFiles" class="file-list"></div>
           </div>
@@ -520,6 +521,7 @@ function changeEventPage(delta) {
 function openCreateModal() {
   state.editingId = '';
   $('#eventForm').reset();
+  refreshRichEditorFields();
   state.pendingFiles = [];
   $('#eventId').value = '';
   $('#modalTitle').textContent = state.lang === 'en' ? 'Add Event' : 'เพิ่มกิจกรรม';
@@ -541,6 +543,7 @@ function openEditModal(eventId) {
   if (!event) return;
   state.editingId = eventId;
   $('#eventForm').reset();
+  refreshRichEditorFields();
   state.pendingFiles = [];
   $('#eventId').value = event.event_id || '';
   $('#titleTh').value = event.title_th || '';
@@ -568,6 +571,7 @@ function openEditModal(eventId) {
   $('#participantCount').value = event.participant_count || '';
   $('#detailTh').value = event.detail_th || '';
   $('#detailEn').value = event.detail_en || '';
+  refreshRichEditorFields();
   $('#applyUrl').value = event.apply_url || '';
   $('#detailUrl').value = event.detail_url || '';
   $('#linkUrl').value = event.link_url || '';
@@ -621,6 +625,14 @@ async function deleteEvent() {
   await deleteV2Event(eventId);
 }
 
+function syncRichEditorFields() {
+  if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.syncAll($('#eventForm'));
+}
+
+function refreshRichEditorFields() {
+  if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.refreshAll($('#eventForm'));
+}
+
 async function deleteV2Event(eventId) {
   if (!eventId) return;
   if (!confirm('ยืนยันลบกิจกรรมนี้หรือไม่')) return;
@@ -645,12 +657,15 @@ function chooseEventFile(role) {
 }
 
 function handleEventFileSelected(evt, role) {
-  const file = evt && evt.target && evt.target.files ? evt.target.files[0] : null;
-  if (!file) return;
-  state.pendingFiles = state.pendingFiles.filter(item => role !== 'poster' || item.role !== 'poster');
-  state.pendingFiles.push({
-    role: role === 'poster' ? 'poster' : 'attachment',
-    file: file
+  const files = evt && evt.target && evt.target.files ? Array.from(evt.target.files) : [];
+  if (!files.length) return;
+  const normalizedRole = role === 'poster' ? 'poster' : 'attachment';
+  if (normalizedRole === 'poster') state.pendingFiles = state.pendingFiles.filter(item => item.role !== 'poster');
+  files.forEach(file => {
+    state.pendingFiles.push({
+      role: normalizedRole,
+      file: file
+    });
   });
   evt.target.value = '';
   renderSelectedFiles();
@@ -736,6 +751,7 @@ function extractSavedEventId(res) {
 }
 
 function buildPayloadFromForm() {
+  syncRichEditorFields();
   const selectedTypeId = $('#eventTypeSelect').value.trim();
   const isCustomType = selectedTypeId === '__custom__';
   const type = isCustomType ? null : findEventType(selectedTypeId, '');
@@ -959,7 +975,9 @@ function showNotice(message, type) {
 }
 
 function truncate(text, max) {
-  const value = String(text || '');
+  const value = window.IROUP_RICH_LITE
+    ? IROUP_RICH_LITE.toText(text)
+    : String(text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   return value.length > max ? value.slice(0, max - 1) + '…' : value;
 }
 

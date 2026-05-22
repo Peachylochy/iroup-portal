@@ -17,6 +17,7 @@
   document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
+<script src="../js/iroup-rich-lite.js"></script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -216,7 +217,7 @@ function renderDetail(){
   document.getElementById('articleShell').style.display = 'block';
   document.getElementById('articleTitle').textContent = title;
   document.getElementById('articleMeta').textContent = formatDate(item.publish_date);
-  document.getElementById('articleContent').textContent = displayContent(item) || '-';
+  document.getElementById('articleContent').innerHTML = renderRichContent(displayContent(item)) || esc('-');
   document.getElementById('badgeRow').innerHTML = (item.category ? '<span class="badge category">' + esc(item.category) + '</span>' : '') + renderSdgBadges(item.sdg_tags);
   document.getElementById('heroCover').innerHTML = item.cover_url ? '<img src="' + escAttr(toImageUrl(item.cover_url, 1600)) + '" alt="' + escAttr(title) + '">' : 'NEWS';
   var link = document.getElementById('externalLinkBtn');
@@ -311,6 +312,7 @@ function showError(message){
 
 function displayTitle(item){ return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en; }
 function displayContent(item){ return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en; }
+function renderRichContent(value){ return window.IROUP_RICH_LITE ? IROUP_RICH_LITE.render(value) : esc(value); }
 function renderSdgBadges(value){ return parseTags(value).slice(0,4).map(function(tag){ return '<span class="badge sdg">SDG ' + esc(tag) + '</span>'; }).join(''); }
 
 function collectFiles(row){

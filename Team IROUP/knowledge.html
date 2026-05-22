@@ -10,6 +10,7 @@
   <script src="js/iroup-v2-endpoint.js"></script>
   <script src="js/iroup-v2-api.js"></script>
   <script src="js/iroup-utils.js"></script>
+  <script src="js/iroup-rich-lite.js"></script>
   <script src="js/iroup-admin-guard.js"></script>
   <style>
     :root{--blue:#0B74B8;--navy:#10294f;--ink:#15243b;--muted:#6b7f96;--line:#e6edf6;--soft:#eef7ff;--bg:#f5f8fc;--ok:#15803d;--warn:#b7791f;--danger:#c2410c}
@@ -275,11 +276,11 @@
           <div class="form-grid">
             <label class="field full">
               <span class="label">เนื้อหา (TH)</span>
-              <textarea id="contentTh" class="textarea large"></textarea>
+              <textarea id="contentTh" class="textarea large" data-rich-lite="true"></textarea>
             </label>
             <label class="field full">
               <span class="label">เนื้อหา (EN)</span>
-              <textarea id="contentEn" class="textarea large"></textarea>
+              <textarea id="contentEn" class="textarea large" data-rich-lite="true"></textarea>
             </label>
           </div>
         </section>
@@ -593,6 +594,7 @@
       state.pendingImages = [];
       state.pendingPdf = null;
       $('#knowledgeForm').reset();
+      refreshRichEditorFields();
       $('#knowledgeId').value = '';
       $('#modalTitle').textContent = 'เพิ่มบทความ';
       $('#modalSub').textContent = 'สร้างข้อมูล KNOWLEDGE ผ่าน V2';
@@ -614,6 +616,7 @@
       state.pendingImages = [];
       state.pendingPdf = null;
       $('#knowledgeForm').reset();
+      refreshRichEditorFields();
       $('#modalTitle').textContent = 'แก้ไขบทความ';
       $('#modalSub').textContent = knowledgeId;
       $('#deleteBtn').style.display = '';
@@ -650,6 +653,7 @@
       $('#categoryInput').value = row.category || '';
       $('#contentTh').value = row.content_th || '';
       $('#contentEn').value = row.content_en || '';
+      refreshRichEditorFields();
       $('#videoUrl').value = row.video_url || '';
       $('#linkUrl').value = row.link_url || '';
       $('#publicVisible').checked = !!row.public_visible;
@@ -710,6 +714,7 @@
     }
 
     function buildPayloadFromForm() {
+      syncRichEditorFields();
       var payload = {
         knowledge_id: $('#knowledgeId').value.trim(),
         title_th: $('#titleTh').value.trim(),
@@ -727,6 +732,14 @@
 
     async function deleteKnowledgeFromModal() {
       await deleteV2Knowledge($('#knowledgeId').value);
+    }
+
+    function syncRichEditorFields() {
+      if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.syncAll($('#knowledgeForm'));
+    }
+
+    function refreshRichEditorFields() {
+      if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.refreshAll($('#knowledgeForm'));
     }
 
     async function deleteV2Knowledge(knowledgeId) {

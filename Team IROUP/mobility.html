@@ -32,7 +32,7 @@ button,input,select,textarea{font:inherit}
 .btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;min-height:42px}
 .btn:hover{border-color:#BBD7EF;box-shadow:0 6px 16px rgba(15,45,90,.08)}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{background:#fff;color:var(--red);border-color:#F5C4C0}.btn.ghost{background:transparent}.btn:disabled{opacity:.55;cursor:not-allowed}
 .lang-toggle,.view-toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px}.lang-toggle button,.view-toggle button{border:0;background:transparent;border-radius:9px;padding:7px 10px;font-weight:900;cursor:pointer;color:var(--muted)}.lang-toggle button.active,.view-toggle button.active{background:var(--blue);color:#fff}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 6px 20px rgba(15,45,90,.06)}.kpi-num{font-size:28px;font-weight:900;color:var(--navy);line-height:1}.kpi-label{font-size:12px;color:var(--muted);font-weight:800;margin-top:6px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 6px 20px rgba(15,45,90,.06)}.kpi-num{font-size:28px;font-weight:900;color:var(--navy);line-height:1}.kpi-label{font-size:12px;color:var(--muted);font-weight:800;margin-top:6px}
 .toolbar{display:grid;grid-template-columns:1.5fr .75fr .8fr .65fr auto;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:16px}
 .input,.select{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;color:var(--text);outline:none}.input:focus,.select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,109,181,.12)}
 .notice{display:none;margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid #BBD7EF;background:#F1F8FE;color:#174B7A;font-weight:700}.notice.error{background:#FFF5F4;border-color:#F5C4C0;color:#A62C25}
@@ -43,7 +43,7 @@ button,input,select,textarea{font:inherit}
 .badge-row{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#fff;color:var(--muted)}.badge.inbound{color:#174B7A;background:#F1F8FE;border-color:#BBD7EF}.badge.outbound{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.active{color:#875D00;background:#FFF8E8;border-color:#F8DB98}.badge.completed{color:#207B32;background:#F2FBF0;border-color:#C7E8BC}.badge.cancelled{color:#A62C25;background:#FFF4F3;border-color:#F5C4C0}.badge.draft{color:#56657A;background:#F3F6FA;border-color:#D7E1EA}
 .empty{background:#fff;border:1px dashed #BFD0E0;border-radius:16px;padding:26px;text-align:center;color:var(--muted);font-weight:800;grid-column:1/-1}.muted{color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;white-space:nowrap}
 .modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1040px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
-.form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}
+.form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}.radio-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.radio-row label{display:flex;gap:8px;align-items:center;font-weight:800}
 .participant-tools{display:grid;gap:12px}.participant-search{position:relative}.suggestions{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(15,45,90,.14);max-height:260px;overflow:auto}.suggestions.open{display:block}.suggestion{width:100%;border:0;background:#fff;text-align:left;padding:10px 12px;cursor:pointer;border-bottom:1px solid #EDF3F8;color:var(--text)}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#F8FBFE}.suggestion-name{font-weight:900}.suggestion-meta{font-size:12px;color:var(--muted);margin-top:2px}.suggestion-action{margin-top:10px}.suggestion-action .btn{width:100%;justify-content:center}.selected-person{display:none;border:1px solid #BBD7EF;background:#F1F8FE;border-radius:14px;padding:10px 12px;align-items:center;gap:10px;justify-content:space-between}.selected-person.show{display:flex}.manual-form{display:none;border:1px dashed #BFD0E0;border-radius:14px;padding:12px;background:#F8FBFE}.manual-form.show{display:block}.participant-list{display:grid;gap:8px}.participant-row{display:grid;grid-template-columns:1.4fr 1fr auto auto;gap:10px;align-items:center;border:1px solid #EDF3F8;border-radius:14px;padding:10px 12px;background:#fff}.participant-name{font-weight:900}.participant-unit{color:var(--muted);font-size:12px}.participant-empty{padding:14px;border:1px dashed #BFD0E0;border-radius:14px;color:var(--muted);text-align:center;font-weight:800}
 
 /* Web design aligned Mobility admin refresh. CSS-only; V2 data/write flows stay intact. */
@@ -211,10 +211,11 @@ body.modal-open{overflow:hidden}
     </header>
 
     <section class="kpis" aria-label="Mobility KPIs">
-      <div class="kpi"><div class="kpi-num" id="kpiInbound">0</div><div class="kpi-label">Inbound ทั้งหมด</div></div>
-      <div class="kpi"><div class="kpi-num" id="kpiOutbound">0</div><div class="kpi-label">Outbound ทั้งหมด</div></div>
-      <div class="kpi"><div class="kpi-num" id="kpiParticipants">0</div><div class="kpi-label">จำนวนคนรวม</div></div>
-      <div class="kpi"><div class="kpi-num" id="kpiCountries">0</div><div class="kpi-label">ประเทศ</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiInbound">0</div><div class="kpi-label">การเดินทาง Inbound</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiInboundPeople">0</div><div class="kpi-label">จำนวนคน Inbound</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiOutbound">0</div><div class="kpi-label">การเดินทาง Outbound</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiOutboundPeople">0</div><div class="kpi-label">จำนวนคน Outbound</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpiCountries">0</div><div class="kpi-label">ประเทศที่เกี่ยวข้อง</div></div>
     </section>
 
     <section class="toolbar" aria-label="Mobility filters">
@@ -253,8 +254,21 @@ body.modal-open{overflow:hidden}
       <div class="modal-body">
         <input type="hidden" id="mobilityId">
 
+        <section class="form-section">
+          <div class="section-title">ประเภทการเดินทาง</div>
+          <div class="form-grid">
+            <div class="field full">
+              <label class="label" for="directionInput">ทิศทาง <span class="req">*</span></label>
+              <select id="directionInput" class="select" required onchange="handleDirectionChange()">
+                <option value="inbound">Inbound - ผู้มาเยือนต่างชาติ</option>
+                <option value="outbound">Outbound - นิสิต/บุคลากร UP เดินทางออก</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
         <section class="form-section" id="participantSection" style="display:none">
-          <div class="section-title">ผู้เข้าร่วม</div>
+          <div class="section-title" id="participantSectionTitle">ผู้เข้าร่วม</div>
           <div class="participant-tools">
             <div class="participant-search">
               <label class="label" for="participantSearchInput">ค้นหานิสิต/บุคลากร...</label>
@@ -278,6 +292,8 @@ body.modal-open{overflow:hidden}
                   <select id="manualParticipantTypeInput" class="select" onchange="syncManualPersonTypeFields()">
                     <option value="student">student</option>
                     <option value="staff">staff</option>
+                    <option value="external">external</option>
+                    <option value="guest">guest</option>
                   </select>
                 </div>
                 <div class="field">
@@ -286,7 +302,7 @@ body.modal-open{overflow:hidden}
                 </div>
                 <div class="field">
                   <label class="label" for="manualPrefixThInput">คำนำหน้า</label>
-                  <input id="manualPrefixThInput" class="input" type="text">
+                  <input id="manualPrefixThInput" class="input" type="text" oninput="handleManualNameInput()">
                 </div>
                 <div class="field">
                   <label class="label" for="manualFirstNameThInput">ชื่อไทย <span class="req">*</span></label>
@@ -298,15 +314,23 @@ body.modal-open{overflow:hidden}
                 </div>
                 <div class="field">
                   <label class="label" for="manualFirstNameEnInput">First name</label>
-                  <input id="manualFirstNameEnInput" class="input" type="text">
+                  <input id="manualFirstNameEnInput" class="input" type="text" oninput="handleManualNameInput()">
+                </div>
+                <div class="field inbound-manual-field">
+                  <label class="label" for="manualMiddleNameInput">Middle name</label>
+                  <input id="manualMiddleNameInput" class="input" type="text" oninput="handleManualNameInput()">
                 </div>
                 <div class="field">
                   <label class="label" for="manualLastNameEnInput">Last name</label>
-                  <input id="manualLastNameEnInput" class="input" type="text">
+                  <input id="manualLastNameEnInput" class="input" type="text" oninput="handleManualNameInput()">
+                </div>
+                <div class="field inbound-manual-field">
+                  <label class="label" for="manualAutoFullNameInput">Full name (auto)</label>
+                  <input id="manualAutoFullNameInput" class="input" type="text" readonly>
                 </div>
                 <div class="field">
                   <label class="label" for="manualFullNameInput">ชื่อเต็ม</label>
-                  <input id="manualFullNameInput" class="input" type="text">
+                  <input id="manualFullNameInput" class="input" type="text" oninput="handleManualFullNameOverrideInput()">
                 </div>
                 <div class="field">
                   <label class="label" for="manualGenderInput">เพศ</label>
@@ -319,7 +343,7 @@ body.modal-open{overflow:hidden}
                 </div>
                 <div class="field">
                   <label class="label" for="manualUnitInput">คณะ/หน่วยงาน</label>
-                  <input id="manualUnitInput" class="input" type="text" list="unitOptions" oninput="syncManualUnitIdFromInput()">
+                  <input id="manualUnitInput" class="input" type="text" list="unitOptions" oninput="handleManualUnitInput()">
                   <input id="manualUnitIdInput" type="hidden">
                 </div>
                 <div class="field">
@@ -353,18 +377,11 @@ body.modal-open{overflow:hidden}
           <div class="section-title">ข้อมูลหลัก</div>
           <div class="form-grid">
             <div class="field">
-              <label class="label" for="directionInput">ทิศทาง <span class="req">*</span></label>
-              <select id="directionInput" class="select" required>
-                <option value="inbound">Inbound</option>
-                <option value="outbound">Outbound</option>
-              </select>
-            </div>
-            <div class="field">
               <label class="label" for="projectNameInput">ชื่อโครงการ <span class="req">*</span></label>
               <input id="projectNameInput" class="input" type="text" required>
             </div>
             <div class="field">
-              <label class="label" for="institutionInput">สถาบัน</label>
+              <label class="label" for="institutionInput">สถาบันต้นทางหลัก / Main sending institution</label>
               <input id="institutionInput" class="input" type="text" list="institutionOptions">
             </div>
             <div class="field">
@@ -377,7 +394,7 @@ body.modal-open{overflow:hidden}
               <input id="cityInput" class="input" type="text">
             </div>
             <div class="field">
-              <label class="label" for="unitInput">หน่วยงาน UP</label>
+              <label class="label" for="unitInput">หน่วยงาน UP ที่รับผิดชอบ / Host UP unit</label>
               <input id="unitInput" class="input" type="text" list="unitOptions" oninput="syncUnitIdFromInput()">
               <input id="upUnitIdInput" type="hidden">
             </div>
@@ -444,6 +461,30 @@ body.modal-open{overflow:hidden}
         </section>
 
         <section class="form-section">
+          <div class="section-title">งบประมาณ</div>
+          <div class="form-grid">
+            <div class="field full">
+              <label class="label">แหล่งงบประมาณ</label>
+              <div class="radio-row">
+                <label><input type="radio" name="budgetMode" value="" onchange="syncBudgetFields()" checked> ไม่ระบุ</label>
+                <label><input type="radio" name="budgetMode" value="internal" onchange="syncBudgetFields()"> ภายใน</label>
+                <label><input type="radio" name="budgetMode" value="external" onchange="syncBudgetFields()"> ภายนอก</label>
+                <label><input type="radio" name="budgetMode" value="self_funded" onchange="syncBudgetFields()"> ผู้เดินทางออกเอง</label>
+                <label><input type="radio" name="budgetMode" value="no_budget" onchange="syncBudgetFields()"> ไม่มีงบประมาณ</label>
+              </div>
+            </div>
+            <div class="field budget-internal">
+              <label class="label" for="budgetSourceTypeInput">ประเภทเงิน</label>
+              <input id="budgetSourceTypeInput" class="input" type="text" list="budgetSourceTypeOptions">
+            </div>
+            <div class="field budget-internal">
+              <label class="label" for="budgetAmountInput">จำนวนเงิน (บาท)</label>
+              <input id="budgetAmountInput" class="input" type="number" min="0" step="0.01">
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
           <div class="section-title">การตั้งค่า</div>
           <div class="form-grid">
             <div class="field">
@@ -474,6 +515,7 @@ body.modal-open{overflow:hidden}
 <datalist id="unitOptions"></datalist>
 <datalist id="institutionOptions"></datalist>
 <datalist id="purposeOptions"></datalist>
+<datalist id="budgetSourceTypeOptions"></datalist>
 
 <script>
 const V2_MOBILITY_WRITE_UI_ENABLED = true;
@@ -520,6 +562,12 @@ function unwrapMobilityDetail(res){
   if (data.record) return data.record;
   if (data.row) return data.row;
   if (data.data) return data.data;
+  return data;
+}
+
+function unwrapMobilityBudget(res){
+  const data = res && res.data ? res.data : null;
+  if (data && data.budget) return data.budget;
   return data;
 }
 
@@ -584,6 +632,12 @@ function normalizeMobility(row){
   const source = row || {};
   const counts = source.aggregate_counts || {};
   const country = normalizeCountry(source);
+  const actualParticipantCount = toNumber(counts.participant_count_actual);
+  const participantTypeTotal =
+    toNumber(counts.student_count_actual) +
+    toNumber(counts.staff_count_actual) +
+    toNumber(counts.external_count_actual) +
+    toNumber(counts.guest_count_actual);
   return {
     ...source,
     mobility_id: source.mobility_id || '',
@@ -603,9 +657,9 @@ function normalizeMobility(row){
     start_date: source.start_date || '',
     end_date: source.end_date || '',
     fiscal_year: source.fiscal_year || '',
-    participant_count_cached: toNumber(source.participant_count_cached ?? counts.participant_count_cached),
-    student_count: toNumber(source.student_count ?? counts.student_count_actual),
-    staff_count: toNumber(source.staff_count ?? counts.staff_count_actual),
+    participant_count_cached: actualParticipantCount || toNumber(source.participant_count ?? source.participant_count_cached ?? counts.participant_count_cached) || participantTypeTotal,
+    student_count: toNumber(counts.student_count_actual ?? source.student_count),
+    staff_count: toNumber(counts.staff_count_actual ?? source.staff_count),
     status: source.status || 'active',
     public_visible: source.public_visible === true || source.public_visible === 'TRUE',
     is_deleted: source.is_deleted === true || source.is_deleted === 'TRUE'
@@ -614,6 +668,21 @@ function normalizeMobility(row){
 
 function enrichMobilityRowsWithCountryNames(rows){
   return (rows || []).map(row => normalizeMobility(row)).filter(row => !row.is_deleted);
+}
+
+function mobilityPeopleCount(row){
+  const counts = row?.aggregate_counts || {};
+  const typeTotal =
+    toNumber(counts.student_count_actual) +
+    toNumber(counts.staff_count_actual) +
+    toNumber(counts.external_count_actual) +
+    toNumber(counts.guest_count_actual);
+  return toNumber(counts.participant_count_actual)
+    || toNumber(row?.participant_count)
+    || toNumber(row?.participant_count_cached)
+    || typeTotal
+    || (toNumber(row?.student_count) + toNumber(row?.staff_count))
+    || 1;
 }
 
 function displayTitle(row){
@@ -659,13 +728,15 @@ function filteredRows(){
 }
 
 function renderKpis(){
-  const inbound = state.rows.filter(row => row.direction === 'inbound').length;
-  const outbound = state.rows.filter(row => row.direction === 'outbound').length;
-  const totalParticipants = state.rows.reduce((sum, row) => sum + toNumber(row.participant_count_cached), 0);
+  const inboundRows = state.rows.filter(row => row.direction === 'inbound');
+  const outboundRows = state.rows.filter(row => row.direction === 'outbound');
+  const inboundPeople = inboundRows.reduce((sum, row) => sum + mobilityPeopleCount(row), 0);
+  const outboundPeople = outboundRows.reduce((sum, row) => sum + mobilityPeopleCount(row), 0);
   const countries = new Set(state.rows.map(row => row.country_id || displayCountry(row)).filter(Boolean));
-  $('#kpiInbound').textContent = inbound;
-  $('#kpiOutbound').textContent = outbound;
-  $('#kpiParticipants').textContent = totalParticipants;
+  $('#kpiInbound').textContent = inboundRows.length;
+  $('#kpiInboundPeople').textContent = inboundPeople;
+  $('#kpiOutbound').textContent = outboundRows.length;
+  $('#kpiOutboundPeople').textContent = outboundPeople;
   $('#kpiCountries').textContent = countries.size;
 }
 
@@ -689,6 +760,9 @@ function renderDatalists(){
   const purposes = Array.from(new Set(state.rows.map(row => row.purpose).filter(Boolean))).sort();
   $('#institutionOptions').innerHTML = institutions.map(value => `<option value="${escAttr(value)}"></option>`).join('');
   $('#purposeOptions').innerHTML = purposes.map(value => `<option value="${escAttr(value)}"></option>`).join('');
+  $('#budgetSourceTypeOptions').innerHTML = Array.from(new Set(state.rows.map(row => row.budget_source_type).filter(Boolean))).sort()
+    .map(value => `<option value="${escAttr(value)}"></option>`)
+    .join('');
 }
 
 function renderMobility(resetPage){
@@ -843,7 +917,7 @@ async function loadPageData(force){
     const [countriesResult, unitsResult, mobilityResult] = await Promise.allSettled([
       IROUP_V2.lookup.countries(),
       IROUP_V2.lookup.units(),
-      IROUP_V2.admin.mobilityList({ includeArchived: true, _: force ? Date.now() : '' })
+      IROUP_V2.admin.mobilityList(force ? { _: Date.now() } : {})
     ]);
     const countriesRes = countriesResult.status === 'fulfilled' ? countriesResult.value : null;
     const unitsRes = unitsResult.status === 'fulfilled' ? unitsResult.value : null;
@@ -914,6 +988,9 @@ async function openEditModal(mobilityRow){
     if (!confirmedMobilityId) throw new Error('ไม่พบ mobility_id');
     detailRow.mobility_id = confirmedMobilityId;
     fillForm(detailRow);
+    const budgetRes = await IROUP_V2.request('v2.admin.mobility.budget.get', { mobility_id: confirmedMobilityId }, { auth: true });
+    if (budgetRes && budgetRes.success === false) throw new Error(budgetRes.error || 'โหลดงบประมาณไม่สำเร็จ');
+    hydrateBudget(unwrapMobilityBudget(budgetRes));
     $('#modalSub').textContent = confirmedMobilityId;
     showParticipantSection(confirmedMobilityId);
     document.body.classList.add('modal-open');
@@ -938,7 +1015,9 @@ function resetForm(){
   $('#publicVisibleInput').checked = true;
   $('#statusInput').value = 'active';
   $('#directionInput').value = 'inbound';
+  syncBudgetFields();
   resetParticipantUi();
+  syncManualPersonTypeFields();
 }
 
 function fillForm(row){
@@ -963,6 +1042,19 @@ function fillForm(row){
   $('#staffCountInput').value = toNumber(row.staff_count);
   $('#statusInput').value = row.status || 'active';
   $('#publicVisibleInput').checked = row.public_visible !== false;
+  syncManualPersonTypeFields();
+}
+
+function hydrateBudget(budget){
+  const internal = budget && (budget.is_internal === true || String(budget.is_internal).toUpperCase() === 'TRUE');
+  const sourceType = budget && !internal ? String(budget.budget_source_type || '').trim() : '';
+  const externalMode = sourceType === 'self_funded' || sourceType === 'no_budget' ? sourceType : 'external';
+  document.querySelectorAll('input[name="budgetMode"]').forEach(radio => {
+    radio.checked = (!budget && radio.value === '') || (internal && radio.value === 'internal') || (!internal && budget && radio.value === externalMode);
+  });
+  $('#budgetSourceTypeInput').value = internal ? (budget.budget_source_type || '') : '';
+  $('#budgetAmountInput').value = internal ? toNumber(budget.amount || budget.amount_thb || 0) || '' : '';
+  syncBudgetFields();
 }
 
 function syncCountryIdFromInput(){
@@ -986,6 +1078,11 @@ function syncUnitIdFromInput(){
 }
 
 function syncManualUnitIdFromInput(){
+  if (isInboundMobility()) {
+    $('#manualUnitIdInput').value = '';
+    syncInboundInstitutionFromParticipant();
+    return;
+  }
   const value = ($('#manualUnitInput').value || '').trim().toLowerCase();
   const found = state.units.find(unit => {
     return [unit.unit_id, unit.unit_code, unit.unit_name_th, unit.unit_name_en, unitLabel(unit)]
@@ -993,6 +1090,81 @@ function syncManualUnitIdFromInput(){
       .includes(value);
   });
   $('#manualUnitIdInput').value = found ? found.unit_id || '' : '';
+}
+
+function handleManualUnitInput(){
+  if (isInboundMobility()) {
+    $('#manualUnitIdInput').value = '';
+    syncInboundInstitutionFromParticipant();
+    return;
+  }
+  syncManualUnitIdFromInput();
+}
+
+function syncInboundInstitutionFromParticipant(){
+  if (!isInboundMobility()) return;
+  const institution = ($('#manualUnitInput')?.value || '').trim();
+  const target = $('#institutionInput');
+  if (!target || !institution) return;
+  const previousAuto = target.dataset.autoInboundInstitution || '';
+  if (!target.value.trim() || target.value.trim() === previousAuto) {
+    target.value = institution;
+    target.dataset.autoInboundInstitution = institution;
+  }
+}
+
+function isInboundMobility(){
+  return ($('#directionInput')?.value || 'inbound') === 'inbound';
+}
+
+function handleDirectionChange(){
+  configureParticipantMode();
+  syncManualPersonTypeFields();
+}
+
+function configureParticipantMode(){
+  const inbound = isInboundMobility();
+  const sectionTitle = $('#participantSectionTitle');
+  const searchBox = document.querySelector('.participant-search');
+  const manualUnit = $('#manualUnitInput');
+  if (sectionTitle) sectionTitle.textContent = inbound ? 'ผู้มาเยือนต่างชาติ' : 'ผู้เข้าร่วมจาก UP';
+  if (searchBox) searchBox.style.display = inbound ? 'none' : '';
+  if (manualUnit) {
+    if (inbound) {
+      manualUnit.removeAttribute('list');
+      $('#manualUnitIdInput').value = '';
+    } else {
+      manualUnit.setAttribute('list', 'unitOptions');
+    }
+  }
+  if ($('#participantSearchInput')) {
+    $('#participantSearchInput').placeholder = inbound ? 'เพิ่มผู้มาเยือนต่างชาติด้านล่าง' : 'ค้นหานิสิต/บุคลากร UP...';
+    if (inbound) $('#participantSearchInput').value = '';
+  }
+  if ($('#participantSuggestions')) {
+    $('#participantSuggestions').className = 'suggestions';
+    $('#participantSuggestions').innerHTML = '';
+  }
+  if ($('#selectedPersonBox')) $('#selectedPersonBox').className = 'selected-person';
+  if ($('#manualAddBtn')) $('#manualAddBtn').style.display = 'none';
+  if (inbound) {
+    $('#manualParticipantForm').className = 'manual-form show';
+    if ($('#manualParticipantTypeInput').value === 'staff') $('#manualParticipantTypeInput').value = 'student';
+  } else {
+    hideManualParticipantForm();
+  }
+}
+
+function syncBudgetFields(){
+  const mode = getBudgetMode();
+  document.querySelectorAll('.budget-internal').forEach(el => {
+    el.style.display = mode === 'internal' ? '' : 'none';
+  });
+}
+
+function getBudgetMode(){
+  const checked = document.querySelector('input[name="budgetMode"]:checked');
+  return checked ? checked.value : '';
 }
 
 function updateFiscalYear(){
@@ -1008,6 +1180,7 @@ function updateFiscalYear(){
 function buildPayload(){
   syncCountryIdFromInput();
   syncUnitIdFromInput();
+  if (isInboundMobility()) syncInboundInstitutionFromParticipant();
   return {
     mobility_id: $('#mobilityId').value.trim(),
     direction: $('#directionInput').value,
@@ -1040,6 +1213,32 @@ function validatePayload(payload){
   return missing;
 }
 
+function buildBudgetPayload(mobilityId){
+  const mode = getBudgetMode();
+  if (!mode) return null;
+  const sourceTypeByMode = {
+    internal: $('#budgetSourceTypeInput').value.trim(),
+    external: 'external',
+    self_funded: 'self_funded',
+    no_budget: 'no_budget'
+  };
+  return {
+    mobility_id: mobilityId,
+    is_internal: mode === 'internal',
+    budget_source_type: sourceTypeByMode[mode] || '',
+    amount: mode === 'internal' ? toNumber($('#budgetAmountInput').value) : 0,
+    currency: 'THB'
+  };
+}
+
+function validateBudgetPayload(payload){
+  if (!payload) return [];
+  const missing = [];
+  if (payload.is_internal && !payload.budget_source_type) missing.push('ประเภทเงิน');
+  if (payload.is_internal && payload.amount <= 0) missing.push('จำนวนเงิน');
+  return missing;
+}
+
 async function saveMobility(event){
   event.preventDefault();
   if (!V2_MOBILITY_WRITE_UI_ENABLED) {
@@ -1048,8 +1247,10 @@ async function saveMobility(event){
   }
   const payload = buildPayload();
   const missing = validatePayload(payload);
-  if (missing.length) {
-    alert('กรุณาตรวจสอบ: ' + missing.join(', '));
+  const budgetPayload = buildBudgetPayload(payload.mobility_id || 'pending');
+  const budgetMissing = validateBudgetPayload(budgetPayload);
+  if (missing.length || budgetMissing.length) {
+    alert('กรุณาตรวจสอบ: ' + missing.concat(budgetMissing).join(', '));
     return;
   }
   const isEdit = !!payload.mobility_id;
@@ -1062,6 +1263,13 @@ async function saveMobility(event){
     if (!res || res.success === false) throw new Error(res?.error || 'บันทึกไม่สำเร็จ');
     const savedMobilityId = isEdit ? $('#mobilityId').value : (res.data?.mobility?.mobility_id || res.data?.persisted_mobility?.mobility_id || '');
     if (!savedMobilityId) throw new Error('ไม่พบ mobility_id หลังบันทึก MOBILITY_PROJECT');
+    if (budgetPayload && savedMobilityId) {
+      budgetPayload.mobility_id = savedMobilityId;
+      const budgetRes = await requestMobilityWrite('v2.admin.mobility.budget.save', budgetPayload);
+      if (!budgetRes || budgetRes.success === false) {
+        throw new Error(budgetRes?.error || 'บันทึกงบประมาณไม่สำเร็จ');
+      }
+    }
     if (!isEdit && pendingParticipants.length) {
       for (const participant of pendingParticipants) {
         const participantPayload = {
@@ -1132,6 +1340,7 @@ function showParticipantSection(mobilityId){
   $('#manualAddBtn').style.display = 'none';
   state.selectedPerson = null;
   $('#selectedPersonBox').className = 'selected-person';
+  configureParticipantMode();
 }
 
 function hideParticipantSection(){
@@ -1155,7 +1364,9 @@ function participantTypeLabel(type){
   const key = String(type || '').toLowerCase();
   if (key === 'student') return 'นิสิต';
   if (key === 'staff') return 'บุคลากร';
-  if (key === 'manual') return 'เพิ่มเอง';
+  if (key === 'external') return 'บุคคลภายนอก';
+  if (key === 'guest') return 'ผู้มาเยือน';
+  if (key === 'manual') return 'ผู้มาเยือน';
   return type || '-';
 }
 
@@ -1173,7 +1384,7 @@ function renderParticipantList(){
         <div class="participant-name">${esc(row.full_name_snapshot || '-')}</div>
         <div class="participant-unit">${esc(row.program_or_position_snapshot || '')}</div>
       </div>
-      <div class="participant-unit">${esc(unitNameById(row.unit_id_snapshot))}</div>
+      <div class="participant-unit">${esc(unitNameById(row.unit_id_snapshot) || row.unit_id_snapshot || '')}</div>
       <div>${participantTypeBadge(row.participant_type)}</div>
       <button class="btn danger" type="button" onclick="deleteParticipant('${escAttr(row.participant_id)}')">ลบ</button>
     </div>
@@ -1189,11 +1400,12 @@ function syncParticipantCountInputs(){
 
 function participantTypeBadge(type){
   const key = String(type || '').toLowerCase();
-  const cls = key === 'staff' ? 'outbound' : key === 'manual' ? 'draft' : 'inbound';
+  const cls = key === 'staff' ? 'outbound' : (key === 'external' || key === 'guest' || key === 'manual') ? 'draft' : 'inbound';
   return `<span class="badge ${cls}">${esc(participantTypeLabel(key))}</span>`;
 }
 
 async function searchParticipants(value){
+  if (isInboundMobility()) return;
   const q = String(value || '').trim().toLowerCase();
   state.selectedPerson = null;
   $('#selectedPersonBox').className = 'selected-person';
@@ -1231,6 +1443,7 @@ function mapPersonSearchResult(row){
     gender_snapshot: row.gender || '',
     unit_id_snapshot: row.unit_id || '',
     program_or_position_snapshot: row.program_or_position || '',
+    degree_level: row.degree_level || '',
     type_label: row.type_label || participantTypeLabel(row.participant_type)
   };
 }
@@ -1284,6 +1497,7 @@ async function addSelectedParticipant(){
     role: ''
   };
   await addParticipantPayload(payload);
+  applyOutboundParticipantDefaults(person);
   state.selectedPerson = null;
   $('#participantSearchInput').value = '';
   $('#selectedPersonBox').className = 'selected-person';
@@ -1300,6 +1514,30 @@ function showManualParticipantForm(){
   $('#manualParticipantTypeInput').focus();
 }
 
+function applyOutboundParticipantDefaults(person){
+  if (isInboundMobility() || !person) return;
+  const type = String(person.participant_type || '').toLowerCase();
+  if (type && $('#participantGroupInput') && !$('#participantGroupInput').value) $('#participantGroupInput').value = type;
+  if (type === 'student' && $('#participantGroupInput')) $('#participantGroupInput').value = 'student';
+  if (type === 'staff' && $('#participantGroupInput')) $('#participantGroupInput').value = 'staff';
+  const level = normalizeDegreeLevel(person.degree_level);
+  if (level && $('#levelInput')) $('#levelInput').value = level;
+  if (person.unit_id_snapshot && !$('#upUnitIdInput').value && !$('#unitInput').value) {
+    $('#upUnitIdInput').value = person.unit_id_snapshot;
+    $('#unitInput').value = unitNameById(person.unit_id_snapshot);
+  }
+  syncParticipantCountInputs();
+}
+
+function normalizeDegreeLevel(value){
+  const text = String(value || '').trim().toLowerCase();
+  if (!text) return '';
+  if (text.includes('doctor') || text.includes('phd') || text.includes('เอก')) return 'ป.เอก';
+  if (text.includes('master') || text.includes('โท')) return 'ป.โท';
+  if (text.includes('bachelor') || text.includes('ตรี')) return 'ป.ตรี';
+  return value;
+}
+
 function hideManualParticipantForm(){
   if (!$('#manualParticipantForm')) return;
   $('#manualParticipantForm').className = 'manual-form';
@@ -1308,7 +1546,9 @@ function hideManualParticipantForm(){
   $('#manualFirstNameThInput').value = '';
   $('#manualLastNameThInput').value = '';
   $('#manualFirstNameEnInput').value = '';
+  $('#manualMiddleNameInput').value = '';
   $('#manualLastNameEnInput').value = '';
+  $('#manualAutoFullNameInput').value = '';
   $('#manualFullNameInput').value = '';
   $('#manualGenderInput').value = '';
   $('#manualUnitInput').value = '';
@@ -1322,11 +1562,64 @@ function hideManualParticipantForm(){
 
 function syncManualPersonTypeFields(){
   const type = $('#manualParticipantTypeInput').value;
+  const direction = $('#directionInput') ? $('#directionInput').value : 'inbound';
+  const isInbound = direction === 'inbound';
   const isStaff = type === 'staff';
+  const isUpStudent = type === 'student' && !isInbound;
+  const autoFullNameField = $('#manualAutoFullNameInput')?.closest('.field');
+  const firstThField = $('#manualFirstNameThInput').closest('.field');
+  const lastThField = $('#manualLastNameThInput').closest('.field');
+  const firstEnLabel = document.querySelector('label[for="manualFirstNameEnInput"]');
+  const lastEnLabel = document.querySelector('label[for="manualLastNameEnInput"]');
+  const prefixLabel = document.querySelector('label[for="manualPrefixThInput"]');
+  const fullNameLabel = document.querySelector('label[for="manualFullNameInput"]');
+  const unitLabelEl = document.querySelector('label[for="manualUnitInput"]');
+  const programLabel = document.querySelector('label[for="manualProgramInput"]');
   document.querySelectorAll('.manual-staff-field').forEach(field => {
     field.style.display = isStaff ? '' : 'none';
   });
-  $('#manualStudentIdInput').closest('.field').style.display = isStaff ? 'none' : '';
+  $('#manualStudentIdInput').closest('.field').style.display = isUpStudent ? '' : 'none';
+  if (!isUpStudent) $('#manualStudentIdInput').value = '';
+  if (autoFullNameField) autoFullNameField.style.display = isInbound ? '' : 'none';
+  if (firstThField) firstThField.style.display = isInbound ? 'none' : '';
+  if (lastThField) lastThField.style.display = isInbound ? 'none' : '';
+  if (firstEnLabel) firstEnLabel.innerHTML = isInbound ? 'First name <span class="req">*</span>' : 'First name';
+  if (lastEnLabel) lastEnLabel.innerHTML = isInbound ? 'Last name <span class="req">*</span>' : 'Last name';
+  if (prefixLabel) prefixLabel.textContent = isInbound ? 'Title / Prefix' : 'คำนำหน้า';
+  if (fullNameLabel) fullNameLabel.textContent = isInbound ? 'Full name override' : 'ชื่อเต็ม';
+  if (unitLabelEl) unitLabelEl.textContent = isInbound ? 'Home institution / Organization' : 'คณะ/หน่วยงาน';
+  if (programLabel) programLabel.textContent = isInbound ? manualProgramLabelForType(type) : 'หลักสูตร/ตำแหน่ง';
+  updateInboundAutoFullName();
+}
+
+function manualProgramLabelForType(type){
+  const key = String(type || '').toLowerCase();
+  if (key === 'student') return 'Program / Major';
+  if (key === 'staff') return 'Position / Job title';
+  return 'Position / Expertise';
+}
+
+function composeInboundForeignFullName(){
+  return [
+    $('#manualPrefixThInput').value.trim(),
+    $('#manualFirstNameEnInput').value.trim(),
+    $('#manualMiddleNameInput').value.trim(),
+    $('#manualLastNameEnInput').value.trim()
+  ].filter(Boolean).join(' ').trim();
+}
+
+function updateInboundAutoFullName(){
+  const autoField = $('#manualAutoFullNameInput');
+  if (!autoField) return;
+  autoField.value = isInboundMobility() ? composeInboundForeignFullName() : '';
+}
+
+function handleManualNameInput(){
+  updateInboundAutoFullName();
+}
+
+function handleManualFullNameOverrideInput(){
+  updateInboundAutoFullName();
 }
 
 function buildManualFullName(){
@@ -1336,42 +1629,70 @@ function buildManualFullName(){
   return $('#manualFullNameInput').value.trim() || [prefix + first, last].filter(Boolean).join(' ').trim();
 }
 
+function buildInboundForeignFullName(){
+  return $('#manualFullNameInput').value.trim() || composeInboundForeignFullName();
+}
+
 async function addManualParticipant(){
   syncManualUnitIdFromInput();
   const type = $('#manualParticipantTypeInput').value;
-  const fullName = buildManualFullName();
-  if (!$('#manualFirstNameThInput').value.trim() || !$('#manualLastNameThInput').value.trim()) return alert('กรุณากรอกชื่อและสกุลภาษาไทย');
-  if (type === 'student' && !$('#manualStudentIdInput').value.trim()) return alert('กรุณากรอกรหัสนิสิต');
+  const isInbound = $('#directionInput').value === 'inbound';
+  const homeInstitution = $('#manualUnitInput').value.trim();
+  const fullName = isInbound ? buildInboundForeignFullName() : buildManualFullName();
+  const englishName = [
+    $('#manualFirstNameEnInput').value.trim(),
+    $('#manualMiddleNameInput').value.trim(),
+    $('#manualLastNameEnInput').value.trim()
+  ].filter(Boolean).join(' ');
+  const displayName = fullName || englishName;
+  const hasName = !!displayName;
+  if (!hasName) return alert('กรุณากรอกชื่อผู้เข้าร่วม');
+  if (isInbound && (!$('#manualFirstNameEnInput').value.trim() || !$('#manualLastNameEnInput').value.trim())) return alert('กรุณากรอก First name และ Last name');
+  if (!isInbound && type === 'student' && !$('#manualStudentIdInput').value.trim()) return alert('กรุณากรอกรหัสนิสิต');
   const personRes = await IROUP_V2.admin.personCreate({
-    person_type: type,
+    person_type: isInbound ? 'manual' : type,
+    participant_type: type,
     student_id: $('#manualStudentIdInput').value.trim(),
     prefix_th: $('#manualPrefixThInput').value.trim(),
     first_name_th: $('#manualFirstNameThInput').value.trim(),
     last_name_th: $('#manualLastNameThInput').value.trim(),
-    full_name_th: fullName,
+    full_name_th: displayName,
+    full_name_en: englishName,
     first_name_en: $('#manualFirstNameEnInput').value.trim(),
     last_name_en: $('#manualLastNameEnInput').value.trim(),
     gender: $('#manualGenderInput').value,
-    unit_id: $('#manualUnitIdInput').value,
-    program_th: type === 'student' ? $('#manualProgramInput').value.trim() : '',
-    position: type === 'staff' ? $('#manualProgramInput').value.trim() : '',
+    unit_id: isInbound ? '' : $('#manualUnitIdInput').value,
+    program_th: !isInbound && type === 'student' ? $('#manualProgramInput').value.trim() : '',
+    position: !isInbound && type === 'staff' ? $('#manualProgramInput').value.trim() : '',
+    program_or_position: $('#manualProgramInput').value.trim(),
     staff_type: type === 'staff' ? $('#manualStaffTypeInput').value : '',
-    source_note: 'mobility_manual_participant'
+    source_note: isInbound
+      ? ['mobility_inbound_foreign_participant', homeInstitution ? `home_institution=${homeInstitution}` : ''].filter(Boolean).join('; ')
+      : 'mobility_manual_participant'
   });
   if (!personRes || personRes.success === false) return alert(personRes?.error || 'สร้างข้อมูลบุคคลไม่สำเร็จ');
   const person = (personRes.data || {});
   const payload = {
     mobility_id: $('#mobilityId').value,
     participant_type: person.participant_type || type,
-    person_source: person.source || (type === 'staff' ? 'PERSON_STAFF' : 'PERSON_STUDENT'),
+    person_source: person.source || (isInbound ? 'MANUAL' : (type === 'staff' ? 'PERSON_STAFF' : 'PERSON_STUDENT')),
     person_id: person.person_id || '',
-    full_name_snapshot: person.full_name_th || person.full_name_en || fullName,
+    full_name_snapshot: person.full_name_th || person.full_name_en || displayName,
     gender_snapshot: person.gender || $('#manualGenderInput').value,
-    unit_id_snapshot: person.unit_id || $('#manualUnitIdInput').value,
+    unit_id_snapshot: isInbound ? homeInstitution : (person.unit_id || $('#manualUnitIdInput').value),
     program_or_position_snapshot: person.program_or_position || $('#manualProgramInput').value.trim(),
     role: $('#manualRoleInput').value.trim()
   };
   await addParticipantPayload(payload);
+  if (isInbound) {
+    syncInboundInstitutionFromParticipant();
+  } else {
+    applyOutboundParticipantDefaults({
+      participant_type: type,
+      unit_id_snapshot: payload.unit_id_snapshot,
+      degree_level: ''
+    });
+  }
   hideManualParticipantForm();
 }
 

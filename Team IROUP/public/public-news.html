@@ -420,7 +420,7 @@ function dateVal(value){
 }
 
 function truncate(value, max){
-  var text = clean(value).replace(/\s+/g,' ');
+  var text = clean(value).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
   return text.length <= max ? text : text.slice(0, max - 1).trim() + '…';
 }
 

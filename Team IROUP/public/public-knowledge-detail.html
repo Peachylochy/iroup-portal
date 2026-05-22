@@ -17,6 +17,7 @@
   document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
+<script src="../js/iroup-rich-lite.js"></script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -198,7 +199,7 @@ function renderDetail(){
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('articleShell').style.display = 'block';
   document.getElementById('articleTitle').textContent = title;
-  document.getElementById('articleContent').textContent = displayContent(item) || '-';
+  document.getElementById('articleContent').innerHTML = renderRichContent(displayContent(item)) || esc('-');
   document.getElementById('badgeRow').innerHTML = renderBadges(item);
   document.getElementById('heroCover').innerHTML = item.cover_url ? '<img src="' + escAttr(toImageUrl(item.cover_url, 1600)) + '" alt="' + escAttr(title) + '">' : 'KNOWLEDGE';
   setAction('pdfBtn', item.pdf_url);
@@ -306,6 +307,7 @@ function showError(message){
 
 function displayTitle(item){ return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en; }
 function displayContent(item){ return currentLang === 'EN' ? item.content_en || item.content_th : item.content_th || item.content_en; }
+function renderRichContent(value){ return window.IROUP_RICH_LITE ? IROUP_RICH_LITE.render(value) : esc(value); }
 function collectFiles(row){ var groups = []; if(Array.isArray(row.files)) groups.push(row.files); if(row.files && typeof row.files === 'object' && !Array.isArray(row.files)){ Object.keys(row.files).forEach(function(key){ if(Array.isArray(row.files[key])) groups.push(row.files[key]); }); } if(Array.isArray(row.public_files)) groups.push(row.public_files); if(row.file_summary && Array.isArray(row.file_summary.files)) groups.push(row.file_summary.files); return groups.reduce(function(acc, group){ return acc.concat(group); }, []).filter(Boolean); }
 function isPublicFile(file){ var visibility = clean(file && file.visibility_level); return !visibility || visibility === 'public'; }
 function firstFileUrl(files, role){ var match = (files || []).find(function(file){ return clean(file.file_role_id || (file.file_role && file.file_role.file_role_id) || file.role).toLowerCase() === role; }); return match ? safeUrl(match.file_url || match.thumbnail_url || match.url || match.drive_url) : ''; }

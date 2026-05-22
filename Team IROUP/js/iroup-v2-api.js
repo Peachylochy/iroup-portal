@@ -374,6 +374,16 @@
       mobilityDetail: function (mobilityId) {
         return request('v2.admin.mobility.detail', withId_('mobility_id', mobilityId), { auth: true });
       },
+      mobilityBudgetGet: function (mobilityId) {
+        return request('v2.admin.mobility.budget.get', withId_('mobility_id', mobilityId), { auth: true });
+      },
+      mobilityBudgetSave: function (payload) {
+        return request('v2.admin.mobility.budget.save', { payload: payload || {} }, {
+          auth: true,
+          method: 'POST',
+          timeoutMs: ADMIN_EVENT_WRITE_TIMEOUT_MS
+        });
+      },
       travelList: function (params) {
         return request('v2.admin.travel.list', params || {}, { auth: true });
       },

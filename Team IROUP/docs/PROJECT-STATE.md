@@ -4494,3 +4494,232 @@ Next session:
   flow once more after cache settles.
 - Optionally add a small install/help note for internal users if people ask how
   to Add to Home Screen on iPhone/Android.
+
+Mobility staging checkpoint, 2026-05-22 late night:
+
+- Local V2 endpoint is intentionally switched to the staging Apps Script URL for
+  testing. Do not commit `Team IROUP/js/iroup-v2-endpoint.js` until it is
+  switched back to the live endpoint.
+- Staging endpoint currently confirmed reachable. Public mobility list returned
+  `success: true`, `total: 1`, `dataCount: 1`, but response time was still about
+  12.9 seconds before the latest local backend optimization is deployed.
+- Person search works against staging, but the backend search performance patch
+  in `IROUP_V2_DTO_LOOKUP.gs` still needs to be uploaded/deployed to Apps Script
+  staging to reduce search latency.
+- Mobility KPI logic has been changed from project-count-only to split trips and
+  people:
+  - inbound trips
+  - inbound people
+  - outbound trips
+  - outbound people
+  - related countries
+- Public landing, admin mobility, dashboard, and report mobility totals now count
+  people where reports need people, instead of treating each mobility project as
+  one person.
+- Mobility budget support has been added locally to match Travel:
+  - UI choices: unspecified, internal, external, self-funded, no budget
+  - internal budget requires source type and amount
+  - budget rows save to `BUDGET` with `module = mobility` and
+    `record_id = mobility_id`
+  - new backend routes: `v2.admin.mobility.budget.get` and
+    `v2.admin.mobility.budget.save`
+- Travel budget choices were expanded to the same set:
+  - unspecified
+  - internal
+  - external
+  - self-funded
+  - no budget
+- Mobility load performance was optimized locally:
+  - `mobility.html` no longer requests `includeArchived: true` for the normal
+    admin list.
+  - admin Mobility list/detail now use a Mobility-specific context instead of
+    reading unrelated MOU, scholarship, and event sheets.
+  - public Mobility list now uses a Mobility-specific public context.
+- Apps Script files that need staging upload/deploy before full testing:
+  - `IROUP_V2_ADMIN_API.gs`
+  - `IROUP_V2_ROUTER.gs`
+  - `IROUP_V2_PUBLIC_API.gs`
+  - `IROUP_V2_DTO_LOOKUP.gs`
+- Local syntax checks passed for the edited frontend/backend files, including
+  `mobility.html`, `travel.html`, `iroup-v2-api.js`, `IROUP_V2_ADMIN_API.gs`,
+  `IROUP_V2_ROUTER.gs`, and `IROUP_V2_PUBLIC_API.gs`.
+
+Mobility inbound/outbound form checkpoint, 2026-05-22 23:55:
+
+- User clarified that the Mobility modal must start with an explicit
+  inbound/outbound switch, not hide the distinction inside the same participant
+  form.
+- Local `mobility.html` now has a first section named "ประเภทการเดินทาง" with:
+  - `Inbound - ผู้มาเยือนต่างชาติ`
+  - `Outbound - นิสิต/บุคลากร UP เดินทางออก`
+- Inbound mode is now intended to be a foreign-visitor/manual-person workflow:
+  - hides the UP student/staff search box
+  - opens the manual participant form immediately
+  - does not require UP student ID
+  - allows participant types `student`, `staff`, `external`, `guest`
+  - should save the person to `PERSON_MANUAL`
+  - should link the person to the project through `MOBILITY_PARTICIPANT` with
+    `person_source = MANUAL`
+- Outbound mode keeps the old UP workflow:
+  - search/select from `PERSON_STUDENT` and `PERSON_STAFF`
+  - manual student/staff fallback still exists
+  - student ID is required only for outbound manual student entries
+- Local backend `IROUP_V2_ADMIN_API.gs` now has `personCreate` support for
+  `PERSON_MANUAL`:
+  - `person_type` may be `manual`, `external`, or `guest`
+  - manual rows use `person_id`
+  - mapper returns `source: MANUAL`
+  - mobility participant validation now accepts participant types
+    `student`, `staff`, `external`, `guest` and `person_source = MANUAL`
+- Important staging requirement before testing inbound save:
+  - upload/deploy `IROUP_V2_ADMIN_API.gs` to Apps Script staging
+  - otherwise the local UI will call backend behavior that the deployed staging
+    script does not have yet
+- Syntax check passed after the latest form switch change:
+  - `mobility.html ok`
+  - `IROUP_V2_ADMIN_API.gs ok`
+- Current known dirty/active scope includes:
+  - mobility trip/person KPI split and participant count fixes
+  - Mobility/Travel budget choices
+  - Mobility budget get/save routes
+  - Mobility load performance context optimization
+  - person search TextFinder patch
+  - inbound foreign participant manual-person workflow
+- Reminder: `Team IROUP/js/iroup-v2-endpoint.js` is still intentionally pointed
+  at staging for local testing and must be switched back to live before commit.
+
+Mobility inbound semantics follow-up, 2026-05-23:
+
+- Local `mobility.html` now separates inbound foreign visitor institution text
+  from UP unit lookup behavior.
+- Inbound `Home institution / Organization` is treated as free text/snapshot for
+  now, not as a `UP_UNIT_MASTER` lookup and not as `PERSON_MANUAL.unit_id`.
+- Inbound project `institution_name` auto-fills from the visitor home
+  institution when the project field is still blank or still contains the
+  previous auto-filled value.
+- Inbound name handling now shows an auto-composed full name from
+  `Title / Prefix`, `First name`, `Middle name`, and `Last name`; the editable
+  full-name field is relabeled as `Full name override`.
+- Inbound `Program / Position` label is now dynamic:
+  - student: `Program / Major`
+  - staff: `Position / Job title`
+  - external/guest: `Position / Expertise`
+- Main project labels were clarified:
+  - `สถาบันต้นทางหลัก / Main sending institution`
+  - `หน่วยงาน UP ที่รับผิดชอบ / Host UP unit`
+- Outbound participant selection now carries `degree_level` from person search
+  and uses it to auto-fill project `level` where possible.
+- Outbound participant selection/manual add also updates participant group,
+  participant counts, and host UP unit from the selected person when those
+  project fields are still empty.
+- Syntax check passed:
+  - `mobility.html ok`
+  - `travel.html ok`
+  - `js/iroup-v2-api.js ok`
+
+Inbound manual person hotfix, 2026-05-23:
+
+- Fixed local `IROUP_V2_ADMIN_API.gs` bug where the `PERSON_MANUAL` construction
+  block had landed outside `normalizeV2PersonWritePayload_()`.
+- Symptom in browser: adding an inbound visitor showed
+  `Cannot read properties of null (reading 'person_id')`.
+- `manual`, `external`, and `guest` person payloads now create a non-null manual
+  person object before `createV2AdminPerson_()` reads `person_id`.
+- Removed the misplaced manual-person block from
+  `normalizeV2MobilityBudgetPayload_()`.
+- Syntax check passed:
+  - `IROUP_V2_ADMIN_API.gs ok`
+  - `IROUP_V2_ROUTER.gs ok`
+  - `IROUP_V2_PUBLIC_API.gs ok`
+  - `mobility.html ok`
+
+Dashboard/Travel/file semantics follow-up, 2026-05-23:
+
+- Executive Dashboard budget snapshot now includes Mobility budget values instead
+  of hardcoding V2 Mobility rows to zero.
+- Dashboard and Report budget helpers now prefer `budget_summary` relation totals
+  before flat parent amount fields.
+- Budget snapshot breakdown now includes Inbound and Outbound alongside Travel,
+  Scholarship, and Event.
+- Travel admin/report faculty display now uses participant unit snapshots from
+  `TRAVEL_PARTICIPANT` via `participant_summary.unit_names`.
+- `IROUP_V2_DTO_TRAVEL.gs` admin travel summary now includes:
+  - `participant_summary.by_unit_id`
+  - `participant_summary.unit_ids`
+  - `participant_summary.unit_names`
+- This preserves the correct model for group travel across multiple faculties:
+  one parent `TRAVEL` row, many `TRAVEL_PARTICIPANT` rows, each participant with
+  its own `unit_id_snapshot`.
+- Travel list/cards now display the combined faculty/unit summary where present.
+- Event and Scholarship attachment inputs now allow selecting multiple files at
+  once; each selected attachment still writes as a separate `FILES` relation row.
+- Syntax check passed:
+  - `dashboard.html ok`
+  - `report.html ok`
+  - `travel.html ok`
+  - `events.html ok`
+  - `scholarship.html ok`
+  - `IROUP_V2_DTO_TRAVEL.gs ok`
+
+Public Mobility flag follow-up, 2026-05-23:
+
+- Public Mobility/Travel page flag fallback now includes Argentina (`AR`) and
+  Brazil (`BR`), fixing Staff Travel timeline rows that were showing the generic
+  placeholder instead of national flags.
+- Syntax check passed:
+  - `public/public-mobility.html ok`
+
+V2 save-speed backend follow-up, 2026-05-23:
+
+- Optimized shared `appendV2Row_()` in `IROUP_V2_DB.gs`.
+- Previous append path scanned the key column across the sheet to find the first
+  empty row, then called `SpreadsheetApp.flush()` and read the key cell back
+  after every single insert.
+- New default append path writes to `sheet.getLastRow() + 1`, expanding the
+  sheet only when needed.
+- The old first-empty-row scan remains available through
+  `appendOptions.fillFirstEmpty === true`.
+- The post-write `flush()`/readback validation is now optional through
+  `appendOptions.validateWrite === true`.
+- This should reduce save latency for every V2 write path that appends rows,
+  including Mobility, Travel, Budget, Files, Event, Scholarship, and person
+  rows.
+- Syntax check passed:
+  - `IROUP_V2_DB.gs ok`
+  - `IROUP_V2_ADMIN_API.gs ok`
+  - `mobility.html ok`
+  - `travel.html ok`
+  - `events.html ok`
+  - `scholarship.html ok`
+
+Rich text content follow-up, 2026-05-23:
+
+- Added lightweight shared editor `js/iroup-rich-lite.js`.
+- The editor uses native `contenteditable`, keeps the original textarea as the
+  backing field, and syncs sanitized HTML back into the existing sheet columns.
+- No schema change is required; formatted content still writes into the current
+  text columns:
+  - NEWS `content_th`, `content_en`
+  - KNOWLEDGE `content_th`, `content_en`
+  - SCHOLARSHIP `content_th`, `content_en`
+  - EVENT `detail_th`, `detail_en`
+- Allowed formatting is intentionally small: paragraph, heading, bold, italic,
+  bullet/numbered lists, links, underline, and line breaks.
+- Public detail pages for News, Knowledge, Scholarship, and Event now render the
+  whitelisted rich HTML instead of displaying it as plain text.
+- Public/admin list snippets strip HTML tags before truncating so cards do not
+  show raw `<p>` or `<strong>` markup.
+- Syntax check passed:
+  - `js/iroup-rich-lite.js ok`
+  - `news.html ok`
+  - `knowledge.html ok`
+  - `scholarship.html ok`
+  - `events.html ok`
+  - `public/public-news.html ok`
+  - `public/public-news-detail.html ok`
+  - `public/public-knowledge.html ok`
+  - `public/public-knowledge-detail.html ok`
+  - `public/public-scholar.html ok`
+  - `public/public-scholar-detail.html ok`
+  - `public/public-events.html ok`
+  - `public/public-events-detail.html ok`

@@ -181,10 +181,19 @@ function mapV2LookupStaffDto_(row) {
 }
 
 function appendV2PersonSearchResults_(results, sheetName, mapper, query) {
-  const read = readV2Sheet_(sheetName);
-  if (!read.success) return;
+  const sheetResult = getV2Sheet_(sheetName);
+  if (!sheetResult.success || !sheetResult.data) return;
 
-  (read.data || []).forEach(function (row) {
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+  if (lastRow < 2 || lastColumn < 1) return;
+
+  const rowNumbers = findV2PersonSearchCandidateRows_(sheet, headers, sheetName, query);
+  rowNumbers.forEach(function (rowNumber) {
+    const values = sheet.getRange(rowNumber, 1, 1, lastColumn).getValues()[0];
+    const row = rowToObjectV2_(headers, values);
     if (isSoftDeletedV2_(row)) return;
     if (typeof row.active !== 'undefined' && row.active !== '' && !isTruthyV2_(row.active)) return;
 
@@ -203,6 +212,69 @@ function appendV2PersonSearchResults_(results, sheetName, mapper, query) {
     dto._score = getV2PersonSearchScore_(dto, query);
     results.push(dto);
   });
+}
+
+function findV2PersonSearchCandidateRows_(sheet, headers, sheetName, query) {
+  const columnNames = getV2PersonSearchColumnNames_(sheetName);
+  const lastRow = sheet.getLastRow();
+  const maxCandidates = 300;
+  const seen = {};
+  const rows = [];
+
+  for (let i = 0; i < columnNames.length; i++) {
+    const colIndex = headers.indexOf(columnNames[i]);
+    if (colIndex < 0) continue;
+
+    const range = sheet.getRange(2, colIndex + 1, lastRow - 1, 1);
+    const matches = range
+      .createTextFinder(query)
+      .matchCase(false)
+      .matchEntireCell(false)
+      .findAll();
+
+    for (let j = 0; j < matches.length; j++) {
+      const rowNumber = matches[j].getRow();
+      if (seen[rowNumber]) continue;
+      seen[rowNumber] = true;
+      rows.push(rowNumber);
+      if (rows.length >= maxCandidates) return rows;
+    }
+  }
+
+  return rows;
+}
+
+function getV2PersonSearchColumnNames_(sheetName) {
+  if (sheetName === IROUP_V2_SHEETS.PERSON_STUDENT) {
+    return [
+      'student_id',
+      'full_name_th',
+      'full_name_en',
+      'first_name_th',
+      'last_name_th',
+      'first_name_en',
+      'last_name_en',
+      'unit_id',
+      'program_th',
+      'degree_level',
+      'student_status'
+    ];
+  }
+  if (sheetName === IROUP_V2_SHEETS.PERSON_STAFF) {
+    return [
+      'staff_id',
+      'full_name_th',
+      'full_name_en',
+      'first_name_th',
+      'last_name_th',
+      'first_name_en',
+      'last_name_en',
+      'unit_id',
+      'position',
+      'staff_type'
+    ];
+  }
+  return [];
 }
 
 function mapV2PersonSearchStudentDto_(row) {

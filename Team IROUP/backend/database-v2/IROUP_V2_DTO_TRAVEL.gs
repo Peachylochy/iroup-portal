@@ -151,7 +151,7 @@ function mapV2AdminTravelSummaryDto_(row, ctx) {
     status: row.status || '',
     public_visible: isTruthyV2_(row.public_visible),
     is_deleted: isSoftDeletedV2_(row),
-    participant_summary: summarizeV2TravelParticipants_(participants),
+    participant_summary: summarizeV2TravelParticipants_(participants, ctx),
     participant_count_cached: toNumberV2_(row.participant_count),
     budget_summary: summarizeV2Budgets_(budgets, ctx),
     file_summary: summarizeV2Files_(files, ctx),
@@ -213,22 +213,41 @@ function countV2TravelParticipants_(ctx, travelId) {
   return findV2TravelParticipants_(ctx, travelId).length;
 }
 
-function summarizeV2TravelParticipants_(participants) {
+function summarizeV2TravelParticipants_(participants, ctx) {
   const summary = {
     total: 0,
     by_person_source: {},
-    by_role: {}
+    by_role: {},
+    by_unit_id: {},
+    unit_ids: [],
+    unit_names: []
   };
+  const unitSeen = {};
 
   (participants || []).forEach(function (participant) {
     const source = String(participant.person_source || '').trim() || 'unknown';
     const role = String(participant.role || '').trim() || 'unknown';
+    const unitId = String(participant.unit_id_snapshot || '').trim();
     summary.total++;
     summary.by_person_source[source] = (summary.by_person_source[source] || 0) + 1;
     summary.by_role[role] = (summary.by_role[role] || 0) + 1;
+    if (unitId) {
+      summary.by_unit_id[unitId] = (summary.by_unit_id[unitId] || 0) + 1;
+      if (!unitSeen[unitId]) {
+        unitSeen[unitId] = true;
+        summary.unit_ids.push(unitId);
+        summary.unit_names.push(displayV2TravelUnitName_(ctx, unitId));
+      }
+    }
   });
 
   return summary;
+}
+
+function displayV2TravelUnitName_(ctx, unitId) {
+  const units = ctx && ctx.unitsById ? ctx.unitsById : {};
+  const unit = units[unitId] || {};
+  return unit.unit_name_th || unit.unit_name_en || unit.unit_code || unitId || '';
 }
 
 function objectValuesV2Travel_(map) {

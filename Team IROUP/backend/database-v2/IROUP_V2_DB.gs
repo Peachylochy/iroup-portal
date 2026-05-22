@@ -147,14 +147,16 @@ function appendV2Row_(sheetName, data, options) {
   try {
     const keyColumnIndex = getV2AppendKeyColumnIndex_(headers, appendOptions.idField);
     diagnostics.keyColumnIndex = keyColumnIndex;
-    diagnostics.rowNumber = findFirstEmptyRowByKey_(sheet, keyColumnIndex);
+    diagnostics.rowNumber = findAppendRowByKey_(sheet, keyColumnIndex, appendOptions);
 
     sheet.getRange(diagnostics.rowNumber, 1, 1, headers.length).setValues([row]);
-    SpreadsheetApp.flush();
 
-    const persistedKey = sheet.getRange(diagnostics.rowNumber, keyColumnIndex).getValue();
-    if (String(persistedKey || '').trim() !== String(row[keyColumnIndex - 1] || '').trim()) {
-      diagnostics.validationWarnings.push('Written key did not match persisted key cell after setValues');
+    if (appendOptions.validateWrite === true) {
+      SpreadsheetApp.flush();
+      const persistedKey = sheet.getRange(diagnostics.rowNumber, keyColumnIndex).getValue();
+      if (String(persistedKey || '').trim() !== String(row[keyColumnIndex - 1] || '').trim()) {
+        diagnostics.validationWarnings.push('Written key did not match persisted key cell after setValues');
+      }
     }
 
     const inserted = rowToObjectV2_(headers, row);
@@ -174,6 +176,19 @@ function appendV2Row_(sheetName, data, options) {
       diagnostics: diagnostics
     };
   }
+}
+
+function findAppendRowByKey_(sheet, keyColumnIndex, options) {
+  const appendOptions = options || {};
+  if (appendOptions.fillFirstEmpty === true) {
+    return findFirstEmptyRowByKey_(sheet, keyColumnIndex);
+  }
+
+  const nextRow = Math.max(2, sheet.getLastRow() + 1);
+  if (nextRow > sheet.getMaxRows()) {
+    sheet.insertRowsAfter(sheet.getMaxRows(), nextRow - sheet.getMaxRows());
+  }
+  return nextRow;
 }
 
 function getV2AppendKeyColumnIndex_(headers, idField) {

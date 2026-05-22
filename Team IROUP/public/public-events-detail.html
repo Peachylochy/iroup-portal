@@ -17,6 +17,7 @@
   document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
+<script src="../js/iroup-rich-lite.js"></script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -240,7 +241,7 @@ function renderDetail(){
       (item.poster ? '<div class="cover"><img src="' + escAttr(item.poster) + '" alt="' + escAttr(title) + '"></div>' : '') +
       '<article class="article">' +
         (content
-          ? '<div class="content">' + esc(content) + '</div>'
+          ? '<div class="content">' + renderRichContent(content) + '</div>'
           : '<p class="no-content">' + esc(t('noContent')) + '</p>') +
       '</article>' +
     '</section>' +
@@ -277,6 +278,7 @@ function fact(label, value){
 function displayOrganizer(item){
   return currentLang === 'EN' ? (item.organizer_en || item.organizer_th) : (item.organizer_th || item.organizer_en);
 }
+function renderRichContent(value){ return window.IROUP_RICH_LITE ? IROUP_RICH_LITE.render(value) : esc(value); }
 function eventStatus(item){
   var today = startOfDay(new Date());
   var s = parseDate(item.start_date);

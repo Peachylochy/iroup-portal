@@ -11,6 +11,7 @@
 <script src="js/iroup-v2-api.js"></script>
 <script src="js/iroup-utils.js"></script>
 <script src="js/iroup-image-helper.js"></script>
+<script src="js/iroup-rich-lite.js"></script>
 <script src="js/iroup-admin-guard.js"></script>
 <style>
 *{box-sizing:border-box}
@@ -232,11 +233,11 @@ body.modal-open{overflow:hidden}
             </div>
             <div class="field full">
               <label class="label" for="contentTh">เนื้อหารายละเอียดทุน (TH)<span class="hint">ใช้สำหรับหน้า public detail แบบข่าว</span></label>
-              <textarea id="contentTh" class="textarea" name="content_th" rows="10"></textarea>
+              <textarea id="contentTh" class="textarea" name="content_th" rows="10" data-rich-lite="true"></textarea>
             </div>
             <div class="field full">
               <label class="label" for="contentEn">Scholarship detail content (EN)<span class="hint">Optional</span></label>
-              <textarea id="contentEn" class="textarea" name="content_en" rows="10"></textarea>
+              <textarea id="contentEn" class="textarea" name="content_en" rows="10" data-rich-lite="true"></textarea>
             </div>
           </div>
         </section>
@@ -311,7 +312,7 @@ body.modal-open{overflow:hidden}
               <div class="file-picker-row">
                 <button id="attachmentPickerBtn" class="btn" type="button" onclick="chooseScholarFile('attachment')">แนบไฟล์</button>
               </div>
-              <input id="attachmentFileInput" type="file" hidden>
+              <input id="attachmentFileInput" type="file" hidden multiple>
               <div id="selectedFiles" class="file-list"></div>
             </div>
             <div class="field full">
@@ -572,6 +573,7 @@ function openCreateModal() {
   }
   state.editingId = '';
   $('#scholarForm').reset();
+  refreshRichEditorFields();
   state.pendingFiles = [];
   $('#scholarshipId').value = '';
   $('#modalTitle').textContent = 'เพิ่มทุนการศึกษา';
@@ -601,6 +603,7 @@ async function openEditModal(scholarshipId) {
   }
   state.editingId = scholarshipId;
   $('#scholarForm').reset();
+  refreshRichEditorFields();
   state.pendingFiles = [];
   $('#scholarshipId').value = item.scholarship_id || '';
   $('#titleTh').value = item.title_th || '';
@@ -616,6 +619,7 @@ async function openEditModal(scholarshipId) {
   $('#coverageEn').value = item.coverage_en || '';
   $('#contentTh').value = item.content_th || '';
   $('#contentEn').value = item.content_en || '';
+  refreshRichEditorFields();
   $('#publishDate').value = item.publish_date || '';
   $('#openDate').value = item.open_date || '';
   $('#closeDate').value = item.close_date || '';
@@ -680,6 +684,14 @@ async function deleteScholarshipFromModal() {
   await deleteV2Scholarship($('#scholarshipId').value);
 }
 
+function syncRichEditorFields() {
+  if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.syncAll($('#scholarForm'));
+}
+
+function refreshRichEditorFields() {
+  if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.refreshAll($('#scholarForm'));
+}
+
 async function deleteV2Scholarship(scholarshipId) {
   if (!V2_SCHOLARSHIP_WRITE_UI_ENABLED) {
     alert('ยังไม่เปิดใช้งานการลบ V2 สำหรับทุนการศึกษา');
@@ -708,6 +720,7 @@ function scholarshipDeleteRequest(scholarshipId) {
 }
 
 function buildPayloadFromForm() {
+  syncRichEditorFields();
   updateCountryIdFromInput();
   const payload = {
     scholarship_id: $('#scholarshipId').value.trim(),
@@ -756,15 +769,16 @@ function chooseScholarFile(role) {
 }
 
 function handleScholarFileSelected(evt, role) {
-  const file = evt && evt.target && evt.target.files ? evt.target.files[0] : null;
-  if (!file) return;
+  const files = evt && evt.target && evt.target.files ? Array.from(evt.target.files) : [];
+  if (!files.length) return;
   const normalizedRole = role === 'poster' ? 'poster' : 'attachment';
   if (normalizedRole === 'poster') state.pendingFiles = state.pendingFiles.filter(item => item.role !== 'poster');
-  state.pendingFiles.push({ role: normalizedRole, file });
+  files.forEach(file => state.pendingFiles.push({ role: normalizedRole, file }));
   evt.target.value = '';
   renderSelectedFiles();
   setFileStatus(normalizedRole === 'poster' ? 'เลือกรูปปกแล้ว' : 'เลือกไฟล์แนบแล้ว', false);
   if (normalizedRole === 'poster') {
+    const file = files[0];
     const reader = new FileReader();
     reader.onload = () => renderPosterPreview(String(reader.result || ''));
     reader.readAsDataURL(file);
@@ -1050,7 +1064,9 @@ function unique(values) {
 }
 
 function truncate(text, max) {
-  const value = String(text || '');
+  const value = window.IROUP_RICH_LITE
+    ? IROUP_RICH_LITE.toText(text)
+    : String(text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   return value.length > max ? value.slice(0, max - 1) + '…' : value;
 }
 

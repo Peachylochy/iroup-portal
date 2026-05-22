@@ -17,6 +17,7 @@
   document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
+<script src="../js/iroup-rich-lite.js"></script>
 <link rel="stylesheet" href="../css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -123,7 +124,7 @@ function fact(label,value){ return '<div class="fact"><div class="fact-label">' 
 function displayTitle(item){ return currentLang === 'EN' ? item.title_en || item.title_th : item.title_th || item.title_en; }
 function displayContent(item){ return currentLang === 'EN' ? item.content_en || item.content_th || item.coverage_en || item.coverage_th : item.content_th || item.content_en || item.coverage_th || item.coverage_en; }
 function displayCountry(item){ var name = currentLang === 'EN' ? item.country_name_en || item.country_name_th : item.country_name_th || item.country_name_en; return cleanCountryName(name); }
-function renderContent(value){ return esc(value).replace(/\n([^\n-][^\n]{0,80})\n/g, '\n<h3>$1</h3>\n'); }
+function renderContent(value){ return window.IROUP_RICH_LITE ? IROUP_RICH_LITE.render(value) : esc(value); }
 function scholarshipStatus(item){ var today = startOfDay(new Date()), openDate = parseDate(item.open_date), closeDate = parseDate(item.close_date); if(openDate && today < openDate) return {status:'upcoming',label:t('upcomingStatus')}; if(closeDate && today > closeDate) return {status:'closed',label:t('closedStatus')}; return {status:'open',label:t('openStatus')}; }
 function parseDate(value){ if(!value) return null; var d = new Date(value); return Number.isNaN(d.getTime()) ? null : startOfDay(d); }
 function startOfDay(date){ return new Date(date.getFullYear(), date.getMonth(), date.getDate()); }

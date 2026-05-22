@@ -329,7 +329,7 @@ function isPublicFile(file){ var visibility = clean(file && file.visibility_leve
 function firstFileUrl(files, role){ var match = (files || []).find(function(file){ return clean(file.file_role_id || (file.file_role && file.file_role.file_role_id) || file.role).toLowerCase() === role; }); return match ? safeUrl(match.file_url || match.thumbnail_url || match.url || match.drive_url) : ''; }
 function getImageUrls(item){ return (item.files || []).filter(function(file){ return clean(file.file_role_id || (file.file_role && file.file_role.file_role_id) || file.role).toLowerCase() === 'image'; }).map(function(file){ return safeUrl(file.file_url || file.thumbnail_url || file.url || file.drive_url); }).filter(Boolean); }
 function toImageUrl(url, size){ var value = safeUrl(url); var match = value.match(/\/file\/d\/([^/]+)/) || value.match(/[?&]id=([^&]+)/); if(match && match[1]) return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(match[1]) + '&sz=w' + (size || 1200); return value; }
-function truncate(value, max){ var text = clean(value).replace(/\s+/g,' '); return text.length <= max ? text : text.slice(0, max - 1).trim() + '…'; }
+function truncate(value, max){ var text = clean(value).replace(/<[^>]+>/g,' ').replace(/\s+/g,' '); return text.length <= max ? text : text.slice(0, max - 1).trim() + '…'; }
 function normalizeLang(lang){ return String(lang || '').toUpperCase() === 'EN' ? 'EN' : 'TH'; }
 function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.TH[key] || key; }
 function unique(values){ return Array.from(new Set((values || []).map(clean).filter(Boolean))); }

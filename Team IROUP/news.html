@@ -11,6 +11,7 @@
   <script src="js/iroup-v2-api.js"></script>
   <script src="js/iroup-utils.js"></script>
   <script src="js/iroup-image-helper.js"></script>
+  <script src="js/iroup-rich-lite.js"></script>
   <script src="js/iroup-admin-guard.js"></script>
   <style>
     :root{--blue:#0B74B8;--navy:#10294f;--ink:#15243b;--muted:#6b7f96;--line:#e6edf6;--soft:#eef7ff;--bg:#f5f8fc;--ok:#15803d;--warn:#b7791f;--danger:#c2410c}
@@ -273,11 +274,11 @@
           <div class="form-grid">
             <label class="field full">
               <span class="label">เนื้อหา (TH)</span>
-              <textarea id="contentTh" class="textarea large"></textarea>
+              <textarea id="contentTh" class="textarea large" data-rich-lite="true"></textarea>
             </label>
             <label class="field full">
               <span class="label">เนื้อหา (EN)</span>
-              <textarea id="contentEn" class="textarea large"></textarea>
+              <textarea id="contentEn" class="textarea large" data-rich-lite="true"></textarea>
             </label>
           </div>
         </section>
@@ -580,6 +581,7 @@
       state.pendingCover = null;
       state.pendingImages = [];
       $('#newsForm').reset();
+      refreshRichEditorFields();
       $('#newsId').value = '';
       $('#modalTitle').textContent = 'เพิ่มข่าว';
       $('#modalSub').textContent = 'สร้างข้อมูล NEWS ผ่าน V2';
@@ -598,6 +600,7 @@
       state.pendingCover = null;
       state.pendingImages = [];
       $('#newsForm').reset();
+      refreshRichEditorFields();
       $('#modalTitle').textContent = 'แก้ไขข่าว';
       $('#modalSub').textContent = newsId;
       $('#deleteBtn').style.display = '';
@@ -635,6 +638,7 @@
       $('#linkUrl').value = row.link_url || '';
       $('#contentTh').value = row.content_th || '';
       $('#contentEn').value = row.content_en || '';
+      refreshRichEditorFields();
       $('#publicVisible').checked = !!row.public_visible;
       setSelectedSdgs(parseSdgTags(row.sdg_tags));
       renderCoverPreview(getCoverUrl(row));
@@ -691,6 +695,7 @@
     }
 
     function buildPayloadFromForm() {
+      syncRichEditorFields();
       const payload = {
         news_id: $('#newsId').value.trim(),
         title_th: $('#titleTh').value.trim(),
@@ -710,6 +715,14 @@
 
     async function deleteNewsFromModal() {
       await deleteV2News($('#newsId').value);
+    }
+
+    function syncRichEditorFields() {
+      if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.syncAll($('#newsForm'));
+    }
+
+    function refreshRichEditorFields() {
+      if (window.IROUP_RICH_LITE) IROUP_RICH_LITE.refreshAll($('#newsForm'));
     }
 
     async function deleteV2News(newsId) {
@@ -1017,7 +1030,9 @@
     }
 
     function displayDate(value) {
-      const text = String(value || '').trim();
+      const text = window.IROUP_RICH_LITE
+        ? IROUP_RICH_LITE.toText(value)
+        : String(value || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       if (!text) return '-';
       const parsed = new Date(text);
       if (isNaN(parsed.getTime())) return text;

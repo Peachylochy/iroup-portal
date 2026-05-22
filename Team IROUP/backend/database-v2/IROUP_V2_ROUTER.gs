@@ -288,6 +288,18 @@ function getV2RouteDispatch_() {
         return deleteV2AdminMobilityParticipant_(request);
       }
     },
+    'v2.admin.mobility.budget.save': {
+      access: 'admin',
+      handler: function (request) {
+        return saveV2AdminMobilityBudget_(request);
+      }
+    },
+    'v2.admin.mobility.budget.get': {
+      access: 'admin',
+      handler: function (request) {
+        return getV2AdminMobilityBudget_(request);
+      }
+    },
     'v2.admin.travel.list': {
       access: 'admin',
       handler: function (request) {

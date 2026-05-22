@@ -297,8 +297,11 @@ body.modal-open{overflow:hidden}
             <div class="field full">
               <label class="label">แหล่งงบประมาณ</label>
               <div class="radio-row">
+                <label><input type="radio" name="budgetMode" value="" onchange="syncBudgetFields()" checked> ไม่ระบุ</label>
                 <label><input type="radio" name="budgetMode" value="internal" onchange="syncBudgetFields()"> ภายใน</label>
                 <label><input type="radio" name="budgetMode" value="external" onchange="syncBudgetFields()"> ภายนอก</label>
+                <label><input type="radio" name="budgetMode" value="self_funded" onchange="syncBudgetFields()"> ผู้เดินทางออกเอง</label>
+                <label><input type="radio" name="budgetMode" value="no_budget" onchange="syncBudgetFields()"> ไม่มีงบประมาณ</label>
               </div>
             </div>
             <div class="field budget-internal">
@@ -509,6 +512,17 @@ function enrichTravelRow(row){
   });
 }
 
+function travelUnitSummary(row){
+  const names = (row?.participant_summary?.unit_names || []).filter(Boolean);
+  if (names.length) return names.join(', ');
+  const participants = row?.participants || [];
+  const fromParticipants = participants
+    .map(participant => unitNameById(participant.unit_id_snapshot) || participant.unit_id_snapshot || '')
+    .filter(Boolean)
+    .filter((value, index, array) => array.indexOf(value) === index);
+  return fromParticipants.join(', ');
+}
+
 function statusLabel(status){
   const labels = {
     draft: { th: 'ร่าง', en: 'Draft' },
@@ -645,6 +659,7 @@ function renderList(rows, totalRows, startIndex){
           <th>ชื่อภารกิจ</th>
           <th>ประเทศ</th>
           <th>วัตถุประสงค์</th>
+          <th>คณะ/หน่วยงาน</th>
           <th>จำนวนผู้เดินทาง</th>
           <th>ช่วงเวลา</th>
           <th>ปีงบประมาณ</th>
@@ -659,6 +674,7 @@ function renderList(rows, totalRows, startIndex){
             <td><div class="title-cell">${esc(row.project_name || '-')}</div><div class="muted">${esc(row.city || '')}</div></td>
             <td>${esc(countryName(row))}</td>
             <td>${esc(row.purpose || '-')}</td>
+            <td>${esc(travelUnitSummary(row) || '-')}</td>
             <td><span class="badge count">${toNumber(row.participant_count).toLocaleString('th-TH')} คน</span></td>
             <td>${esc(dateRange(row))}</td>
             <td>${esc(row.fiscal_year || '-')}</td>
@@ -690,6 +706,7 @@ function renderCards(rows, totalRows){
         <div class="card-sub">${esc([countryName(row), row.city].filter(Boolean).join(' | '))}</div>
       </div>
       <div class="card-sub">${esc(row.purpose || '-')}</div>
+      <div class="card-sub">คณะ/หน่วยงาน: ${esc(travelUnitSummary(row) || '-')}</div>
       <div class="badge-row">
         <span class="badge count">${toNumber(row.participant_count).toLocaleString('th-TH')} คน</span>
         ${statusBadge(row.status)}
@@ -825,10 +842,11 @@ function hydrateForm(row){
 
 function hydrateBudget(budget){
   const internal = budget && boolValue(budget.is_internal);
-  const external = budget && !boolValue(budget.is_internal);
+  const sourceType = budget && !internal ? String(budget.budget_source_type || '').trim() : '';
+  const externalMode = sourceType === 'self_funded' || sourceType === 'no_budget' ? sourceType : 'external';
   const radios = document.querySelectorAll('input[name="budgetMode"]');
   radios.forEach(radio => {
-    radio.checked = (internal && radio.value === 'internal') || (external && radio.value === 'external');
+    radio.checked = (!budget && radio.value === '') || (internal && radio.value === 'internal') || (!internal && budget && radio.value === externalMode);
   });
   $('#budgetSourceTypeInput').value = internal ? (budget.budget_source_type || '') : '';
   $('#budgetAmountInput').value = internal ? toNumber(budget.amount || budget.amount_thb || 0) || '' : '';
@@ -913,10 +931,16 @@ function validatePayload(payload){
 function buildBudgetPayload(travelId){
   const mode = getBudgetMode();
   if (!mode) return null;
+  const sourceTypeByMode = {
+    internal: $('#budgetSourceTypeInput').value,
+    external: 'external',
+    self_funded: 'self_funded',
+    no_budget: 'no_budget'
+  };
   return {
     travel_id: travelId,
     is_internal: mode === 'internal',
-    budget_source_type: mode === 'internal' ? $('#budgetSourceTypeInput').value : '',
+    budget_source_type: sourceTypeByMode[mode] || '',
     amount: mode === 'internal' ? toNumber($('#budgetAmountInput').value) : 0,
     currency: 'THB'
   };
@@ -1225,8 +1249,9 @@ function renderParticipantList(){
 }
 
 function unitNameById(unitId){
+  if (!unitId) return '';
   const unit = state.units.find(item => String(item.unit_id || '') === String(unitId || ''));
-  return unit ? unitLabel(unit) : '-';
+  return unit ? unitLabel(unit) : '';
 }
 
 async function deleteParticipant(participantId){

@@ -207,8 +207,12 @@ function createV2AdminPerson_(request) {
   const person = normalized.data.person;
   const type = normalized.data.person_type;
   const now = new Date().toISOString();
-  const sheetName = type === 'student' ? IROUP_V2_SHEETS.PERSON_STUDENT : IROUP_V2_SHEETS.PERSON_STAFF;
-  const idField = type === 'student' ? 'student_id' : 'staff_id';
+  const sheetName = type === 'student'
+    ? IROUP_V2_SHEETS.PERSON_STUDENT
+    : type === 'staff'
+      ? IROUP_V2_SHEETS.PERSON_STAFF
+      : IROUP_V2_SHEETS.PERSON_MANUAL;
+  const idField = type === 'student' ? 'student_id' : type === 'staff' ? 'staff_id' : 'person_id';
   const personId = person[idField];
 
   const existing = findV2RowById_(sheetName, idField, personId);
@@ -217,12 +221,15 @@ function createV2AdminPerson_(request) {
   }
 
   person.active = true;
+  if (type !== 'student' && type !== 'staff' && !person.created_by) person.created_by = cleanV2EventText_(actor.user && actor.user.email);
   person.source_system = 'APP_FORM';
   person.updated_at = now;
 
   const requiredFields = type === 'student'
     ? ['student_id', 'full_name_th', 'active']
-    : ['staff_id', 'full_name_th', 'active'];
+    : type === 'staff'
+      ? ['staff_id', 'full_name_th', 'active']
+      : ['person_id', 'person_type', 'full_name', 'active'];
   const persisted = appendV2Row_(sheetName, person, {
     idField: idField,
     requiredFields: requiredFields
@@ -237,7 +244,9 @@ function createV2AdminPerson_(request) {
 
   const dto = type === 'student'
     ? mapV2PersonSearchStudentDto_(persisted.data)
-    : mapV2PersonSearchStaffDto_(persisted.data);
+    : type === 'staff'
+      ? mapV2PersonSearchStaffDto_(persisted.data)
+      : mapV2PersonManualDto_(persisted.data);
 
   return adminResponseV2_(true, dto, 1, '');
 }
@@ -260,7 +269,7 @@ function getV2AdminMobilityProject_(requestOrMobilityId) {
     }, 0, 'Mobility project is deleted.');
   }
 
-  const context = buildV2AdminContext_();
+  const context = buildV2AdminMobilityContext_();
   if (!context.success) return context;
 
   const project = existing.data;
@@ -269,7 +278,7 @@ function getV2AdminMobilityProject_(requestOrMobilityId) {
 }
 
 function listV2AdminMobilityProjects_(includeArchived) {
-  const context = buildV2AdminContext_();
+  const context = buildV2AdminMobilityContext_();
   if (!context.success) return context;
 
   const ctx = context.data;
@@ -747,6 +756,99 @@ function deleteV2AdminTravelParticipant_(request) {
     success: true,
     travel_participant_id: participantId
   }, 1, '');
+}
+
+function saveV2AdminMobilityBudget_(request) {
+  const actor = authorizeV2MobilityWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const payload = extractV2MobilityBudgetPayload_(request);
+  const normalized = normalizeV2MobilityBudgetPayload_(payload);
+  if (!normalized.success) {
+    return adminResponseV2_(false, normalized.data, 0, normalized.error);
+  }
+
+  const mobilityId = normalized.data.mobility_id;
+  const existingMobility = findV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId);
+  if (!existingMobility.success) {
+    return adminResponseV2_(false, null, 0, existingMobility.error);
+  }
+  if (isSoftDeletedV2_(existingMobility.data)) {
+    return adminResponseV2_(false, null, 0, 'Cannot save budget for a deleted mobility project.');
+  }
+
+  const existingBudget = findV2MobilityBudgetByMobilityId_(mobilityId);
+  const now = new Date().toISOString();
+  const adminEmail = cleanV2EventText_(actor.user.email);
+  let budgetId = existingBudget ? cleanV2EventText_(existingBudget.budget_id) : generateV2Id_(IROUP_V2_ID_PREFIXES.BUDGET);
+  if (!budgetId) budgetId = generateV2Id_('BUD');
+
+  const budgetRequiredFields = ['budget_id', 'module', 'record_id', 'currency', 'is_internal', 'is_deleted', 'created_by', 'created_at'];
+  const row = {
+    budget_id: String(budgetId || ''),
+    module: 'mobility',
+    record_id: String(mobilityId || ''),
+    budget_type_id: cleanV2EventText_(payload.budget_type_id || ''),
+    budget_source_type: normalized.data.budget_source_type,
+    budget_source_unit_id: cleanV2EventText_(payload.budget_source_unit_id || ''),
+    budget_source_name: cleanV2EventText_(payload.budget_source_name || normalized.data.budget_source_type),
+    currency: normalized.data.currency,
+    exchange_rate: normalized.data.exchange_rate,
+    amount: normalized.data.amount,
+    amount_thb: normalized.data.amount_thb,
+    budget_note: cleanV2EventText_(payload.budget_note || payload.note || ''),
+    is_internal: Boolean(normalized.data.is_internal),
+    is_deleted: false
+  };
+
+  let persisted;
+  if (existingBudget) {
+    const patch = {};
+    Object.keys(row).forEach(function (key) {
+      if (key !== 'budget_id') patch[key] = row[key];
+    });
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.BUDGET, 'budget_id', budgetId, patch);
+  } else {
+    row.created_by = adminEmail;
+    row.created_at = now;
+    persisted = appendV2Row_(IROUP_V2_SHEETS.BUDGET, row, {
+      idField: 'budget_id',
+      requiredFields: budgetRequiredFields
+    });
+  }
+
+  if (!persisted.success) {
+    return adminResponseV2_(false, {
+      budget_id: budgetId,
+      diagnostics: persisted.diagnostics || {}
+    }, 0, persisted.error);
+  }
+
+  return adminResponseV2_(true, {
+    success: true,
+    budget_id: budgetId
+  }, 1, '');
+}
+
+function getV2AdminMobilityBudget_(request) {
+  const actor = authorizeV2MobilityWriteActor_(request);
+  if (!actor.success) {
+    return adminResponseV2_(false, null, 0, actor.error);
+  }
+
+  const mobilityId = extractV2MobilityBudgetMobilityId_(request);
+  if (!mobilityId) {
+    return adminResponseV2_(false, null, 0, 'mobility_id is required for mobility budget get.');
+  }
+
+  const budget = findV2MobilityBudgetByMobilityId_(mobilityId);
+  if (!budget) return adminResponseV2_(true, null, 0, '');
+
+  const context = buildV2AdminMobilityContext_();
+  const dto = context.success ? mapV2BudgetDto_(budget, context.data) : budget;
+  return adminResponseV2_(true, dto, 1, '');
 }
 
 function saveV2AdminTravelBudget_(request) {
@@ -2824,6 +2926,33 @@ function extractV2TravelBudgetPayload_(request) {
   return params;
 }
 
+function extractV2MobilityBudgetPayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.budget || params.payload || params.budget || null;
+
+  if (candidate && typeof candidate === 'object') {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === 'string') {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      return { payload_parse_error: err && err.message ? err.message : String(err) };
+    }
+  }
+
+  return params;
+}
+
+function extractV2MobilityBudgetMobilityId_(request) {
+  const payload = extractV2MobilityBudgetPayload_(request);
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  return cleanV2EventText_(payload.mobility_id || body.mobility_id || params.mobility_id || payload.record_id || body.record_id || params.record_id || payload.id || body.id || params.id || '');
+}
+
 function extractV2TravelBudgetTravelId_(request) {
   const payload = extractV2TravelBudgetPayload_(request);
   const params = request && request.params ? request.params : {};
@@ -3086,12 +3215,12 @@ function normalizeV2MobilityParticipantPayload_(payload) {
   if (source.payload_parse_error) errors.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
   if (!normalized.mobility_id) errors.push({ field: 'mobility_id', code: 'MOBILITY_ID_REQUIRED', message: 'mobility_id is required.' });
   if (!normalized.participant_type) errors.push({ field: 'participant_type', code: 'PARTICIPANT_TYPE_REQUIRED', message: 'participant_type is required.' });
-  if (participantType && ['student', 'staff', 'manual'].indexOf(participantType) < 0) {
-    errors.push({ field: 'participant_type', code: 'PARTICIPANT_TYPE_INVALID', message: 'participant_type must be student, staff, or manual.' });
+  if (participantType && ['student', 'staff', 'external', 'guest'].indexOf(participantType) < 0) {
+    errors.push({ field: 'participant_type', code: 'PARTICIPANT_TYPE_INVALID', message: 'participant_type must be student, staff, external, or guest.' });
   }
   if (!normalized.person_source) errors.push({ field: 'person_source', code: 'PERSON_SOURCE_REQUIRED', message: 'person_source is required.' });
-  if (personSource && ['PERSON_STUDENT', 'PERSON_STAFF', 'manual'].indexOf(personSource) < 0) {
-    errors.push({ field: 'person_source', code: 'PERSON_SOURCE_INVALID', message: 'person_source must be PERSON_STUDENT, PERSON_STAFF, or manual.' });
+  if (personSource && ['PERSON_STUDENT', 'PERSON_STAFF', 'MANUAL'].indexOf(personSource) < 0) {
+    errors.push({ field: 'person_source', code: 'PERSON_SOURCE_INVALID', message: 'person_source must be PERSON_STUDENT, PERSON_STAFF, or MANUAL.' });
   }
   if (!normalized.full_name_snapshot) errors.push({ field: 'full_name_snapshot', code: 'FULL_NAME_REQUIRED', message: 'full_name_snapshot is required.' });
 
@@ -3157,15 +3286,16 @@ function normalizeV2PersonWritePayload_(payload) {
   const source = payload || {};
   const errors = [];
   const type = String(source.person_type || source.type || source.participant_type || '').trim().toLowerCase();
+  const participantType = normalizeV2MobilityParticipantType_(source.participant_type || type);
   const prefixTh = cleanV2EventText_(source.prefix_th || source.prefix || '');
   const firstNameTh = cleanV2EventText_(source.first_name_th || '');
   const lastNameTh = cleanV2EventText_(source.last_name_th || '');
-  const fullNameTh = cleanV2EventText_(source.full_name_th || [prefixTh + firstNameTh, lastNameTh].filter(function (value) { return !!value; }).join(' '));
+  const fullNameTh = cleanV2EventText_(source.full_name_th || source.full_name || [prefixTh + firstNameTh, lastNameTh].filter(function (value) { return !!value; }).join(' '));
   const unitId = cleanV2EventText_(source.unit_id || source.unit_id_snapshot || '');
 
   if (source.payload_parse_error) errors.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
-  if (['student', 'staff'].indexOf(type) < 0) {
-    errors.push({ field: 'person_type', code: 'PERSON_TYPE_INVALID', message: 'person_type must be student or staff.' });
+  if (['student', 'staff', 'manual', 'external', 'guest'].indexOf(type) < 0) {
+    errors.push({ field: 'person_type', code: 'PERSON_TYPE_INVALID', message: 'person_type must be student, staff, manual, external, or guest.' });
   }
   if (!fullNameTh) errors.push({ field: 'full_name_th', code: 'FULL_NAME_REQUIRED', message: 'full_name_th is required.' });
 
@@ -3215,6 +3345,27 @@ function normalizeV2PersonWritePayload_(payload) {
     };
   }
 
+  if (['manual', 'external', 'guest'].indexOf(type) >= 0) {
+    const firstNameEn = cleanV2EventText_(source.first_name_en || '');
+    const lastNameEn = cleanV2EventText_(source.last_name_en || '');
+    const fullNameEn = cleanV2EventText_(source.full_name_en || [firstNameEn, lastNameEn].filter(function (value) { return !!value; }).join(' '));
+    person = {
+      person_id: cleanV2EventText_(source.person_id || '') || generateV2Id_(IROUP_V2_ID_PREFIXES.PERSON_MANUAL || 'PER'),
+      person_type: participantType || type,
+      prefix: prefixTh,
+      first_name: firstNameEn || firstNameTh,
+      last_name: lastNameEn || lastNameTh,
+      full_name: fullNameEn || fullNameTh,
+      gender: cleanV2EventText_(source.gender || ''),
+      unit_id: unitId,
+      program_or_position: cleanV2EventText_(source.program_or_position || source.program_th || source.position || ''),
+      source_note: cleanV2EventText_(source.source_note || 'manual_person'),
+      created_at: new Date().toISOString(),
+      created_by: cleanV2EventText_(source.created_by || ''),
+      active: true
+    };
+  }
+
   return {
     success: errors.length === 0,
     error: errors.length ? 'Person payload validation failed.' : '',
@@ -3233,6 +3384,22 @@ function normalizeV2StaffType_(value) {
   if (lower === 'academic' || raw === 'วิชาการ') return 'academic';
   if (lower === 'support' || raw === 'สนับสนุน') return 'support';
   return raw;
+}
+
+function mapV2PersonManualDto_(row) {
+  const type = normalizeV2MobilityParticipantType_(row.person_type || 'guest');
+  return {
+    source: 'MANUAL',
+    person_id: row.person_id || '',
+    participant_type: type || 'guest',
+    full_name_snapshot: row.full_name || [row.first_name, row.last_name].filter(function (value) { return !!value; }).join(' '),
+    full_name_th: row.full_name || '',
+    full_name_en: row.full_name || '',
+    gender: row.gender || '',
+    unit_id: row.unit_id || '',
+    program_or_position: row.program_or_position || '',
+    type_label: type || 'manual'
+  };
 }
 
 function normalizeV2TravelBudgetPayload_(payload) {
@@ -3280,11 +3447,59 @@ function normalizeV2TravelBudgetPayload_(payload) {
   };
 }
 
+function normalizeV2MobilityBudgetPayload_(payload) {
+  const source = payload || {};
+  const errors = [];
+  const isInternalProvided = source.is_internal !== undefined && source.is_internal !== null && String(source.is_internal).trim() !== '';
+  const isInternal = isTruthyV2_(source.is_internal);
+  const currency = cleanV2EventText_(source.currency || 'THB') || 'THB';
+  const exchangeRate = currency === 'THB' ? 1 : toNumberV2_(source.exchange_rate || 1) || 1;
+  const amount = toNumberV2_(source.amount);
+  const normalized = {
+    mobility_id: cleanV2EventText_(source.mobility_id || source.record_id || ''),
+    is_internal: isInternal,
+    budget_source_type: cleanV2EventText_(source.budget_source_type || ''),
+    amount: amount,
+    currency: currency,
+    exchange_rate: exchangeRate,
+    amount_thb: currency === 'THB' ? amount : amount * exchangeRate
+  };
+
+  if (source.payload_parse_error) errors.push({ field: 'payload', code: 'PAYLOAD_PARSE_ERROR', message: source.payload_parse_error });
+  if (!normalized.mobility_id) errors.push({ field: 'mobility_id', code: 'MOBILITY_ID_REQUIRED', message: 'mobility_id is required.' });
+  if (!isInternalProvided) errors.push({ field: 'is_internal', code: 'IS_INTERNAL_REQUIRED', message: 'is_internal is required.' });
+  if (isInternal && !normalized.budget_source_type) {
+    errors.push({ field: 'budget_source_type', code: 'BUDGET_SOURCE_TYPE_REQUIRED', message: 'budget_source_type is required when is_internal is true.' });
+  }
+
+  if (isInternal && amount <= 0) {
+    errors.push({ field: 'amount', code: 'AMOUNT_REQUIRED', message: 'amount is required when is_internal is true.' });
+  }
+
+  return {
+    success: errors.length === 0,
+    error: errors.length ? 'Mobility budget payload validation failed.' : '',
+    data: {
+      valid: errors.length === 0,
+      errors: errors,
+      mobility_id: normalized.mobility_id,
+      is_internal: normalized.is_internal,
+      budget_source_type: normalized.budget_source_type,
+      amount: normalized.amount,
+      currency: normalized.currency,
+      exchange_rate: normalized.exchange_rate,
+      amount_thb: normalized.amount_thb
+    }
+  };
+}
+
 function normalizeV2MobilityParticipantType_(value) {
   const text = cleanV2EventText_(value).toLowerCase();
   if (text === 'student') return 'student';
   if (text === 'staff') return 'staff';
-  if (text === 'manual' || text === 'person_manual') return 'manual';
+  if (text === 'external') return 'external';
+  if (text === 'guest') return 'guest';
+  if (text === 'manual' || text === 'person_manual') return 'guest';
   return text;
 }
 
@@ -3293,7 +3508,7 @@ function normalizeV2MobilityPersonSource_(value) {
   const lower = text.toLowerCase();
   if (lower === 'person_student' || lower === 'student') return 'PERSON_STUDENT';
   if (lower === 'person_staff' || lower === 'staff') return 'PERSON_STAFF';
-  if (lower === 'manual' || lower === 'person_manual') return 'manual';
+  if (lower === 'manual' || lower === 'person_manual') return 'MANUAL';
   return text;
 }
 
@@ -3521,6 +3736,37 @@ function buildV2AdminContext_() {
   }, 1, '');
 }
 
+function buildV2AdminMobilityContext_() {
+  const sheetNames = [
+    IROUP_V2_SHEETS.COUNTRY_MASTER,
+    IROUP_V2_SHEETS.UP_UNIT_MASTER,
+    IROUP_V2_SHEETS.BUDGET_TYPE_MASTER,
+    IROUP_V2_SHEETS.FILE_ROLE_MASTER,
+    IROUP_V2_SHEETS.MOBILITY_PROJECT,
+    IROUP_V2_SHEETS.MOBILITY_PARTICIPANT,
+    IROUP_V2_SHEETS.BUDGET,
+    IROUP_V2_SHEETS.FILES
+  ];
+
+  const tables = {};
+  for (let i = 0; i < sheetNames.length; i++) {
+    const sheetName = sheetNames[i];
+    const read = readV2Sheet_(sheetName);
+    if (!read.success) {
+      return adminResponseV2_(false, null, 0, read.error);
+    }
+    tables[sheetName] = read.data || [];
+  }
+
+  return adminResponseV2_(true, {
+    tables: tables,
+    countriesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.COUNTRY_MASTER], 'country_id'),
+    unitsById: indexV2RowsById_(tables[IROUP_V2_SHEETS.UP_UNIT_MASTER], 'unit_id'),
+    budgetTypesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.BUDGET_TYPE_MASTER], 'budget_type_id'),
+    fileRolesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.FILE_ROLE_MASTER], 'file_role_id')
+  }, 1, '');
+}
+
 function indexV2RowsById_(rows, idField) {
   const index = {};
   (rows || []).forEach(function (row) {
@@ -3649,6 +3895,23 @@ function findV2TravelBudgetByTravelId_(travelId) {
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     if (String(row.module || '').trim() === 'travel'
+      && String(row.record_id || '').trim() === targetId
+      && !isSoftDeletedV2_(row)) {
+      return row;
+    }
+  }
+  return null;
+}
+
+function findV2MobilityBudgetByMobilityId_(mobilityId) {
+  const read = readV2Sheet_(IROUP_V2_SHEETS.BUDGET);
+  if (!read.success) return null;
+
+  const targetId = String(mobilityId || '').trim();
+  const rows = read.data || [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if (String(row.module || '').trim() === 'mobility'
       && String(row.record_id || '').trim() === targetId
       && !isSoftDeletedV2_(row)) {
       return row;

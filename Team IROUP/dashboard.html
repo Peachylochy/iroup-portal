@@ -381,22 +381,40 @@ function displayValue(value){
 function firstValue(...values){for(const value of values){const text=displayValue(value); if(text) return text;} return ''}
 function toNumber(value){const n=Number(String(value??'').replace(/,/g,'')); return Number.isFinite(n)?n:0}
 function countryDisplay(item){const c=item?.country||{}; return firstValue(item.country_display,item.country_name_th,item.country_name_en,c.country_name_th,c.country_name_en,c.name_th,c.name_en,item.country_id,c.country_id,item.country)}
-function unitDisplay(item){const u=item?.up_unit||item?.organizer||item?.organizer_unit||item?.unit||{}; return firstValue(item.unit_display,item.up_unit_name_th,item.up_unit_name_en,item.organizer_unit_name_th,item.organizer_unit_name_en,u.unit_name_th,u.unit_name_en,u.name_th,u.name_en,item.organizer,item.up_unit_id,item.organizer_unit_id,u.unit_id)}
+function unitDisplay(item){const u=item?.up_unit||item?.organizer||item?.organizer_unit||item?.unit||{}; const participantUnits=(item?.participant_summary?.unit_names||[]).filter(Boolean).join(', '); return firstValue(item.unit_display,item.up_unit_name_th,item.up_unit_name_en,item.organizer_unit_name_th,item.organizer_unit_name_en,participantUnits,u.unit_name_th,u.unit_name_en,u.name_th,u.name_en,item.organizer,item.up_unit_id,item.organizer_unit_id,u.unit_id)}
 function fiscalYearFromDate(value){const d=toDate(value); if(!d) return ''; return String(d.getFullYear()+543+(d.getMonth()>=9?1:0))}
-function participantTotal(item){return toNumber(item.participant_count_cached ?? item.participant_count ?? item.participants_count ?? item.aggregate_counts?.participant_count_cached ?? item.participant_summary?.total)}
+function participantTotal(item){
+  const counts=item?.aggregate_counts || item?.participant_counts || {};
+  const typeTotal=
+    toNumber(counts.student_count_actual ?? counts.student) +
+    toNumber(counts.staff_count_actual ?? counts.staff) +
+    toNumber(counts.external_count_actual ?? counts.external) +
+    toNumber(counts.guest_count_actual ?? counts.guest);
+  return toNumber(
+    counts.participant_count_actual ??
+    item?.participant_count ??
+    item?.people_count ??
+    item?.count ??
+    item?.participant_count_cached ??
+    item?.participants_count ??
+    counts.participant_count_cached ??
+    item?.participant_summary?.total
+  ) || typeTotal || (toNumber(item?.student_count) + toNumber(item?.staff_count)) || 1;
+}
+function mobilityDashboardPeople(rows){return (rows||[]).reduce((sum,row)=>sum+toNumber(row['จำนวนคน'] ?? row.people ?? row.participant_count ?? 1),0)}
 function budgetTotal(item){
   const summary=item?.budget_summary || item?.budgetSummary || {};
   return toNumber(
-    item?.amount ??
-    item?.amount_thb ??
-    item?.budget_amount ??
-    item?.funding_amount ??
-    item?.budget_total ??
-    item?.total_budget ??
     summary.total_amount_thb ??
     summary.amount_thb ??
     summary.total_amount ??
-    summary.total
+    summary.total ??
+    item?.amount_thb ??
+    item?.amount ??
+    item?.budget_amount ??
+    item?.funding_amount ??
+    item?.budget_total ??
+    item?.total_budget
   );
 }
 function hasTravelReportContent(item){return !!firstValue(item.project_name,item.project_title,item.purpose,countryDisplay(item),unitDisplay(item),item.start_date,item.end_date,item.departure_date,item.return_date)}
@@ -431,9 +449,9 @@ async function fetchReport(year=''){
     scholar:data.scholar.length,
     event:data.event.length,
     travel:data.travel.length,
-    inbound:data.inbound.length,
-    outbound:data.outbound.length,
-    mobility:data.inbound.length+data.outbound.length,
+    inbound:mobilityDashboardPeople(data.inbound),
+    outbound:mobilityDashboardPeople(data.outbound),
+    mobility:mobilityDashboardPeople(data.inbound)+mobilityDashboardPeople(data.outbound),
     all:Object.values(data).flat().length
   };
   return {success:true,generatedAt:new Date().toISOString(),data,total,summary:makeSummary(data)};
@@ -452,7 +470,7 @@ async function hydrateDashboardScholarshipsFromV2(report){
     report.data.scholar=rows;
     report.total=report.total || {};
     report.total.scholar=rows.length;
-    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.mobility=mobilityDashboardPeople(report.data.inbound)+mobilityDashboardPeople(report.data.outbound);
     report.total.all=Object.values(report.data).flat().length;
     report.summary=makeSummary(report.data);
     console.info('[Dashboard] scholarship data hydrated from V2 admin list', {count:rows.length});
@@ -475,7 +493,7 @@ async function hydrateDashboardMouFromV2(report){
     report.data.mou=rows;
     report.total=report.total || {};
     report.total.mou=rows.length;
-    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.mobility=mobilityDashboardPeople(report.data.inbound)+mobilityDashboardPeople(report.data.outbound);
     report.total.all=Object.values(report.data).flat().length;
     report.summary=makeSummary(report.data);
     console.info('[Dashboard] MOU data hydrated from V2 admin list', {count:rows.length});
@@ -499,7 +517,7 @@ async function hydrateDashboardEventsFromV2(report){
     report.data.event=rows;
     report.total=report.total || {};
     report.total.event=rows.length;
-    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.mobility=mobilityDashboardPeople(report.data.inbound)+mobilityDashboardPeople(report.data.outbound);
     report.total.all=Object.values(report.data).flat().length;
     report.summary=makeSummary(report.data);
     console.info('[Dashboard] Event data hydrated from V2 admin list', {count:rows.length});
@@ -508,7 +526,7 @@ async function hydrateDashboardEventsFromV2(report){
     report.data.event=[];
     report.total=report.total || {};
     report.total.event=0;
-    report.total.mobility=(report.data.inbound||[]).length+(report.data.outbound||[]).length;
+    report.total.mobility=mobilityDashboardPeople(report.data.inbound)+mobilityDashboardPeople(report.data.outbound);
     report.total.all=Object.values(report.data).flat().length;
     report.summary=makeSummary(report.data);
   }
@@ -528,8 +546,8 @@ async function hydrateDashboardMobilityFromV2(report){
     report.data.inbound=rows.filter(row=>row.direction==='inbound').map(row=>row.dashboardRow);
     report.data.outbound=rows.filter(row=>row.direction==='outbound').map(row=>row.dashboardRow);
     report.total=report.total || {};
-    report.total.inbound=report.data.inbound.length;
-    report.total.outbound=report.data.outbound.length;
+    report.total.inbound=mobilityDashboardPeople(report.data.inbound);
+    report.total.outbound=mobilityDashboardPeople(report.data.outbound);
     report.total.mobility=report.total.inbound+report.total.outbound;
     report.total.all=Object.values(report.data).flat().length;
     report.summary=makeSummary(report.data);
@@ -568,7 +586,7 @@ function v2MobilityToDashboardRow(item){
     'วันสิ้นสุด': item.end_date || '',
     'ปีงบ': item.fiscal_year || fiscalYearFromDate(item.start_date || item.end_date),
     'สถานะ': item.status || '',
-    'จำนวนเงิน': 0
+    'จำนวนเงิน': budgetTotal(item)
   };
   return {direction,dashboardRow:row};
 }
@@ -926,7 +944,7 @@ function render(){
   const activeMou=data.mou.filter(r=>IU.statusMou(r)==='active').length;
   const activeTravel=data.travel.filter(r=>IU.statusEvent({'วันเริ่ม':r['วันเริ่ม'],'วันสิ้นสุด':r['วันสิ้นสุด']})==='active').length;
   const budgetContent=summary.budget.all>0
-    ? `<div class="budget-total"><div class="n">${IU.money(summary.budget.all)+' บาท'}</div><div class="l">งบประมาณรวมที่บันทึก</div></div>${barList({'ทุนการศึกษา':summary.budget.scholar,'กิจกรรม':summary.budget.event,'การเดินทาง':summary.budget.travel},3)}`
+    ? `<div class="budget-total"><div class="n">${IU.money(summary.budget.all)+' บาท'}</div><div class="l">งบประมาณรวมที่บันทึก</div></div>${barList({'ทุนการศึกษา':summary.budget.scholar,'กิจกรรม':summary.budget.event,'การเดินทาง':summary.budget.travel,'Inbound':summary.budget.inbound,'Outbound':summary.budget.outbound},5)}`
     : '<div class="empty">ยังไม่มีข้อมูลงบประมาณจาก V2 list สำหรับสรุปผล</div>';
 
   $('#appContent').innerHTML=`

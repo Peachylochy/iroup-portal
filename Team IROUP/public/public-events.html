@@ -663,7 +663,7 @@ function renderCard(item){
         (modeClass && modeLabel ? '<span class="tag ' + escAttr(modeClass) + '">' + esc(modeLabel) + '</span>' : '') +
         (item.participant_count ? '<span class="tag">👥 ' + esc(String(item.participant_count)) + '</span>' : '') +
       '</div>' +
-      (summary ? '<p class="summary">' + esc(summary) + '</p>' : '') +
+      (summary ? '<p class="summary">' + esc(plainText(summary)) + '</p>' : '') +
       '<div class="actions">' +
         '<a class="action" href="' + escAttr(detailHref) + '">' + esc(t('detail')) + '</a>' +
         (joinUrl ? '<a class="action join" target="_blank" rel="noopener" href="' + escAttr(joinUrl) + '">' + esc(t('join')) + '</a>' : '') +
@@ -726,6 +726,7 @@ function applyTheme(){
   if(btn) btn.textContent = isLight ? t('themeLight') : t('themeDark');
 }
 
+function plainText(value){ return String(value == null ? '' : value).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
 function esc(value){ return String(value == null ? '' : value).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
 function escAttr(value){ return esc(value).replace(/`/g,'&#96;'); }
 </script>
