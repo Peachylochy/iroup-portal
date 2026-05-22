@@ -42,13 +42,26 @@ Completed:
   - `exclude_or_hold`: 1 source unit group / 10 source rows
 - Generated local-only helper CSV for the 5 new `UP_UNIT_MASTER` rows:
   - `D:\DATA_MASTER_ Students_Staff\UP_UNIT_MASTER_ADDITIONS_REVIEW_2026-05-22.csv`
+- User confirmed the 5 new `UP_UNIT_MASTER` rows were added.
+- Generated local-only person import staging files:
+  - `D:\DATA_MASTER_ Students_Staff\staging\PERSON_STUDENT_IMPORT_STAGING.csv`
+  - `D:\DATA_MASTER_ Students_Staff\staging\PERSON_STAFF_IMPORT_STAGING.csv`
+  - `D:\DATA_MASTER_ Students_Staff\staging\PERSON_IMPORT_HELD_ROWS.csv`
+- Staging verification:
+  - `PERSON_STUDENT_IMPORT_STAGING.csv`: 22,838 rows, header matches `PERSON_STUDENT`
+  - `PERSON_STAFF_IMPORT_STAGING.csv`: 3,732 rows, header matches `PERSON_STAFF`
+  - `PERSON_IMPORT_HELD_ROWS.csv`: 10 rows held out from the first import
+- Added reusable local staging tool:
+  - `tools/build_person_import_staging.ps1`
 
 Next:
 
-- Add/review the 5 new `UP_UNIT_MASTER` rows before importing real person data.
-- Do not run the real person import until every source unit has an approved
-  `unit_id`; the 10 `exclude_or_hold` source rows should remain out of the first
-  import unless the user later approves a mapping.
+- Import `PERSON_STUDENT_IMPORT_STAGING.csv` and `PERSON_STAFF_IMPORT_STAGING.csv`
+  into a staging/test copy first.
+- Keep the 10 held rows out of the first import unless the user later approves a
+  mapping.
+- After staging import, run authenticated person search/lookup checks before
+  loading into the live workbook.
 
 ---
 
