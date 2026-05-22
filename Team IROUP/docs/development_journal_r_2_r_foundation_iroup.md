@@ -3376,3 +3376,70 @@ Follow-up data parity note:
   scholarship KPI/table use the same V2 source as the module page.
 - This is intentionally scoped to scholarships; other dashboard modules still
   use the existing report aggregate until each module is checked.
+
+---
+
+## Upload Optimization And Partner Directory Planning (2026-05-22)
+
+This session surfaced a practical operational issue before live content entry:
+poster and content-image uploads for Event, Scholarship, and News were slow when
+staff selected large original images from phones or cameras. The existing upload
+path sent `FileReader.readAsDataURL()` output directly to Apps Script, which
+inflates payload size and increases the chance of long Drive writes or timeout.
+
+Implementation notes:
+- Added browser-side image optimization to `js/iroup-image-helper.js`.
+- The optimizer is intentionally conservative:
+  - only image files are considered
+  - GIF, SVG, PDF, DOCX, and other attachments are untouched
+  - small images are skipped
+  - large images are resized to a maximum 2000px dimension
+  - JPEG quality is kept high at 0.9
+  - the original file is used when optimization does not produce meaningful
+    savings
+- Wired the optimizer into:
+  - Event poster uploads
+  - Scholarship poster uploads
+  - News cover/gallery image uploads
+- User compared upload behavior and confirmed that resize is active.
+
+R2R relevance:
+- This is a workflow-efficiency improvement, not just a technical optimization.
+- The intervention reduces staff waiting time during repeated public-content
+  entry while preserving image quality for public communication work.
+- It also reduces data-transfer volume and Drive storage growth, which supports
+  long-term maintainability of a low-code Apps Script/Sheets/Drive stack.
+
+Design reflection:
+- Image optimization belongs in the browser before base64 conversion; doing it
+  only in Apps Script would still pay the network and base64 cost.
+- The default should protect communication quality first. Aggressive compression
+  would be counterproductive for public-facing news, event, and scholarship
+  materials.
+
+Partner directory planning:
+- A new admin-only partner knowledge base was identified as the next meaningful
+  expansion:
+  - institutions in Thailand and abroad
+  - external contact persons met through executive visits, meetings, email, or
+    business cards
+  - internal notes and follow-up context
+  - logos for MOU/partner institutions
+- The privacy boundary is central:
+  - contacts, business cards, emails, phone numbers, and internal notes must be
+    admin-only
+  - public pages may show only explicitly approved institution-level data
+- Recommended build order:
+  1. Create the `INSTITUTION` schema and admin-only routes.
+  2. Add `CONTACT_PERSON` after institution records are stable.
+  3. Add `CONTACT_INTERACTION` for meeting/follow-up history.
+  4. Add logo upload using the existing V2 `FILES` relation.
+  5. Build a public partner-network page only from public-safe institution data.
+
+Research framing:
+- The partner directory supports institutional memory. It converts informal
+  relationship artifacts such as business cards, meeting notes, and email
+  introductions into reusable administrative knowledge.
+- The later public logo-network visualization can communicate international
+  collaboration breadth without exposing personal data or internal relationship
+  notes.

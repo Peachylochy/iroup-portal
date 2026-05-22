@@ -1,10 +1,65 @@
 # IROUP Project — Migration State
-**Last updated: 2026-05-21 | Session: Student/Staff Data Security Readiness**
+**Last updated: 2026-05-22 | Session: Upload Optimization + Partner Directory Planning**
 
 > Living document. Update after every migration session.
 > Source of truth for what is done, what is safe to do next, and what must not be touched.
 >
 > Core principle: **Stabilize → Modularize → Optimize → Expand**
+
+---
+
+## Latest Upload Optimization + Partner Directory Planning
+
+### Session: 2026-05-22 - Image Upload Resize + Institution/Contact Direction
+
+Completed:
+
+- Added browser-side image optimization for admin content uploads before the
+  Apps Script/Drive upload call.
+- Shared helper added in `js/iroup-image-helper.js`:
+  - optimizes only image files
+  - skips GIF/SVG and non-image attachments
+  - skips small images below the threshold
+  - limits large images to a 2000px maximum dimension
+  - uses high-quality JPEG output at quality 0.9
+  - falls back to the original file when optimization is not beneficial
+- Wired the helper into:
+  - `events.html` poster uploads
+  - `scholarship.html` poster uploads
+  - `news.html` cover/gallery image uploads
+- User confirmed live comparison showed image resize is working.
+
+Verification:
+
+- `git diff --check` passed for the changed upload files with Windows CRLF
+  warnings only.
+- JavaScript syntax check passed for `js/iroup-image-helper.js`.
+- Inline script syntax check passed for:
+  - `events.html`
+  - `scholarship.html`
+  - `news.html`
+
+Planning outcome:
+
+- Next expansion should start with an admin-only Institution/Contact directory,
+  not the public logo-network visualization.
+- Proposed admin-only data direction:
+  - `INSTITUTION`
+  - `CONTACT_PERSON`
+  - later `CONTACT_INTERACTION`
+- Institution records should support public-safe fields and logo uploads.
+- Contact/person data, business cards, email details, and internal notes must
+  remain admin-only.
+- Public logo-network page should be built later from explicitly public-safe
+  institution records only.
+
+Next:
+
+- Commit or otherwise preserve the upload optimization change before starting
+  the new partner-directory feature.
+- Design V2 schema for `INSTITUTION` first, then add admin routes/UI.
+- Add public network visualization only after institution/logo data is clean and
+  privacy boundaries are enforced.
 
 ---
 

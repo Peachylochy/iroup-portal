@@ -10,6 +10,7 @@
 <script src="js/iroup-v2-endpoint.js"></script>
 <script src="js/iroup-v2-api.js"></script>
 <script src="js/iroup-utils.js"></script>
+<script src="js/iroup-image-helper.js"></script>
 <script src="js/iroup-admin-guard.js"></script>
 <style>
 *{box-sizing:border-box}
@@ -825,11 +826,12 @@ function setFileControlsDisabled(disabled) {
 async function uploadPendingScholarshipFiles(recordId) {
   if (!recordId) throw new Error('ไม่พบรหัสทุนการศึกษาสำหรับแนบไฟล์');
   for (const item of state.pendingFiles) {
-    const dataUrl = await readFileAsDataUrl(item.file);
+    const uploadFile = await prepareScholarshipUploadFile(item);
+    const dataUrl = await readFileAsDataUrl(uploadFile);
     const payload = {
       base64_data: dataUrl,
-      filename: item.file.name,
-      mime_type: item.file.type || 'application/octet-stream',
+      filename: uploadFile.name,
+      mime_type: uploadFile.type || 'application/octet-stream',
       module: 'scholarship',
       record_id: recordId,
       file_role_id: item.role === 'poster' ? 'poster' : 'attachment',
@@ -840,6 +842,27 @@ async function uploadPendingScholarshipFiles(recordId) {
   }
   state.pendingFiles = [];
   renderSelectedFiles();
+}
+
+async function prepareScholarshipUploadFile(item) {
+  const file = item && item.file ? item.file : null;
+  if (!file || item.role !== 'poster' || typeof iroupOptimizeImageForUpload !== 'function') return file;
+  const result = await iroupOptimizeImageForUpload(file, {
+    maxWidth: 2000,
+    maxHeight: 2000,
+    quality: 0.9
+  });
+  if (result && result.optimized) {
+    console.info('[scholarship-upload] optimized poster image', {
+      original_name: file.name,
+      upload_name: result.file.name,
+      original_kb: Math.round(result.originalSize / 1024),
+      upload_kb: Math.round(result.optimizedSize / 1024),
+      original_size: result.originalWidth + 'x' + result.originalHeight,
+      upload_size: result.width + 'x' + result.height
+    });
+  }
+  return result && result.file ? result.file : file;
 }
 
 function readFileAsDataUrl(file) {
