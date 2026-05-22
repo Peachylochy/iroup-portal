@@ -32,17 +32,23 @@ Completed:
   - Student distinct units: 20, with 1 requiring review
   - Staff distinct units: 55, with 25 requiring review
   - Total mapping rows requiring review: 26
+- User completed the `Needs Review` mapping sheet.
+- Exported approved mapping locally:
+  - `D:\DATA_MASTER_ Students_Staff\approved_unit_mapping_review.json`
+- Approved mapping summary:
+  - `use_existing`: 11 source unit groups
+  - `map_to_parent`: 9 source unit groups
+  - `add_active_unit`: 5 source unit groups
+  - `exclude_or_hold`: 1 source unit group / 10 source rows
+- Generated local-only helper CSV for the 5 new `UP_UNIT_MASTER` rows:
+  - `D:\DATA_MASTER_ Students_Staff\UP_UNIT_MASTER_ADDITIONS_REVIEW_2026-05-22.csv`
 
 Next:
 
-- Review the `Needs Review` sheet and approve one action for each unmatched unit:
-  - use an existing unit
-  - add an active unit
-  - add an inactive/historical unit
-  - map to a parent unit
-  - exclude/hold until confirmed
+- Add/review the 5 new `UP_UNIT_MASTER` rows before importing real person data.
 - Do not run the real person import until every source unit has an approved
-  `unit_id`.
+  `unit_id`; the 10 `exclude_or_hold` source rows should remain out of the first
+  import unless the user later approves a mapping.
 
 ---
 
