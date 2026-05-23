@@ -74,7 +74,7 @@
     var lang = opts.lang || 'th';
     var label = opts.label || ('SDG ' + id);
     var classes = 'sdg-icon-img' + (opts.className ? ' ' + opts.className : '');
-    return '<img class="' + esc(classes) + '" src="' + esc(iconUrl(id, lang, opts)) + '" alt="' + esc(label) + '" loading="lazy" onerror="this.hidden=true">';
+    return '<img class="' + esc(classes) + '" src="' + esc(iconUrl(id, lang, opts)) + '" alt="' + esc(label) + '" loading="lazy" decoding="async" width="34" height="34" onerror="this.hidden=true">';
   }
 
   function renderBadge(tag, options) {

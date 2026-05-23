@@ -51,6 +51,12 @@
     parent.removeChild(node);
   }
 
+  function renameNode(node, tagName) {
+    var replacement = document.createElement(tagName);
+    while (node.firstChild) replacement.appendChild(node.firstChild);
+    node.parentNode.replaceChild(replacement, node);
+  }
+
   function sanitizeHtml(value) {
     var template = document.createElement('template');
     template.innerHTML = String(value || '');
@@ -72,8 +78,8 @@
         node.setAttribute('target', '_blank');
         node.setAttribute('rel', 'noopener');
       }
-      if (node.tagName === 'B') node.outerHTML = '<strong>' + node.innerHTML + '</strong>';
-      if (node.tagName === 'I') node.outerHTML = '<em>' + node.innerHTML + '</em>';
+      if (node.tagName === 'B') renameNode(node, 'strong');
+      if (node.tagName === 'I') renameNode(node, 'em');
     });
     return template.innerHTML
       .replace(/<p>(\s|&nbsp;|<br>)*<\/p>/gi, '')

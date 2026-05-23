@@ -4752,3 +4752,30 @@ SDG icon assets follow-up, 2026-05-23:
   - `news.html ok`
   - `public/public-news.html ok`
   - `public/public-news-detail.html ok`
+
+News launch-prep hotfix, 2026-05-23:
+
+- Fixed `js/iroup-rich-lite.js` sanitizer crash during News save.
+  - Previous sanitizer converted `<b>` and `<i>` by assigning `outerHTML`.
+  - Chrome can reject `outerHTML` when the element parent is a document
+    fragment, producing: `Failed to set the 'outerHTML' property on 'Element'`.
+  - New sanitizer renames nodes by creating a replacement element and calling
+    `replaceChild()`.
+- Tightened News modal layout for production launch.
+  - `modal-body` now scrolls between fixed header/footer bounds.
+  - `modal-foot` is anchored to the bottom of the modal so Save/Cancel no
+    longer float in the middle of a blank white area.
+- News admin SDG selector now uses compact 34px thumbnail icons plus text,
+  preserving icon visibility without returning to large image tiles.
+- Added query-string cache busting for `iroup-sdg-icons.js` on News and public
+  News pages.
+- Production endpoint check:
+  - `js/iroup-v2-endpoint.js` is pointing at the production Apps Script URL
+    ending `...rhp0z-swSg/exec`.
+- Remaining untracked local reference file:
+  - `SDG_Guidelines_AUG_2019_Final.pdf` remains outside `Team IROUP` and is not
+    part of launch commits.
+- Syntax check passed:
+  - `js/iroup-rich-lite.js ok`
+  - `js/iroup-sdg-icons.js ok`
+  - `news.html ok`

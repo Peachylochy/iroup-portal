@@ -12,7 +12,7 @@
   <script src="js/iroup-utils.js"></script>
   <script src="js/iroup-image-helper.js"></script>
   <script src="js/iroup-rich-lite.js"></script>
-  <script src="js/iroup-sdg-icons.js"></script>
+  <script src="js/iroup-sdg-icons.js?v=20260523-sdg2"></script>
   <script src="js/iroup-admin-guard.js"></script>
   <style>
     :root{--blue:#0B74B8;--navy:#10294f;--ink:#15243b;--muted:#6b7f96;--line:#e6edf6;--soft:#eef7ff;--bg:#f5f8fc;--ok:#15803d;--warn:#b7791f;--danger:#c2410c}
@@ -78,10 +78,11 @@
     .field.full{grid-column:1/-1}.label{display:block;font-size:13px;font-weight:900;color:var(--navy);margin-bottom:7px}.required{color:#c1121f}
     .toggle-line{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--navy)}
     .toggle-line input{width:18px;height:18px}
-    .sdg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
-    .sdg-item{border:1px solid var(--line);border-radius:12px;padding:8px;display:grid;gap:8px;font-weight:800;color:#20324d;background:#fbfdff;cursor:pointer}
+    .sdg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+    .sdg-item{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;font-weight:800;color:#20324d;background:#fbfdff;cursor:pointer}
     .sdg-item input{position:absolute;opacity:0;pointer-events:none}
-    .sdg-item img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;display:block;background:#eef3f8}
+    .sdg-item .sdg-icon-img{width:34px;height:34px;border-radius:8px;object-fit:cover;display:block;flex:0 0 auto;background:var(--sdg-color,var(--blue))}
+    .sdg-fallback{width:34px;height:34px;border-radius:8px;background:var(--sdg-color,var(--blue));color:#fff;display:grid;place-items:center;flex:0 0 auto;font-size:12px;font-weight:900}
     .sdg-item span{font-size:12px;line-height:1.35}
     .sdg-item:has(input:checked){border-color:var(--sdg-color,var(--blue));box-shadow:0 0 0 3px color-mix(in srgb,var(--sdg-color,var(--blue)) 18%,transparent);background:#fff}
     .file-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -175,8 +176,8 @@
     .modal-head{position:relative;top:auto;flex:0 0 auto;padding:22px 30px;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
     .modal-head h2{font-size:24px;color:#0F2D5A;margin:0}
     .modal-head p{font-size:14px;line-height:1.45;margin:4px 0 0;color:#6B7F96!important;font-weight:700}
-    .modal-body{flex:1 1 auto;min-height:0;overflow:auto;padding:24px 30px;background:#FBFBFE;max-height:none}
-    .modal-foot{position:relative;bottom:auto;flex:0 0 auto;padding:16px 30px;background:#fff;border-top-color:#E6EDF6}
+    .modal-body{position:absolute;left:0;right:0;top:86px;bottom:74px;overflow:auto;padding:24px 30px;background:#FBFBFE;max-height:none}
+    .modal-foot{position:absolute;left:0;right:0;bottom:0;height:74px;padding:16px 30px;background:#fff;border-top:1px solid #E6EDF6;display:flex;justify-content:space-between;gap:10px;z-index:2}
     .form-section{background:rgba(255,255,255,.94);border-color:#E6EDF6;border-radius:22px;box-shadow:0 10px 30px rgba(15,45,90,.06);padding:18px;margin-bottom:16px;min-width:0}
     .form-section h3{font-size:13px;color:#0F2D5A;text-transform:uppercase;letter-spacing:.06em;margin:0 0 14px;font-weight:900}
     .form-grid{gap:16px;grid-template-columns:repeat(2,minmax(260px,1fr))}
@@ -186,7 +187,7 @@
     .modal .input:focus,.modal .select:focus,.modal .textarea:focus{background:#fff !important;border-color:#1A6DB5;box-shadow:0 0 0 4px rgba(26,109,181,.12)}
     .preview,.file-chip,.sdg-item{border-color:#D7E1EA;background:#F5F8FC}
     @media(max-width:1180px){.modal-panel{width:calc(100vw - 64px);height:calc(100vh - 96px);max-height:calc(100vh - 96px)}.form-grid{grid-template-columns:1fr}}
-    @media(max-width:900px){.main{margin-left:0;width:100%;padding:16px}.topbar{padding:18px}.modal-panel{width:calc(100vw - 24px);height:calc(100vh - 32px);max-height:calc(100vh - 32px);border-radius:18px}.modal-head,.modal-body,.modal-foot{padding-left:16px;padding-right:16px}}
+    @media(max-width:900px){.main{margin-left:0;width:100%;padding:16px}.topbar{padding:18px}.modal-panel{width:calc(100vw - 24px);height:calc(100vh - 32px);max-height:calc(100vh - 32px);border-radius:18px}.modal-head,.modal-body,.modal-foot{padding-left:16px;padding-right:16px}.modal-body{top:82px;bottom:72px}.modal-foot{height:72px}}
   </style>
   <link rel="stylesheet" href="css/iroup-admin-responsive.css">
 </head>
@@ -991,8 +992,8 @@
     }
 
     function renderSdgIconImage(tag) {
-      if (window.IROUP_SDG_ICONS) return IROUP_SDG_ICONS.renderIcon(tag, { lang: 'th', label: 'SDG ' + tag });
-      return '<span>SDG-' + esc(tag) + '</span>';
+      if (window.IROUP_SDG_ICONS) return IROUP_SDG_ICONS.renderIcon(tag, { lang: 'th', label: 'SDG ' + tag, className: 'sdg-picker-icon' });
+      return '<span class="sdg-fallback">' + esc(tag) + '</span>';
     }
 
     function renderSdgBadge(tag) {
