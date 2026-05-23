@@ -45,6 +45,7 @@ button,input,select,textarea{font:inherit}
 .modal{display:none;position:fixed;inset:0;background:rgba(7,24,40,.46);z-index:100;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modal-panel{width:min(1040px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(7,24,40,.28)}.modal-head{position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-title{font-size:20px;font-weight:900;color:var(--navy)}.modal-body{padding:18px}.modal-foot{position:sticky;bottom:0;background:#fff;display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
 .form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}.radio-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.radio-row label{display:flex;gap:8px;align-items:center;font-weight:800}
 .participant-tools{display:grid;gap:12px}.participant-search{position:relative}.suggestions{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(15,45,90,.14);max-height:260px;overflow:auto}.suggestions.open{display:block}.suggestion{width:100%;border:0;background:#fff;text-align:left;padding:10px 12px;cursor:pointer;border-bottom:1px solid #EDF3F8;color:var(--text)}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#F8FBFE}.suggestion-name{font-weight:900}.suggestion-meta{font-size:12px;color:var(--muted);margin-top:2px}.suggestion-action{margin-top:10px}.suggestion-action .btn{width:100%;justify-content:center}.selected-person{display:none;border:1px solid #BBD7EF;background:#F1F8FE;border-radius:14px;padding:10px 12px;align-items:center;gap:10px;justify-content:space-between}.selected-person.show{display:flex}.manual-form{display:none;border:1px dashed #BFD0E0;border-radius:14px;padding:12px;background:#F8FBFE}.manual-form.show{display:block}.participant-list{display:grid;gap:8px}.participant-row{display:grid;grid-template-columns:1.4fr 1fr auto auto;gap:10px;align-items:center;border:1px solid #EDF3F8;border-radius:14px;padding:10px 12px;background:#fff}.participant-name{font-weight:900}.participant-unit{color:var(--muted);font-size:12px}.participant-empty{padding:14px;border:1px dashed #BFD0E0;border-radius:14px;color:var(--muted);text-align:center;font-weight:800}
+.inbound-group-planner{display:none;border:1px solid #D7E8F7;background:#F6FBFF;border-radius:14px;padding:12px}.inbound-group-planner.show{display:block}.planner-grid{display:grid;grid-template-columns:minmax(180px,260px) 1fr;gap:12px;align-items:end}.planner-status{font-weight:900;color:#174B7A;padding:12px 0}.planner-hint{font-size:12px;color:var(--muted);margin-top:4px}
 
 /* Web design aligned Mobility admin refresh. CSS-only; V2 data/write flows stay intact. */
 body{
@@ -284,6 +285,16 @@ body.modal-open{overflow:hidden}
             </div>
             <div>
               <button id="manualAddBtn" class="btn" type="button" onclick="showManualParticipantForm()" style="display:none">+ เพิ่มด้วยตนเอง</button>
+            </div>
+            <div id="inboundGroupPlanner" class="inbound-group-planner">
+              <div class="planner-grid">
+                <div class="field">
+                  <label class="label" for="inboundExpectedCountInput">จำนวนผู้มาเยือนที่จะกรอก</label>
+                  <input id="inboundExpectedCountInput" class="input" type="number" min="0" step="1" placeholder="เช่น 5" oninput="syncInboundGroupPlanner()">
+                  <div class="planner-hint">ใช้เป็นตัวช่วยนับเท่านั้น จำนวนจริงจะนับจากรายชื่อที่เพิ่มแล้ว</div>
+                </div>
+                <div id="inboundGroupPlannerStatus" class="planner-status">เพิ่มแล้ว 0 คน</div>
+              </div>
             </div>
             <div id="manualParticipantForm" class="manual-form">
               <div class="form-grid">
@@ -558,6 +569,8 @@ function unwrapList(res){
 function unwrapMobilityDetail(res){
   const data = res && res.data ? res.data : {};
   if (data.mobility) return data.mobility;
+  if (data.mobility_project) return data.mobility_project;
+  if (data.project && data.project.mobility_id) return data.project;
   if (data.project) return data.project;
   if (data.record) return data.record;
   if (data.row) return data.row;
@@ -630,7 +643,7 @@ function normalizeCountry(row){
 
 function normalizeMobility(row){
   const source = row || {};
-  const counts = source.aggregate_counts || {};
+  const counts = source.aggregate_counts || source.participant_counts || {};
   const country = normalizeCountry(source);
   const actualParticipantCount = toNumber(counts.participant_count_actual);
   const participantTypeTotal =
@@ -649,7 +662,7 @@ function normalizeMobility(row){
     country_name_en: country.country_name_en,
     country_name_th: country.country_name_th,
     city: source.city || '',
-    up_unit_id: source.up_unit_id || source.up_unit?.unit_id || '',
+    up_unit_id: source.up_unit_id || source.up_unit?.unit_id || source.unit?.unit_id || '',
     direction: String(source.direction || '').toLowerCase(),
     purpose: source.purpose || '',
     level: source.level || '',
@@ -658,8 +671,8 @@ function normalizeMobility(row){
     end_date: source.end_date || '',
     fiscal_year: source.fiscal_year || '',
     participant_count_cached: actualParticipantCount || toNumber(source.participant_count ?? source.participant_count_cached ?? counts.participant_count_cached) || participantTypeTotal,
-    student_count: toNumber(counts.student_count_actual ?? source.student_count),
-    staff_count: toNumber(counts.staff_count_actual ?? source.staff_count),
+    student_count: toNumber(counts.student_count_actual ?? counts.student ?? source.student_count),
+    staff_count: toNumber(counts.staff_count_actual ?? counts.staff ?? source.staff_count),
     status: source.status || 'active',
     public_visible: source.public_visible === true || source.public_visible === 'TRUE',
     is_deleted: source.is_deleted === true || source.is_deleted === 'TRUE'
@@ -992,10 +1005,22 @@ async function openEditModal(mobilityRow){
     if (budgetRes && budgetRes.success === false) throw new Error(budgetRes.error || 'โหลดงบประมาณไม่สำเร็จ');
     hydrateBudget(unwrapMobilityBudget(budgetRes));
     $('#modalSub').textContent = confirmedMobilityId;
+    if (Array.isArray(detailData.participants)) {
+      state.participants = detailData.participants;
+    }
     showParticipantSection(confirmedMobilityId);
     document.body.classList.add('modal-open');
     $('#mobilityModal').classList.add('open');
-    await loadParticipants(confirmedMobilityId);
+    try {
+      await loadParticipants(confirmedMobilityId);
+    } catch (participantError) {
+      if (Array.isArray(detailData.participants)) {
+        state.participants = detailData.participants;
+        renderParticipantList();
+      } else {
+        throw participantError;
+      }
+    }
   } catch (error) {
     alert(error.message || String(error));
     closeModal();
@@ -1127,8 +1152,10 @@ function configureParticipantMode(){
   const sectionTitle = $('#participantSectionTitle');
   const searchBox = document.querySelector('.participant-search');
   const manualUnit = $('#manualUnitInput');
+  const inboundPlanner = $('#inboundGroupPlanner');
   if (sectionTitle) sectionTitle.textContent = inbound ? 'ผู้มาเยือนต่างชาติ' : 'ผู้เข้าร่วมจาก UP';
   if (searchBox) searchBox.style.display = inbound ? 'none' : '';
+  if (inboundPlanner) inboundPlanner.className = inbound ? 'inbound-group-planner show' : 'inbound-group-planner';
   if (manualUnit) {
     if (inbound) {
       manualUnit.removeAttribute('list');
@@ -1153,6 +1180,7 @@ function configureParticipantMode(){
   } else {
     hideManualParticipantForm();
   }
+  syncInboundGroupPlanner();
 }
 
 function syncBudgetFields(){
@@ -1320,6 +1348,7 @@ function resetParticipantUi(){
   state.selectedPerson = null;
   const section = $('#participantSection');
   if (section) section.style.display = 'none';
+  if ($('#inboundExpectedCountInput')) $('#inboundExpectedCountInput').value = '';
   if ($('#participantSearchInput')) $('#participantSearchInput').value = '';
   if ($('#participantSuggestions')) {
     $('#participantSuggestions').className = 'suggestions';
@@ -1374,6 +1403,7 @@ function renderParticipantList(){
   const list = $('#participantList');
   if (!list) return;
   syncParticipantCountInputs();
+  syncInboundGroupPlanner();
   if (!state.participants.length) {
     list.innerHTML = '<div class="participant-empty">ยังไม่มีผู้เข้าร่วม</div>';
     return;
@@ -1396,6 +1426,17 @@ function syncParticipantCountInputs(){
   $('#participantCountInput').value = state.participants.length;
   $('#studentCountInput').value = state.participants.filter(row => String(row.participant_type || '').toLowerCase() === 'student').length;
   $('#staffCountInput').value = state.participants.filter(row => String(row.participant_type || '').toLowerCase() === 'staff').length;
+}
+
+function syncInboundGroupPlanner(){
+  const status = $('#inboundGroupPlannerStatus');
+  if (!status) return;
+  const expected = toNumber($('#inboundExpectedCountInput')?.value || 0);
+  const actual = state.participants.length;
+  status.textContent = expected > 0
+    ? `เพิ่มแล้ว ${actual}/${expected} คน`
+    : `เพิ่มแล้ว ${actual} คน`;
+  status.style.color = expected > 0 && actual >= expected ? '#207B32' : '#174B7A';
 }
 
 function participantTypeBadge(type){
@@ -1541,6 +1582,10 @@ function normalizeDegreeLevel(value){
 function hideManualParticipantForm(){
   if (!$('#manualParticipantForm')) return;
   $('#manualParticipantForm').className = 'manual-form';
+  resetManualParticipantEntry(false);
+}
+
+function resetManualParticipantEntry(keepInboundContext){
   $('#manualStudentIdInput').value = '';
   $('#manualPrefixThInput').value = '';
   $('#manualFirstNameThInput').value = '';
@@ -1551,12 +1596,14 @@ function hideManualParticipantForm(){
   $('#manualAutoFullNameInput').value = '';
   $('#manualFullNameInput').value = '';
   $('#manualGenderInput').value = '';
-  $('#manualUnitInput').value = '';
-  $('#manualUnitIdInput').value = '';
-  $('#manualProgramInput').value = '';
+  if (!keepInboundContext) {
+    $('#manualUnitInput').value = '';
+    $('#manualUnitIdInput').value = '';
+    $('#manualProgramInput').value = '';
+    $('#manualRoleInput').value = '';
+  }
   $('#manualStaffTypeInput').value = 'support';
   $('#manualParticipantTypeInput').value = 'student';
-  $('#manualRoleInput').value = '';
   syncManualPersonTypeFields();
 }
 
@@ -1686,14 +1733,17 @@ async function addManualParticipant(){
   await addParticipantPayload(payload);
   if (isInbound) {
     syncInboundInstitutionFromParticipant();
+    resetManualParticipantEntry(true);
+    $('#manualParticipantForm').className = 'manual-form show';
+    $('#manualFirstNameEnInput').focus();
   } else {
     applyOutboundParticipantDefaults({
       participant_type: type,
       unit_id_snapshot: payload.unit_id_snapshot,
       degree_level: ''
     });
+    hideManualParticipantForm();
   }
-  hideManualParticipantForm();
 }
 
 async function addParticipantPayload(payload){

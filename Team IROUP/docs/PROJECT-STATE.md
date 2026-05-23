@@ -4792,3 +4792,26 @@ User-facing V2 wording cleanup, 2026-05-23:
 - Remaining `V2` matches in HTML are internal implementation names, comments, or
   console/debug messages, not normal user-facing labels.
 - Syntax check passed for the touched admin and public HTML pages.
+
+Production endpoint switch, 2026-05-23:
+
+- User renamed/confirmed the real spreadsheet and Apps Script project as
+  `IROUP_DATABASE_PRODUCTION`.
+- Updated `js/iroup-v2-endpoint.js` to the production web app URL:
+  `https://script.google.com/macros/s/AKfycbx84FaCV07b_uiuBDYK-bjbD422BrwRI3OF7kC1BnviBc5SqGOyADK03KTLkDXn678-/exec`
+- The previous endpoint ending `...rhp0z-swSg/exec` was tied to the
+  experiment/test sheet and is no longer the local launch target.
+- Next verification should test admin load, public load, and one low-risk write
+  against `IROUP_DATABASE_PRODUCTION`.
+
+Mobility inbound group-entry follow-up, 2026-05-23:
+
+- Added an inbound-only group planner in `mobility.html`.
+  - User can enter the expected number of foreign visitors as a guide.
+  - The real total still comes from saved participant rows, keeping counts
+    auditable and avoiding manual mismatch.
+- After adding an inbound visitor, the manual participant form stays open and
+  clears only the person-specific name/gender fields so the next visitor can be
+  entered quickly while institution/program/role context can be reused.
+- Hardened Mobility edit hydration for production response shapes and uses
+  detail `participants` as a fallback if the participant list request fails.
