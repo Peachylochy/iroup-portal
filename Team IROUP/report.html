@@ -34,7 +34,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="sub">สรุปข้อมูล MOU / ทุน / กิจกรรม / Inbound / Outbound / การเดินทาง พร้อมกรองและส่งออกข้อมูล</div>
     </div>
     <div class="quick-grid">
-      <span class="badge gray" id="v2ReportReadiness">V2 report: checking</span>
+      <span class="badge gray" id="v2ReportReadiness">รายงาน: กำลังตรวจสอบ</span>
       <button class="btn" onclick="loadAll(true)">↻ โหลดใหม่</button>
       <button class="btn primary" onclick="exportFilteredCsv()">⬇ Export ตาม Filter</button>
     </div>
@@ -176,7 +176,7 @@ function fileValue(row){return firstValue(row.file_url,row.attachment_url,row.do
 function hasReportContent(row){return ['name','project','country','faculty','institution','start','end','file','level'].some(key=>!!displayValue(row&&row[key]))}
 
 async function getV2ReportData(){
-  if(!window.IROUP_V2 || !IROUP_V2.admin) throw new Error('IROUP_V2 admin adapter is not available');
+  if(!window.IROUP_V2 || !IROUP_V2.admin) throw new Error('Report adapter is not available');
   const admin=IROUP_V2.admin;
   const [mouRes,mobilityRes,travelRes,scholarRes,eventRes]=await Promise.all([
     admin.mouList({includeArchived:false,_:Date.now()}),
@@ -193,7 +193,7 @@ async function getV2ReportData(){
 }
 function readCache(){try{localStorage.removeItem(REPORT_CACHE_KEY); const c=JSON.parse(sessionStorage.getItem(REPORT_CACHE_KEY)||'null'); if(!c||!c.raw)return null; return c;}catch(e){return null}}
 function writeCache(){try{sessionStorage.setItem(REPORT_CACHE_KEY,JSON.stringify({ts:Date.now(),raw}));}catch(e){console.warn('cache write failed',e)}}
-function useCache(){const c=readCache(); if(!c)return false; raw=c.raw; makeRowsFromV2(); initFilters(); applyReport(); const ageMin=Math.round((Date.now()-c.ts)/60000); $('#notice').textContent=`แสดงข้อมูล V2 จาก cache เมื่อ ${ageMin} นาทีที่แล้ว · กำลังอัปเดตข้อมูลล่าสุด...`; return true;}
+function useCache(){const c=readCache(); if(!c)return false; raw=c.raw; makeRowsFromV2(); initFilters(); applyReport(); const ageMin=Math.round((Date.now()-c.ts)/60000); $('#notice').textContent=`แสดงข้อมูลจาก cache เมื่อ ${ageMin} นาทีที่แล้ว · กำลังอัปเดตข้อมูลล่าสุด...`; return true;}
 
 function getV2ReportBridgeSession(){
   // V2 read-only report bridge: inspect V1 session metadata only, never token values.
@@ -219,17 +219,17 @@ async function fetchV2ReportSummary(fiscalYear=''){
   const badge=$('#v2ReportReadiness');
   try{
     if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.reportSummary){
-      throw new Error('IROUP_V2 report adapter is not available');
+      throw new Error('Report adapter is not available');
     }
     const bridgeSession=getV2ReportBridgeSession();
     const adapterToken=typeof IROUP_V2.getAdminToken==='function' ? IROUP_V2.getAdminToken() : '';
     if(!bridgeSession.email && !bridgeSession.hasAdminToken && !adapterToken){
-      throw new Error('No V1 admin session metadata available for V2 report handoff');
+      throw new Error('No admin session metadata available for report');
     }
     const response=await IROUP_V2.admin.reportSummary(fiscalYear || '');
-    if(!response.success) throw new Error(response.error || 'V2 report summary API error');
+    if(!response.success) throw new Error(response.error || 'Report summary API error');
     v2ReportSummary=response.data || null;
-    if(badge) badge.textContent='V2 report: ready';
+    if(badge) badge.textContent='รายงาน: พร้อมใช้งาน';
     console.info('IROUP V2 report summary readiness OK', {
       fiscalYear: fiscalYear || 'all',
       action: response.meta && response.meta.action ? response.meta.action : ''
@@ -237,7 +237,7 @@ async function fetchV2ReportSummary(fiscalYear=''){
     return v2ReportSummary;
   }catch(err){
     v2ReportSummary=null;
-    if(badge) badge.textContent='V2 report: unavailable';
+    if(badge) badge.textContent='รายงาน: ไม่พร้อมใช้งาน';
     console.warn('IROUP V2 report summary readiness failed; V1 report render continues.', err);
     return null;
   }
@@ -296,14 +296,14 @@ function exportFilteredCsv(){downloadCsv(rowsToCsv(filteredRows),`iroup-report-f
 function exportRaw(key){const rows=filteredRows.filter(row=>row.typeKey===key); if(!rows.length)return alert('ไม่มีข้อมูล'); downloadCsv(rowsToCsv(rows),`iroup-${key}-${new Date().toISOString().slice(0,10)}.csv`)}
 async function loadAll(force=false){
   if(isLoading)return; isLoading=true;
-  $('#notice').textContent='กำลังโหลดข้อมูล V2 สำหรับรายงาน...';
+  $('#notice').textContent='กำลังโหลดข้อมูลสำหรับรายงาน...';
   if(!force) useCache();
   try{
     raw={inbound:[],outbound:[],travel:[],mou:[],scholar:[],event:[],...(await getV2ReportData())};
     writeCache(); makeRowsFromV2(); initFilters(); applyReport();
     setTimeout(()=>fetchV2ReportSummary($('#fyFilter').value || ''),250);
-    $('#notice').textContent=`โหลดข้อมูล V2 ล่าสุดแล้ว: MOU ${raw.mou.length} · ทุน ${raw.scholar.length} · กิจกรรม ${raw.event.length} · Inbound ${mobilityPeopleFromRaw(raw.inbound)} คน · Outbound ${mobilityPeopleFromRaw(raw.outbound)} คน · Travel ${raw.travel.length}`;
-  }catch(e){console.error('Report load failed',e); const hasData=allRows.length>0; $('#notice').textContent=hasData ? `โหลดข้อมูล V2 ไม่สำเร็จ จึงแสดง cache ล่าสุดก่อน (${e.message})` : `โหลดข้อมูล V2 ไม่สำเร็จ: ${e.message}`; }
+    $('#notice').textContent=`โหลดข้อมูลล่าสุดแล้ว: MOU ${raw.mou.length} · ทุน ${raw.scholar.length} · กิจกรรม ${raw.event.length} · Inbound ${mobilityPeopleFromRaw(raw.inbound)} คน · Outbound ${mobilityPeopleFromRaw(raw.outbound)} คน · Travel ${raw.travel.length}`;
+  }catch(e){console.error('Report load failed',e); const hasData=allRows.length>0; $('#notice').textContent=hasData ? `โหลดข้อมูลไม่สำเร็จ จึงแสดง cache ล่าสุดก่อน (${e.message})` : `โหลดข้อมูลไม่สำเร็จ: ${e.message}`; }
   finally{isLoading=false;}
 }
 loadAll(false);

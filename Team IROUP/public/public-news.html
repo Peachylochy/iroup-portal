@@ -193,7 +193,7 @@ async function loadNews(){
   grid.innerHTML = '<div class="state"><div class="spinner"></div>' + esc(t('loading')) + '</div>';
   try{
     var response = await IROUP_V2.public.newsList();
-    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public news API error');
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'Unable to load news data');
     allNews = normalizeList(response).map(normalizeNews).filter(function(item){ return item.id; }).sort(function(a,b){ return dateVal(b.publish_date) - dateVal(a.publish_date); });
     populateFilters();
     updateKpis();

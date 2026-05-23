@@ -175,7 +175,7 @@ async function loadDetail(){
   if(!id) return showError(t('missingId'));
   try{
     var response = await IROUP_V2.public.newsList();
-    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public news API error');
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'Unable to load news data');
     var rows = normalizeList(response).map(normalizeNews);
     currentItem = rows.find(function(item){ return String(item.id) === String(id); });
     if(!currentItem) return showError(t('notFound'));

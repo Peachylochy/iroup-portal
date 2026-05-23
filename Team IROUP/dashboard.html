@@ -295,12 +295,12 @@ body{
       <div class="hero">
         <div class="hero-card">
           <div class="hero-title">ภาพรวมความเป็นนานาชาติของมหาวิทยาลัยพะเยา</div>
-          <div class="hero-sub">หน้านี้อ่านข้อมูลจาก V2 admin lists แล้วสรุปเป็น KPI, insight, ranking, งบประมาณ และรายการล่าสุด เพื่อใช้เป็นหน้าเสนอผู้บริหารหรือ monitor งานประจำวัน</div>
+          <div class="hero-sub">หน้านี้อ่านข้อมูลจากฐานข้อมูลหลักแล้วสรุปเป็น KPI, insight, ranking, งบประมาณ และรายการล่าสุด เพื่อใช้เป็นหน้าเสนอผู้บริหารหรือ monitor งานประจำวัน</div>
           <div class="hero-meta">
             <span class="hero-chip" id="lastUpdated">กำลังโหลดข้อมูล...</span>
             <span class="hero-chip" id="yearChip">ทุกปีงบประมาณ</span>
             <span class="hero-chip">⚡ Fast Report API</span>
-            <span class="hero-chip" id="v2Readiness">V2 admin: checking</span>
+            <span class="hero-chip" id="v2Readiness">ฐานข้อมูล: กำลังตรวจสอบ</span>
           </div>
         </div>
         <div class="globy-box">
@@ -420,7 +420,7 @@ function budgetTotal(item){
 function hasTravelReportContent(item){return !!firstValue(item.project_name,item.project_title,item.purpose,countryDisplay(item),unitDisplay(item),item.start_date,item.end_date,item.departure_date,item.return_date)}
 
 async function fetchReport(year=''){
-  if(!window.IROUP_V2 || !IROUP_V2.admin) throw new Error('IROUP_V2 admin adapter is not available');
+  if(!window.IROUP_V2 || !IROUP_V2.admin) throw new Error('Dashboard adapter is not available');
   const admin=IROUP_V2.admin;
   const [mouRes,mobilityRes,travelRes,scholarRes,eventRes]=await Promise.all([
     admin.mouList({includeArchived:false,_:Date.now()}),
@@ -465,7 +465,7 @@ async function hydrateDashboardScholarshipsFromV2(report){
   }
   try{
     const res=await IROUP_V2.admin.scholarshipList({includeArchived:false,_:Date.now()});
-    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 scholarship list failed');
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'Scholarship list failed');
     const rows=normalizeV2DashboardList(res).map(v2ScholarshipToDashboardRow);
     report.data.scholar=rows;
     report.total=report.total || {};
@@ -488,7 +488,7 @@ async function hydrateDashboardMouFromV2(report){
   }
   try{
     const res=await IROUP_V2.admin.mouList({includeArchived:false,_:Date.now()});
-    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 MOU list failed');
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'MOU list failed');
     const rows=normalizeV2DashboardList(res).map(v2MouToDashboardRow);
     report.data.mou=rows;
     report.total=report.total || {};
@@ -512,7 +512,7 @@ async function hydrateDashboardEventsFromV2(report){
   }
   try{
     const res=await IROUP_V2.admin.eventList({includeArchived:false,_:Date.now()});
-    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 Event list failed');
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'Event list failed');
     const rows=normalizeV2DashboardList(res).map(v2EventToDashboardRow);
     report.data.event=rows;
     report.total=report.total || {};
@@ -541,7 +541,7 @@ async function hydrateDashboardMobilityFromV2(report){
   }
   try{
     const res=await IROUP_V2.admin.mobilityList({includeArchived:false,_:Date.now()});
-    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'V2 Mobility list failed');
+    if(!res || !res.success) throw new Error(res && res.error ? res.error : 'Mobility list failed');
     const rows=normalizeV2DashboardList(res).map(v2MobilityToDashboardRow);
     report.data.inbound=rows.filter(row=>row.direction==='inbound').map(row=>row.dashboardRow);
     report.data.outbound=rows.filter(row=>row.direction==='outbound').map(row=>row.dashboardRow);
@@ -694,7 +694,7 @@ async function fetchV2DashboardSummary(attempt=1){
       adapterVersion: window.IROUP_V2 && IROUP_V2.API_VERSION ? IROUP_V2.API_VERSION : ''
     });
     if(!window.IROUP_V2 || !IROUP_V2.admin || !IROUP_V2.admin.dashboardSummary){
-      throw new Error('IROUP_V2 admin adapter is not available');
+      throw new Error('Dashboard adapter is not available');
     }
     const bridgeSession=getV2AdminBridgeSession();
     const adapterToken=typeof IROUP_V2.getAdminToken==='function' ? IROUP_V2.getAdminToken() : '';
@@ -708,7 +708,7 @@ async function fetchV2DashboardSummary(attempt=1){
       if(attempt<3){
         setTimeout(()=>fetchV2DashboardSummary(attempt+1), 700);
       }
-      throw new Error('No V1 admin session metadata available for V2 read-only handoff');
+      throw new Error('No admin session metadata available');
     }
     console.info('IROUP V2 dashboard auth bridge session ready', {
       email: bridgeSession.email || '(token-only)',
@@ -721,9 +721,9 @@ async function fetchV2DashboardSummary(attempt=1){
       error: response && response.error ? response.error : '',
       action: response && response.meta ? response.meta.action : ''
     });
-    if(!response.success) throw new Error(response.error || 'V2 dashboard summary API error');
+    if(!response.success) throw new Error(response.error || 'Dashboard summary API error');
     state.v2Summary=response.data || null;
-    if(badge) badge.textContent='V2 admin: ready';
+    if(badge) badge.textContent='ฐานข้อมูล: พร้อมใช้งาน';
     console.info('IROUP V2 dashboard summary readiness OK', {
       counts: state.v2Summary && state.v2Summary.counts,
       participants: state.v2Summary && state.v2Summary.participants
@@ -731,7 +731,7 @@ async function fetchV2DashboardSummary(attempt=1){
     return state.v2Summary;
   }catch(err){
     state.v2Summary=null;
-    if(badge) badge.textContent='V2 admin: unavailable';
+    if(badge) badge.textContent='ฐานข้อมูล: ไม่พร้อมใช้งาน';
     console.warn('IROUP V2 dashboard summary readiness failed; V1 dashboard render continues.', err);
     return null;
   }
@@ -741,7 +741,7 @@ async function reloadData(force=false){
   if(state.loading) return;
   state.loading=true;
   $('#notice').style.display='none';
-  $('#appContent').innerHTML='<div class="loading"><div><div class="spinner"></div><div>กำลังโหลดข้อมูล Dashboard จาก V2...</div></div></div>';
+  $('#appContent').innerHTML='<div class="loading"><div><div class="spinner"></div><div>กำลังโหลดข้อมูล Dashboard...</div></div></div>';
   try{
     const cacheKey='iroup_dashboard_v2_full_'+(state.year||'all');
     try{localStorage.removeItem('iroup_dashboard_full_'+(state.year||'all'));}catch(_){}
@@ -765,7 +765,7 @@ async function reloadData(force=false){
     buildYearOptions();
     render();
   }catch(err){
-    $('#appContent').innerHTML=`<div class="panel"><div class="empty">โหลดข้อมูลไม่ได้<br><b>${IU.esc(err.message)}</b><br><br>เช็กว่า Apps Script Deploy เวอร์ชันล่าสุดแล้ว และ V2 endpoint ถูกต้อง</div></div>`;
+    $('#appContent').innerHTML=`<div class="panel"><div class="empty">โหลดข้อมูลไม่ได้<br><b>${IU.esc(err.message)}</b><br><br>เช็กว่า Apps Script Deploy เวอร์ชันล่าสุดแล้ว และ endpoint ถูกต้อง</div></div>`;
   }finally{
     state.loading=false;
   }
@@ -914,7 +914,7 @@ function generateInsights(report){
   insights.push({icon:'🎓',title:openScholar.length?`ขณะนี้มีทุนที่ยังเปิดรับ/ใกล้ปิดรับ ${IU.num(openScholar.length)} ทุน`:'ขณะนี้ยังไม่มีทุนที่เปิดรับสมัครในข้อมูลชุดนี้',sub:'ดูจากวันเปิดรับและวันปิดรับ'});
   const upcoming=data.event.filter(r=>{const d=IU.toDate(r['วันเริ่ม']); if(!d)return false; const diff=daysBetween(d,startDay(new Date())); return diff>=0 && diff<=30});
   if(upcoming.length) insights.push({icon:'📅',title:`มีกิจกรรมที่กำลังจะเกิดขึ้นใน 30 วัน ${IU.num(upcoming.length)} รายการ`,sub:'เหมาะสำหรับติดตามงานประจำเดือน'});
-  if(summary.budget.all>0) insights.push({icon:'💰',title:`งบประมาณรวมที่บันทึกในระบบ ${IU.money(summary.budget.all)+' บาท'}`,sub:'รวมเฉพาะหมวดที่มี field งบประมาณจาก V2'});
+  if(summary.budget.all>0) insights.push({icon:'💰',title:`งบประมาณรวมที่บันทึกในระบบ ${IU.money(summary.budget.all)+' บาท'}`,sub:'รวมเฉพาะหมวดที่มีข้อมูลงบประมาณ'});
   const soonMou=data.mou.filter(r=>IU.statusMou(r)==='soon');
   if(soonMou.length) insights.push({icon:'⏰',title:`มี MOU ใกล้หมดอายุ ${IU.num(soonMou.length)} รายการ`,sub:'ควรตรวจสอบเพื่อต่ออายุหรือประเมินความร่วมมือ'});
   return insights.slice(0,6);
@@ -945,7 +945,7 @@ function render(){
   const activeTravel=data.travel.filter(r=>IU.statusEvent({'วันเริ่ม':r['วันเริ่ม'],'วันสิ้นสุด':r['วันสิ้นสุด']})==='active').length;
   const budgetContent=summary.budget.all>0
     ? `<div class="budget-total"><div class="n">${IU.money(summary.budget.all)+' บาท'}</div><div class="l">งบประมาณรวมที่บันทึก</div></div>${barList({'ทุนการศึกษา':summary.budget.scholar,'กิจกรรม':summary.budget.event,'การเดินทาง':summary.budget.travel,'Inbound':summary.budget.inbound,'Outbound':summary.budget.outbound},5)}`
-    : '<div class="empty">ยังไม่มีข้อมูลงบประมาณจาก V2 list สำหรับสรุปผล</div>';
+    : '<div class="empty">ยังไม่มีข้อมูลงบประมาณสำหรับสรุปผล</div>';
 
   $('#appContent').innerHTML=`
     <div class="grid-kpi">
@@ -954,7 +954,7 @@ function render(){
       ${kpi('calendar',IU.num(total.event),'กิจกรรม',`${IU.num(upcomingEvent)} upcoming`,'purple')}
       ${kpi('globe',IU.num(total.mobility),'Mobility',`Inbound ${IU.num(total.inbound)} · Outbound ${IU.num(total.outbound)}`,'teal')}
       ${kpi('plane',IU.num(total.travel),'การเดินทาง',`${IU.num(activeTravel)} กำลังเดินทาง`,'green')}
-      ${kpi('budget',summary.budget.all?IU.money(summary.budget.all)+' บาท':'ไม่มีข้อมูล','งบประมาณรวม','จาก field งบประมาณใน V2','red')}
+      ${kpi('budget',summary.budget.all?IU.money(summary.budget.all)+' บาท':'ไม่มีข้อมูล','งบประมาณรวม','จากข้อมูลงบประมาณ','red')}
     </div>
 
     <div class="layout-main">

@@ -156,7 +156,7 @@ async function loadDetail(){
   if(!id) return showError(t('missingId'));
   try{
     var response = await IROUP_V2.public.knowledgeList();
-    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public knowledge API error');
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'Unable to load knowledge data');
     var rows = normalizeList(response).map(normalizeKnowledge);
     currentItem = rows.find(function(item){ return String(item.id) === String(id); });
     if(!currentItem) return showError(t('notFound'));

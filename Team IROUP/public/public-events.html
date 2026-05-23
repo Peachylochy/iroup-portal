@@ -289,7 +289,7 @@ async function loadEvents(){
   document.getElementById('allCards').innerHTML = '';
   try{
     var response = await IROUP_V2.public.eventList();
-    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public event API error');
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'Unable to load event data');
     allEvents = normalizeList(response).map(normalizeEvent).filter(function(item){ return item.id; }).sort(sortEvents);
     populateFilters();
     updateKpis();

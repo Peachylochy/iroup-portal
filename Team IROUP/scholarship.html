@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ทุนการศึกษา - iROUP V2</title>
+<title>ทุนการศึกษา - iROUP</title>
 <link rel="stylesheet" href="css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/iroup-config.js"></script>
@@ -123,7 +123,7 @@ body.modal-open{overflow:hidden}
     <header class="topbar">
       <div>
         <div class="title">ทุนการศึกษา</div>
-        <div class="subtitle scholar-header-subtitle">จัดการข้อมูลทุนการศึกษาด้วย V2 เป็นแหล่งข้อมูลหลัก</div>
+        <div class="subtitle scholar-header-subtitle">จัดการข้อมูลทุนการศึกษาจากฐานข้อมูลหลัก</div>
       </div>
       <div class="spacer"></div>
       <div class="lang-toggle" aria-label="Language">
@@ -162,7 +162,7 @@ body.modal-open{overflow:hidden}
       <div class="modal-head">
         <div>
           <div id="modalTitle" class="modal-title">เพิ่มทุนการศึกษา</div>
-          <div id="modalSub" class="subtitle">V2-native SCHOLARSHIP metadata</div>
+          <div id="modalSub" class="subtitle">ข้อมูลทุนการศึกษา</div>
         </div>
         <div class="spacer"></div>
         <button class="btn" type="button" onclick="closeModal()">ปิด</button>
@@ -568,7 +568,7 @@ function changeScholarshipPage(delta) {
 
 function openCreateModal() {
   if (!V2_SCHOLARSHIP_WRITE_UI_ENABLED) {
-    alert('ยังไม่เปิดใช้งานการบันทึก V2 สำหรับทุนการศึกษา');
+    alert('ยังไม่เปิดใช้งานการบันทึกสำหรับทุนการศึกษา');
     return;
   }
   state.editingId = '';
@@ -577,7 +577,7 @@ function openCreateModal() {
   state.pendingFiles = [];
   $('#scholarshipId').value = '';
   $('#modalTitle').textContent = 'เพิ่มทุนการศึกษา';
-  $('#modalSub').textContent = 'V2-native SCHOLARSHIP metadata';
+  $('#modalSub').textContent = 'ข้อมูลทุนการศึกษา';
   $('#deleteBtn').style.display = 'none';
   $('#statusSelect').value = 'draft';
   $('#publicVisible').checked = true;
@@ -666,7 +666,7 @@ async function saveScholarship(evt) {
       setFileStatus('กำลังอัปโหลดไฟล์...', true);
       await uploadPendingScholarshipFiles(savedId);
     }
-    alert('บันทึกสำเร็จ (V2)');
+    alert('บันทึกสำเร็จ');
     closeModal();
     await loadScholarships(true);
   } catch (error) {
@@ -694,7 +694,7 @@ function refreshRichEditorFields() {
 
 async function deleteV2Scholarship(scholarshipId) {
   if (!V2_SCHOLARSHIP_WRITE_UI_ENABLED) {
-    alert('ยังไม่เปิดใช้งานการลบ V2 สำหรับทุนการศึกษา');
+    alert('ยังไม่เปิดใช้งานการลบสำหรับทุนการศึกษา');
     return;
   }
   if (!scholarshipId) return;

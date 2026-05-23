@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOU ต่างประเทศ — iROUP V2</title>
+<title>MOU ต่างประเทศ — iROUP</title>
 <link rel="stylesheet" href="css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -327,7 +327,7 @@ tr:hover td{background:#F3FAFF}
         <span>›</span>
         <strong>MOU ต่างประเทศ</strong>
       </div>
-      <div class="page-badge">V2 Native MOU</div>
+      <div class="page-badge">MOU Management</div>
     </div>
     <div class="topbar-right">
       <div class="lang-toggle" aria-label="Language">
@@ -862,7 +862,7 @@ async function openMouFile(mouId){
     window.open(url, '_blank', 'noopener');
     return;
   }
-  alert('รายการนี้มีข้อมูลสรุปไฟล์จาก V2 list แต่ยังไม่มี URL ใน list response กรุณาเปิดหน้าแก้ไขเพื่อดูไฟล์จาก detail');
+  alert('รายการนี้มีข้อมูลสรุปไฟล์ แต่ยังไม่มี URL ในรายการ กรุณาเปิดหน้าแก้ไขเพื่อดูไฟล์จากรายละเอียด');
 }
 
 function fileUrl(file){
@@ -1140,7 +1140,7 @@ function showTableLoading(){
 
 function openCreateModal(){
   if (!V2_MOU_WRITE_UI_ENABLED) {
-    alert('V2 MOU write UI ยังปิดอยู่');
+    alert('ยังไม่เปิดใช้งานการบันทึก MOU');
     return;
   }
   state.currentDetail = null;
@@ -1151,7 +1151,7 @@ function openCreateModal(){
 
 async function openEditModal(mouId){
   if (!V2_MOU_WRITE_UI_ENABLED) {
-    alert('V2 MOU write UI ยังปิดอยู่');
+    alert('ยังไม่เปิดใช้งานการบันทึก MOU');
     return;
   }
   resetForm();
@@ -1304,7 +1304,7 @@ function validatePayload(payload){
 async function saveMOU(){
   if (state.isSaving) return;
   if (!V2_MOU_WRITE_UI_ENABLED) {
-    alert('V2 MOU write UI ยังปิดอยู่');
+    alert('ยังไม่เปิดใช้งานการบันทึก MOU');
     return;
   }
   const payload = buildPayload();
@@ -1326,7 +1326,7 @@ async function saveMOU(){
       setSaveStatus('info', 'กำลังอัปโหลดไฟล์...');
       await uploadPendingAttachment(savedId);
     }
-    alert('บันทึกสำเร็จ (V2)');
+    alert('บันทึกสำเร็จ');
     closeModal();
     await loadPageData();
   } catch (error) {
@@ -1373,7 +1373,7 @@ function readFileAsDataUrl(file){
 
 async function deleteV2MOU(mouId){
   if (!V2_MOU_WRITE_UI_ENABLED) {
-    alert('V2 MOU write UI ยังปิดอยู่');
+    alert('ยังไม่เปิดใช้งานการลบ MOU');
     return;
   }
   if (!mouId) return alert('ไม่พบ ID สำหรับลบ');

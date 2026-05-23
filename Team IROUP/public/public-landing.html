@@ -483,14 +483,14 @@
   <!-- ── HERO ── -->
   <section class="hero">
     <div class="hero-copy">
-      <div class="eyebrow"><span class="live-dot"></span><span data-i18n="eyebrow">V2 Public Portal · Live International Relations Data</span></div>
+      <div class="eyebrow"><span class="live-dot"></span><span data-i18n="eyebrow">Public Portal · Live International Relations Data</span></div>
       <h1 id="heroTitle">เชื่อมโยงมหาวิทยาลัยพะเยา<br><span class="hl">สู่เครือข่ายระดับโลก</span></h1>
       <p class="lead" data-i18n="heroLead">ศูนย์กลางข้อมูลความร่วมมือสากล การแลกเปลี่ยน และโอกาสระดับนานาชาติ เพื่อขับเคลื่อนมหาวิทยาลัยพะเยาสู่อนาคต</p>
       <div class="hero-actions">
         <a class="btn primary" href="public-mou.html" data-i18n="mouCta">ดูเครือข่าย MOU</a>
         <a class="btn ghost" href="public-news.html" data-i18n="newsCta">ข่าวสารล่าสุด</a>
       </div>
-      <div class="portal-status" id="portalStatus"><span class="spinner"></span><span>กำลังโหลดข้อมูล V2…</span></div>
+      <div class="portal-status" id="portalStatus"><span class="spinner"></span><span>กำลังโหลดข้อมูล…</span></div>
     </div>
   </section>
 
@@ -540,7 +540,7 @@
       <div>
         <div class="sec-kicker" data-i18n="networkKicker">Partner Atlas</div>
         <h2 data-i18n="networkTitle">เครือข่ายความร่วมมือ <span id="atlasCounts" style="font-size:.65em;color:var(--text-muted);font-weight:600"></span></h2>
-        <p class="sec-note" data-i18n="networkNote">สรุปข้อมูล MOU และ Mobility จาก V2 public routes</p>
+        <p class="sec-note" data-i18n="networkNote">สรุปข้อมูล MOU และ Mobility จากฐานข้อมูลหลัก</p>
       </div>
       <a class="btn teal" href="public-mou.html" data-i18n="viewAllMou">ดูทั้งหมด →</a>
     </div>
@@ -599,7 +599,7 @@
   <div class="mob-wrap">
     <div class="mob-panel">
       <div class="mob-panel-head">
-        <div style="font-size:12.5px;color:var(--text-muted)" data-i18n="mobilityNote">International movement and exchange activity from V2 public routes</div>
+        <div style="font-size:12.5px;color:var(--text-muted)" data-i18n="mobilityNote">International movement and exchange activity from the central database</div>
       </div>
       <div class="mob-countries-grid" id="mobilityFlowGrid">
         <div class="empty-s" style="grid-column:1/-1">Loading mobility flow…</div>
@@ -615,7 +615,7 @@
         <h2 id="activityTitle">อัปเดต &amp; โอกาส</h2>
         <div class="activity-note">ข่าวสาร คลังความรู้ ทุน และเข้าถึงระบบ ครบในมุมมองเดียว</div>
       </div>
-      <div class="activity-status"><i></i><span id="activityStatusText">อัปเดตล่าสุดจาก V2</span></div>
+      <div class="activity-status"><i></i><span id="activityStatusText">อัปเดตล่าสุดจากระบบ</span></div>
     </div>
   </section>
 
@@ -626,7 +626,7 @@
           <div>
             <div class="sec-kicker" data-i18n="newsKicker">Latest News</div>
             <h3 data-i18n="newsTitle">ข่าวสารและประกาศ</h3>
-            <div class="feed-note" data-i18n="newsNote">ข่าวที่เผยแพร่จากระบบ NEWS V2</div>
+            <div class="feed-note" data-i18n="newsNote">ข่าวที่เผยแพร่จากระบบข่าว</div>
           </div>
           <a class="feed-link" href="public-news.html" data-i18n="viewAllNews">ดูข่าวทั้งหมด →</a>
         </div>
@@ -679,7 +679,7 @@
     <div>มหาวิทยาลัยพะเยา 19 หมู่ 2 ต.แม่กา อ.เมืองพะเยา จ.พะเยา 56000</div>
     <div>054-466-666 ต่อ 1024 &nbsp;·&nbsp; inter@up.ac.th</div>
   </div>
-  <div class="foot-copy">© 2569 International Relations Office · University of Phayao · V2 Public Portal &nbsp;·&nbsp; v2.0.0 · public</div>
+  <div class="foot-copy">© 2569 International Relations Office · University of Phayao · Public Portal</div>
 </footer>
 
 <script src="../js/iroup-config.js"></script>
@@ -712,63 +712,63 @@ const FLAGS = {
 /* ── I18N ── */
 const TEXT = {
   TH:{
-    eyebrow:'V2 Public Portal · Live International Relations Data',
+    eyebrow:'Public Portal · Live International Relations Data',
     heroTitle:'เชื่อมโยงมหาวิทยาลัยพะเยาสู่เครือข่ายระดับโลก',
     heroLead:'ศูนย์กลางข้อมูลความร่วมมือสากล การแลกเปลี่ยน และโอกาสระดับนานาชาติ เพื่อขับเคลื่อนมหาวิทยาลัยพะเยาสู่อนาคต',
     mouCta:'ดูเครือข่าย MOU',newsCta:'ข่าวสารล่าสุด',
     statCountriesLbl:'ประเทศ',statMousLbl:'MOU ทั้งหมด',statInLbl:'ผู้แลกเปลี่ยนเข้า',statOutLbl:'ออกสู่ต่างประเทศ',
     statInboundSub:'Inbound · 12 เดือนล่าสุด',statOutboundSub:'Outbound · 12 เดือนล่าสุด',
     networkKicker:'Partner Atlas',networkTitle:'เครือข่ายความร่วมมือ',
-    networkNote:'สรุปข้อมูล MOU และ Mobility จาก V2 public routes',
+    networkNote:'สรุปข้อมูล MOU และ Mobility จากฐานข้อมูลหลัก',
     viewAllMou:'ดูทั้งหมด →',
     mobilityKicker:'Mobility Flow · 12 เดือนล่าสุด',mobilityTitle:'การเดินทาง In – Out',
-    mobilityNote:'International movement and exchange activity from V2 public routes',
+    mobilityNote:'International movement and exchange activity from the central database',
     mobilitySummary:'ผู้แลกเปลี่ยนเข้ามา {inbound} คน · ออกสู่ต่างประเทศ {outbound} คน',
-    activityTitle:'อัปเดต & โอกาส',activityStatus:'อัปเดตล่าสุดจาก V2',
+    activityTitle:'อัปเดต & โอกาส',activityStatus:'อัปเดตล่าสุดจากระบบ',
     viewMobility:'Open Mobility →',
-    newsKicker:'Latest News',newsTitle:'ข่าวสารล่าสุด',newsNote:'ข่าวที่เผยแพร่จากระบบ NEWS V2',
+    newsKicker:'Latest News',newsTitle:'ข่าวสารล่าสุด',newsNote:'ข่าวที่เผยแพร่จากระบบข่าว',
     viewAllNews:'ดูข่าวทั้งหมด →',
     knowledgeKicker:'Featured Knowledge',knowledgeTitle:'คลังความรู้แนะนำ',
     knowledgeNote:'บทความ เอกสาร วิดีโอ และสื่อการเรียนรู้',viewAllKnowledge:'ดูคลังความรู้ทั้งหมด →',
     opportunityKicker:'Opportunities & Events',opportunityTitle:'ทุนการศึกษาและกิจกรรมเด่น',
     opportunityNote:'รายการเด่นจากระบบทุนและกิจกรรมสาธารณะ',
     opScholar:'ทุนการศึกษา',opEvent:'กิจกรรม',viewAll:'ดูทั้งหมด →',
-    moduleKicker:'Quick Links',moduleTitle:'เลือกดูข้อมูลตามระบบ',moduleNote:'เชื่อมต่อฐานข้อมูล V2 public route โดยตรง',
+    moduleKicker:'Quick Links',moduleTitle:'เลือกดูข้อมูลตามระบบ',moduleNote:'เชื่อมต่อฐานข้อมูลหลักโดยตรง',
     navNews:'ข่าวสาร',navKnowledge:'คลังความรู้',navScholar:'ทุนการศึกษา',
     navEvents:'กิจกรรม',navMou:'เครือข่ายความร่วมมือ',navMobility:'การแลกเปลี่ยน',
     noNews:'ยังไม่มีข่าวที่เผยแพร่',noKnowledge:'ยังไม่มีคลังความรู้ที่เผยแพร่',
     noOpportunities:'ยังไม่มีทุนหรือกิจกรรมที่เผยแพร่',
-    dataReady:'โหลดข้อมูล V2 สำเร็จ',partialReady:'โหลดข้อมูลบางส่วนสำเร็จ',dataError:'ไม่สามารถโหลดข้อมูล V2 ได้',
+    dataReady:'โหลดข้อมูลสำเร็จ',partialReady:'โหลดข้อมูลบางส่วนสำเร็จ',dataError:'ไม่สามารถโหลดข้อมูลได้',
     open:'เปิดดู',published:'เผยแพร่',readMore:'อ่านต่อ'
   },
   EN:{
-    eyebrow:'V2 Public Portal · Live International Relations Data',
+    eyebrow:'Public Portal · Live International Relations Data',
     heroTitle:'University of Phayao – Global Network Hub',
     heroLead:'Central hub for international partnerships, exchanges, and opportunities driving the University of Phayao forward.',
     mouCta:'Browse MOU Network',newsCta:'Latest News',
     statCountriesLbl:'Countries',statMousLbl:'Total MOU Agreements',statInLbl:'Inbound Exchange',statOutLbl:'Outbound Travel',
     statInboundSub:'Inbound · Last 12 months',statOutboundSub:'Outbound · Last 12 months',
     networkKicker:'Partner Atlas',networkTitle:'Partnership Network',
-    networkNote:'MOU and Mobility summary from V2 public routes',
+    networkNote:'MOU and Mobility summary from the central database',
     viewAllMou:'View all →',
     mobilityKicker:'Mobility Flow · Last 12 months',mobilityTitle:'Inbound – Outbound Flow',
-    mobilityNote:'International movement and exchange activity from V2 public routes',
+    mobilityNote:'International movement and exchange activity from the central database',
     mobilitySummary:'Inbound {inbound} people · Outbound {outbound} people',
-    activityTitle:'Updates & Opportunities',activityStatus:'Latest updates from V2',
+    activityTitle:'Updates & Opportunities',activityStatus:'Latest updates from the system',
     viewMobility:'Open Mobility →',
-    newsKicker:'Latest News',newsTitle:'Latest News',newsNote:'Published stories from the NEWS V2 system.',
+    newsKicker:'Latest News',newsTitle:'Latest News',newsNote:'Published stories from the news system.',
     viewAllNews:'View all news →',
     knowledgeKicker:'Featured Knowledge',knowledgeTitle:'Featured Knowledge',
     knowledgeNote:'Articles, documents, videos, and learning media.',viewAllKnowledge:'View knowledge hub →',
     opportunityKicker:'Opportunities & Events',opportunityTitle:'Scholarship & Event Highlights',
     opportunityNote:'Selected public records from scholarship and event systems.',
     opScholar:'Scholarships',opEvent:'Events',viewAll:'View all →',
-    moduleKicker:'Quick Links',moduleTitle:'Browse by system',moduleNote:'Each link opens a V2 public route page.',
+    moduleKicker:'Quick Links',moduleTitle:'Browse by system',moduleNote:'Each link opens a public information page.',
     navNews:'News',navKnowledge:'Knowledge',navScholar:'Scholarships',
     navEvents:'Events',navMou:'Partnership network',navMobility:'Mobility',
     noNews:'No published news yet.',noKnowledge:'No published knowledge records yet.',
     noOpportunities:'No public scholarships or events yet.',
-    dataReady:'V2 data loaded',partialReady:'Partial V2 data loaded',dataError:'Unable to load V2 data',
+    dataReady:'Data loaded',partialReady:'Partial data loaded',dataError:'Unable to load data',
     open:'Open',published:'Published',readMore:'Read more'
   }
 };
@@ -846,7 +846,7 @@ function applyLanguage() {
 /* ── LOAD DATA ── */
 async function loadLandingData() {
   const status = document.getElementById('portalStatus');
-  setStatus(status, true, 'กำลังโหลดข้อมูล V2…');
+  setStatus(status, true, 'กำลังโหลดข้อมูล…');
   const keys = ['news','knowledge','scholarships','events','mous','mouMap','mobility'];
   const fns = {
     news: function() { return IROUP_V2.public.newsList(); },
@@ -1385,7 +1385,7 @@ function renderNews() {
       '</div>' +
       '<div class="news-feature-title">' + esc(featureTitle) + '</div>' +
       (featureDesc ? '<div class="news-feature-desc">' + esc(truncate(featureDesc, 180)) + '</div>' : '') +
-      '<div class="feed-card-foot"><span>' + iconSvg('clock') + ' V2 public</span><strong class="feed-link">' + esc(d.readMore) + ' →</strong></div>' +
+      '<div class="feed-card-foot"><span>' + iconSvg('clock') + ' public</span><strong class="feed-link">' + esc(d.readMore) + ' →</strong></div>' +
     '</div>' +
   '</a>';
 

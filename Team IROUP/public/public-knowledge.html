@@ -174,7 +174,7 @@ async function loadKnowledge(){
   grid.innerHTML = '<div class="state"><div class="spinner"></div>' + esc(t('loading')) + '</div>';
   try{
     var response = await IROUP_V2.public.knowledgeList();
-    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public knowledge API error');
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'Unable to load knowledge data');
     allKnowledge = normalizeList(response).map(normalizeKnowledge).filter(function(item){ return item.id; });
     populateFilters();
     updateKpis();

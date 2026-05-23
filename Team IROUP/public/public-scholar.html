@@ -197,7 +197,7 @@ async function loadScholarships(){
   document.getElementById('allCards').innerHTML = '';
   try{
     var response = await IROUP_V2.public.scholarshipList();
-    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public scholarship API error');
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'Unable to load scholarship data');
     var rawList = normalizeList(response);
     allScholarships = rawList.map(normalizeScholarship).filter(function(item){ return item.id; }).sort(sortScholarships);
     populateFilters();

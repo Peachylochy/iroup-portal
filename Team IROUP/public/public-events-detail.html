@@ -159,7 +159,7 @@ async function loadDetail(){
   try{
     var id = new URLSearchParams(location.search).get('id') || '';
     var response = await IROUP_V2.public.eventList();
-    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'V2 public event API error');
+    if(!response || !response.success) throw new Error(response && response.error ? response.error : 'Unable to load event data');
     var rows = normalizeList(response).map(normalizeEvent);
     currentItem = rows.find(function(item){ return item.id === id; }) || null;
     if(!currentItem){ renderNotFound(); return; }

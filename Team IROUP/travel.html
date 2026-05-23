@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>การเดินทาง - iROUP V2</title>
+<title>การเดินทาง - iROUP</title>
 <link rel="stylesheet" href="css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/iroup-config.js"></script>
@@ -121,7 +121,7 @@ body.modal-open{overflow:hidden}
     <header class="topbar">
       <div>
         <div class="title">การเดินทาง</div>
-        <div class="subtitle">จัดการข้อมูลการเดินทางบุคลากรด้วย V2-native API</div>
+        <div class="subtitle">จัดการข้อมูลการเดินทางบุคลากรจากฐานข้อมูลหลัก</div>
       </div>
       <div class="spacer"></div>
       <div class="lang-toggle" aria-label="Language">
@@ -166,7 +166,7 @@ body.modal-open{overflow:hidden}
       <div class="modal-head">
         <div>
           <div id="modalTitle" class="modal-title">เพิ่มการเดินทาง</div>
-          <div id="modalSub" class="subtitle">V2-native TRAVEL metadata</div>
+          <div id="modalSub" class="subtitle">ข้อมูลการเดินทาง</div>
         </div>
         <div class="spacer"></div>
         <button class="btn" type="button" onclick="closeModal()">ปิด</button>
@@ -774,7 +774,7 @@ function resetForm(){
 function openCreateModal(){
   resetForm();
   $('#modalTitle').textContent = 'เพิ่มการเดินทาง';
-  $('#modalSub').textContent = 'สร้างข้อมูล TRAVEL ผ่าน V2';
+  $('#modalSub').textContent = 'สร้างข้อมูลการเดินทาง';
   $('#deleteModalBtn').style.display = 'none';
   $('#participantSection').style.display = '';
   $('#travelModal').classList.add('open');
@@ -957,7 +957,7 @@ function validateBudgetPayload(payload){
 async function saveTravel(event){
   event.preventDefault();
   if (!V2_TRAVEL_WRITE_UI_ENABLED) {
-    alert('V2 Travel write UI ยังปิดอยู่');
+    alert('ยังไม่เปิดใช้งานการบันทึกการเดินทาง');
     return;
   }
   const payload = buildPayload();
@@ -1003,7 +1003,7 @@ async function saveTravel(event){
         }
       }
     }
-    alert('บันทึกสำเร็จ (V2)');
+    alert('บันทึกสำเร็จ');
     closeModal();
     await loadPageData(true);
   } catch (error) {
@@ -1196,7 +1196,7 @@ async function addManualParticipant(){
 }
 
 async function addParticipantPayload(payload){
-  if (!V2_TRAVEL_WRITE_UI_ENABLED) return alert('V2 Travel write UI ยังปิดอยู่');
+  if (!V2_TRAVEL_WRITE_UI_ENABLED) return alert('ยังไม่เปิดใช้งานการบันทึกการเดินทาง');
   if (!payload.travel_id) {
     state.participants.push({
       travel_participant_id: createPendingParticipantId(),
@@ -1255,7 +1255,7 @@ function unitNameById(unitId){
 }
 
 async function deleteParticipant(participantId){
-  if (!V2_TRAVEL_WRITE_UI_ENABLED) return alert('V2 Travel write UI ยังปิดอยู่');
+  if (!V2_TRAVEL_WRITE_UI_ENABLED) return alert('ยังไม่เปิดใช้งานการบันทึกการเดินทาง');
   if (!participantId) return alert('ไม่พบ travel_participant_id');
   if (!$('#travelId').value) {
     state.participants = state.participants.filter(row => String(row.travel_participant_id || '') !== String(participantId));
@@ -1278,7 +1278,7 @@ async function deleteTravelFromModal(){
 
 async function deleteV2Travel(travelId){
   if (!V2_TRAVEL_WRITE_UI_ENABLED) {
-    alert('V2 Travel write UI ยังปิดอยู่');
+    alert('ยังไม่เปิดใช้งานการลบการเดินทาง');
     return;
   }
   if (!travelId) return alert('ไม่พบ travel_id');

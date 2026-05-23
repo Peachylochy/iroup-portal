@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ข่าว - IROUP V2</title>
+  <title>ข่าว - IROUP</title>
   <link rel="stylesheet" href="css/iroup-theme.css">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="js/iroup-config.js"></script>
@@ -197,7 +197,7 @@
       <header class="topbar">
         <div>
           <h1>ข่าว</h1>
-          <div class="subtitle">จัดการข่าวประชาสัมพันธ์ด้วย V2 เป็นแหล่งข้อมูลหลัก</div>
+          <div class="subtitle">จัดการข่าวประชาสัมพันธ์จากฐานข้อมูลหลัก</div>
         </div>
         <div class="top-actions">
           <div class="segmented">
@@ -237,7 +237,7 @@
       <div class="modal-head">
         <div>
           <h2 id="modalTitle">เพิ่มข่าว</h2>
-          <p id="modalSub">สร้างข้อมูล NEWS ผ่าน V2</p>
+          <p id="modalSub">สร้างข้อมูลข่าว</p>
         </div>
         <button class="btn" type="button" onclick="closeModal()">ปิด</button>
       </div>
@@ -581,7 +581,7 @@
 
     function openCreateModal() {
       if (!V2_NEWS_WRITE_UI_ENABLED) {
-        alert('ยังไม่เปิดใช้งานการบันทึก V2 สำหรับข่าว');
+        alert('ยังไม่เปิดใช้งานการบันทึกสำหรับข่าว');
         return;
       }
       state.editingId = '';
@@ -591,7 +591,7 @@
       refreshRichEditorFields();
       $('#newsId').value = '';
       $('#modalTitle').textContent = 'เพิ่มข่าว';
-      $('#modalSub').textContent = 'สร้างข้อมูล NEWS ผ่าน V2';
+      $('#modalSub').textContent = 'สร้างข้อมูลข่าว';
       $('#deleteBtn').style.display = 'none';
       $('#publicVisible').checked = true;
       renderCoverPreview('');
@@ -682,7 +682,7 @@
         await uploadPendingNewsFiles(savedId);
         console.timeEnd('[news-save] uploadPendingFiles');
         console.info('[news-save] complete', { elapsed_ms: Date.now() - saveStartedAt });
-        alert('บันทึกสำเร็จ (V2)');
+        alert('บันทึกสำเร็จ');
         closeModal();
         await loadNews(true);
       } catch (error) {
@@ -734,7 +734,7 @@
 
     async function deleteV2News(newsId) {
       if (!V2_NEWS_WRITE_UI_ENABLED) {
-        alert('ยังไม่เปิดใช้งานการลบ V2 สำหรับข่าว');
+        alert('ยังไม่เปิดใช้งานการลบสำหรับข่าว');
         return;
       }
       if (!newsId) return;

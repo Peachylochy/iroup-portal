@@ -4769,9 +4769,12 @@ News launch-prep hotfix, 2026-05-23:
   preserving icon visibility without returning to large image tiles.
 - Added query-string cache busting for `iroup-sdg-icons.js` on News and public
   News pages.
-- Production endpoint check:
-  - `js/iroup-v2-endpoint.js` is pointing at the production Apps Script URL
-    ending `...rhp0z-swSg/exec`.
+- Endpoint correction after user review:
+  - User clarified that the current `js/iroup-v2-endpoint.js` URL is still tied
+    to the experiment/test sheet, not the real launch sheet.
+  - Do not push/deploy as production while this endpoint is active.
+  - Launch is blocked until the real production Apps Script deployment URL, wired
+    to the real production spreadsheet, is provided and verified.
 - Remaining untracked local reference file:
   - `SDG_Guidelines_AUG_2019_Final.pdf` remains outside `Team IROUP` and is not
     part of launch commits.
@@ -4779,3 +4782,13 @@ News launch-prep hotfix, 2026-05-23:
   - `js/iroup-rich-lite.js ok`
   - `js/iroup-sdg-icons.js ok`
   - `news.html ok`
+
+User-facing V2 wording cleanup, 2026-05-23:
+
+- Removed visible `V2` wording from admin/public page titles, subtitles, badges,
+  readiness labels, save alerts, and public loading/error copy.
+- Kept internal filenames, adapter names, route names, and `IROUP_V2` code
+  identifiers unchanged to avoid unnecessary risk before launch.
+- Remaining `V2` matches in HTML are internal implementation names, comments, or
+  console/debug messages, not normal user-facing labels.
+- Syntax check passed for the touched admin and public HTML pages.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Events — iROUP V2</title>
+<title>Events — iROUP</title>
 <link rel="stylesheet" href="css/iroup-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/iroup-config.js"></script>
@@ -124,7 +124,7 @@ body.modal-open{overflow:hidden}
     <header class="topbar">
       <div>
         <div class="title" data-i18n-th="กิจกรรม" data-i18n-en="Events">กิจกรรม</div>
-        <div class="subtitle" data-i18n-th="จัดการข้อมูลกิจกรรมด้วย V2 เป็นแหล่งข้อมูลหลัก" data-i18n-en="Manage event records with V2 as the source of truth">จัดการข้อมูลกิจกรรมด้วย V2 เป็นแหล่งข้อมูลหลัก</div>
+        <div class="subtitle" data-i18n-th="จัดการข้อมูลกิจกรรมจากฐานข้อมูลหลัก" data-i18n-en="Manage event records from the central database">จัดการข้อมูลกิจกรรมจากฐานข้อมูลหลัก</div>
       </div>
       <div class="spacer"></div>
       <div class="lang-toggle" aria-label="Language">
@@ -163,7 +163,7 @@ body.modal-open{overflow:hidden}
       <div class="modal-head">
         <div>
           <div id="modalTitle" class="modal-title">เพิ่มกิจกรรม</div>
-          <div id="modalSub" class="subtitle">V2-native EVENT metadata</div>
+          <div id="modalSub" class="subtitle">ข้อมูลกิจกรรม</div>
         </div>
         <div class="spacer"></div>
         <button class="btn" type="button" onclick="closeModal()">ปิด</button>
@@ -525,7 +525,7 @@ function openCreateModal() {
   state.pendingFiles = [];
   $('#eventId').value = '';
   $('#modalTitle').textContent = state.lang === 'en' ? 'Add Event' : 'เพิ่มกิจกรรม';
-  $('#modalSub').textContent = 'V2-native EVENT metadata';
+  $('#modalSub').textContent = 'ข้อมูลกิจกรรม';
   $('#deleteBtn').style.display = 'none';
   $('#statusSelect').value = 'draft';
   $('#customEventType').value = '';
@@ -637,7 +637,7 @@ async function deleteV2Event(eventId) {
   if (!eventId) return;
   if (!confirm('ยืนยันลบกิจกรรมนี้หรือไม่')) return;
   if (!IROUP_V2.admin.eventDelete) {
-    alert('ยังไม่มี V2 soft delete route สำหรับ EVENT');
+    alert('ยังไม่เปิดใช้งานการลบสำหรับกิจกรรม');
     return;
   }
   const res = await IROUP_V2.admin.eventDelete(eventId);
