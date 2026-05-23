@@ -4815,3 +4815,22 @@ Mobility inbound group-entry follow-up, 2026-05-23:
   entered quickly while institution/program/role context can be reused.
 - Hardened Mobility edit hydration for production response shapes and uses
   detail `participants` as a fallback if the participant list request fails.
+
+Partner organization master seed, 2026-05-23:
+
+- Added production master structure for foreign partner organizations:
+  - `PARTNER_ORG_MASTER`
+  - `PARTNER_CONTACT`
+- Added local seed builder `tools/build_partner_seed.py`.
+  - Source workbook: `Contact_องค์กรต่างประเทศ_v5.xlsx`
+  - Generated seed CSVs in `data/imports/`.
+  - Output counts: 53 partner organizations and 58 partner contacts.
+- Updated `IROUP_DATABASE_V2_BUILDER.gs` so future database repair/generation
+  includes both partner tabs in the MASTER group.
+- Added both tabs to Google Sheet `IROUP_DATABASE_PRODUCTION`
+  (`1WK9kvTgNn1zeSKSqtFz4BWf5DturzeRZ1am2GJp3PiE`) and imported the seed rows.
+- Verification readback from production confirmed:
+  - `PARTNER_ORG_MASTER` header + 53 data rows.
+  - `PARTNER_CONTACT` header + 58 data rows.
+  - Phone values with leading `+` were repaired as text to avoid Sheets formula
+    parsing errors.
