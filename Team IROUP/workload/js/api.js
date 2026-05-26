@@ -5,12 +5,13 @@
 var API = (function() {
   'use strict';
 
+  var DEFAULT_BASE_URL = 'https://script.google.com/macros/s/AKfycbxHbMgrHZqo8bhe7H0axCwT5DX3WezOtlYxMSYTTSX_rw1KwWdZZiiisPvYEv4P1YnO/exec';
   var _baseUrl = '';
   var _apiToken = '';
 
   function getBaseUrl() {
     if (_baseUrl) return _baseUrl;
-    _baseUrl = localStorage.getItem('peach_api_url') || '';
+    _baseUrl = localStorage.getItem('peach_api_url') || DEFAULT_BASE_URL;
     return _baseUrl;
   }
 
