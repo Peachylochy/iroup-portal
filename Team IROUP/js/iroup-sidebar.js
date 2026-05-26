@@ -41,7 +41,7 @@
     ]},
     { section: 'ECOSYSTEM', items: [
       { icon: 'workspace', label: 'Workspace', href: '../index.html', match: [] },
-      { icon: 'portfolio', label: 'Workload Portfolio', href: '../peach-workload-portfolio/frontend/index.html', match: [] }
+      { icon: 'portfolio', label: 'Workload Portfolio', href: 'workload/index.html', match: [] }
     ]}
   ];
 

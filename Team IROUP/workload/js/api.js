@@ -1,0 +1,379 @@
+/* ============================================================
+   PEACH Workload Portfolio — API Client
+   ============================================================ */
+
+var API = (function() {
+  'use strict';
+
+  var _baseUrl = '';
+  var _apiToken = '';
+
+  function getBaseUrl() {
+    if (_baseUrl) return _baseUrl;
+    _baseUrl = localStorage.getItem('peach_api_url') || '';
+    return _baseUrl;
+  }
+
+  function setBaseUrl(url) {
+    _baseUrl = url;
+    localStorage.setItem('peach_api_url', url);
+  }
+
+  function getApiToken() {
+    if (_apiToken) return _apiToken;
+    _apiToken = localStorage.getItem('peach_api_token') || '';
+    return _apiToken;
+  }
+
+  function setApiToken(token) {
+    _apiToken = token || '';
+    localStorage.setItem('peach_api_token', _apiToken);
+  }
+
+  // ─── GET Request ────────────────────────────────────────
+  function get(resource, params) {
+    var url = getBaseUrl();
+    if (!url) return Promise.reject(new Error('ยังไม่ได้ตั้งค่า API URL'));
+
+    var qs = 'resource=' + encodeURIComponent(resource);
+    if (params) {
+      Object.keys(params).forEach(function(k) {
+        if (params[k] !== undefined && params[k] !== null && params[k] !== '') {
+          qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+        }
+      });
+    }
+    var fullUrl = url + '?' + qs;
+
+    return fetch(fullUrl)
+      .then(function(res) { return res.json(); })
+      .then(normalizeResponse)
+      .catch(function(err) { throw new Error('GET error: ' + err.message); });
+  }
+
+  // ─── POST Request ────────────────────────────────────────
+  function post(resource, action, data) {
+    var url = getBaseUrl();
+    if (!url) return Promise.reject(new Error('ยังไม่ได้ตั้งค่า API URL'));
+
+    var body = Object.assign({ resource: resource, action: action, apiToken: getApiToken() }, data || {});
+
+    return fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'text/plain' } // GAS workaround
+    })
+    .then(function(res) { return res.json(); })
+    .then(normalizeResponse)
+    .catch(function(err) { throw new Error('POST error: ' + err.message); });
+  }
+
+  function normalizeResponse(res) {
+    if (res && (res.success === false || res.error)) {
+      throw new Error(res.error || 'API request failed');
+    }
+    return res;
+  }
+
+  // ─── WORKLOADS ────────────────────────────────────────────
+  function listWorkloads(filters) {
+    return get('workloads', filters);
+  }
+  function getWorkload(id) {
+    return get('workloads', { action: 'get', id: id });
+  }
+  function createWorkload(data) {
+    return post('workloads', 'create', data);
+  }
+  function updateWorkload(data) {
+    return post('workloads', 'update', data);
+  }
+  function deleteWorkload(id) {
+    return post('workloads', 'delete', { id: id });
+  }
+
+  // ─── EVIDENCE ─────────────────────────────────────────────
+  function listEvidence(params) {
+    return get('evidence', params);
+  }
+  function createEvidence(data) {
+    return post('evidence', 'create', data);
+  }
+  function deleteEvidence(id) {
+    return post('evidence', 'delete', { id: id });
+  }
+
+  // ─── CATEGORIES ───────────────────────────────────────────
+  var _catCache = null;
+  function getCategories() {
+    if (_catCache) return Promise.resolve(_catCache);
+    return get('categories').then(function(res) {
+      _catCache = res;
+      return res;
+    });
+  }
+  function getCategoriesFresh() {
+    _catCache = null;
+    return get('categories').then(function(res) {
+      _catCache = res;
+      return res;
+    });
+  }
+  function createCategory(data) {
+    _catCache = null;
+    return post('categories', 'create', data);
+  }
+  function updateCategory(data) {
+    _catCache = null;
+    return post('categories', 'update', data);
+  }
+  function deleteCategory(id) {
+    _catCache = null;
+    return post('categories', 'delete', { id: id });
+  }
+
+  // ─── DASHBOARD ────────────────────────────────────────────
+  function getDashboard(year) {
+    return get('dashboard', { year: year });
+  }
+
+  // ─── ANNUAL SUMMARY ───────────────────────────────────────
+  function getAnnualSummary(year) {
+    return get('annual-summary', { year: year });
+  }
+
+  // ─── SETTINGS ─────────────────────────────────────────────
+  function getSettings() {
+    return get('settings');
+  }
+
+  // ─── PROFILE ──────────────────────────────────────────────
+  function updateProfile(profile) {
+    return post('settings', 'updateProfile', {
+      name: profile.name, position: profile.position,
+      dept: profile.dept, year: profile.year, email: profile.email
+    });
+  }
+
+  // ─── AI IMPORT (proxy ผ่าน GAS → Claude API) ──────────────
+  function aiImport(fileBase64, fileMediaType, fileName, apiKey) {
+    var url = getBaseUrl();
+    if (!url) return Promise.reject(new Error('ยังไม่ได้ตั้งค่า API URL'));
+    return fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        resource: 'ai-import',
+        action: 'extract',
+        apiToken: getApiToken(),
+        fileBase64: fileBase64,
+        fileMediaType: fileMediaType,
+        fileName: fileName,
+        apiKey: apiKey,
+      }),
+      headers: { 'Content-Type': 'text/plain' }
+    }).then(function(r) { return r.json(); }).then(normalizeResponse);
+  }
+
+  // ─── SEED DATA ────────────────────────────────────────────
+  function seed() {
+    return post('seed', 'seed', {});
+  }
+
+  // ─── INIT SHEETS ──────────────────────────────────────────
+  function init() {
+    return post('init', 'init', {});
+  }
+
+  return {
+    getBaseUrl: getBaseUrl,
+    setBaseUrl: setBaseUrl,
+    getApiToken: getApiToken,
+    setApiToken: setApiToken,
+    listWorkloads: listWorkloads,
+    getWorkload: getWorkload,
+    createWorkload: createWorkload,
+    updateWorkload: updateWorkload,
+    deleteWorkload: deleteWorkload,
+    listEvidence: listEvidence,
+    createEvidence: createEvidence,
+    deleteEvidence: deleteEvidence,
+    getCategories: getCategories,
+    getCategoriesFresh: getCategoriesFresh,
+    createCategory: createCategory,
+    updateCategory: updateCategory,
+    deleteCategory: deleteCategory,
+    getDashboard: getDashboard,
+    getAnnualSummary: getAnnualSummary,
+    getSettings: getSettings,
+    updateProfile: updateProfile,
+    aiImport: aiImport,
+    seed: seed,
+    init: init,
+  };
+})();
+
+/* ─── DEMO MODE (ไม่มี API URL) ────────────────────────────── */
+var DEMO_DATA = (function() {
+  var categories = [
+    { id:'CAT01', name:'การต้อนรับแขกต่างชาติ', icon:'🤝', color:'#06b6d4' },
+    { id:'CAT02', name:'การจัดทำ MOU/MOA',       icon:'📝', color:'#8b5cf6' },
+    { id:'CAT03', name:'การประสานงานทุน',         icon:'🎓', color:'#f59e0b' },
+    { id:'CAT04', name:'การแปลเอกสาร',           icon:'🌐', color:'#10b981' },
+    { id:'CAT05', name:'การจัดอบรม/สัมมนา',      icon:'📚', color:'#f97316' },
+    { id:'CAT06', name:'การประชุมวิเทศสัมพันธ์', icon:'🏛️', color:'#ec4899' },
+    { id:'CAT07', name:'งานโครงการแลกเปลี่ยน',   icon:'✈️', color:'#14b8a6' },
+    { id:'CAT08', name:'ดูแลนักศึกษาต่างชาติ',   icon:'🌏', color:'#a78bfa' },
+    { id:'CAT09', name:'จัดทำเอกสาร/รายงาน',     icon:'📄', color:'#34d399' },
+    { id:'CAT10', name:'การพัฒนาตนเอง',          icon:'⭐', color:'#fb7185' },
+    { id:'CAT11', name:'งานธุรการวิเทศ',          icon:'🗂️', color:'#60a5fa' },
+    { id:'CAT12', name:'อื่นๆ',                  icon:'📌', color:'#94a3b8' },
+  ];
+
+  var workloads = [
+    { id:'w01', title:'ต้อนรับคณะจาก Xiamen University', category:'CAT01',
+      detail:'ต้อนรับและบรรยายสรุปโครงการความร่วมมือ', workDate:'2024-01-10', hours:8, year:'2567', month:1, status:'เสร็จสิ้น', evidenceCount:2 },
+    { id:'w02', title:'จัดทำร่าง MOU กับ Zhejiang Normal University', category:'CAT02',
+      detail:'ร่าง MOU ฉบับภาษาอังกฤษ ประสานงานกับฝ่ายกฎหมาย', workDate:'2024-01-15', hours:12, year:'2567', month:1, status:'เสร็จสิ้น', evidenceCount:1 },
+    { id:'w03', title:'จัดอบรม Academic English Writing', category:'CAT05',
+      detail:'จัดอบรมภาษาอังกฤษเชิงวิชาการ 2 วัน', workDate:'2024-02-12', hours:16, year:'2567', month:2, status:'เสร็จสิ้น', evidenceCount:3 },
+    { id:'w04', title:'จัดทำรายงานประจำปี 2566', category:'CAT09',
+      detail:'รวบรวมและวิเคราะห์ข้อมูลผลการดำเนินงาน', workDate:'2024-02-20', hours:20, year:'2567', month:2, status:'เสร็จสิ้น', evidenceCount:1 },
+    { id:'w05', title:'ลงนาม MOU กับ Zhejiang Normal University', category:'CAT02',
+      detail:'เตรียมพิธีลงนาม MOU จัดทำเอกสาร', workDate:'2024-03-12', hours:12, year:'2567', month:3, status:'เสร็จสิ้น', evidenceCount:4 },
+    { id:'w06', title:'จัดโครงการ English Camp', category:'CAT05',
+      detail:'จัดค่ายภาษาอังกฤษ 3 วัน 2 คืน นักศึกษา 60 คน', workDate:'2024-05-06', hours:24, year:'2567', month:5, status:'เสร็จสิ้น', evidenceCount:5 },
+    { id:'w07', title:'ต้อนรับ Visiting Professor จาก Seoul National University', category:'CAT01',
+      detail:'ต้อนรับ Prof. Kim และคณะ จัดเตรียมห้องพัก', workDate:'2024-05-13', hours:6, year:'2567', month:5, status:'เสร็จสิ้น', evidenceCount:2 },
+    { id:'w08', title:'จัดอบรม IELTS Preparation Workshop', category:'CAT05',
+      detail:'จัดอบรมเตรียมความพร้อม IELTS สำหรับนักศึกษา 40 คน', workDate:'2024-10-14', hours:16, year:'2567', month:10, status:'เสร็จสิ้น', evidenceCount:2 },
+    { id:'w09', title:'จัดงาน International Day 2024', category:'CAT05',
+      detail:'จัดงาน International Day 2024 ผู้เข้าร่วม 500+ คน', workDate:'2024-12-02', hours:24, year:'2567', month:12, status:'เสร็จสิ้น', evidenceCount:6 },
+    { id:'w10', title:'จัดทำรายงานประจำปี 2567 ฉบับสมบูรณ์', category:'CAT09',
+      detail:'จัดทำรายงานฉบับสมบูรณ์พร้อมภาพถ่ายกิจกรรม', workDate:'2024-12-16', hours:24, year:'2567', month:12, status:'เสร็จสิ้น', evidenceCount:1 },
+  ];
+
+  function buildByMonth() {
+    var bm = {};
+    for (var m = 1; m <= 12; m++) bm[m] = 0;
+    workloads.forEach(function(w) { bm[w.month] = (bm[w.month] || 0) + 1; });
+    return bm;
+  }
+
+  function buildByCat() {
+    var bc = {};
+    workloads.forEach(function(w) { bc[w.category] = (bc[w.category] || 0) + 1; });
+    return bc;
+  }
+
+  return {
+    categories: categories,
+    workloads: workloads,
+    dashboard: {
+      year: '2567', totalWorkloads: workloads.length,
+      totalHours: workloads.reduce(function(s,w){ return s + w.hours; }, 0),
+      completed: workloads.length, inProgress: 0, pending: 0,
+      totalEvidence: workloads.reduce(function(s,w){ return s + w.evidenceCount; }, 0),
+      byMonth: buildByMonth(), byCat: buildByCat(),
+      recent: workloads.slice(0,5)
+    }
+  };
+})();
+
+var DemoStore = (function() {
+  'use strict';
+
+  var KEY = 'peach_demo_workloads';
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function all() {
+    var saved = localStorage.getItem(KEY);
+    if (!saved) return clone(DEMO_DATA.workloads);
+    try {
+      var parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : clone(DEMO_DATA.workloads);
+    } catch(e) {
+      return clone(DEMO_DATA.workloads);
+    }
+  }
+
+  function save(items) {
+    localStorage.setItem(KEY, JSON.stringify(items || []));
+  }
+
+  function list(filters) {
+    var items = all();
+    if (filters && filters.year) {
+      items = items.filter(function(w) { return String(w.year || '') === String(filters.year); });
+    }
+    return items;
+  }
+
+  function get(id) {
+    return all().find(function(w) { return w.id === id; }) || null;
+  }
+
+  function create(data) {
+    var items = all();
+    var item = Object.assign({}, data, {
+      id: 'demo-' + Date.now(),
+      evidenceCount: data.evidenceCount || 0
+    });
+    items.unshift(item);
+    save(items);
+    return { success: true, id: item.id, data: item };
+  }
+
+  function update(data) {
+    var items = all();
+    var found = false;
+    items = items.map(function(w) {
+      if (w.id !== data.id) return w;
+      found = true;
+      return Object.assign({}, w, data);
+    });
+    save(items);
+    return { success: found, id: data.id, data: get(data.id) };
+  }
+
+  function remove(id) {
+    var before = all();
+    var after = before.filter(function(w) { return w.id !== id; });
+    save(after);
+    return { success: before.length !== after.length };
+  }
+
+  function dashboard(year) {
+    var items = list({ year: year });
+    var byMonth = {};
+    var byCat = {};
+    for (var m = 1; m <= 12; m++) byMonth[m] = 0;
+    items.forEach(function(w) {
+      byMonth[w.month] = (byMonth[w.month] || 0) + 1;
+      byCat[w.category] = (byCat[w.category] || 0) + 1;
+    });
+    return {
+      year: String(year || '2567'),
+      totalWorkloads: items.length,
+      totalHours: items.reduce(function(s, w) { return s + (parseFloat(w.hours) || 0); }, 0),
+      completed: items.filter(function(w) { return w.status === 'เสร็จสิ้น'; }).length,
+      inProgress: items.filter(function(w) { return w.status === 'กำลังดำเนินการ'; }).length,
+      pending: items.filter(function(w) { return w.status === 'รอดำเนินการ'; }).length,
+      totalEvidence: items.reduce(function(s, w) { return s + (parseFloat(w.evidenceCount) || 0); }, 0),
+      byMonth: byMonth,
+      byCat: byCat,
+      recent: items.slice(0, 5)
+    };
+  }
+
+  return {
+    list: list,
+    get: get,
+    create: create,
+    update: update,
+    remove: remove,
+    dashboard: dashboard
+  };
+})();
