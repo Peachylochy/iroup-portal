@@ -12,6 +12,31 @@
   var DEFAULT_TIMEOUT_MS = 30000;
   var ADMIN_SUMMARY_TIMEOUT_MS = 120000;
   var ADMIN_EVENT_WRITE_TIMEOUT_MS = 120000;
+  var CACHE_VERSION = '2026-06-11-lookup-cache-v1';
+  var CACHE_PREFIX = 'iroup:v2:cache:';
+  var CACHE_TTL = {
+    lookup: 24 * 60 * 60 * 1000,
+    public: 5 * 60 * 1000
+  };
+  var CACHEABLE_GET_ACTIONS = {
+    'v2.lookup.countries': CACHE_TTL.lookup,
+    'v2.lookup.units': CACHE_TTL.lookup,
+    'v2.lookup.fileroles': CACHE_TTL.lookup,
+    'v2.lookup.budgettypes': CACHE_TTL.lookup,
+    'v2.lookup.event_types': CACHE_TTL.lookup,
+    'v2.public.stats': CACHE_TTL.public,
+    'v2.public.mou.list': CACHE_TTL.public,
+    'v2.public.mou.map': CACHE_TTL.public,
+    'v2.public.mobility.list': CACHE_TTL.public,
+    'v2.public.mobility.map': CACHE_TTL.public,
+    'v2.public.mobility.summary': CACHE_TTL.public,
+    'v2.public.travel.list': CACHE_TTL.public,
+    'v2.public.travel.summary': CACHE_TTL.public,
+    'v2.public.scholarship.list': CACHE_TTL.public,
+    'v2.public.event.list': CACHE_TTL.public,
+    'v2.public.news.list': CACHE_TTL.public,
+    'v2.public.knowledge.list': CACHE_TTL.public
+  };
   var APPS_SCRIPT_FETCH_DEFAULTS = {
     mode: 'cors',
     redirect: 'follow',
@@ -125,7 +150,54 @@
       return postJson_(scriptUrl, routeAction, requestParams, requestOptions);
     }
 
+    var cacheOptions = getCacheOptions_(scriptUrl, routeAction, requestParams, requestOptions);
+    if (cacheOptions) {
+      return cachedGetJson_(scriptUrl, routeAction, requestParams, requestOptions, cacheOptions);
+    }
+
     return getJson_(scriptUrl, routeAction, requestParams, requestOptions);
+  }
+
+  function getCacheOptions_(scriptUrl, action, params, options) {
+    var normalizedAction = String(action || '').trim().toLowerCase();
+    var requestOptions = options || {};
+    var requestParams = params || {};
+    var ttl = CACHEABLE_GET_ACTIONS[normalizedAction];
+
+    if (!ttl) return null;
+    if (requestOptions.cache === false || requestOptions.noCache === true) return null;
+    if (requestOptions.auth === true || normalizedAction.indexOf('v2.admin.') === 0) return null;
+    if (requestParams._ || requestParams.refresh === true || requestParams.noCache === true) return null;
+
+    return {
+      key: buildCacheKey_(scriptUrl, normalizedAction, requestParams),
+      ttl: ttl
+    };
+  }
+
+  function cachedGetJson_(scriptUrl, action, params, options, cacheOptions) {
+    var cached = readCache_(cacheOptions.key, cacheOptions.ttl);
+    if (cached && cached.fresh) {
+      return Promise.resolve(markCacheHit_(cached.value, action, 'hit'));
+    }
+
+    return getJson_(scriptUrl, action, params, options)
+      .then(function (result) {
+        if (result && result.success === true) {
+          writeCache_(cacheOptions.key, result);
+          return markCacheHit_(result, action, 'miss');
+        }
+        if (cached && cached.value) {
+          return markCacheHit_(cached.value, action, 'stale');
+        }
+        return result;
+      })
+      .catch(function (error) {
+        if (cached && cached.value) {
+          return markCacheHit_(cached.value, action, 'stale');
+        }
+        return normalizeError_(error, action);
+      });
   }
 
   function getJson_(scriptUrl, action, params, options) {
@@ -270,6 +342,74 @@
     return target;
   }
 
+  function buildCacheKey_(scriptUrl, action, params) {
+    return CACHE_PREFIX + CACHE_VERSION + ':' + action + ':' + hashString_(scriptUrl + '|' + stableStringify_(params || {}));
+  }
+
+  function stableStringify_(source) {
+    var data = source || {};
+    var keys = Object.keys(data).sort();
+    var parts = [];
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (key === '_' || key === 'action') continue;
+      if (typeof data[key] === 'undefined' || data[key] === null) continue;
+      parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(String(data[key])));
+    }
+    return parts.join('&');
+  }
+
+  function hashString_(text) {
+    var hash = 0;
+    var value = String(text || '');
+    for (var i = 0; i < value.length; i++) {
+      hash = ((hash << 5) - hash) + value.charCodeAt(i);
+      hash |= 0;
+    }
+    return String(hash);
+  }
+
+  function readCache_(key, ttlMs) {
+    try {
+      if (!global.localStorage) return null;
+      var raw = global.localStorage.getItem(key);
+      if (!raw) return null;
+      var entry = JSON.parse(raw);
+      if (!entry || !entry.value || !entry.createdAt) return null;
+      var age = Date.now() - Number(entry.createdAt || 0);
+      return {
+        value: entry.value,
+        fresh: age >= 0 && age <= ttlMs
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeCache_(key, value) {
+    try {
+      if (!global.localStorage) return;
+      global.localStorage.setItem(key, JSON.stringify({
+        createdAt: Date.now(),
+        value: value
+      }));
+    } catch (error) {
+      // Browser storage may be full or disabled. API calls should still work.
+    }
+  }
+
+  function markCacheHit_(result, action, cacheStatus) {
+    var normalized = result || createClientError_(action, 'Missing cached response.');
+    var meta = normalizeMeta_(normalized.meta, action);
+    meta.cache = cacheStatus;
+    return {
+      success: normalized.success === true,
+      data: typeof normalized.data === 'undefined' ? null : normalized.data,
+      error: normalized.error || '',
+      meta: meta
+    };
+  }
+
   function safeSessionGet_(key) {
     try {
       return global.sessionStorage ? global.sessionStorage.getItem(key) : '';
@@ -313,6 +453,21 @@
     getGoogleAccessToken: getGoogleAccessToken,
     getAdminAuthDiagnostics: getAdminAuthDiagnostics,
     request: request,
+    clearCache: function () {
+      try {
+        if (!global.localStorage) return;
+        var keys = [];
+        for (var i = 0; i < global.localStorage.length; i++) {
+          var key = global.localStorage.key(i);
+          if (key && key.indexOf(CACHE_PREFIX) === 0) keys.push(key);
+        }
+        keys.forEach(function (key) {
+          global.localStorage.removeItem(key);
+        });
+      } catch (error) {
+        // Ignore cache cleanup errors.
+      }
+    },
 
     health: function () {
       return request('v2.health');
