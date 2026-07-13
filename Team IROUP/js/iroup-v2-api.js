@@ -551,7 +551,7 @@
         });
       },
       mobilityParticipantBatchAdd: function (payload) {
-        return request('v2.admin.mobility.participant.batchAdd', { payload: payload || {} }, {
+        return request('v2.admin.mobility.participant.batchadd', { payload: payload || {} }, {
           auth: true,
           method: 'POST',
           timeoutMs: 90000
@@ -616,7 +616,7 @@
         return request('v2.admin.person.search', params || {}, { auth: true });
       },
       personResolveBatch: function (payload) {
-        return request('v2.admin.person.resolveBatch', { payload: payload || {} }, {
+        return request('v2.admin.person.resolvebatch', { payload: payload || {} }, {
           auth: true,
           method: 'POST',
           timeoutMs: 60000
