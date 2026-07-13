@@ -8,6 +8,7 @@
 function runV2BackendTests_() {
   const tests = [
     testV2SeedData_,
+    testV2MobilityEffectiveStatus_,
     testV2AdminMobilityDTO_,
     testV2PublicMobilityDTO_,
     testV2PublicFileFiltering_,
@@ -38,6 +39,21 @@ function runV2BackendTests_() {
     total: results.length,
     tests: results
   };
+}
+
+function testV2MobilityEffectiveStatus_() {
+  const today = '2026-07-13';
+  const checks = {
+    expired_active_completes: resolveV2MobilityStatus_('active', '2026-07-11', today) === 'completed',
+    active_on_end_date: resolveV2MobilityStatus_('active', today, today) === 'active',
+    future_active_stays_active: resolveV2MobilityStatus_('active', '2026-07-14', today) === 'active',
+    completed_stays_completed: resolveV2MobilityStatus_('completed', '2026-07-14', today) === 'completed',
+    cancelled_is_not_overridden: resolveV2MobilityStatus_('cancelled', '2026-07-11', today) === 'cancelled',
+    draft_is_not_overridden: resolveV2MobilityStatus_('draft', '2026-07-11', today) === 'draft',
+    malformed_date_stays_active: resolveV2MobilityStatus_('active', 'not-a-date', today) === 'active'
+  };
+
+  return v2TestResult_('testV2MobilityEffectiveStatus_', allV2TestChecksPass_(checks), checks);
 }
 
 function testV2SeedData_() {

@@ -47,7 +47,7 @@ function getV2AdminDashboardSummary_() {
     },
     by_status: {
       mou: countV2AggregateByField_(rows.mou, 'status'),
-      mobility_project: countV2AggregateByField_(rows.mobility_project, 'status'),
+      mobility_project: countV2AggregateMobilityStatuses_(rows.mobility_project),
       travel: countV2AggregateByField_(rows.travel, 'status'),
       scholarship: countV2AggregateByField_(rows.scholarship, 'status'),
       event: countV2AggregateByField_(rows.event, 'status')
@@ -93,7 +93,7 @@ function getV2AdminReportSummary_(year) {
     },
     by_status: {
       mou: countV2AggregateByField_(filtered.mou, 'status'),
-      mobility_project: countV2AggregateByField_(filtered.mobility_project, 'status'),
+      mobility_project: countV2AggregateMobilityStatuses_(filtered.mobility_project),
       travel: countV2AggregateByField_(filtered.travel, 'status'),
       scholarship: countV2AggregateByField_(filtered.scholarship, 'status'),
       event: countV2AggregateByField_(filtered.event, 'status')
@@ -138,6 +138,15 @@ function countV2AggregateByField_(rows, fieldName) {
   const counts = {};
   (rows || []).forEach(function (row) {
     const key = String(row[fieldName] || 'unknown').trim() || 'unknown';
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  return counts;
+}
+
+function countV2AggregateMobilityStatuses_(rows) {
+  const counts = {};
+  (rows || []).forEach(function (row) {
+    const key = resolveV2MobilityStatus_(row.status, row.end_date) || 'unknown';
     counts[key] = (counts[key] || 0) + 1;
   });
   return counts;

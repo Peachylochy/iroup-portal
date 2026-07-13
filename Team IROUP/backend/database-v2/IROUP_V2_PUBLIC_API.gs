@@ -375,7 +375,7 @@ function mapV2PublicMobilityDto_(row, ctx) {
     start_date: row.start_date || '',
     end_date: row.end_date || '',
     fiscal_year: row.fiscal_year || '',
-    status: row.status || '',
+    status: resolveV2MobilityStatus_(row.status, row.end_date),
     participant_count: participants.total,
     participant_counts: {
       student: participants.student,
