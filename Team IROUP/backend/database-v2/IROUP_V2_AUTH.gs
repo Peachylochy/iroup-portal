@@ -5,6 +5,48 @@
  * wired into production Code.gs and does not create public routes.
  */
 
+const IROUP_V2_AUTH_CACHE_VERSION = '2026-07-13-v1';
+const IROUP_V2_GOOGLE_AUTH_CACHE_TTL_SECONDS = 300;
+const IROUP_V2_ADMIN_CACHE_TTL_SECONDS = 60;
+
+function getV2AuthCache_() {
+  try {
+    return CacheService.getScriptCache();
+  } catch (err) {
+    return null;
+  }
+}
+
+function getV2AuthCacheValue_(key) {
+  const cache = getV2AuthCache_();
+  if (!cache || !key) return '';
+
+  try {
+    return String(cache.get(key) || '');
+  } catch (err) {
+    return '';
+  }
+}
+
+function putV2AuthCacheValue_(key, value, ttlSeconds) {
+  const cache = getV2AuthCache_();
+  if (!cache || !key || !value) return;
+
+  try {
+    cache.put(key, String(value), Number(ttlSeconds || 60));
+  } catch (err) {
+    // Authentication must keep working when Apps Script cache is unavailable.
+  }
+}
+
+function getV2GoogleAuthCacheKey_(token) {
+  return 'v2auth:' + IROUP_V2_AUTH_CACHE_VERSION + ':google:' + sha256HexV2_(token);
+}
+
+function getV2AdminCacheKey_(email) {
+  return 'v2auth:' + IROUP_V2_AUTH_CACHE_VERSION + ':admin:' + sha256HexV2_(normalizeV2Email_(email));
+}
+
 function authResponseV2_(success, user, error, code) {
   return {
     success: !!success,
@@ -277,16 +319,29 @@ function getV2AdminEmailFromGoogleToken_(token) {
     return authResponseV2_(false, null, 'Google token missing', 'V2_AUTH_GOOGLE_TOKEN_MISSING');
   }
 
+  const cacheKey = getV2GoogleAuthCacheKey_(raw);
+  const cachedEmail = normalizeV2Email_(getV2AuthCacheValue_(cacheKey));
+  if (cachedEmail) {
+    return authResponseV2_(true, { email: cachedEmail, source: 'google_token_cache' }, '', '');
+  }
+
   // Browser-side Google Identity Services currently hands off an OAuth access
   // token, not an ID token. Verify that token through Google userinfo first.
   const access = fetchV2GoogleUserInfo_(raw);
-  if (access.success) return access;
+  if (access.success) {
+    putV2AuthCacheValue_(cacheKey, access.user.email, IROUP_V2_GOOGLE_AUTH_CACHE_TTL_SECONDS);
+    return access;
+  }
 
   if (raw.indexOf('.') < 0) {
     return access;
   }
 
-  return fetchV2GoogleTokenInfo_(raw);
+  const idToken = fetchV2GoogleTokenInfo_(raw);
+  if (idToken.success) {
+    putV2AuthCacheValue_(cacheKey, idToken.user.email, IROUP_V2_GOOGLE_AUTH_CACHE_TTL_SECONDS);
+  }
+  return idToken;
 }
 
 function fetchV2GoogleUserInfo_(token) {
@@ -364,6 +419,19 @@ function getV2AdminByEmail_(email) {
     return authResponseV2_(false, null, 'Missing admin email', 'V2_AUTH_EMAIL_REQUIRED');
   }
 
+  const cacheKey = getV2AdminCacheKey_(target);
+  const cached = getV2AuthCacheValue_(cacheKey);
+  if (cached) {
+    try {
+      const cachedUser = JSON.parse(cached);
+      if (cachedUser && normalizeV2Email_(cachedUser.email) === target && isTruthyV2_(cachedUser.active)) {
+        return authResponseV2_(true, cachedUser, '', '');
+      }
+    } catch (err) {
+      // Ignore malformed cache entries and refresh from the ADMIN sheet.
+    }
+  }
+
   const admins = readV2Sheet_(IROUP_V2_SHEETS.ADMIN);
   if (!admins.success) {
     return authResponseV2_(false, null, admins.error || 'Unable to read V2 ADMIN table', 'V2_AUTH_ADMIN_READ_FAILED');
@@ -378,13 +446,19 @@ function getV2AdminByEmail_(email) {
       return authResponseV2_(false, null, 'Admin account is inactive', 'V2_AUTH_ADMIN_INACTIVE');
     }
 
-    return authResponseV2_(true, mapV2AdminUserDto_(row), '', '');
+    const user = mapV2AdminUserDto_(row);
+    putV2AuthCacheValue_(cacheKey, JSON.stringify(user), IROUP_V2_ADMIN_CACHE_TTL_SECONDS);
+    return authResponseV2_(true, user, '', '');
   }
 
   return authResponseV2_(false, null, 'Email is not authorized for V2 admin access', 'V2_AUTH_ADMIN_NOT_FOUND');
 }
 
 function requireV2Admin_(request) {
+  if (request && request.user && request.user.email && isTruthyV2_(request.user.active)) {
+    return authResponseV2_(true, request.user, '', '');
+  }
+
   const tokenEmail = getV2AdminEmailFromToken_(request);
   if (tokenEmail.success && tokenEmail.user && tokenEmail.user.email) {
     return getV2AdminByEmail_(tokenEmail.user.email);
