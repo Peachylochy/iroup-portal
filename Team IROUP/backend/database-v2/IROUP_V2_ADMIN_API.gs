@@ -631,6 +631,185 @@ function addV2AdminMobilityParticipant_(request) {
   }, 1, '');
 }
 
+function addV2AdminMobilityParticipantsBatch_(request) {
+  const actor = authorizeV2MobilityWriteActor_(request);
+  if (!actor.success) return adminResponseV2_(false, null, 0, actor.error);
+
+  const payload = extractV2MobilityParticipantBatchPayload_(request);
+  const mobilityId = cleanV2EventText_(payload.mobility_id || '');
+  const items = Array.isArray(payload.participants) ? payload.participants : [];
+  if (!mobilityId) return adminResponseV2_(false, null, 0, 'mobility_id is required for batch participant add.');
+  if (!items.length) return adminResponseV2_(false, null, 0, 'At least one participant is required.');
+  if (items.length > 200) return adminResponseV2_(false, null, 0, 'A batch can contain at most 200 participants.');
+
+  const lock = LockService.getScriptLock();
+  try {
+    if (!lock.tryLock(20000)) {
+      return adminResponseV2_(false, null, 0, 'Another participant update is running. Please try again.');
+    }
+
+    const project = findV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId);
+    if (!project.success || !project.data) return adminResponseV2_(false, null, 0, project.error || 'Mobility project not found.');
+    if (isSoftDeletedV2_(project.data)) return adminResponseV2_(false, null, 0, 'Cannot add participants to a deleted mobility project.');
+
+    const participantRead = readV2Sheet_(IROUP_V2_SHEETS.MOBILITY_PARTICIPANT);
+    if (!participantRead.success) return adminResponseV2_(false, null, 0, participantRead.error);
+    const studentRead = readV2Sheet_(IROUP_V2_SHEETS.PERSON_STUDENT);
+    if (!studentRead.success) return adminResponseV2_(false, null, 0, studentRead.error);
+    const staffRead = readV2Sheet_(IROUP_V2_SHEETS.PERSON_STAFF);
+    if (!staffRead.success) return adminResponseV2_(false, null, 0, staffRead.error);
+
+    const studentMap = buildV2ActivePersonMap_(studentRead.data || [], 'student_id');
+    const staffMap = buildV2ActivePersonMap_(staffRead.data || [], 'staff_id');
+    const activeForProject = (participantRead.data || []).filter(function (row) {
+      return String(row.mobility_id || '').trim() === mobilityId && !isSoftDeletedV2_(row);
+    });
+    const seen = {};
+    activeForProject.forEach(function (row) {
+      seen[getV2MobilityParticipantDedupeKey_(row)] = true;
+    });
+
+    const now = new Date().toISOString();
+    const createdBy = actor.user.email || '';
+    const rows = [];
+    const skipped = [];
+    const errors = [];
+
+    items.forEach(function (item, index) {
+      const raw = item || {};
+      const personSource = normalizeV2MobilityPersonSource_(raw.person_source || raw.source || '');
+      const personId = cleanV2EventText_(raw.person_id || '');
+      let normalized;
+
+      if (personSource === 'PERSON_STUDENT') {
+        const person = studentMap[normalizeV2PersonBatchId_(personId)];
+        if (!person) {
+          errors.push({ index: index, person_id: personId, error: 'Student ID was not found or is inactive.' });
+          return;
+        }
+        normalized = {
+          mobility_id: mobilityId,
+          participant_type: 'student',
+          person_source: personSource,
+          person_id: person.student_id || personId,
+          full_name_snapshot: person.full_name_th || person.full_name_en || '',
+          gender_snapshot: person.gender || '',
+          unit_id_snapshot: person.unit_id || '',
+          program_or_position_snapshot: person.program_th || person.degree_level || '',
+          role: cleanV2EventText_(raw.role || '')
+        };
+      } else if (personSource === 'PERSON_STAFF') {
+        const person = staffMap[normalizeV2PersonBatchId_(personId)];
+        if (!person) {
+          errors.push({ index: index, person_id: personId, error: 'Staff ID was not found or is inactive.' });
+          return;
+        }
+        normalized = {
+          mobility_id: mobilityId,
+          participant_type: 'staff',
+          person_source: personSource,
+          person_id: person.staff_id || personId,
+          full_name_snapshot: person.full_name_th || person.full_name_en || '',
+          gender_snapshot: person.gender || '',
+          unit_id_snapshot: person.unit_id || '',
+          program_or_position_snapshot: person.position || person.staff_type || '',
+          role: cleanV2EventText_(raw.role || '')
+        };
+      } else {
+        const manual = normalizeV2MobilityParticipantPayload_(Object.assign({}, raw, {
+          mobility_id: mobilityId,
+          person_source: personSource || 'MANUAL'
+        }));
+        if (!manual.success) {
+          errors.push({ index: index, person_id: personId, error: manual.error, details: manual.data && manual.data.errors });
+          return;
+        }
+        normalized = manual.data;
+      }
+
+      const dedupeKey = getV2MobilityParticipantDedupeKey_(normalized);
+      if (seen[dedupeKey]) {
+        skipped.push({ index: index, person_id: normalized.person_id, full_name: normalized.full_name_snapshot, reason: 'duplicate' });
+        return;
+      }
+      seen[dedupeKey] = true;
+      rows.push({
+        participant_id: generateV2Id_(IROUP_V2_ID_PREFIXES.MOBILITY_PARTICIPANT),
+        mobility_id: mobilityId,
+        participant_type: normalized.participant_type,
+        person_source: normalized.person_source,
+        person_id: normalized.person_id,
+        unit_id_snapshot: normalized.unit_id_snapshot,
+        full_name_snapshot: normalized.full_name_snapshot,
+        gender_snapshot: normalized.gender_snapshot,
+        program_or_position_snapshot: normalized.program_or_position_snapshot,
+        role: normalized.role,
+        is_deleted: false,
+        created_by: createdBy,
+        created_at: now
+      });
+    });
+
+    if (errors.length) {
+      return adminResponseV2_(false, { errors: errors, skipped: skipped }, 0, 'Batch participant validation failed. No rows were written.');
+    }
+
+    const persisted = appendV2RowsBatch_(IROUP_V2_SHEETS.MOBILITY_PARTICIPANT, rows, {
+      requiredFields: ['participant_id', 'mobility_id', 'participant_type', 'person_source', 'full_name_snapshot', 'is_deleted', 'created_by', 'created_at']
+    });
+    if (!persisted.success) {
+      return adminResponseV2_(false, { diagnostics: persisted.diagnostics || {}, skipped: skipped }, 0, persisted.error);
+    }
+
+    const finalParticipants = activeForProject.concat(rows);
+    const countPatch = {
+      participant_count_cached: finalParticipants.length,
+      student_count: finalParticipants.filter(function (row) { return String(row.participant_type || '').toLowerCase() === 'student'; }).length,
+      staff_count: finalParticipants.filter(function (row) { return String(row.participant_type || '').toLowerCase() === 'staff'; }).length,
+      updated_by: createdBy,
+      updated_at: now
+    };
+    const countResult = updateV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId, countPatch, {
+      rejectSoftDeleted: true,
+      softDeletedError: 'Cannot update counts for a deleted mobility project.'
+    });
+
+    return adminResponseV2_(true, {
+      mobility_id: mobilityId,
+      inserted: rows.map(mapV2AdminMobilityParticipantDto_),
+      inserted_count: rows.length,
+      skipped: skipped,
+      skipped_count: skipped.length,
+      counts: countPatch,
+      count_sync_success: !!countResult.success,
+      count_sync_error: countResult.success ? '' : countResult.error,
+      diagnostics: persisted.diagnostics || {}
+    }, rows.length, '');
+  } catch (err) {
+    return adminResponseV2_(false, null, 0, String(err && err.message ? err.message : err));
+  } finally {
+    try { lock.releaseLock(); } catch (ignore) {}
+  }
+}
+
+function extractV2MobilityParticipantBatchPayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || body.batch || params.payload || params.batch || body;
+  if (candidate && typeof candidate === 'object') return candidate;
+  if (typeof candidate === 'string') {
+    try { return JSON.parse(candidate); } catch (err) { return { payload_parse_error: String(err) }; }
+  }
+  return params;
+}
+
+function getV2MobilityParticipantDedupeKey_(row) {
+  const source = normalizeV2MobilityPersonSource_(row && row.person_source) || 'MANUAL';
+  const personId = cleanV2EventText_(row && row.person_id);
+  if (personId) return normalizeV2MobilityPersonKey_(source, personId);
+  return source + '|NAME:' + String(row && row.full_name_snapshot || '').trim().toUpperCase();
+}
+
 function deleteV2AdminMobilityParticipant_(request) {
   const actor = authorizeV2MobilityWriteActor_(request);
   if (!actor.success) {

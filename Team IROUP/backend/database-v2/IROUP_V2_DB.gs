@@ -266,6 +266,92 @@ function appendV2Rows_(sheetName, rows, options) {
   };
 }
 
+/**
+ * Appends a contiguous block with one Sheets write. This intentionally appends
+ * after the last populated row instead of filling gaps so existing rows can
+ * never be overwritten by a multi-row range.
+ */
+function appendV2RowsBatch_(sheetName, rows, options) {
+  const items = Array.isArray(rows) ? rows : [];
+  const appendOptions = options || {};
+  if (!items.length) {
+    return { success: true, data: [], total: 0, error: '', diagnostics: { writeCalls: 0 } };
+  }
+
+  const sheetResult = getV2Sheet_(sheetName);
+  if (!sheetResult.success) return sheetResult;
+  const sheet = sheetResult.data;
+  const headers = getV2Headers_(sheet);
+  if (!headers.length) {
+    return { success: false, data: null, total: 0, error: 'Missing headers in V2 sheet: ' + sheetName };
+  }
+
+  const requiredFields = appendOptions.requiredFields || [];
+  const missingHeaders = requiredFields.filter(function (field) {
+    return headers.indexOf(field) < 0;
+  });
+  if (missingHeaders.length) {
+    return {
+      success: false,
+      data: null,
+      total: 0,
+      error: 'Missing required columns in ' + sheetName + ': ' + missingHeaders.join(', '),
+      diagnostics: { missingHeaders: missingHeaders, writeCalls: 0 }
+    };
+  }
+
+  const invalidRows = [];
+  const values = items.map(function (row, index) {
+    const emptyFields = requiredFields.filter(function (field) {
+      const value = row && row[field];
+      return value === undefined || value === null || String(value).trim() === '';
+    });
+    if (emptyFields.length) invalidRows.push({ index: index, emptyFields: emptyFields });
+    return headers.map(function (header) {
+      return row && row[header] !== undefined ? row[header] : '';
+    });
+  });
+  if (invalidRows.length) {
+    return {
+      success: false,
+      data: null,
+      total: 0,
+      error: 'Batch append preflight failed for ' + sheetName,
+      diagnostics: { invalidRows: invalidRows, writeCalls: 0 }
+    };
+  }
+
+  const startRow = Math.max(2, sheet.getLastRow() + 1);
+  const requiredLastRow = startRow + values.length - 1;
+  if (requiredLastRow > sheet.getMaxRows()) {
+    sheet.insertRowsAfter(sheet.getMaxRows(), requiredLastRow - sheet.getMaxRows());
+  }
+
+  try {
+    sheet.getRange(startRow, 1, values.length, headers.length).setValues(values);
+    return {
+      success: true,
+      data: values.map(function (rowValues) { return rowToObjectV2_(headers, rowValues); }),
+      total: values.length,
+      error: '',
+      diagnostics: {
+        startRow: startRow,
+        endRow: requiredLastRow,
+        rowCount: values.length,
+        writeCalls: 1
+      }
+    };
+  } catch (err) {
+    return {
+      success: false,
+      data: null,
+      total: 0,
+      error: String(err && err.message ? err.message : err),
+      diagnostics: { startRow: startRow, rowCount: values.length, writeCalls: 1 }
+    };
+  }
+}
+
 function validateV2AppendEnumValue_(fieldName, value) {
   const allowed = getV2AppendEnumAllowedValues_(fieldName);
   if (!allowed.length) {

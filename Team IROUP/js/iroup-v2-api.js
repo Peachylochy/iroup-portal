@@ -550,6 +550,13 @@
           timeoutMs: ADMIN_EVENT_WRITE_TIMEOUT_MS
         });
       },
+      mobilityParticipantBatchAdd: function (payload) {
+        return request('v2.admin.mobility.participant.batchAdd', { payload: payload || {} }, {
+          auth: true,
+          method: 'POST',
+          timeoutMs: 90000
+        });
+      },
       travelList: function (params) {
         return request('v2.admin.travel.list', params || {}, { auth: true });
       },
@@ -607,6 +614,13 @@
       },
       personSearch: function (params) {
         return request('v2.admin.person.search', params || {}, { auth: true });
+      },
+      personResolveBatch: function (payload) {
+        return request('v2.admin.person.resolveBatch', { payload: payload || {} }, {
+          auth: true,
+          method: 'POST',
+          timeoutMs: 60000
+        });
       },
       personCreate: function (payload) {
         return request('v2.admin.person.create', { payload: payload || {} }, {
