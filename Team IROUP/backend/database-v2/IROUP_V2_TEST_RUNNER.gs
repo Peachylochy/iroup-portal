@@ -9,6 +9,7 @@ function runV2BackendTests_() {
   const tests = [
     testV2SeedData_,
     testV2AdminSessionToken_,
+    testV2PersonBatchParsing_,
     testV2MobilityEffectiveStatus_,
     testV2AdminMobilityDTO_,
     testV2PublicMobilityDTO_,
@@ -40,6 +41,17 @@ function runV2BackendTests_() {
     total: results.length,
     tests: results
   };
+}
+
+function testV2PersonBatchParsing_() {
+  const parsed = parseV2PersonBatchIds_(['67205370', ' 67205381 ', '67205370', '', 'STF-001']);
+  const checks = {
+    unique_ids_preserve_order: JSON.stringify(parsed.ids) === JSON.stringify(['67205370', '67205381', 'STF-001']),
+    duplicate_id_reported: JSON.stringify(parsed.duplicate_ids) === JSON.stringify(['67205370']),
+    requested_count_excludes_blanks: parsed.requested_count === 4,
+    keys_are_case_insensitive: normalizeV2MobilityPersonKey_('person_staff', 'stf-001') === 'PERSON_STAFF|STF-001'
+  };
+  return v2TestResult_('testV2PersonBatchParsing_', allV2TestChecksPass_(checks), checks);
 }
 
 function testV2AdminSessionToken_() {

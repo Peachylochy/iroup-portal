@@ -51,6 +51,118 @@ function searchV2AdminPeople_(request) {
   return publicResponseV2_(true, dtos, dtos.length, '');
 }
 
+function resolveV2AdminPeopleBatch_(request) {
+  const payload = extractV2PersonBatchPayload_(request);
+  const parsed = parseV2PersonBatchIds_(payload.ids || payload.person_ids || payload.text || '');
+  if (!parsed.ids.length) {
+    return publicResponseV2_(false, {
+      matched: [],
+      not_found: [],
+      duplicate_ids: parsed.duplicate_ids
+    }, 0, 'At least one person ID is required.');
+  }
+  if (parsed.ids.length > 200) {
+    return publicResponseV2_(false, null, 0, 'A batch can contain at most 200 unique IDs.');
+  }
+
+  const studentRead = readV2Sheet_(IROUP_V2_SHEETS.PERSON_STUDENT);
+  if (!studentRead.success) return publicResponseV2_(false, null, 0, studentRead.error);
+  const staffRead = readV2Sheet_(IROUP_V2_SHEETS.PERSON_STAFF);
+  if (!staffRead.success) return publicResponseV2_(false, null, 0, staffRead.error);
+
+  const studentMap = buildV2ActivePersonMap_(studentRead.data || [], 'student_id');
+  const staffMap = buildV2ActivePersonMap_(staffRead.data || [], 'staff_id');
+  const matched = [];
+  const notFound = [];
+  parsed.ids.forEach(function (id) {
+    const key = normalizeV2PersonBatchId_(id);
+    if (studentMap[key]) {
+      matched.push(mapV2PersonSearchStudentDto_(studentMap[key]));
+    } else if (staffMap[key]) {
+      matched.push(mapV2PersonSearchStaffDto_(staffMap[key]));
+    } else {
+      notFound.push(id);
+    }
+  });
+
+  const existingKeys = {};
+  const mobilityId = cleanV2EventText_(payload.mobility_id || '');
+  if (mobilityId) {
+    const participantRead = readV2Sheet_(IROUP_V2_SHEETS.MOBILITY_PARTICIPANT);
+    if (!participantRead.success) return publicResponseV2_(false, null, 0, participantRead.error);
+    (participantRead.data || []).forEach(function (row) {
+      if (String(row.mobility_id || '').trim() !== mobilityId || isSoftDeletedV2_(row)) return;
+      existingKeys[normalizeV2MobilityPersonKey_(row.person_source, row.person_id)] = true;
+    });
+  }
+
+  matched.forEach(function (person) {
+    person.already_linked = !!existingKeys[normalizeV2MobilityPersonKey_(person.source, person.person_id)];
+  });
+
+  return publicResponseV2_(true, {
+    matched: matched,
+    not_found: notFound,
+    duplicate_ids: parsed.duplicate_ids,
+    requested_count: parsed.requested_count,
+    unique_count: parsed.ids.length,
+    matched_count: matched.length,
+    not_found_count: notFound.length,
+    already_linked_count: matched.filter(function (person) { return person.already_linked; }).length
+  }, matched.length, '');
+}
+
+function extractV2PersonBatchPayload_(request) {
+  const params = request && request.params ? request.params : {};
+  const body = request && request.body ? request.body : {};
+  const candidate = body.payload || params.payload || body;
+  if (candidate && typeof candidate === 'object') return candidate;
+  if (typeof candidate === 'string') {
+    try { return JSON.parse(candidate); } catch (err) { return { text: candidate }; }
+  }
+  return params;
+}
+
+function parseV2PersonBatchIds_(value) {
+  const source = Array.isArray(value) ? value : String(value || '').split(/[\s,;]+/);
+  const seen = {};
+  const ids = [];
+  const duplicates = [];
+  let requestedCount = 0;
+  source.forEach(function (raw) {
+    const id = cleanV2EventText_(raw || '');
+    if (!id) return;
+    requestedCount++;
+    const key = normalizeV2PersonBatchId_(id);
+    if (seen[key]) {
+      if (duplicates.indexOf(id) < 0) duplicates.push(id);
+      return;
+    }
+    seen[key] = true;
+    ids.push(id);
+  });
+  return { ids: ids, duplicate_ids: duplicates, requested_count: requestedCount };
+}
+
+function normalizeV2PersonBatchId_(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function buildV2ActivePersonMap_(rows, idField) {
+  const map = {};
+  (rows || []).forEach(function (row) {
+    if (isSoftDeletedV2_(row)) return;
+    if (typeof row.active !== 'undefined' && row.active !== '' && !isTruthyV2_(row.active)) return;
+    const key = normalizeV2PersonBatchId_(row[idField]);
+    if (key && !map[key]) map[key] = row;
+  });
+  return map;
+}
+
+function normalizeV2MobilityPersonKey_(source, personId) {
+  return String(source || '').trim().toUpperCase() + '|' + normalizeV2PersonBatchId_(personId);
+}
+
 function listV2LookupFileRoles_() {
   return listV2LookupSheet_(IROUP_V2_SHEETS.FILE_ROLE_MASTER, mapV2LookupFileRoleDto_);
 }

@@ -288,6 +288,12 @@ function getV2RouteDispatch_() {
         return addV2AdminMobilityParticipant_(request);
       }
     },
+    'v2.admin.mobility.participant.batchAdd': {
+      access: 'admin',
+      handler: function (request) {
+        return addV2AdminMobilityParticipantsBatch_(request);
+      }
+    },
     'v2.admin.mobility.participant.delete': {
       access: 'admin',
       handler: function (request) {
@@ -526,6 +532,12 @@ function getV2RouteDispatch_() {
       access: 'admin',
       handler: function (request) {
         return searchV2AdminPeople_(request);
+      }
+    },
+    'v2.admin.person.resolveBatch': {
+      access: 'admin',
+      handler: function (request) {
+        return resolveV2AdminPeopleBatch_(request);
       }
     },
     'v2.admin.person.create': {
