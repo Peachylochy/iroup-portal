@@ -198,6 +198,12 @@ function getV2RouteDispatch_() {
         return getV2Health_();
       }
     },
+    'v2.auth.session': {
+      access: 'public',
+      handler: function (request) {
+        return createV2AdminSession_(request);
+      }
+    },
     'v2.schema': {
       access: 'admin',
       handler: function () {

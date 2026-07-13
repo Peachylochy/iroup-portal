@@ -762,7 +762,6 @@ body{
 // GOOGLE SIGN IN
 // ============================================================
 const GOOGLE_CLIENT_ID = '691790352317-ijpbb36rh3dti6gbqmtnsa0581thk4t2.apps.googleusercontent.com';
-const ADMIN_EMAIL_ALLOWLIST = ['panpancake17@gmail.com'];
 
 function signInWithGoogle() {
   showStatus('loading');
@@ -800,16 +799,16 @@ async function handleGoogleResponse(response) {
   }
 }
 
-function completeAdminLogin(email, name, adminToken, googleAccessToken) {
+function completeAdminLogin(email, name, adminToken, sessionExpiresAt) {
   if (adminToken) sessionStorage.setItem('iroup_admin_token', adminToken);
   else sessionStorage.removeItem('iroup_admin_token');
-  if (googleAccessToken) sessionStorage.setItem('iroup_google_access_token', googleAccessToken);
-  else sessionStorage.removeItem('iroup_google_access_token');
+  sessionStorage.removeItem('iroup_google_access_token');
   sessionStorage.setItem('iroup_user', JSON.stringify({
     email,
     name,
     adminToken: adminToken || '',
-    googleAccessToken: googleAccessToken || '',
+    googleAccessToken: '',
+    sessionExpiresAt: sessionExpiresAt || '',
     loginAt: new Date().toISOString()
   }));
   showStatus('success');
@@ -817,12 +816,22 @@ function completeAdminLogin(email, name, adminToken, googleAccessToken) {
 }
 
 async function checkAdminAccess(email, name, googleAccessToken) {
-  const normalizedEmail = String(email || '').trim().toLowerCase();
-  if (ADMIN_EMAIL_ALLOWLIST.includes(normalizedEmail)) {
-    completeAdminLogin(email, name, '', googleAccessToken);
-    return;
+  try {
+    const session = await IROUP_V2.auth.createSession(googleAccessToken || '');
+    if (!session || session.success === false || !session.data || !session.data.admin_token) {
+      showStatus('denied', email);
+      return;
+    }
+    const sessionUser = session.data.user || {};
+    completeAdminLogin(
+      sessionUser.email || email,
+      sessionUser.name || name,
+      session.data.admin_token,
+      session.data.expires_at || ''
+    );
+  } catch (error) {
+    showStatus('error', error && error.message ? error.message : String(error));
   }
-  showStatus('denied', email);
 }
 
 // ============================================================
@@ -850,9 +859,22 @@ function showStatus(type, msg) {
 // ============================================================
 // เช็ค Session — ถ้า Login อยู่แล้วข้ามไป Dashboard เลย
 // ============================================================
-const session = sessionStorage.getItem('iroup_user');
-if (session) {
-  window.location.href = 'dashboard.html';
+try {
+  const storedSession = JSON.parse(sessionStorage.getItem('iroup_user') || 'null');
+  const storedToken = sessionStorage.getItem('iroup_admin_token') || storedSession?.adminToken || '';
+  const storedExpiry = Date.parse(storedSession?.sessionExpiresAt || '');
+  const sessionIsValid = !!storedToken && (!storedExpiry || Date.now() < storedExpiry);
+  if (sessionIsValid) {
+    window.location.href = 'dashboard.html';
+  } else {
+    sessionStorage.removeItem('iroup_admin_token');
+    sessionStorage.removeItem('iroup_google_access_token');
+    sessionStorage.removeItem('iroup_user');
+  }
+} catch (error) {
+  sessionStorage.removeItem('iroup_admin_token');
+  sessionStorage.removeItem('iroup_google_access_token');
+  sessionStorage.removeItem('iroup_user');
 }
 </script>
 <script src="js/pwa-register.js"></script>
