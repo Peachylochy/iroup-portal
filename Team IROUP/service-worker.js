@@ -1,4 +1,4 @@
-const IROUP_PWA_CACHE = 'iroup-static-v7';
+const IROUP_PWA_CACHE = 'iroup-static-v8';
 
 const STATIC_ASSETS = [
   '/manifest-admin.webmanifest',
