@@ -5,11 +5,21 @@
 
   function hasAdminSession() {
     try {
-      if (sessionStorage.getItem('iroup_admin_token')) return true;
       var raw = sessionStorage.getItem('iroup_user');
-      if (!raw) return false;
+      var directToken = sessionStorage.getItem('iroup_admin_token');
+      if (!raw) return !!directToken;
       var user = JSON.parse(raw);
-      return !!(user && (user.adminToken || user.email));
+      var token = directToken || (user && user.adminToken) || '';
+      if (!token) return false;
+
+      var expiresAt = Date.parse(user && user.sessionExpiresAt ? user.sessionExpiresAt : '');
+      if (expiresAt && Date.now() >= expiresAt) {
+        sessionStorage.removeItem('iroup_admin_token');
+        sessionStorage.removeItem('iroup_google_access_token');
+        sessionStorage.removeItem('iroup_user');
+        return false;
+      }
+      return true;
     } catch (err) {
       return false;
     }

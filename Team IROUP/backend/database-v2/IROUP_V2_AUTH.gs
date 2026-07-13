@@ -8,6 +8,8 @@
 const IROUP_V2_AUTH_CACHE_VERSION = '2026-07-13-v1';
 const IROUP_V2_GOOGLE_AUTH_CACHE_TTL_SECONDS = 300;
 const IROUP_V2_ADMIN_CACHE_TTL_SECONDS = 60;
+const IROUP_V2_ADMIN_SESSION_TTL_SECONDS = 8 * 60 * 60;
+const IROUP_V2_ADMIN_TOKEN_SECRET_PROPERTY = 'IROUP_V2_ADMIN_TOKEN_SECRET';
 
 function getV2AuthCache_() {
   try {
@@ -282,14 +284,14 @@ function debugV2AdminTokenMap_(request) {
   }
 }
 
-function getV2AdminEmailFromSignedToken_(token) {
+function getV2AdminEmailFromSignedToken_(token, secretOverride, nowMs) {
   try {
     const parts = String(token || '').split('.');
     if (parts.length !== 3 || parts[0] !== 'v2adm') {
       return authResponseV2_(false, null, 'Not a V2 signed admin token', 'V2_AUTH_SIGNED_TOKEN_FORMAT');
     }
 
-    const secret = String(PropertiesService.getScriptProperties().getProperty('IROUP_V2_ADMIN_TOKEN_SECRET') || '').trim();
+    const secret = String(secretOverride || PropertiesService.getScriptProperties().getProperty(IROUP_V2_ADMIN_TOKEN_SECRET_PROPERTY) || '').trim();
     if (!secret) return authResponseV2_(false, null, 'No V2 admin token secret configured', 'V2_AUTH_SIGNED_TOKEN_SECRET_MISSING');
 
     const unsigned = parts[0] + '.' + parts[1];
@@ -303,13 +305,125 @@ function getV2AdminEmailFromSignedToken_(token) {
     if (!email) return authResponseV2_(false, null, 'V2 signed admin token missing email', 'V2_AUTH_SIGNED_TOKEN_EMAIL_REQUIRED');
 
     const exp = Number(payload.exp || 0);
-    if (exp && Date.now() > exp * 1000) {
+    const currentTimeMs = Number(typeof nowMs === 'number' ? nowMs : Date.now());
+    if (exp && currentTimeMs > exp * 1000) {
       return authResponseV2_(false, null, 'V2 signed admin token expired', 'V2_AUTH_SIGNED_TOKEN_EXPIRED');
     }
 
     return authResponseV2_(true, { email: email, source: 'signed_token' }, '', '');
   } catch (err) {
     return authResponseV2_(false, null, 'V2 signed admin token verification failed: ' + (err && err.message ? err.message : err), 'V2_AUTH_SIGNED_TOKEN_ERROR');
+  }
+}
+
+function createV2AdminSession_(request) {
+  const googleToken = getV2GoogleToken_(request);
+  const google = getV2AdminEmailFromGoogleToken_(googleToken);
+  if (!google.success || !google.user || !google.user.email) {
+    return {
+      success: false,
+      data: null,
+      total: 0,
+      error: google.error || 'Google authentication failed'
+    };
+  }
+
+  const admin = getV2AdminByEmail_(google.user.email);
+  if (!admin.success || !admin.user) {
+    return {
+      success: false,
+      data: null,
+      total: 0,
+      error: admin.error || 'Email is not authorized for V2 admin access'
+    };
+  }
+
+  const issued = issueV2SignedAdminToken_(admin.user);
+  if (!issued.success) {
+    return {
+      success: false,
+      data: null,
+      total: 0,
+      error: issued.error || 'Unable to create iROUP admin session'
+    };
+  }
+
+  return {
+    success: true,
+    data: {
+      admin_token: issued.token,
+      expires_at: issued.expires_at,
+      expires_in: IROUP_V2_ADMIN_SESSION_TTL_SECONDS,
+      user: admin.user
+    },
+    total: 1,
+    error: ''
+  };
+}
+
+function issueV2SignedAdminToken_(user, secretOverride, nowMs) {
+  try {
+    const email = normalizeV2Email_(user && user.email);
+    if (!email) {
+      return { success: false, token: '', expires_at: '', error: 'Missing admin email for session token' };
+    }
+
+    const secret = String(secretOverride || getOrCreateV2AdminTokenSecret_() || '').trim();
+    if (!secret) {
+      return { success: false, token: '', expires_at: '', error: 'Unable to initialize iROUP admin session secret' };
+    }
+
+    const issuedAt = Math.floor(Number(typeof nowMs === 'number' ? nowMs : Date.now()) / 1000);
+    const expiresAt = issuedAt + IROUP_V2_ADMIN_SESSION_TTL_SECONDS;
+    const payload = {
+      email: email,
+      role: String(user && user.role ? user.role : '').trim(),
+      iat: issuedAt,
+      exp: expiresAt,
+      ver: 1
+    };
+    const payloadPart = Utilities.base64EncodeWebSafe(
+      Utilities.newBlob(JSON.stringify(payload), 'application/json').getBytes()
+    ).replace(/=+$/g, '');
+    const unsigned = 'v2adm.' + payloadPart;
+    const signature = hmacSha256Base64WebSafeV2_(unsigned, secret);
+
+    return {
+      success: true,
+      token: unsigned + '.' + signature,
+      expires_at: new Date(expiresAt * 1000).toISOString(),
+      error: ''
+    };
+  } catch (err) {
+    return {
+      success: false,
+      token: '',
+      expires_at: '',
+      error: 'Unable to create iROUP admin session: ' + (err && err.message ? err.message : err)
+    };
+  }
+}
+
+function getOrCreateV2AdminTokenSecret_() {
+  const properties = PropertiesService.getScriptProperties();
+  let secret = String(properties.getProperty(IROUP_V2_ADMIN_TOKEN_SECRET_PROPERTY) || '').trim();
+  if (secret) return secret;
+
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(5000);
+    secret = String(properties.getProperty(IROUP_V2_ADMIN_TOKEN_SECRET_PROPERTY) || '').trim();
+    if (!secret) {
+      secret = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+      properties.setProperty(IROUP_V2_ADMIN_TOKEN_SECRET_PROPERTY, secret);
+    }
+    return secret;
+  } finally {
+    try {
+      lock.releaseLock();
+    } catch (err) {
+      // The generated secret remains valid even if releasing the lock fails.
+    }
   }
 }
 

@@ -8,6 +8,7 @@
 function runV2BackendTests_() {
   const tests = [
     testV2SeedData_,
+    testV2AdminSessionToken_,
     testV2MobilityEffectiveStatus_,
     testV2AdminMobilityDTO_,
     testV2PublicMobilityDTO_,
@@ -39,6 +40,37 @@ function runV2BackendTests_() {
     total: results.length,
     tests: results
   };
+}
+
+function testV2AdminSessionToken_() {
+  const secret = 'test-only-iroup-session-secret';
+  const nowMs = Date.UTC(2026, 6, 13, 10, 0, 0);
+  const issued = issueV2SignedAdminToken_({
+    email: 'Admin@Example.com',
+    role: 'admin'
+  }, secret, nowMs);
+  const verified = issued.success
+    ? getV2AdminEmailFromSignedToken_(issued.token, secret, nowMs + 1000)
+    : authResponseV2_(false, null, issued.error, 'TEST_ISSUE_FAILED');
+  const expired = issued.success
+    ? getV2AdminEmailFromSignedToken_(
+      issued.token,
+      secret,
+      nowMs + ((IROUP_V2_ADMIN_SESSION_TTL_SECONDS + 1) * 1000)
+    )
+    : authResponseV2_(false, null, issued.error, 'TEST_ISSUE_FAILED');
+  const tampered = issued.success
+    ? getV2AdminEmailFromSignedToken_(issued.token + 'x', secret, nowMs + 1000)
+    : authResponseV2_(false, null, issued.error, 'TEST_ISSUE_FAILED');
+  const checks = {
+    token_issued: issued.success && /^v2adm\.[^.]+\.[^.]+$/.test(issued.token),
+    expiry_is_eight_hours: issued.expires_at === '2026-07-13T18:00:00.000Z',
+    valid_token_is_accepted: verified.success && verified.user.email === 'admin@example.com',
+    expired_token_is_rejected: !expired.success && expired.code === 'V2_AUTH_SIGNED_TOKEN_EXPIRED',
+    tampered_token_is_rejected: !tampered.success && tampered.code === 'V2_AUTH_SIGNED_TOKEN_BAD_SIGNATURE'
+  };
+
+  return v2TestResult_('testV2AdminSessionToken_', allV2TestChecksPass_(checks), checks);
 }
 
 function testV2MobilityEffectiveStatus_() {

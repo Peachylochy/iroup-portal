@@ -477,6 +477,17 @@
       return request('v2.schema');
     },
 
+    auth: {
+      createSession: function (googleAccessToken) {
+        return request('v2.auth.session', {
+          googleAccessToken: googleAccessToken || ''
+        }, {
+          method: 'POST',
+          timeoutMs: DEFAULT_TIMEOUT_MS
+        });
+      }
+    },
+
     public: {
       stats: function () {
         return request('v2.public.stats');
