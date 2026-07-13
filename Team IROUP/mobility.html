@@ -692,7 +692,7 @@ function normalizeMobility(row){
     participant_group: source.participant_group || '',
     start_date: source.start_date || '',
     end_date: source.end_date || '',
-    fiscal_year: source.fiscal_year || '',
+    fiscal_year: String(source.fiscal_year ?? '').trim(),
     participant_count_cached: actualParticipantCount || toNumber(source.participant_count ?? source.participant_count_cached ?? counts.participant_count_cached) || participantTypeTotal,
     student_count: toNumber(counts.student_count_actual ?? counts.student ?? source.student_count),
     staff_count: toNumber(counts.staff_count_actual ?? counts.staff ?? source.staff_count),
@@ -758,7 +758,7 @@ function filteredRows(){
     if (q && !haystack.includes(q)) return false;
     if (direction && row.direction !== direction) return false;
     if (status && row.status !== status) return false;
-    if (year && row.fiscal_year !== year) return false;
+    if (year && String(row.fiscal_year ?? '').trim() !== year) return false;
     return true;
   });
 }
