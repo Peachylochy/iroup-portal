@@ -419,3 +419,18 @@ function normalizeV2Cell_(value) {
   if (value === null || value === undefined) return '';
   return value;
 }
+
+function resolveV2MobilityStatus_(status, endDate, todayIso) {
+  const original = String(status || '').trim();
+  const normalized = original.toLowerCase();
+  if (normalized !== 'active') return original;
+
+  const endIso = String(normalizeV2Cell_(endDate) || '').trim();
+  const today = String(todayIso || Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd')).trim();
+  const isIsoDate = function (value) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(value);
+  };
+
+  if (!isIsoDate(endIso) || !isIsoDate(today)) return 'active';
+  return endIso < today ? 'completed' : 'active';
+}

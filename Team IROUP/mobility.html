@@ -606,6 +606,29 @@ function normalizeDate(value){
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
 
+function bangkokTodayIso(now){
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(now || new Date());
+  const values = {};
+  parts.forEach(part => { if (part.type !== 'literal') values[part.type] = part.value; });
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function effectiveMobilityStatus(status, endDate, todayIso){
+  const original = String(status || '').trim();
+  const normalized = original.toLowerCase();
+  if (normalized !== 'active') return original;
+
+  const endIso = normalizeDate(endDate);
+  const today = todayIso || bangkokTodayIso();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(endIso) || !/^\d{4}-\d{2}-\d{2}$/.test(today)) return 'active';
+  return endIso < today ? 'completed' : 'active';
+}
+
 function formatDate(value){
   const iso = normalizeDate(value);
   if (!iso) return '-';
@@ -673,7 +696,7 @@ function normalizeMobility(row){
     participant_count_cached: actualParticipantCount || toNumber(source.participant_count ?? source.participant_count_cached ?? counts.participant_count_cached) || participantTypeTotal,
     student_count: toNumber(counts.student_count_actual ?? counts.student ?? source.student_count),
     staff_count: toNumber(counts.staff_count_actual ?? counts.staff ?? source.staff_count),
-    status: source.status || 'active',
+    status: effectiveMobilityStatus(source.status || 'active', source.end_date),
     public_visible: source.public_visible === true || source.public_visible === 'TRUE',
     is_deleted: source.is_deleted === true || source.is_deleted === 'TRUE'
   };

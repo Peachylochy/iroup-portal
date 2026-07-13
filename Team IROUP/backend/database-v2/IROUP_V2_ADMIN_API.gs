@@ -3941,7 +3941,7 @@ function mapV2AdminMobilityProjectDto_(row, ctx, includeChildren) {
     start_date: row.start_date || '',
     end_date: row.end_date || '',
     fiscal_year: row.fiscal_year || '',
-    status: row.status || '',
+    status: resolveV2MobilityStatus_(row.status, row.end_date),
     public_visible: isTruthyV2_(row.public_visible),
     is_deleted: isSoftDeletedV2_(row),
     aggregate_counts: {
