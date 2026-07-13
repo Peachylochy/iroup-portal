@@ -334,7 +334,7 @@ function getV2AppendCheckboxFields_() {
   ];
 }
 
-function updateV2RowById_(sheetName, idField, idValue, patch) {
+function updateV2RowById_(sheetName, idField, idValue, patch, options) {
   const sheetResult = getV2Sheet_(sheetName);
   if (!sheetResult.success) return sheetResult;
 
@@ -352,15 +352,41 @@ function updateV2RowById_(sheetName, idField, idValue, patch) {
 
   for (let i = 1; i < values.length; i++) {
     if (String(values[i][idIndex]) === String(idValue)) {
+      const existingRow = rowToObjectV2_(headers, values[i]);
+      const updateOptions = options || {};
+      if (updateOptions.rejectSoftDeleted === true && isSoftDeletedV2_(existingRow)) {
+        return {
+          success: false,
+          data: existingRow,
+          error: updateOptions.softDeletedError || 'Cannot update a deleted V2 row.',
+          total: 0
+        };
+      }
+
       const nextRow = values[i].slice();
+      const changedFields = [];
       headers.forEach(function (header, index) {
         if (!header) return;
         if (patch && patch[header] !== undefined) {
           nextRow[index] = patch[header];
-          sheet.getRange(i + 1, index + 1).setValue(patch[header]);
+          changedFields.push(header);
         }
       });
-      return { success: true, data: rowToObjectV2_(headers, nextRow), error: '', total: 1 };
+      if (changedFields.length) {
+        sheet.getRange(i + 1, 1, 1, headers.length).setValues([nextRow]);
+      }
+      return {
+        success: true,
+        data: rowToObjectV2_(headers, nextRow),
+        error: '',
+        total: 1,
+        diagnostics: {
+          rowNumber: i + 1,
+          changedFields: changedFields,
+          batchWrite: changedFields.length > 0,
+          writeCalls: changedFields.length > 0 ? 1 : 0
+        }
+      };
     }
   }
 

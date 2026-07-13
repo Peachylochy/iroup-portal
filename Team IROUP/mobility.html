@@ -1290,6 +1290,26 @@ function validateBudgetPayload(payload){
   return missing;
 }
 
+function applySavedMobilityToState(savedMobilityId, payload, responseData){
+  const existingIndex = state.rows.findIndex(row => String(row.mobility_id || '') === String(savedMobilityId || ''));
+  const existingRow = existingIndex >= 0 ? state.rows[existingIndex] : {};
+  const responseRow = responseData && responseData.mobility ? responseData.mobility : {};
+  const nextRow = normalizeMobility({
+    ...existingRow,
+    ...payload,
+    ...responseRow,
+    mobility_id: savedMobilityId,
+    participant_count_cached: toNumber(payload.participant_count)
+  });
+
+  if (existingIndex >= 0) state.rows.splice(existingIndex, 1, nextRow);
+  else state.rows.unshift(nextRow);
+
+  renderYearFilter();
+  renderDatalists();
+  renderMobility(false);
+}
+
 async function saveMobility(event){
   event.preventDefault();
   if (!V2_MOBILITY_WRITE_UI_ENABLED) {
@@ -1340,9 +1360,9 @@ async function saveMobility(event){
         }
       }
     }
-    alert('บันทึกสำเร็จ');
+    applySavedMobilityToState(savedMobilityId, payload, res.data || {});
     closeModal();
-    await loadPageData(true);
+    alert('บันทึกสำเร็จ');
   } catch (error) {
     alert(error.message || String(error));
   } finally {

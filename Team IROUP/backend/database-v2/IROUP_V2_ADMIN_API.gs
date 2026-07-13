@@ -1434,7 +1434,7 @@ function writeV2AdminMobilityProjectMetadata_(request, mode) {
     return adminResponseV2_(false, null, 0, actor.error);
   }
 
-  const context = buildV2AdminContext_();
+  const context = buildV2AdminMobilityWriteContext_();
   if (!context.success) return context;
 
   const writeMode = String(mode || '').trim().toLowerCase();
@@ -1455,10 +1455,6 @@ function writeV2AdminMobilityProjectMetadata_(request, mode) {
       return adminResponseV2_(false, preview.data, 0, 'mobility_id is required for mobility update.');
     }
 
-    const existing = findV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId);
-    if (!existing.success) return adminResponseV2_(false, null, 0, existing.error);
-    if (isSoftDeletedV2_(existing.data)) return adminResponseV2_(false, null, 0, 'Cannot update a deleted mobility project.');
-
     const patch = buildV2MobilityProjectSheetRow_(normalized);
     delete patch.mobility_id;
     delete patch.created_by;
@@ -1466,7 +1462,10 @@ function writeV2AdminMobilityProjectMetadata_(request, mode) {
     patch.updated_by = adminEmail;
     patch.updated_at = now;
 
-    persisted = updateV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId, patch);
+    persisted = updateV2RowById_(IROUP_V2_SHEETS.MOBILITY_PROJECT, 'mobility_id', mobilityId, patch, {
+      rejectSoftDeleted: true,
+      softDeletedError: 'Cannot update a deleted mobility project.'
+    });
   } else {
     const row = buildV2MobilityProjectSheetRow_(normalized);
     row.mobility_id = generateV2Id_(IROUP_V2_ID_PREFIXES.MOBILITY_PROJECT);
@@ -3764,6 +3763,31 @@ function buildV2AdminMobilityContext_() {
     unitsById: indexV2RowsById_(tables[IROUP_V2_SHEETS.UP_UNIT_MASTER], 'unit_id'),
     budgetTypesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.BUDGET_TYPE_MASTER], 'budget_type_id'),
     fileRolesById: indexV2RowsById_(tables[IROUP_V2_SHEETS.FILE_ROLE_MASTER], 'file_role_id')
+  }, 1, '');
+}
+
+function buildV2AdminMobilityWriteContext_() {
+  const countryRead = readV2Sheet_(IROUP_V2_SHEETS.COUNTRY_MASTER);
+  if (!countryRead.success) return adminResponseV2_(false, null, 0, countryRead.error);
+
+  const unitRead = readV2Sheet_(IROUP_V2_SHEETS.UP_UNIT_MASTER);
+  if (!unitRead.success) return adminResponseV2_(false, null, 0, unitRead.error);
+
+  const countries = countryRead.data || [];
+  const units = unitRead.data || [];
+  const tables = {};
+  tables[IROUP_V2_SHEETS.COUNTRY_MASTER] = countries;
+  tables[IROUP_V2_SHEETS.UP_UNIT_MASTER] = units;
+  tables[IROUP_V2_SHEETS.MOBILITY_PARTICIPANT] = [];
+  tables[IROUP_V2_SHEETS.BUDGET] = [];
+  tables[IROUP_V2_SHEETS.FILES] = [];
+
+  return adminResponseV2_(true, {
+    tables: tables,
+    countriesById: indexV2RowsById_(countries, 'country_id'),
+    unitsById: indexV2RowsById_(units, 'unit_id'),
+    budgetTypesById: {},
+    fileRolesById: {}
   }, 1, '');
 }
 
