@@ -622,6 +622,13 @@
           timeoutMs: 60000
         });
       },
+      studentResolveBatch: function (payload) {
+        return request('v2.admin.person.studentresolvebatch', { payload: payload || {} }, {
+          auth: true,
+          method: 'POST',
+          timeoutMs: 90000
+        });
+      },
       personCreate: function (payload) {
         return request('v2.admin.person.create', { payload: payload || {} }, {
           auth: true,

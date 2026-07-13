@@ -540,6 +540,12 @@ function getV2RouteDispatch_() {
         return resolveV2AdminPeopleBatch_(request);
       }
     },
+    'v2.admin.person.studentresolvebatch': {
+      access: 'admin',
+      handler: function (request) {
+        return resolveV2AdminStudentsBatch_(request);
+      }
+    },
     'v2.admin.person.create': {
       access: 'admin',
       handler: function (request) {

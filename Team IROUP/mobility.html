@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/iroup-config.js"></script>
 <script src="js/iroup-v2-endpoint.js"></script>
-<script src="js/iroup-v2-api.js?v=mobility-bulk-new-students-20260714"></script>
+<script src="js/iroup-v2-api.js?v=mobility-bulk-new-students-hotfix-20260714"></script>
 <script src="js/iroup-utils.js"></script>
 <script src="js/iroup-admin-guard.js"></script>
 <style>
@@ -1609,7 +1609,7 @@ function findUnitForStudentSheet(value){
 }
 
 function parseNewStudentSheet(value){
-  const lines = String(value || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const lines = String(value || '').split(/\r?\n/).map(line => line.replace(/\r$/, '')).filter(line => line.trim());
   if (!lines.length) return { rows: [], invalid: [], duplicate_ids: [] };
   const splitLine = line => line.includes('\t') ? line.split('\t') : line.split(',');
   const firstCells = splitLine(lines[0]).map(cell => cell.trim());
@@ -1684,7 +1684,7 @@ async function checkNewStudentBatch(){
   button.textContent = 'กำลังตรวจสอบ...';
   result.innerHTML = '<div class="participant-empty">กำลังตรวจรหัสกับฐานข้อมูล...</div>';
   try {
-    const res = await IROUP_V2.admin.personResolveBatch({ ids: parsed.rows.map(row => row.student_id) });
+    const res = await IROUP_V2.admin.studentResolveBatch({ ids: parsed.rows.map(row => row.student_id) });
     if (!res || res.success === false) throw new Error(res?.error || 'ตรวจสอบรหัสไม่สำเร็จ');
     const existingIds = new Set((res.data?.matched || []).map(person => String(person.person_id || '').toUpperCase()));
     state.newStudentBatchPreview = {
