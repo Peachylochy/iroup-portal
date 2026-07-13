@@ -628,6 +628,13 @@
           method: 'POST',
           timeoutMs: ADMIN_EVENT_WRITE_TIMEOUT_MS
         });
+      },
+      personCreateBatch: function (payload) {
+        return request('v2.admin.person.createbatch', { payload: payload || {} }, {
+          auth: true,
+          method: 'POST',
+          timeoutMs: 60000
+        });
       }
     },
 

@@ -251,6 +251,82 @@ function createV2AdminPerson_(request) {
   return adminResponseV2_(true, dto, 1, '');
 }
 
+function createV2AdminPeopleBatch_(request) {
+  const actor = requireV2Admin_(request);
+  if (!actor.success) return adminResponseV2_(false, null, 0, actor.error);
+
+  const payload = extractV2PersonBatchPayload_(request);
+  const items = Array.isArray(payload.people) ? payload.people : Array.isArray(payload.students) ? payload.students : [];
+  if (!items.length) return adminResponseV2_(false, null, 0, 'At least one student is required.');
+  if (items.length > 200) return adminResponseV2_(false, null, 0, 'A batch can contain at most 200 students.');
+
+  const lock = LockService.getScriptLock();
+  try {
+    if (!lock.tryLock(20000)) {
+      return adminResponseV2_(false, null, 0, 'Another person update is running. Please try again.');
+    }
+
+    const studentRead = readV2Sheet_(IROUP_V2_SHEETS.PERSON_STUDENT);
+    if (!studentRead.success) return adminResponseV2_(false, null, 0, studentRead.error);
+    const existingMap = buildV2ActivePersonMap_(studentRead.data || [], 'student_id');
+    const seen = {};
+    const rows = [];
+    const skipped = [];
+    const errors = [];
+    const now = new Date().toISOString();
+
+    items.forEach(function (item, index) {
+      const normalized = normalizeV2PersonWritePayload_(Object.assign({}, item || {}, {
+        person_type: 'student',
+        participant_type: 'student'
+      }));
+      if (!normalized.success) {
+        errors.push({ index: index, student_id: cleanV2EventText_(item && item.student_id), error: normalized.error, details: normalized.data && normalized.data.errors });
+        return;
+      }
+
+      const person = normalized.data.person;
+      const key = normalizeV2PersonBatchId_(person.student_id);
+      if (seen[key]) {
+        skipped.push({ index: index, student_id: person.student_id, reason: 'duplicate_input' });
+        return;
+      }
+      seen[key] = true;
+      if (existingMap[key]) {
+        skipped.push({ index: index, student_id: person.student_id, reason: 'already_exists' });
+        return;
+      }
+
+      person.active = true;
+      person.source_system = 'APP_FORM_BATCH';
+      person.updated_at = now;
+      rows.push(person);
+    });
+
+    if (errors.length) {
+      return adminResponseV2_(false, { errors: errors, skipped: skipped }, 0, 'Batch person validation failed. No rows were written.');
+    }
+
+    const persisted = appendV2RowsBatch_(IROUP_V2_SHEETS.PERSON_STUDENT, rows, {
+      requiredFields: ['student_id', 'full_name_th', 'active']
+    });
+    if (!persisted.success) {
+      return adminResponseV2_(false, { diagnostics: persisted.diagnostics || {}, skipped: skipped }, 0, persisted.error);
+    }
+
+    const created = (persisted.data || []).map(mapV2PersonSearchStudentDto_);
+    return adminResponseV2_(true, {
+      created: created,
+      created_count: created.length,
+      skipped: skipped,
+      skipped_count: skipped.length,
+      diagnostics: persisted.diagnostics || {}
+    }, created.length, '');
+  } finally {
+    try { lock.releaseLock(); } catch (err) {}
+  }
+}
+
 function getV2AdminMobilityProject_(requestOrMobilityId) {
   const mobilityId = extractV2MobilityDetailId_(requestOrMobilityId);
   if (!mobilityId) {

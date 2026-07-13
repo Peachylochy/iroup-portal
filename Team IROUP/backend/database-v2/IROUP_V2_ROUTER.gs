@@ -546,6 +546,12 @@ function getV2RouteDispatch_() {
         return createV2AdminPerson_(request);
       }
     },
+    'v2.admin.person.createbatch': {
+      access: 'admin',
+      handler: function (request) {
+        return createV2AdminPeopleBatch_(request);
+      }
+    },
     'v2.lookup.countries': {
       access: 'public',
       handler: function () {
