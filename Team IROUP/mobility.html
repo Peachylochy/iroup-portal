@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/iroup-config.js"></script>
 <script src="js/iroup-v2-endpoint.js"></script>
-<script src="js/iroup-v2-api.js?v=mobility-bulk-routes-20260714"></script>
+<script src="js/iroup-v2-api.js?v=mobility-bulk-new-students-20260714"></script>
 <script src="js/iroup-utils.js"></script>
 <script src="js/iroup-admin-guard.js"></script>
 <style>
@@ -46,7 +46,7 @@ button,input,select,textarea{font:inherit}
 .form-section{border:1px solid #EDF3F8;border-radius:16px;padding:14px;margin-bottom:14px;background:#fff}.section-title{font-weight:900;color:var(--navy);margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.label{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;color:#344761;margin-bottom:6px}.req{color:var(--red)}.hint{font-size:11px;color:var(--muted);font-weight:600}.check{display:flex;align-items:center;gap:8px;font-weight:800}.check input{width:18px;height:18px}.radio-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.radio-row label{display:flex;gap:8px;align-items:center;font-weight:800}
 .participant-tools{display:grid;gap:12px}.participant-search{position:relative}.suggestions{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(15,45,90,.14);max-height:260px;overflow:auto}.suggestions.open{display:block}.suggestion{width:100%;border:0;background:#fff;text-align:left;padding:10px 12px;cursor:pointer;border-bottom:1px solid #EDF3F8;color:var(--text)}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#F8FBFE}.suggestion-name{font-weight:900}.suggestion-meta{font-size:12px;color:var(--muted);margin-top:2px}.suggestion-action{margin-top:10px}.suggestion-action .btn{width:100%;justify-content:center}.selected-person{display:none;border:1px solid #BBD7EF;background:#F1F8FE;border-radius:14px;padding:10px 12px;align-items:center;gap:10px;justify-content:space-between}.selected-person.show{display:flex}.manual-form{display:none;border:1px dashed #BFD0E0;border-radius:14px;padding:12px;background:#F8FBFE}.manual-form.show{display:block}.participant-list{display:grid;gap:8px}.participant-row{display:grid;grid-template-columns:1.4fr 1fr auto auto;gap:10px;align-items:center;border:1px solid #EDF3F8;border-radius:14px;padding:10px 12px;background:#fff}.participant-name{font-weight:900}.participant-unit{color:var(--muted);font-size:12px}.participant-empty{padding:14px;border:1px dashed #BFD0E0;border-radius:14px;color:var(--muted);text-align:center;font-weight:800}
 .inbound-group-planner{display:none;border:1px solid #D7E8F7;background:#F6FBFF;border-radius:14px;padding:12px}.inbound-group-planner.show{display:block}.planner-grid{display:grid;grid-template-columns:minmax(180px,260px) 1fr;gap:12px;align-items:end}.planner-status{font-weight:900;color:#174B7A;padding:12px 0}.planner-hint{font-size:12px;color:var(--muted);margin-top:4px}
-.bulk-participant{border:1px solid #D7E8F7;background:#F8FBFE;border-radius:14px;padding:12px}.bulk-participant-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.bulk-participant-panel{display:none;margin-top:12px}.bulk-participant-panel.show{display:block}.bulk-participant textarea{width:100%;min-height:112px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--text)}.bulk-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:10px}.bulk-summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.bulk-preview{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}.bulk-preview-row{display:grid;grid-template-columns:120px minmax(180px,1fr) minmax(140px,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border:1px solid #E6EDF6;border-radius:12px;background:#fff;font-size:12px}.bulk-preview-row.problem{border-color:#F5C4C0;background:#FFF8F7}.bulk-preview-id{font-weight:900;color:var(--navy)}.bulk-note{font-size:12px;color:var(--muted);margin-top:6px}
+.bulk-participant{border:1px solid #D7E8F7;background:#F8FBFE;border-radius:14px;padding:12px}.bulk-participant-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.bulk-participant-panel{display:none;margin-top:12px}.bulk-participant-panel.show{display:block}.bulk-participant textarea{width:100%;min-height:112px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--text)}.bulk-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:10px}.bulk-summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.bulk-preview{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}.bulk-preview-row{display:grid;grid-template-columns:120px minmax(180px,1fr) minmax(140px,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border:1px solid #E6EDF6;border-radius:12px;background:#fff;font-size:12px}.bulk-preview-row.problem{border-color:#F5C4C0;background:#FFF8F7}.bulk-preview-row.warning{border-color:#F4D58D;background:#FFFCF3}.bulk-preview-id{font-weight:900;color:var(--navy)}.bulk-note{font-size:12px;color:var(--muted);margin-top:6px}
 
 /* Web design aligned Mobility admin refresh. CSS-only; V2 data/write flows stay intact. */
 body{
@@ -287,6 +287,7 @@ body.modal-open{overflow:hidden}
             <div id="bulkParticipantTools" class="bulk-participant">
               <div class="bulk-participant-head">
                 <button class="btn" type="button" onclick="toggleBulkParticipantPanel()">+ เพิ่มหลายคนจากรหัส</button>
+                <button class="btn" type="button" onclick="toggleNewStudentBatchPanel()">+ สร้างนิสิตใหม่จาก Excel</button>
                 <span class="bulk-note">คัดลอกคอลัมน์รหัสจาก Excel แล้ววางได้สูงสุด 200 รหัส</span>
               </div>
               <div id="bulkParticipantPanel" class="bulk-participant-panel">
@@ -297,6 +298,16 @@ body.modal-open{overflow:hidden}
                   <button id="bulkCheckBtn" class="btn primary" type="button" onclick="checkBulkParticipants()">ตรวจสอบรายชื่อ</button>
                 </div>
                 <div id="bulkParticipantResult"></div>
+              </div>
+              <div id="newStudentBatchPanel" class="bulk-participant-panel">
+                <label class="label" for="newStudentBatchText">วางข้อมูลจาก Excel ตามลำดับ: รหัสนิสิต | คำนำหน้า | ชื่อ | นามสกุล | คณะ/หน่วยงาน | หลักสูตร | ชื่ออังกฤษ</label>
+                <textarea id="newStudentBatchText" placeholder="67205370&#9;นาย&#9;กฤตพน&#9;แก้วตัน&#9;วิทยาลัยการศึกษา&#9;การบริหารการศึกษา&#9;Mr. Kritapon Kaewtan"></textarea>
+                <div class="bulk-note">ใส่หรือไม่ใส่แถวหัวตารางก็ได้ ระบบจะตรวจข้อมูลซ้ำก่อนสร้าง และจะไม่เขียนข้อมูลหากมีแถวผิดพลาด</div>
+                <div class="bulk-actions">
+                  <button class="btn" type="button" onclick="clearNewStudentBatchPanel()">ล้าง</button>
+                  <button id="newStudentCheckBtn" class="btn primary" type="button" onclick="checkNewStudentBatch()">ตรวจสอบข้อมูลใหม่</button>
+                </div>
+                <div id="newStudentBatchResult"></div>
               </div>
             </div>
             <div>
@@ -567,7 +578,10 @@ const state = {
   selectedPerson: null,
   bulkParticipantPreview: null,
   bulkParticipantChecking: false,
-  bulkParticipantAdding: false
+  bulkParticipantAdding: false,
+  newStudentBatchPreview: null,
+  newStudentBatchChecking: false,
+  newStudentBatchCreating: false
 };
 
 const $ = selector => document.querySelector(selector);
@@ -1415,6 +1429,9 @@ function resetParticipantUi(){
   state.bulkParticipantPreview = null;
   state.bulkParticipantChecking = false;
   state.bulkParticipantAdding = false;
+  state.newStudentBatchPreview = null;
+  state.newStudentBatchChecking = false;
+  state.newStudentBatchCreating = false;
   const section = $('#participantSection');
   if (section) section.style.display = 'none';
   if ($('#inboundExpectedCountInput')) $('#inboundExpectedCountInput').value = '';
@@ -1426,6 +1443,7 @@ function resetParticipantUi(){
   if ($('#selectedPersonBox')) $('#selectedPersonBox').className = 'selected-person';
   if ($('#manualAddBtn')) $('#manualAddBtn').style.display = 'none';
   clearBulkParticipantPanel();
+  clearNewStudentBatchPanel();
   hideManualParticipantForm();
   renderParticipantList();
 }
@@ -1440,6 +1458,7 @@ function showParticipantSection(mobilityId){
   state.selectedPerson = null;
   $('#selectedPersonBox').className = 'selected-person';
   clearBulkParticipantPanel();
+  clearNewStudentBatchPanel();
   configureParticipantMode();
 }
 
@@ -1520,6 +1539,8 @@ function toggleBulkParticipantPanel(){
   if (isInboundMobility()) return;
   const panel = $('#bulkParticipantPanel');
   if (!panel) return;
+  const newPanel = $('#newStudentBatchPanel');
+  if (newPanel) newPanel.className = 'bulk-participant-panel';
   panel.classList.toggle('show');
   if (panel.classList.contains('show')) $('#bulkParticipantIds')?.focus();
 }
@@ -1538,6 +1559,222 @@ function clearBulkParticipantPanel(){
   if (checkBtn) {
     checkBtn.disabled = false;
     checkBtn.textContent = 'ตรวจสอบรายชื่อ';
+  }
+}
+
+function toggleNewStudentBatchPanel(){
+  if (isInboundMobility()) return;
+  const panel = $('#newStudentBatchPanel');
+  if (!panel) return;
+  const idPanel = $('#bulkParticipantPanel');
+  if (idPanel) idPanel.className = 'bulk-participant-panel';
+  panel.classList.toggle('show');
+  if (panel.classList.contains('show')) $('#newStudentBatchText')?.focus();
+}
+
+function clearNewStudentBatchPanel(){
+  state.newStudentBatchPreview = null;
+  state.newStudentBatchChecking = false;
+  state.newStudentBatchCreating = false;
+  const panel = $('#newStudentBatchPanel');
+  const input = $('#newStudentBatchText');
+  const result = $('#newStudentBatchResult');
+  const checkBtn = $('#newStudentCheckBtn');
+  if (panel) panel.className = 'bulk-participant-panel';
+  if (input) input.value = '';
+  if (result) result.innerHTML = '';
+  if (checkBtn) {
+    checkBtn.disabled = false;
+    checkBtn.textContent = 'ตรวจสอบข้อมูลใหม่';
+  }
+}
+
+function normalizeStudentSheetHeader(value){
+  return String(value || '').trim().toLowerCase().replace(/[\s_\-\/()]+/g, '');
+}
+
+function findStudentSheetColumn(headers, aliases, fallback){
+  const normalizedAliases = aliases.map(normalizeStudentSheetHeader);
+  const index = headers.findIndex(header => normalizedAliases.includes(normalizeStudentSheetHeader(header)));
+  return index >= 0 ? index : fallback;
+}
+
+function findUnitForStudentSheet(value){
+  const key = normalizeStudentSheetHeader(value);
+  if (!key) return null;
+  return state.units.find(unit => {
+    return [unit.unit_id, unit.unit_code, unit.unit_name_th, unit.unit_name_en, unitLabel(unit)]
+      .some(candidate => normalizeStudentSheetHeader(candidate) === key);
+  }) || null;
+}
+
+function parseNewStudentSheet(value){
+  const lines = String(value || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (!lines.length) return { rows: [], invalid: [], duplicate_ids: [] };
+  const splitLine = line => line.includes('\t') ? line.split('\t') : line.split(',');
+  const firstCells = splitLine(lines[0]).map(cell => cell.trim());
+  const firstHeader = firstCells.map(normalizeStudentSheetHeader);
+  const headerTokens = ['studentid', 'รหัสนิสิต', 'firstname', 'ชื่อ', 'lastname', 'นามสกุล', 'fullname', 'ชื่อสกุล'];
+  const hasHeader = firstHeader.some(cell => headerTokens.includes(cell));
+  const headers = hasHeader ? firstCells : [];
+  const indexes = {
+    student_id: findStudentSheetColumn(headers, ['student_id', 'student id', 'รหัสนิสิต', 'รหัส'], 0),
+    prefix_th: findStudentSheetColumn(headers, ['prefix_th', 'prefix', 'คำนำหน้า'], 1),
+    first_name_th: findStudentSheetColumn(headers, ['first_name_th', 'ชื่อ', 'ชื่อไทย'], 2),
+    last_name_th: findStudentSheetColumn(headers, ['last_name_th', 'นามสกุล', 'สกุล'], 3),
+    unit_name: findStudentSheetColumn(headers, ['unit', 'unit_name', 'คณะ', 'คณะ/หน่วยงาน', 'หน่วยงาน'], 4),
+    program_th: findStudentSheetColumn(headers, ['program', 'program_th', 'หลักสูตร', 'สาขา'], 5),
+    full_name_en: findStudentSheetColumn(headers, ['full_name_en', 'english name', 'ชื่ออังกฤษ', 'ชื่อ-สกุลอังกฤษ'], 6),
+    full_name_th: findStudentSheetColumn(headers, ['full_name_th', 'ชื่อ-สกุล', 'ชื่อสกุล', 'ชื่อเต็ม'], -1)
+  };
+  const seen = new Set();
+  const duplicateIds = [];
+  const rows = [];
+  const invalid = [];
+
+  lines.slice(hasHeader ? 1 : 0).forEach((line, lineIndex) => {
+    const cells = splitLine(line).map(cell => cell.trim());
+    const get = key => indexes[key] >= 0 ? String(cells[indexes[key]] || '').trim() : '';
+    const studentId = get('student_id');
+    const prefixTh = get('prefix_th');
+    const firstNameTh = get('first_name_th');
+    const lastNameTh = get('last_name_th');
+    const fullNameTh = get('full_name_th') || [prefixTh + firstNameTh, lastNameTh].filter(Boolean).join(' ').trim();
+    const unitName = get('unit_name');
+    const unit = findUnitForStudentSheet(unitName);
+    const row = {
+      student_id: studentId,
+      prefix_th: prefixTh,
+      first_name_th: firstNameTh,
+      last_name_th: lastNameTh,
+      full_name_th: fullNameTh,
+      full_name_en: get('full_name_en'),
+      unit_id: unit?.unit_id || '',
+      program_th: get('program_th'),
+      student_status: 'active',
+      _line: lineIndex + (hasHeader ? 2 : 1),
+      _unit_name: unitName,
+      _unit_found: !unitName || !!unit
+    };
+    const errors = [];
+    if (!studentId) errors.push('ไม่มีรหัสนิสิต');
+    if (!fullNameTh) errors.push('ไม่มีชื่อ-สกุล');
+    if (studentId && seen.has(studentId.toUpperCase())) {
+      duplicateIds.push(studentId);
+      errors.push('รหัสซ้ำในข้อมูลที่วาง');
+    }
+    if (studentId) seen.add(studentId.toUpperCase());
+    if (errors.length) invalid.push({ ...row, errors: errors });
+    else rows.push(row);
+  });
+  return { rows: rows, invalid: invalid, duplicate_ids: [...new Set(duplicateIds)] };
+}
+
+async function checkNewStudentBatch(){
+  if (state.newStudentBatchChecking) return;
+  const parsed = parseNewStudentSheet($('#newStudentBatchText')?.value || '');
+  const total = parsed.rows.length + parsed.invalid.length;
+  if (!total) return alert('กรุณาวางข้อมูลนิสิตจาก Excel อย่างน้อย 1 แถว');
+  if (total > 200) return alert('สร้างได้สูงสุดครั้งละ 200 คน');
+
+  state.newStudentBatchChecking = true;
+  const button = $('#newStudentCheckBtn');
+  const result = $('#newStudentBatchResult');
+  button.disabled = true;
+  button.textContent = 'กำลังตรวจสอบ...';
+  result.innerHTML = '<div class="participant-empty">กำลังตรวจรหัสกับฐานข้อมูล...</div>';
+  try {
+    const res = await IROUP_V2.admin.personResolveBatch({ ids: parsed.rows.map(row => row.student_id) });
+    if (!res || res.success === false) throw new Error(res?.error || 'ตรวจสอบรหัสไม่สำเร็จ');
+    const existingIds = new Set((res.data?.matched || []).map(person => String(person.person_id || '').toUpperCase()));
+    state.newStudentBatchPreview = {
+      ready: parsed.rows.filter(row => !existingIds.has(row.student_id.toUpperCase())),
+      existing: parsed.rows.filter(row => existingIds.has(row.student_id.toUpperCase())),
+      invalid: parsed.invalid,
+      duplicate_ids: parsed.duplicate_ids
+    };
+    renderNewStudentBatchPreview();
+  } catch (error) {
+    result.innerHTML = '<div class="participant-empty" style="color:#A62C25">' + esc(error.message || String(error)) + '</div>';
+  } finally {
+    state.newStudentBatchChecking = false;
+    button.disabled = false;
+    button.textContent = 'ตรวจสอบข้อมูลใหม่';
+  }
+}
+
+function renderNewStudentBatchPreview(){
+  const result = $('#newStudentBatchResult');
+  const preview = state.newStudentBatchPreview;
+  if (!result || !preview) return;
+  const rowHtml = (row, status, problem) => `<div class="bulk-preview-row${problem ? ' problem' : (!row._unit_found ? ' warning' : '')}">
+    <div class="bulk-preview-id">${esc(row.student_id || `แถว ${row._line}`)}</div>
+    <div><div class="participant-name">${esc(row.full_name_th || '-')}</div><div class="participant-unit">${esc(row.program_th || '')}</div></div>
+    <div class="participant-unit">${esc(row._unit_name || 'ไม่ระบุคณะ')}${!row._unit_found ? ' · ไม่พบชื่อหน่วยงานในระบบ' : ''}</div>
+    <div>${status}</div>
+  </div>`;
+  const readyRows = preview.ready.map(row => rowHtml(row, '<span class="badge completed">พร้อมสร้าง</span>', false)).join('');
+  const existingRows = preview.existing.map(row => rowHtml(row, '<span class="badge active">มีแล้ว</span>', true)).join('');
+  const invalidRows = preview.invalid.map(row => rowHtml(row, '<span class="badge cancelled">' + esc((row.errors || []).join(', ')) + '</span>', true)).join('');
+  result.innerHTML = `<div class="bulk-summary">
+      <span class="badge completed">พร้อมสร้าง ${preview.ready.length}</span>
+      <span class="badge active">มีแล้ว ${preview.existing.length}</span>
+      <span class="badge cancelled">ข้อมูลผิด ${preview.invalid.length}</span>
+    </div>
+    <div class="bulk-preview">${readyRows}${existingRows}${invalidRows}</div>
+    <div class="bulk-actions"><button class="btn primary" type="button" onclick="createNewStudentsBatch()" ${preview.ready.length && !preview.invalid.length ? '' : 'disabled'}>สร้างและเพิ่ม ${preview.ready.length} คน</button></div>`;
+}
+
+async function createNewStudentsBatch(){
+  if (state.newStudentBatchCreating) return;
+  const preview = state.newStudentBatchPreview || {};
+  const rows = preview.ready || [];
+  if (!rows.length) return alert('ไม่มีข้อมูลนิสิตใหม่ที่พร้อมสร้าง');
+  if ((preview.invalid || []).length) return alert('กรุณาแก้แถวที่ข้อมูลผิดก่อนสร้าง');
+  state.newStudentBatchCreating = true;
+  const button = $('#newStudentBatchResult .bulk-actions .btn.primary');
+  if (button) { button.disabled = true; button.textContent = 'กำลังสร้าง...'; }
+  let createdPeople = [];
+  try {
+    const payloadRows = rows.map(row => ({
+      student_id: row.student_id,
+      prefix_th: row.prefix_th,
+      first_name_th: row.first_name_th,
+      last_name_th: row.last_name_th,
+      full_name_th: row.full_name_th,
+      full_name_en: row.full_name_en,
+      unit_id: row.unit_id,
+      program_th: row.program_th,
+      student_status: row.student_status
+    }));
+    const createRes = await IROUP_V2.admin.personCreateBatch({ people: payloadRows });
+    if (!createRes || createRes.success === false) throw new Error(createRes?.error || 'สร้างข้อมูลนิสิตแบบกลุ่มไม่สำเร็จ');
+    createdPeople = (createRes.data?.created || []).map(mapPersonSearchResult);
+    if (!createdPeople.length) throw new Error('ไม่มีข้อมูลใหม่ถูกสร้าง');
+
+    const mobilityId = $('#mobilityId').value || '';
+    if (!mobilityId) {
+      createdPeople.forEach(person => {
+        state.participants.push({ participant_id: createPendingParticipantId(), ...toMobilityParticipantPayload(person, ''), pending: true });
+      });
+      renderParticipantList();
+    } else {
+      const participantRes = await IROUP_V2.admin.mobilityParticipantBatchAdd({
+        mobility_id: mobilityId,
+        participants: createdPeople.map(person => toMobilityParticipantPayload(person, mobilityId))
+      });
+      if (!participantRes || participantRes.success === false) throw new Error(participantRes?.error || 'สร้างนิสิตแล้ว แต่เพิ่มเข้า Mobility ไม่สำเร็จ');
+      await loadParticipants(mobilityId);
+    }
+    state.personLookupsLoaded = false;
+    const count = createdPeople.length;
+    clearNewStudentBatchPanel();
+    alert(`สร้างข้อมูลและเพิ่มเข้า Mobility สำเร็จ ${count} คน`);
+  } catch (error) {
+    alert(error.message || String(error));
+    renderNewStudentBatchPreview();
+  } finally {
+    state.newStudentBatchCreating = false;
   }
 }
 
