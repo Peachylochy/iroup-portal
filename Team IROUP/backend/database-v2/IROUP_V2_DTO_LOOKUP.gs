@@ -112,6 +112,36 @@ function resolveV2AdminPeopleBatch_(request) {
   }, matched.length, '');
 }
 
+function resolveV2AdminStudentsBatch_(request) {
+  const payload = extractV2PersonBatchPayload_(request);
+  const parsed = parseV2PersonBatchIds_(payload.ids || payload.person_ids || payload.text || '');
+  if (!parsed.ids.length) {
+    return publicResponseV2_(false, { matched: [], not_found: [], duplicate_ids: parsed.duplicate_ids }, 0, 'At least one student ID is required.');
+  }
+  if (parsed.ids.length > 200) return publicResponseV2_(false, null, 0, 'A batch can contain at most 200 unique IDs.');
+
+  const studentRead = readV2Sheet_(IROUP_V2_SHEETS.PERSON_STUDENT);
+  if (!studentRead.success) return publicResponseV2_(false, null, 0, studentRead.error);
+  const studentMap = buildV2ActivePersonMap_(studentRead.data || [], 'student_id');
+  const matched = [];
+  const notFound = [];
+  parsed.ids.forEach(function (id) {
+    const person = studentMap[normalizeV2PersonBatchId_(id)];
+    if (person) matched.push(mapV2PersonSearchStudentDto_(person));
+    else notFound.push(id);
+  });
+
+  return publicResponseV2_(true, {
+    matched: matched,
+    not_found: notFound,
+    duplicate_ids: parsed.duplicate_ids,
+    requested_count: parsed.requested_count,
+    unique_count: parsed.ids.length,
+    matched_count: matched.length,
+    not_found_count: notFound.length
+  }, matched.length, '');
+}
+
 function extractV2PersonBatchPayload_(request) {
   const params = request && request.params ? request.params : {};
   const body = request && request.body ? request.body : {};
